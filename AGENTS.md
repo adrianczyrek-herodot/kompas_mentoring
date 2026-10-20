@@ -43,6 +43,7 @@ Zasady:
 2. **Importy między pakietami tylko przez nazwę pakietu** i jego `exports` (`@devmentor/db`, `@devmentor/ui/backend/button`) — nigdy ścieżką względną do innego pakietu ani do jego `src/`.
 3. **Pakiety wewnętrzne to źródła TS** bez kroku budowania (`exports` wskazuje na `src/`); nowy pakiet dopisz do `transpilePackages` w `packages/app/next.config.ts`.
 4. Nowy pakiet w `packages/` dodawaj tylko po decyzji użytkownika; nazwa `@devmentor/<nazwa>`, `tsconfig.json` rozszerzający `../../tsconfig.base.json`, skrypt `typecheck`.
+5. Przed pisaniem kodu Next.js sprawdź API w dokumentacji zainstalowanej wersji (`node_modules/next/dist/docs/`) — wersja może być nowsza niż Twoja wiedza. `packages/app/AGENTS.md` generuje `next dev`; nie usuwaj go i nie edytuj ręcznie.
 
 ### Dependency Injection (Awilix)
 

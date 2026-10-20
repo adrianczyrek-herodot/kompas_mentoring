@@ -43,4 +43,4 @@ Aplikacja „DevMentor”: najnowszy Next.js + TypeScript + React, PostgreSQL z 
 - Brak lintera/formattera (ESLint/Biome, Prettier) i testów — do decyzji w kolejnej specyfikacji; reguły kierunku zależności są na razie tylko w `AGENTS.md` (można je wymusić np. `eslint-plugin-boundaries` lub dependency-cruiser).
 
 ## Wnioski
-- `.ai/lessons.md` → „Kod i mockupy”: leniwe łączenie MikroORM 7; TS 7 + Next 16 i augmentacja `Cradle`.
+- `.ai/lessons.md` → „Kod i mockupy”: leniwe łączenie MikroORM 7; TS 7 + Next 16 i augmentacja `Cradle`; `packages/app/AGENTS.md` generowany przez `next dev` (zacommitowany, opisany w `AGENTS.md`).
