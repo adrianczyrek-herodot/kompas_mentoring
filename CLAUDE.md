@@ -25,3 +25,4 @@ Obowiązkowo:
 4. Po naprawieniu nieoczywistego błędu lub przy ustaleniu wartym zapamiętania → wpis w `.ai/lessons.md` (szczegóły w `.ai/lessons/`).
 5. Wnioski dotyczące **projektu** zapisuj w `.ai/lessons.md`, a nie (tylko) w prywatnej pamięci Claude Code — `.ai/` jest współdzielone z innymi agentami i ludźmi.
 6. Nazwy plików: `YYYY-MM-DD-slug.md`, slug w kebab-case bez polskich znaków.
+7. Złożone zadanie → tryb planowania i plan w specyfikacji; przed raportem weryfikacja zmian; korekta od użytkownika → reguła w `.ai/lessons.md`. Szczegóły: `AGENTS.md` → „Sposób pracy”.
