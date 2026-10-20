@@ -1,4 +1,4 @@
-import { Role } from './mocks';
+import type { Role } from '@devmentor/core/domain';
 import { DEFAULT_ROUTE, applyDemoStudent, store } from './store';
 import { Ctx, View, ViewState, closeModal, esc, icon } from './ui';
 import { auth, home, profile, search } from './screens/public';
@@ -57,7 +57,7 @@ function match(path: string): { route: Route; params: Record<string, string> } |
     const rp = route.pattern.split('/').filter(Boolean);
     if (rp.length !== parts.length) continue;
     const params: Record<string, string> = {};
-    if (rp.every((p, i) => (p.startsWith(':') ? ((params[p.slice(1)] = decodeURIComponent(parts[i])), true) : p === parts[i]))) return { route, params };
+    if (rp.every((p, i) => (p.startsWith(':') ? ((params[p.slice(1)] = decodeURIComponent(parts[i]!)), true) : p === parts[i]))) return { route, params };
   }
   return null;
 }
@@ -72,7 +72,8 @@ function parseHash(): { path: string; query: URLSearchParams } {
   return { path: path || '/', query };
 }
 
-const app = document.getElementById('app')!;
+// Element, w którym renderowana jest aplikacja — ustawiany przez startKompasApp().
+let app: HTMLElement;
 let navToken = 0;
 
 function header(route: Route): string {
@@ -171,5 +172,19 @@ function bindChrome(): void {
   app.querySelector('[data-become-mentor]')?.addEventListener('click', () => { if (store.role === 'student') store.role = 'mentor'; });
 }
 
-window.addEventListener('hashchange', () => render(true));
-render(true);
+const onHashChange = (): void => render(true);
+
+/**
+ * Uruchamia aplikację (router na hashu) w podanym elemencie.
+ * Zwraca funkcję sprzątającą — wywoływaną przy odmontowaniu komponentu React.
+ */
+export function startKompasApp(root: HTMLElement): () => void {
+  app = root;
+  window.addEventListener('hashchange', onHashChange);
+  render(true);
+  return () => {
+    window.removeEventListener('hashchange', onHashChange);
+    navToken++;
+    closeModal();
+  };
+}

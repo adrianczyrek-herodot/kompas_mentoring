@@ -1,5 +1,6 @@
 // Stan aplikacji w pamięci (mockupy nie mają backendu).
-import { MENTORS, SESSIONS, THREADS, REQUESTS, APPLICATIONS, DISPUTES, NOTIFICATIONS, Role, Session } from './mocks';
+import type { Role, Session, Thread } from '@devmentor/core/domain';
+import { MENTORS, SESSIONS, THREADS, REQUESTS, APPLICATIONS, DISPUTES, NOTIFICATIONS } from '@devmentor/db/fixtures';
 
 export interface BookingDraft {
   mentorId: string;
@@ -24,7 +25,7 @@ export const store = {
   favorites: new Set<string>(['m3']),
   draft: null as BookingDraft | null,
   sessions: [] as Session[],
-  threads: [] as typeof THREADS,
+  threads: [] as Thread[],
   requests: [...REQUESTS],
   applications: [...APPLICATIONS],
   disputes: [...DISPUTES],
@@ -44,8 +45,8 @@ export const store = {
   bookingSeq: 100,
 };
 
-export const mentorById = (id: string) => MENTORS.find((m) => m.id === id);
-export const sessionById = (id: string) => store.sessions.find((s) => s.id === id);
+export const mentorById = (id: string | undefined) => MENTORS.find((m) => m.id === id);
+export const sessionById = (id: string | undefined) => store.sessions.find((s) => s.id === id);
 
 export const DEFAULT_ROUTE: Record<Role, string> = {
   guest: '#/',

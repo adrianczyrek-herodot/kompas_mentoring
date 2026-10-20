@@ -1,5 +1,6 @@
 // Reguły domenowe jako czyste funkcje — w docelowym systemie te same funkcje działają na serwerze.
-import { Mentor, NOW, Session } from './mocks';
+// „Teraz” zawsze przekazywane jawnie (`now`), żeby reguły dało się testować i liczyć dla dowolnej chwili.
+import type { Mentor, Session } from './types';
 
 export const FREE_CANCEL_HOURS = 12;
 export const MIN_NOTICE_HOURS = 6;
@@ -16,7 +17,7 @@ const startOfWeek = (d: Date): Date => {
 };
 
 /** Sloty mentora w danym tygodniu (0 = bieżący). Deterministycznie oznacza część jako zajęte. */
-export function weekSlots(m: Mentor, weekOffset: number, now = NOW): { day: Date; slots: Slot[] }[] {
+export function weekSlots(m: Mentor, weekOffset: number, now: Date): { day: Date; slots: Slot[] }[] {
   const start = startOfWeek(now);
   start.setDate(start.getDate() + weekOffset * 7);
   return Array.from({ length: 7 }, (_, i) => {
@@ -34,22 +35,22 @@ export function weekSlots(m: Mentor, weekOffset: number, now = NOW): { day: Date
   });
 }
 
-export function nextFreeWeek(m: Mentor, from: number): number | null {
+export function nextFreeWeek(m: Mentor, from: number, now: Date): number | null {
   for (let w = from + 1; w < from + 6; w++) {
-    if (weekSlots(m, w).some((d) => d.slots.some((s) => !s.taken))) return w;
+    if (weekSlots(m, w, now).some((d) => d.slots.some((s) => !s.taken))) return w;
   }
   return null;
 }
 
-export const canCancelFree = (s: Session, now = NOW): boolean =>
+export const canCancelFree = (s: Session, now: Date): boolean =>
   new Date(s.startsAt).getTime() - now.getTime() >= FREE_CANCEL_HOURS * 36e5;
 
-export const canJoin = (s: Session, now = NOW): boolean => {
+export const canJoin = (s: Session, now: Date): boolean => {
   const start = new Date(s.startsAt).getTime();
   return s.status === 'scheduled' && now.getTime() >= start - JOIN_BEFORE_MIN * 6e4 && now.getTime() <= start + s.durationMin * 6e4;
 };
 
-export const hasStarted = (s: Session, now = NOW): boolean => new Date(s.startsAt).getTime() <= now.getTime();
+export const hasStarted = (s: Session, now: Date): boolean => new Date(s.startsAt).getTime() <= now.getTime();
 
 /** Prowizja platformy malejąca z liczbą przepracowanych godzin (wartości robocze, Z5). */
 export function commissionRate(hours: number): number {

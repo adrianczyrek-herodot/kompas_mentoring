@@ -1,4 +1,9 @@
-import { NOW } from './mocks';
+// Widoki mockupu jako stringi HTML (warstwa przejściowa — ekrany są stopniowo przepisywane na React).
+import { DEMO_NOW as NOW } from '@devmentor/db/fixtures';
+import { initials } from '@devmentor/ui/lib/format';
+import { ICON_PATHS } from '@devmentor/ui/lib/icons';
+
+export { dayShort, fmtDate, fmtDateLong, fmtTime, initials, money, weekday } from '@devmentor/ui/lib/format';
 
 export type ViewState = 'success' | 'loading' | 'empty' | 'error';
 
@@ -17,29 +22,7 @@ export interface View {
 export const esc = (s: unknown): string =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
-const DAYS = ['pon', 'wt', 'śr', 'czw', 'pt', 'sob', 'nd'];
-const DAYS_LONG = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];
-const MONTHS = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
-
-export const weekday = (d: Date): number => (d.getDay() + 6) % 7;
-export const dayShort = (i: number): string => DAYS[i];
-export const fmtDate = (iso: string | Date): string => {
-  const d = new Date(iso);
-  return `${DAYS[weekday(d)]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
-};
-export const fmtDateLong = (iso: string | Date): string => {
-  const d = new Date(iso);
-  return `${DAYS_LONG[weekday(d)]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-};
-export const fmtTime = (iso: string | Date): string => {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-};
-export const money = (n: number): string => `${n.toLocaleString('pl-PL')} zł`;
 export const hoursUntil = (iso: string): number => (new Date(iso).getTime() - NOW.getTime()) / 36e5;
-
-export const initials = (name: string): string =>
-  name.split(/\s+/).map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 
 export const avatar = (name: string, hue: number, size = 44): string =>
   `<span class="avatar" style="--h:${hue};--s:${size}px" aria-hidden="true">${esc(initials(name))}</span>`;
@@ -47,33 +30,8 @@ export const avatar = (name: string, hue: number, size = 44): string =>
 export const stars = (r: number): string =>
   r > 0 ? `<span class="rating"><span class="star">★</span> ${r.toFixed(1)}</span>` : `<span class="badge badge--new">Nowy</span>`;
 
-export const icon = (name: string): string => {
-  const p: Record<string, string> = {
-    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
-    cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
-    chat: '<path d="M4 5h16v11H8l-4 4z"/>',
-    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
-    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
-    home: '<path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/>',
-    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c.8-3.5 3.4-5 7-5s6.2 1.5 7 5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 15c2 .6 3.3 2.2 4 5"/>',
-    wallet: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M16 15h2"/>',
-    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
-    play: '<path d="M8 5v14l11-7z" fill="currentColor"/>',
-    check: '<path d="m5 12 5 5L20 7"/>',
-    shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
-    alert: '<path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/>',
-    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
-    mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
-    cam: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>',
-    screen: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
-    x: '<path d="M6 6l12 12M18 6 6 18"/>',
-    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
-    back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
-    flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
-    map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
-  };
-  return `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p[name] ?? ''}</svg>`;
-};
+export const icon = (name: string): string =>
+  `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] ?? ''}</svg>`;
 
 // ---- Stany ekranu ----------------------------------------------------------
 

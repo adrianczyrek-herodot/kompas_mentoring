@@ -6,9 +6,9 @@ Ten plik obowiązuje **każdego** agenta AI pracującego w tym repozytorium (Cla
 
 **DevMentor** — aplikacja portalu mentoringu 1:1, monorepo w `packages/`. Opis architektury: `README.md`.
 
-- Koncepcja produktu i klikalne mockupy (punkt odniesienia dla ekranów i reguł domenowych): `kompas-mentoring/README.md`, `kompas-mentoring/KONCEPCJA.md`, `kompas-mentoring/mockupy/` (osobny projekt, nie należy do workspace'ów).
-- Sprawdzenie zmian w aplikacji (z korzenia repo): `npm run typecheck && npm run build`.
-- Sprawdzenie zmian w mockupach: `cd kompas-mentoring/mockupy && npm run typecheck && npm run build`.
+- Koncepcja produktu (punkt odniesienia dla ekranów i reguł domenowych): `kompas-mentoring/KONCEPCJA.md`, `kompas-mentoring/README.md`.
+- Aplikacja powstaje z klikalnego mockupu Kompas przenoszonego fazami — plan i postęp: `.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`. Kod mockupu: `packages/app/src/legacy/`.
+- Sprawdzenie zmian (z korzenia repo): `npm run typecheck && npm run build`.
 
 ## Stos technologiczny i architektura DevMentor
 
@@ -33,9 +33,9 @@ Założenia są wiążące. Odejście od nich (nowa biblioteka zastępująca ele
 | Pakiet | Nazwa | Odpowiedzialność | Może zależeć od |
 |---|---|---|---|
 | `packages/app` | `@devmentor/app` | Aplikacja Next.js: trasy, strony, route handlery, server actions; **jedyny composition root** kontenera DI (`src/server/container.ts`). | `core`, `db`, `ui` |
-| `packages/core` | `@devmentor/core` | Części wielokrotnego użytku niezależne od frameworka: kontener DI i typ `Cradle`, błędy domenowe, abstrakcje (np. `Clock`), reguły domenowe jako czyste funkcje/serwisy. | tylko biblioteki zewnętrzne bez React/Next/MikroORM |
-| `packages/db` | `@devmentor/db` | Dane: konfiguracja MikroORM, encje, migracje, repozytoria, `registerDb()`. | `core` |
-| `packages/ui` | `@devmentor/ui` | Komponenty UI wielokrotnego użytku bez logiki biznesowej i dostępu do danych: `frontend/` (Tailwind), `backend/` (shadcn/ui), `lib/utils.ts` (`cn`), `styles/globals.css`. | biblioteki UI (React jako peer) |
+| `packages/core` | `@devmentor/core` | Części wielokrotnego użytku niezależne od frameworka: kontener DI i typ `Cradle`, błędy domenowe, abstrakcje (np. `Clock`); `domain/` — typy domenowe i reguły jako czyste funkcje z jawnym `now`. | tylko biblioteki zewnętrzne bez React/Next/MikroORM |
+| `packages/db` | `@devmentor/db` | Dane: konfiguracja MikroORM, encje, migracje, repozytoria, `registerDb()`; `fixtures/` — dane demo. | `core` |
+| `packages/ui` | `@devmentor/ui` | Komponenty UI wielokrotnego użytku bez logiki biznesowej i dostępu do danych: `frontend/` (Tailwind), `backend/` (shadcn/ui), `lib/` (`cn`, formatowanie, ikony), `styles/globals.css`, `styles/kompas.css` (przejściowo). | biblioteki UI (React jako peer) |
 
 Zasady:
 
@@ -43,7 +43,9 @@ Zasady:
 2. **Importy między pakietami tylko przez nazwę pakietu** i jego `exports` (`@devmentor/db`, `@devmentor/ui/backend/button`) — nigdy ścieżką względną do innego pakietu ani do jego `src/`.
 3. **Pakiety wewnętrzne to źródła TS** bez kroku budowania (`exports` wskazuje na `src/`); nowy pakiet dopisz do `transpilePackages` w `packages/app/next.config.ts`.
 4. Nowy pakiet w `packages/` dodawaj tylko po decyzji użytkownika; nazwa `@devmentor/<nazwa>`, `tsconfig.json` rozszerzający `../../tsconfig.base.json`, skrypt `typecheck`.
-5. Przed pisaniem kodu Next.js sprawdź API w dokumentacji zainstalowanej wersji (`node_modules/next/dist/docs/`) — wersja może być nowsza niż Twoja wiedza. `packages/app/AGENTS.md` generuje `next dev`; nie usuwaj go i nie edytuj ręcznie.
+5. **Podścieżki dla przeglądarki:** kod kliencki importuje z pakietów tylko moduły bez zależności serwerowych: `@devmentor/core/domain`, `@devmentor/db/fixtures`, `@devmentor/ui/*`. Nigdy `@devmentor/core` (Awilix) ani `@devmentor/db` (MikroORM) w komponentach `"use client"`.
+6. **`src/legacy` (przejściowo):** ekrany mockupu jako HTML ze stringów. Nie rozbudowuj ich o nowe funkcje — nowy kod pisz w React (`(frontend)`/`(backend)`), a przepisany ekran usuń z `legacy`. Zmiany w `legacy` weryfikuj zrzutami ekranu przed/po.
+7. Przed pisaniem kodu Next.js sprawdź API w dokumentacji zainstalowanej wersji (`node_modules/next/dist/docs/`) — wersja może być nowsza niż Twoja wiedza. `packages/app/AGENTS.md` generuje `next dev`; nie usuwaj go i nie edytuj ręcznie.
 
 ### Dependency Injection (Awilix)
 
@@ -58,7 +60,7 @@ Zasady:
 1. Encja = plik `packages/db/src/entities/<nazwa>.entity.ts` (`defineEntity` + `setClass`) dopisany do tablicy `entities` w `entities/index.ts` — bez skanowania folderów (nie działa po zbundlowaniu).
 2. Każda zmiana schematu = migracja: `npm run db:migration:create`, przejrzyj wygenerowany SQL, `npm run db:migration:up`. Commituj migrację razem z `.snapshot-*.json`. Nie edytuj zastosowanych migracji i nie używaj `schema:update` poza eksperymentami lokalnymi.
 3. Jedna instancja ORM i pula połączeń na proces (`getOrm()`); nie wywołuj `MikroORM.init` gdzie indziej. Do zapytań w żądaniu używaj `em` ze scope'u (fork z własną mapą tożsamości), nie globalnego `orm.em`.
-4. Kod z `@devmentor/db` uruchamiaj tylko po stronie serwera — nigdy w komponentach `"use client"`.
+4. Kod z `@devmentor/db` uruchamiaj tylko po stronie serwera — nigdy w komponentach `"use client"`. Wyjątek: `@devmentor/db/fixtures` (czyste dane demo) do czasu przejścia ekranów na bazę.
 5. Konfiguracja przez zmienne środowiskowe w jednym pliku `.env` w korzeniu (wzór: `.env.example`). Sekretów nie commituj.
 
 ### UI: Tailwind (frontend) i shadcn/ui (backend)

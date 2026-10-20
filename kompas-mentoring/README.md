@@ -7,22 +7,25 @@ Wstępna koncepcja i klikalne mockupy portalu mentoringu 1:1, wzorowanego funkcj
 | Ścieżka | Co to jest |
 |---|---|
 | `KONCEPCJA.md` | Użytkownicy i potrzeby, use case'y, przepływy z błędami, mapa ekranów, specyfikacja 22 ekranów (cel, funkcje, komponenty, stany, walidacje, API), model danych, ryzyka |
-| `mockupy/index.html` | Klikalne mockupy — otwórz w przeglądarce |
-| `mockupy/src/` | Kod TypeScript: `main.ts` (router, pasek mockupu), `mocks.ts` (dane), `domain.ts` (reguły jako czyste funkcje), `screens/*` |
-| `mockupy/dist/app.js` | Gotowy zbudowany bundle — nic nie trzeba instalować |
+
+Klikalne mockupy zostały przeniesione do monorepo DevMentor (zob. [`README.md`](../README.md) w korzeniu):
+
+| Ścieżka | Co to jest |
+|---|---|
+| `packages/app/src/legacy/` | Router, pasek mockupu, stan w pamięci i ekrany (`screens/*`) — widoki jako HTML, stopniowo przepisywane na React |
+| `packages/core/src/domain/` | Typy domenowe i reguły jako czyste funkcje (dawniej `domain.ts`) |
+| `packages/db/src/fixtures/` | Dane demo (dawniej `mocks.ts`) |
+| `packages/ui/src/styles/kompas.css`, `packages/ui/src/lib/` | Style, formatowanie i ikony |
 
 ## Jak uruchomić
 
-**Bez instalacji:** otwórz `mockupy/index.html` dwuklikiem. Działa offline.
-
-**Z przebudową po zmianach w kodzie:**
+Z korzenia repozytorium:
 
 ```bash
-cd mockupy
 npm install
-npm run build       # przebudowuje dist/app.js
-npm run dev         # serwer z auto-przebudową: http://localhost:8000
+npm run dev         # http://localhost:3000 — mockup pod /, panel pod /admin
 npm run typecheck
+npm run build
 ```
 
 ## Jak przeglądać

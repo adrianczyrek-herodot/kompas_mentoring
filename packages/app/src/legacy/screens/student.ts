@@ -1,8 +1,9 @@
-import { MENTORS, NOW, PLAN_OPTIONS, Session } from '../mocks';
+import { PLAN_OPTIONS, type Session } from '@devmentor/core/domain';
+import { DEMO_NOW as NOW, MENTORS } from '@devmentor/db/fixtures';
 import { mentorById, sessionById, store } from '../store';
 import {
   FREE_CANCEL_HOURS, HOLD_MINUTES, canCancelFree, canJoin, hasStarted, nextFreeWeek, planPrice, transferSessions, weekSlots,
-} from '../domain';
+} from '@devmentor/core/domain';
 import {
   Ctx, View, avatar, bindCounters, closeModal, dayShort, emptyState, errorState, esc, field, fmtDate, fmtDateLong, fmtTime,
   go, hoursUntil, icon, len, money, openModal, req, skeleton, states, toast, validate,
@@ -23,15 +24,15 @@ export function pickSlot(ctx: Ctx): View {
   const fromBalance = store.loggedIn && (store.balances[m.id] ?? 0) > 0;
   const type: 'trial' | 'plan' = fromBalance ? 'plan' : 'trial';
   const duration = type === 'trial' ? 30 : Number(ctx.query.get('d') ?? 60);
-  const week = ctx.state === 'empty' ? weekSlots(m, w).map((d) => ({ ...d, slots: [] })) : weekSlots(m, w);
+  const week = ctx.state === 'empty' ? weekSlots(m, w, NOW).map((d) => ({ ...d, slots: [] })) : weekSlots(m, w, NOW);
   const hasFree = week.some((d) => d.slots.some((s) => !s.taken));
-  const next = hasFree ? null : nextFreeWeek(m, w);
+  const next = hasFree ? null : nextFreeWeek(m, w, NOW);
   const sel = store.draft?.mentorId === m.id ? store.draft.startsAt : undefined;
 
   const grid = `
     <div class="row between week-nav">
       <a class="btn btn--ghost btn--s ${w <= 0 ? 'is-disabled' : ''}" href="#/rezerwacja/${m.id}?w=${Math.max(0, w - 1)}" aria-disabled="${w <= 0}">${icon('back')}</a>
-      <strong>${fmtDate(week[0].day)} – ${fmtDate(week[6].day)}</strong>
+      <strong>${fmtDate(week[0]!.day)} – ${fmtDate(week[6]!.day)}</strong>
       <a class="btn btn--ghost btn--s" href="#/rezerwacja/${m.id}?w=${w + 1}">${icon('arrow')}</a>
     </div>
     ${hasFree ? `<div class="slot-grid">${week.map((d, i) => `
@@ -301,7 +302,7 @@ export function sessions(ctx: Ctx): View {
         <span class="eyebrow">Najbliższa sesja</span>
         <div class="row between wrap gap-s"><div class="row gap-s">${avatar(mentorById(next.mentorId)!.name, mentorById(next.mentorId)!.hue, 52)}
           <div><strong>${esc(mentorById(next.mentorId)!.name)}</strong><br><span class="muted small">${fmtDateLong(next.startsAt)} · ${fmtTime(next.startsAt)} · ${next.durationMin} min</span></div></div>
-          ${canJoin(next) ? `<a class="btn btn--primary" href="#/sesje/${next.id}/pokoj">${icon('cam')} Dołącz</a>`
+          ${canJoin(next, NOW) ? `<a class="btn btn--primary" href="#/sesje/${next.id}/pokoj">${icon('cam')} Dołącz</a>`
             : `<span class="muted small">Dołączenie możliwe 10 min przed startem (za ${Math.max(0, Math.round(hoursUntil(next.startsAt)))} h)</span>`}
         </div>
         <p class="small">${icon('target')} ${esc(next.goal)}</p>
@@ -322,8 +323,8 @@ export function sessionDetail(ctx: Ctx): View {
   if (!s || ctx.state === 'error') return { html: `<div class="narrow">${errorState('Ta sesja nie istnieje albo nie masz do niej dostępu.')}</div>` };
   const m = mentorById(s.mentorId)!;
   const upcoming = s.status === 'scheduled' || s.status === 'requested';
-  const started = hasStarted(s);
-  const free = canCancelFree(s);
+  const started = hasStarted(s, NOW);
+  const free = canCancelFree(s, NOW);
   const hoursAfter = -hoursUntil(s.startsAt) - s.durationMin / 60;
   const canReport = s.status === 'completed' && hoursAfter <= 72;
 
@@ -339,7 +340,7 @@ export function sessionDetail(ctx: Ctx): View {
           ? `Możesz bezpłatnie przełożyć lub anulować sesję do ${FREE_CANCEL_HOURS} h przed startem.`
           : started ? 'Sesja już się rozpoczęła — przełożenie i anulowanie nie są możliwe.' : `Do sesji zostało mniej niż ${FREE_CANCEL_HOURS} h. Anulowanie teraz oznacza utratę sesji.`}</p>
         <div class="row wrap gap-s">
-          ${canJoin(s) ? `<a class="btn btn--primary" href="#/sesje/${s.id}/pokoj">${icon('cam')} Dołącz</a>` : ''}
+          ${canJoin(s, NOW) ? `<a class="btn btn--primary" href="#/sesje/${s.id}/pokoj">${icon('cam')} Dołącz</a>` : ''}
           <button class="btn btn--ghost" data-reschedule ${started || !free ? 'disabled' : ''}>Przełóż</button>
           <button class="btn btn--danger-ghost" data-cancel ${started ? 'disabled' : ''}>Anuluj sesję</button>
           <a class="btn btn--ghost" href="#/wiadomosci/nowa?m=${m.id}">Napisz</a>
@@ -358,7 +359,7 @@ export function sessionDetail(ctx: Ctx): View {
     html,
     bind(root) {
       root.querySelectorAll<HTMLInputElement>('[data-ai]').forEach((c) => c.addEventListener('change', () => {
-        s.actionItems![Number(c.dataset.ai)].done = c.checked;
+        s.actionItems![Number(c.dataset.ai)]!.done = c.checked;
         toast(c.checked ? 'Zadanie wykonane' : 'Zadanie otwarte');
       }));
       root.querySelector('[data-cancel]')?.addEventListener('click', () => {
@@ -376,7 +377,7 @@ export function sessionDetail(ctx: Ctx): View {
         }));
       });
       root.querySelector('[data-reschedule]')?.addEventListener('click', () => {
-        const slots = [...weekSlots(m, 0), ...weekSlots(m, 1)].flatMap((d) => d.slots).filter((x) => !x.taken).slice(0, 12);
+        const slots = [...weekSlots(m, 0, NOW), ...weekSlots(m, 1, NOW)].flatMap((d) => d.slots).filter((x) => !x.taken).slice(0, 12);
         openModal(`<h2 class="h3">Wybierz nowy termin</h2>
           ${slots.length ? `<div class="slot-list">${slots.map((x) => `<button class="slot" data-new="${x.iso}">${fmtDate(x.iso)} · ${fmtTime(x.iso)}</button>`).join('')}</div>`
             : emptyState('Brak wolnych terminów w 14 dni', 'Napisz do mentora, żeby ustalić termin.', `<a class="btn btn--primary" href="#/wiadomosci/nowa?m=${m.id}">Napisz</a>`)}`,
@@ -445,7 +446,7 @@ export function room(ctx: Ctx): View {
       <aside class="card summary">
         <div class="row gap-s">${avatar(m.name, m.hue, 48)}<div><strong>${esc(m.name)}</strong><br><span class="muted small">${fmtTime(s.startsAt)} · ${s.durationMin} min</span></div></div>
         <p class="small">${icon('target')} ${esc(s.goal)}</p>
-        ${canJoin(s) ? `<a class="btn btn--primary btn--block" href="#/sesje/${s.id}/pokoj?krok=pokoj">Dołącz do sesji</a>`
+        ${canJoin(s, NOW) ? `<a class="btn btn--primary btn--block" href="#/sesje/${s.id}/pokoj?krok=pokoj">Dołącz do sesji</a>`
           : `<button class="btn btn--primary btn--block" disabled>Pokój otworzy się 10 min przed startem</button>`}
       </section>
     </div>`;
@@ -664,7 +665,7 @@ export function plans(ctx: Ctx): View {
         (mod) => mod.querySelector('[data-ok]')!.addEventListener('click', () => { store.subscription = null; closeModal(); toast('Plan anulowany'); ctx.rerender(); })));
       root.querySelectorAll<HTMLElement>('[data-transfer]').forEach((b) => b.addEventListener('click', () => {
         const from = mentorById(b.dataset.transfer!)!;
-        const n = store.balances[from.id];
+        const n = store.balances[from.id] ?? 0;
         const others = MENTORS.filter((x) => x.id !== from.id && x.acceptingNew);
         openModal(`<h2 class="h3">Przenieś saldo</h2><p class="small muted">Wartość sesji przeliczamy według stawki nowego mentora.</p>
           <div class="field"><label for="f-to">Do mentora</label><select id="f-to">${others.map((o) => `<option value="${o.id}">${esc(o.name)} · ${money(o.rate60)}/h</option>`).join('')}</select></div>
@@ -728,8 +729,8 @@ export function progress(ctx: Ctx): View {
   return {
     html,
     bind(root) {
-      root.querySelectorAll<HTMLInputElement>('[data-ms]').forEach((c) => c.addEventListener('change', () => { store.goal.milestones[Number(c.dataset.ms)].done = c.checked; ctx.rerender(); }));
-      root.querySelectorAll<HTMLInputElement>('[data-s]').forEach((c) => c.addEventListener('change', () => { sessionById(c.dataset.s!)!.actionItems![Number(c.dataset.i)].done = c.checked; }));
+      root.querySelectorAll<HTMLInputElement>('[data-ms]').forEach((c) => c.addEventListener('change', () => { store.goal.milestones[Number(c.dataset.ms)]!.done = c.checked; ctx.rerender(); }));
+      root.querySelectorAll<HTMLInputElement>('[data-s]').forEach((c) => c.addEventListener('change', () => { sessionById(c.dataset.s!)!.actionItems![Number(c.dataset.i)]!.done = c.checked; }));
       const f = root.querySelector<HTMLFormElement>('[data-form=goal]');
       f?.addEventListener('submit', (e) => {
         e.preventDefault();

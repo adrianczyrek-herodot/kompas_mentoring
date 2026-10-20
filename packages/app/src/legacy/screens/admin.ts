@@ -5,7 +5,7 @@ import { Ctx, View, avatar, bindCounters, emptyState, errorState, esc, field, fm
 
 export function verification(ctx: Ctx): View {
   const list = ctx.state === 'empty' ? [] : store.applications;
-  const sel = list.find((a) => a.id === ctx.query.get('id')) ?? list[0];
+  const sel = list.find((a) => a.id === ctx.query.get('id')) ?? list[0]!;
   const kycBadge = (k: string) => `<span class="badge badge--${k === 'zweryfikowano' ? 'scheduled' : k === 'oczekuje' ? 'requested' : 'cancelled'}">KYC: ${k}</span>`;
   const html = `
   <div class="page-head"><h1>Weryfikacja mentorów</h1><span class="muted small">SLA: 2 dni robocze</span></div>
@@ -67,7 +67,7 @@ export function verification(ctx: Ctx): View {
 
 export function disputes(ctx: Ctx): View {
   const list = ctx.state === 'empty' ? [] : store.disputes;
-  const sel = list.find((d) => d.id === ctx.query.get('id')) ?? list[0];
+  const sel = list.find((d) => d.id === ctx.query.get('id')) ?? list[0]!;
   const html = `
   <div class="page-head"><h1>Spory i zwroty</h1></div>
   ${states(ctx, {

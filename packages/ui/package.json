@@ -8,7 +8,8 @@
     "./lib/*": "./src/lib/*.ts",
     "./frontend/*": "./src/frontend/*.tsx",
     "./backend/*": "./src/backend/*.tsx",
-    "./styles.css": "./src/styles/globals.css"
+    "./styles.css": "./src/styles/globals.css",
+    "./kompas.css": "./src/styles/kompas.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

@@ -17,4 +17,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-20** — DevMentor: TypeScript 7 (natywny) działa z Next.js 16 (`next build` i `tsc --noEmit` przechodzą); augmentacja `declare module "@devmentor/core"` poprawnie rozszerza `Cradle` reeksportowany przez `export *`.
 - **2026-10-20** — `next dev` (Next.js 16) sam tworzy i odtwarza `packages/app/AGENTS.md` z regułami Next.js — commituj go razem ze zmianą, nie usuwaj (wróci jako niezacommitowana zmiana).
 
+- **2026-10-20** — Przenosząc ekrany (`src/legacy` → React) weryfikuj regresje zrzutami ekranu przed/po: Playwright (przeglądarki są w `~/Library/Caches/ms-playwright`) + `pixelmatch`, skrypty trzymaj poza repo (np. katalog tmp cezar); stary build odtwórz przez `git archive <commit> <ścieżka>`. Pasek dev Next.js (lewy dolny róg, ~38×38 px) daje różnicę w `next dev` — porównuj na `next start`.
+- **2026-10-20** — Aplikacja z `src/legacy` i strony Tailwind muszą mieć osobne root layouty (`(legacy)`, `(backend)`): preflight Tailwinda psuje wygląd `kompas.css`. Moduły `legacy` ładuj dynamicznym `import()` w `useEffect` — dotykają `window` przy imporcie (SSR padnie).
+
 ## Błędy i ich przyczyny

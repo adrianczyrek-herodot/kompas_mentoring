@@ -1,48 +1,11 @@
-// Dane mockowane. Wszystkie kwoty w złotych (w API: grosze), daty jako ISO.
-// "Teraz" jest stałe, żeby mockupy wyglądały tak samo przy każdym uruchomieniu.
+// Dane demo (persona ucznia, mentorka Kasia Nowicka, panel admina). Kwoty w złotych (w API: grosze), daty jako ISO.
+// Czyste dane bez zależności od MikroORM — bezpieczne w przeglądarce; w fazie 5 posłużą jako seed bazy.
+import type {
+  Application, Dispute, Earning, Mentor, Notification, Session, Student, Thread, TrialRequest,
+} from '@devmentor/core/domain';
 
-export const NOW = new Date('2026-10-20T14:00:00+02:00');
-
-export type Role = 'guest' | 'student' | 'mentor' | 'admin';
-
-export interface Review {
-  author: string;
-  rating: number;
-  date: string;
-  text: string;
-  tags: string[];
-}
-
-export interface Mentor {
-  id: string;
-  name: string;
-  headline: string;
-  bio: string;
-  country: string;
-  languages: string[];
-  categories: string[];
-  tags: string[];
-  yearsExp: number;
-  companies: string[];
-  rate60: number;
-  trialPrice: number;
-  rating: number;
-  reviewsCount: number;
-  sessions: number;
-  returningPct: number;
-  responseHours: number;
-  verified: boolean;
-  acceptingNew: boolean;
-  hue: number;
-  reviews: Review[];
-  // dostępność: dzień tygodnia (0 = pon) → godziny startu slotów
-  availability: Record<number, number[]>;
-}
-
-export const CATEGORIES = [
-  'Frontend', 'Backend', 'Data & AI', 'Product Management', 'UX/UI Design',
-  'Kariera w IT', 'DevOps & Cloud', 'Przywództwo',
-];
+/** Stałe „teraz” danych demo, żeby aplikacja wyglądała tak samo przy każdym uruchomieniu. */
+export const DEMO_NOW = new Date('2026-10-20T14:00:00+02:00');
 
 const std = { 0: [9, 10, 17, 18], 1: [17, 18, 19], 2: [9, 10, 11], 3: [18, 19], 4: [8, 9, 16], 5: [10, 11], 6: [] };
 
@@ -113,22 +76,6 @@ export const MENTORS: Mentor[] = [
   },
 ];
 
-export type SessionStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show' | 'disputed' | 'requested';
-
-export interface Session {
-  id: string;
-  mentorId: string;
-  student: string;
-  startsAt: string;
-  durationMin: number;
-  type: 'trial' | 'plan';
-  status: SessionStatus;
-  goal: string;
-  note?: string;
-  actionItems?: { text: string; done: boolean }[];
-  reviewed?: boolean;
-}
-
 export const SESSIONS: Session[] = [
   { id: 's1', mentorId: 'm1', student: 'Ty', startsAt: '2026-10-20T14:05:00+02:00', durationMin: 60, type: 'plan', status: 'scheduled', goal: 'Review architektury komponentów w projekcie portfolio' },
   { id: 's2', mentorId: 'm1', student: 'Ty', startsAt: '2026-10-23T18:00:00+02:00', durationMin: 60, type: 'plan', status: 'scheduled', goal: 'Testy jednostkowe hooków' },
@@ -143,10 +90,6 @@ export const SESSIONS: Session[] = [
 ];
 
 // Perspektywa mentora (Kasia Nowicka, m1)
-export interface Student {
-  id: string; name: string; status: 'aktywny' | 'próbny' | 'nieaktywny'; goal: string; sessions: number;
-  balance: number; plan: string; nextSession?: string; hue: number;
-}
 export const STUDENTS: Student[] = [
   { id: 'st1', name: 'Adrian C.', status: 'aktywny', goal: 'Pierwsza praca jako frontend dev do marca 2027', sessions: 6, balance: 3, plan: '1×60 min / tydz.', nextSession: '2026-10-20T14:05:00+02:00', hue: 12 },
   { id: 'st2', name: 'Julia M.', status: 'aktywny', goal: 'Awans na mid w obecnej firmie', sessions: 14, balance: 5, plan: '2×60 min / tydz.', nextSession: '2026-10-20T17:00:00+02:00', hue: 300 },
@@ -154,13 +97,11 @@ export const STUDENTS: Student[] = [
   { id: 'st4', name: 'Monika K.', status: 'nieaktywny', goal: 'Nauka TypeScript', sessions: 4, balance: 0, plan: 'anulowany', hue: 50 },
 ];
 
-export interface TrialRequest { id: string; student: string; startsAt: string; goal: string; hue: number; }
 export const REQUESTS: TrialRequest[] = [
   { id: 'r1', student: 'Paweł R.', startsAt: '2026-10-22T09:00:00+02:00', goal: 'Mam rozmowę techniczną za 2 tygodnie w scale-upie, chcę przećwiczyć zadanie live coding w React.', hue: 190 },
   { id: 'r2', student: 'Iga T.', startsAt: '2026-10-24T10:00:00+02:00', goal: 'Uczę się sama od pół roku, nie wiem, czy mój kod jest „produkcyjny”.', hue: 140 },
 ];
 
-export interface Earning { date: string; student: string; type: string; gross: number; fee: number; status: 'dostępne' | 'oczekujące' | 'wypłacone'; }
 export const EARNINGS: Earning[] = [
   { date: '2026-10-19', student: 'Julia M.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'oczekujące' },
   { date: '2026-10-17', student: 'Julia M.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'dostępne' },
@@ -170,7 +111,6 @@ export const EARNINGS: Earning[] = [
   { date: '2026-10-08', student: 'Julia M.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'wypłacone' },
 ];
 
-export interface Thread { id: string; withName: string; hue: number; unread: number; messages: { me: boolean; text: string; at: string }[]; }
 export const THREADS: Thread[] = [
   { id: 't1', withName: 'Kasia Nowicka', hue: 168, unread: 1, messages: [
     { me: false, text: 'Cześć! Przed czwartkiem wrzuć proszę link do repo z formularzem, przejrzę go wcześniej.', at: '2026-10-19T19:12:00+02:00' },
@@ -183,14 +123,12 @@ export const THREADS: Thread[] = [
   ] },
 ];
 
-export interface Application { id: string; name: string; headline: string; submitted: string; kyc: 'zweryfikowano' | 'oczekuje' | 'niezgodność'; linkedin: boolean; hue: number; categories: string[]; }
 export const APPLICATIONS: Application[] = [
   { id: 'a1', name: 'Adam Górski', headline: 'Product Manager · discovery, metryki', submitted: '2026-10-17', kyc: 'zweryfikowano', linkedin: true, hue: 90, categories: ['Product Management'] },
   { id: 'a2', name: 'Robert Zając', headline: 'iOS Developer · Swift, SwiftUI', submitted: '2026-10-18', kyc: 'oczekuje', linkedin: true, hue: 20, categories: ['Frontend'] },
   { id: 'a3', name: 'Laura Bielecka', headline: 'Cloud Architect · Azure, Terraform', submitted: '2026-10-19', kyc: 'niezgodność', linkedin: false, hue: 230, categories: ['DevOps & Cloud'] },
 ];
 
-export interface Dispute { id: string; sessionId: string; student: string; mentor: string; reason: string; opened: string; amount: number; events: string[]; studentSays: string; mentorSays: string; }
 export const DISPUTES: Dispute[] = [
   { id: 'd1', sessionId: 's-901', student: 'Filip W.', mentor: 'Marek Lis', reason: 'Mentor się nie pojawił', opened: '2026-10-18', amount: 260,
     events: ['18:00:12 — uczeń dołączył do pokoju', '18:10:40 — uczeń kliknął „Mentor się nie pojawił”', '18:14:02 — mentor dołączył do pokoju', '18:15:30 — uczeń opuścił pokój'],
@@ -200,11 +138,9 @@ export const DISPUTES: Dispute[] = [
     studentSays: 'Chciałam omówić research, a rozmawiałyśmy tylko o Figmie.', mentorSays: 'Cel sesji w rezerwacji dotyczył Figmy.' },
 ];
 
-export const NOTIFICATIONS = [
+export const NOTIFICATIONS: Notification[] = [
   { text: 'Sesja z Kasią Nowicką zaczyna się za 5 minut', at: '2026-10-20T14:00:00+02:00', link: '#/sesje/s1', unread: true },
   { text: 'Nowa wiadomość od Kasi Nowickiej', at: '2026-10-20T09:02:00+02:00', link: '#/wiadomosci/t1', unread: true },
   { text: 'Oceń sesję próbną z 9 października', at: '2026-10-10T09:00:00+02:00', link: '#/sesje/s5/ocena', unread: false },
   { text: 'Plan odnowiony: 4 sesje dodane do salda', at: '2026-10-06T08:00:00+02:00', link: '#/plany', unread: false },
 ];
-
-export const PLAN_OPTIONS = [1, 2, 3, 5];

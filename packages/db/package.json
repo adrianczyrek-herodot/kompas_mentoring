@@ -5,7 +5,8 @@
   "description": "Dostęp do danych: MikroORM + PostgreSQL, encje, migracje, rejestracja w kontenerze DI",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./fixtures": "./src/fixtures/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

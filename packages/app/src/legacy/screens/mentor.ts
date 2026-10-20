@@ -1,6 +1,6 @@
-import { CATEGORIES, EARNINGS, STUDENTS } from '../mocks';
+import { CATEGORIES, commissionRate, nextTier } from '@devmentor/core/domain';
+import { EARNINGS, STUDENTS } from '@devmentor/db/fixtures';
 import { store } from '../store';
-import { commissionRate, nextTier } from '../domain';
 import {
   Ctx, View, avatar, bindCounters, closeModal, dayShort, emptyState, errorState, esc, field, fmtDate, fmtDateLong, fmtTime,
   go, icon, len, money, openModal, range, req, skeleton, states, toast, validate,
@@ -118,13 +118,13 @@ export function onboarding(ctx: Ctx): View {
             terms: [req('Akceptacja regulaminu jest wymagana.')] },
         };
         if (step === 1 && !d.photo) { f.querySelector('[data-err=photo]')!.textContent = 'Dodaj zdjęcie.'; }
-        if (!validate(f, rules[step]) || (step === 1 && !d.photo)) return;
+        if (!validate(f, rules[step]!) || (step === 1 && !d.photo)) return;
         new FormData(f).forEach((v, k) => { if (!['lang', 'cat'].includes(k)) d[k] = String(v); });
         if (step === 1) d.lang = vals('lang').join(',');
         if (step === 2) d.cat = vals('cat').join(',');
         if (step === 6) {
           ob.status = 'submitted';
-          store.applications.unshift({ id: 'a-new', name: d.name, headline: d.headline ?? '', submitted: '2026-10-20', kyc: 'zweryfikowano', linkedin: true, hue: 168, categories: (d.cat ?? '').split(',') });
+          store.applications.unshift({ id: 'a-new', name: d.name ?? '', headline: d.headline ?? '', submitted: '2026-10-20', kyc: 'zweryfikowano', linkedin: true, hue: 168, categories: (d.cat ?? '').split(',') });
           go('#/mentor/onboarding/wyslano');
         } else {
           toast('Zapisano szkic');
@@ -311,7 +311,7 @@ export function mentorStudents(ctx: Ctx): View {
   const list = ctx.state === 'empty' ? [] : STUDENTS.filter((s) => filter === 'wszyscy' || s.status === filter);
   const html = `
   <div class="page-head"><h1>Uczniowie</h1></div>
-  <div class="chips">${['wszyscy', 'aktywny', 'próbny', 'nieaktywny'].map((f) => `<a class="chip ${f === filter ? 'chip--on' : ''}" href="#/mentor/uczniowie?f=${encodeURIComponent(f)}">${f === 'wszyscy' ? 'Wszyscy' : f[0].toUpperCase() + f.slice(1)}</a>`).join('')}</div>
+  <div class="chips">${['wszyscy', 'aktywny', 'próbny', 'nieaktywny'].map((f) => `<a class="chip ${f === filter ? 'chip--on' : ''}" href="#/mentor/uczniowie?f=${encodeURIComponent(f)}">${f === 'wszyscy' ? 'Wszyscy' : f[0]!.toUpperCase() + f.slice(1)}</a>`).join('')}</div>
   ${states(ctx, {
     loading: () => skeleton(4, 'line'),
     error: () => errorState(),

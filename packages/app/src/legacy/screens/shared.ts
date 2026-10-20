@@ -1,6 +1,6 @@
-import { NOW } from '../mocks';
+import { DEMO_NOW as NOW } from '@devmentor/db/fixtures';
 import { applyDemoStudent, mentorById, store } from '../store';
-import { OFF_PLATFORM } from '../domain';
+import { OFF_PLATFORM } from '@devmentor/core/domain';
 import { Ctx, View, avatar, emptyState, errorState, esc, field, fmtDate, fmtTime, go, icon, len, req, skeleton, states, toast, validate } from '../ui';
 
 // ---------------------------------------------------------------- S1 Wiadomości
@@ -30,7 +30,7 @@ export function messages(ctx: Ctx): View {
   if (t) t.unread = 0;
 
   const listHtml = `<div class="list threads">${threads.map((x) => `<a class="list-item ${x === t ? 'is-active' : ''}" href="#/wiadomosci/${x.id}">${avatar(x.withName, x.hue, 44)}
-    <div class="grow min0"><div class="row between"><strong>${esc(x.withName)}</strong><span class="muted small">${x.messages.length ? fmtDate(x.messages[x.messages.length - 1].at) : ''}</span></div>
+    <div class="grow min0"><div class="row between"><strong>${esc(x.withName)}</strong><span class="muted small">${x.messages.length ? fmtDate(x.messages[x.messages.length - 1]!.at) : ''}</span></div>
     <span class="muted small ellipsis">${esc(x.messages[x.messages.length - 1]?.text ?? 'Nowa rozmowa')}</span></div>${x.unread ? `<span class="count">${x.unread}</span>` : ''}</a>`).join('')}</div>`;
 
   const upcoming = t ? store.sessions.find((s) => mentorById(s.mentorId)?.name === t.withName && s.status === 'scheduled') : undefined;

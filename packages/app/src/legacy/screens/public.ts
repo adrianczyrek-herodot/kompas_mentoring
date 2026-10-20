@@ -1,6 +1,6 @@
-import { CATEGORIES, MENTORS, Mentor } from '../mocks';
+import { CATEGORIES, type Mentor, weekSlots } from '@devmentor/core/domain';
+import { DEMO_NOW as NOW, MENTORS } from '@devmentor/db/fixtures';
 import { applyDemoStudent, applyFreshStudent, mentorById, store } from '../store';
-import { weekSlots } from '../domain';
 import {
   Ctx, Rule, View, avatar, bindCounters, emailRule, emptyState, errorState, esc, field, fmtDate, fmtTime, go, icon,
   len, money, req, skeleton, states, stars, toast, validate, dayShort,
@@ -223,7 +223,7 @@ export function profile(ctx: Ctx): View {
   }
   if (ctx.state === 'loading') return { html: `<div class="sk sk--hero"></div>${skeleton(2)}` };
   const empty = ctx.state === 'empty' || m.reviews.length === 0;
-  const week = weekSlots(m, 0);
+  const week = weekSlots(m, 0, NOW);
   const anySlot = week.some((d) => d.slots.length);
   const similar = MENTORS.filter((x) => x.id !== m.id && x.categories.some((c) => m.categories.includes(c))).slice(0, 3);
 

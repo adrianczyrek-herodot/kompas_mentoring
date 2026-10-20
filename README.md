@@ -1,6 +1,6 @@
 # DevMentor
 
-Portal mentoringu 1:1 dla programistów. Koncepcja produktu, przepływy i klikalne mockupy: [`kompas-mentoring/`](kompas-mentoring/README.md).
+Portal mentoringu 1:1 dla programistów. Koncepcja produktu i przepływy: [`kompas-mentoring/`](kompas-mentoring/README.md). Aplikacja powstaje z klikalnego mockupu Kompas, przenoszonego do monorepo fazami — plan: [`.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`](.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md).
 
 ## Stos
 
@@ -30,7 +30,7 @@ npm run dev                   # http://localhost:3000
 | `npm run db:migration:create` | Nowa migracja z różnicy encji i snapshotu schematu |
 | `npm run db:migration:up` / `db:migration:down` | Zastosowanie / cofnięcie migracji |
 
-Adresy: `/` — strona publiczna, `/admin` — panel, `/api/health` — stan aplikacji i bazy (200 / 503).
+Adresy: `/` — aplikacja (mockup Kompas, ekrany pod hashem, np. `/#/mentorzy`; dane demo, bez bazy), `/admin` — panel, `/api/health` — stan aplikacji i bazy (200 / 503).
 
 ## Architektura
 
@@ -40,16 +40,25 @@ Adresy: `/` — strona publiczna, `/admin` — panel, `/api/health` — stan apl
 .
 ├── packages/
 │   ├── app/    @devmentor/app   aplikacja Next.js, composition root DI
-│   ├── core/   @devmentor/core  części wielokrotnego użytku (DI, błędy, abstrakcje)
-│   ├── db/     @devmentor/db    MikroORM: konfiguracja, encje, migracje
+│   ├── core/   @devmentor/core  części wielokrotnego użytku (DI, domena: typy i reguły)
+│   ├── db/     @devmentor/db    MikroORM: konfiguracja, encje, migracje; dane demo
 │   └── ui/     @devmentor/ui    komponenty UI: Tailwind i shadcn/ui
-├── kompas-mentoring/            koncepcja i mockupy (osobny projekt)
+├── kompas-mentoring/            koncepcja produktu (KONCEPCJA.md)
 ├── compose.yaml                 lokalny PostgreSQL
 ├── tsconfig.base.json           wspólne ustawienia TypeScript
 └── .env.example                 zmienne środowiskowe (jeden .env w korzeniu)
 ```
 
 Pakiety wewnętrzne są dostarczane jako źródła TypeScript (pole `exports` wskazuje na `src/`) i transpilowane przez Next.js (`transpilePackages`) — nie mają własnego kroku budowania.
+
+Podścieżki bezpieczne w przeglądarce (bez Awilixa i MikroORM):
+
+| Import | Zawartość |
+|---|---|
+| `@devmentor/core/domain` | Typy domenowe (`Mentor`, `Session`, `Role`…), katalog (`CATEGORIES`, `PLAN_OPTIONS`), reguły z jawnym `now` (`weekSlots`, `canJoin`, `canCancelFree`, `commissionRate`, `planPrice`…) |
+| `@devmentor/db/fixtures` | Dane demo (`MENTORS`, `SESSIONS`, …, `DEMO_NOW`) — dziś źródło danych aplikacji, docelowo seed bazy |
+| `@devmentor/ui/lib/format`, `@devmentor/ui/lib/icons` | Formatowanie dat/kwot (pl), ścieżki ikon SVG |
+| `@devmentor/ui/kompas.css` | System wizualny Kompasu (przejściowo, do czasu przepisania ekranów na Tailwind) |
 
 ### Zależności między pakietami
 
@@ -70,12 +79,14 @@ Next.js App Router w `packages/app/src/app`:
 
 | Ścieżka | Rola |
 |---|---|
-| `(frontend)/` | Strony publiczne — Tailwind + `@devmentor/ui/frontend` |
-| `(backend)/admin/` | Panel administracyjny — shadcn/ui z `@devmentor/ui/backend` |
+| `(legacy)/` | Root layout z `kompas.css` (bez Tailwinda) i strona `/`, która montuje aplikację z `src/legacy` |
+| `(backend)/` | Root layout z Tailwindem; `admin/` — panel na shadcn/ui z `@devmentor/ui/backend` |
+| `(frontend)/` | (od fazy 2) strony publiczne przepisane na React — Tailwind + `@devmentor/ui/frontend` |
 | `api/` | Route handlery (np. `api/health`) |
+| `src/legacy/` | Aplikacja przeniesiona z mockupu: router na hashu, stan w pamięci, 22 ekrany jako HTML; start przez `startKompasApp(root)` |
 | `src/server/container.ts` | Composition root kontenera Awilix (`server-only`) |
 
-Grupy tras `(frontend)` i `(backend)` nie wpływają na adresy URL — rozdzielają layouty i zestawy komponentów.
+Grupy tras nie wpływają na adresy URL. `(legacy)` i `(backend)` mają osobne root layouty, bo preflight Tailwinda zmieniłby wygląd ekranów Kompasu; przejście między nimi to pełne przeładowanie strony. Ekrany z `src/legacy` są kolejno przepisywane na React (fazy 2–4), a dane demo zastępowane bazą (faza 5).
 
 ### Dependency Injection (Awilix)
 

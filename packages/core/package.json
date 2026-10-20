@@ -5,7 +5,8 @@
   "description": "Części wielokrotnego użytku: kontener DI, błędy domenowe, abstrakcje niezależne od frameworka",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./domain": "./src/domain/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
