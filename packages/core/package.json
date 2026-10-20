@@ -1,0 +1,16 @@
+{
+  "name": "@devmentor/core",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Części wielokrotnego użytku: kontener DI, błędy domenowe, abstrakcje niezależne od frameworka",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "awilix": "^13.0.5"
+  }
+}

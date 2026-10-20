@@ -1,0 +1,29 @@
+{
+  "name": "@devmentor/ui",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Komponenty UI wielokrotnego użytku: Tailwind (strony frontendowe) i shadcn/ui (strony backendowe)",
+  "type": "module",
+  "exports": {
+    "./lib/*": "./src/lib/*.ts",
+    "./frontend/*": "./src/frontend/*.tsx",
+    "./backend/*": "./src/backend/*.tsx",
+    "./styles.css": "./src/styles/globals.css"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1"
+  },
+  "peerDependencies": {
+    "react": "^19"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "radix-ui": "^1.8.1",
+    "tailwind-merge": "^3.7.0"
+  }
+}

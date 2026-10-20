@@ -6,6 +6,8 @@ Pełne, wiążące instrukcje dla agentów są w `AGENTS.md` — importowane pon
 
 ## Skrót dla Claude Code
 
+DevMentor — monorepo (npm workspaces): `packages/app` (Next.js App Router, composition root Awilix), `packages/core` (DI, abstrakcje), `packages/db` (MikroORM + PostgreSQL, encje, migracje), `packages/ui` (`frontend/` — Tailwind, `backend/` — shadcn/ui). Kierunek zależności `core ← db ← app`, `ui ← app`. Sprawdzenie: `npm run typecheck && npm run build`. Wiążące zasady stosu: `AGENTS.md` → „Stos technologiczny i architektura DevMentor”.
+
 Struktura `.ai/` (szczegóły i szablony w `AGENTS.md`):
 
 | Ścieżka | Przeznaczenie |
