@@ -46,6 +46,18 @@ Wszystkie pliki w `specs/`, `runs/` i `lessons/` **MUSZĄ** mieć nazwę `YYYY-M
 7. **Nie zapisuj sekretów** (tokenów, haseł, danych osobowych) w żadnym pliku w `.ai/`.
 8. Pliki w `.ai/` commituj razem ze zmianą, której dotyczą.
 
+## Sposób pracy
+
+Praktyki uzupełniające zasady obowiązkowe (na podstawie wskazówek zespołu Claude Code — Boris Cherny).
+
+1. **Najpierw plan, potem kod.** Złożone zadanie zaczynaj od planu (w Claude Code — tryb planowania) i zapisz go w specyfikacji („Projekt rozwiązania”, „Plan wdrożenia”) tak dokładnie, żeby implementacja przeszła za jednym podejściem. Gdy coś idzie nie tak, zatrzymaj się i przeplanuj (zasada 3), zamiast brnąć dalej. Przy dużej zmianie poproś sub-agenta o krytyczny przegląd planu.
+2. **Weryfikuj, zanim ogłosisz koniec.** Po zmianie w mockupach uruchom sprawdzenie z sekcji „Projekt” i przejdź zmieniony przepływ w przeglądarce (`npm run dev`); odhacz kryteria akceptacji specyfikacji. Nie raportuj sukcesu bez wyniku komend — jeśli czegoś nie dało się sprawdzić, napisz to wprost.
+3. **Korekta = reguła.** Gdy użytkownik poprawia Twój wynik lub sposób pracy, zapisz regułę zapobiegającą powtórce w `.ai/lessons.md` (zasada 6); jeśli dotyczy procesu wszystkich agentów, zaproponuj zmianę w `AGENTS.md`.
+4. **Błędy naprawiaj samodzielnie, od przyczyny.** Zgłoszony błąd albo czerwony typecheck/build to wystarczające polecenie: odtwórz, znajdź przyczynę, napraw, zweryfikuj — nie dopytuj o to, co da się ustalić z kodu.
+5. **Po doraźnej poprawce — zrób to porządnie.** Jeśli fix wyszedł obejściem lub przypadkiem specjalnym, odrzuć go i wdróż eleganckie rozwiązanie z wiedzą, którą już masz.
+6. **Sub-agenci i praca równoległa.** Szerokie przeszukiwanie, research i przeglądy zlecaj sub-agentom, żeby nie zaśmiecać głównego kontekstu. Na równoległe sesje (osobne worktree, np. cezar) dziel tylko zadania niezależne, o rozłącznym zakresie plików.
+7. **Powtarzalne czynności → skill.** To, co robisz regularnie, zaproponuj jako skill lub komendę commitowaną do repozytorium.
+
 ## `.ai/specs/` — specyfikacje SDD
 
 Specyfikacja opisuje **co** i **dlaczego** przed **jak**. Jest źródłem prawdy dla implementacji i przeglądu.
@@ -160,6 +172,7 @@ tags: []
 
 - [ ] Przeczytałem `.ai/lessons.md` na początku pracy.
 - [ ] Nietrywialna zmiana ma specyfikację w `.ai/specs/`, a kod jest z nią zgodny.
+- [ ] Zmiana w kodzie jest zweryfikowana (typecheck, build, przepływ w przeglądarce), a wynik podałem w raporcie.
 - [ ] Wdrożona specyfikacja ma `status: implemented` i leży w `.ai/specs/implemented/`.
 - [ ] Przebieg autonomiczny ma zamknięty log w `.ai/runs/`.
 - [ ] Nowe ustalenia i wnioski z naprawionych błędów są w `.ai/lessons.md` / `.ai/lessons/`.
