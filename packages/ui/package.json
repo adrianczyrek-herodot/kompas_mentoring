@@ -9,7 +9,8 @@
     "./frontend/*": "./src/frontend/*.tsx",
     "./backend/*": "./src/backend/*.tsx",
     "./styles.css": "./src/styles/globals.css",
-    "./kompas.css": "./src/styles/kompas.css"
+    "./kompas.css": "./src/styles/kompas.css",
+    "./frontend.css": "./src/styles/frontend.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

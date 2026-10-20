@@ -1,5 +1,5 @@
 import { DEMO_NOW as NOW } from '@devmentor/db/fixtures';
-import { applyDemoStudent, mentorById, store } from '../store';
+import { applyDemoStudent, mentorById, store } from '../../demo/store';
 import { OFF_PLATFORM } from '@devmentor/core/domain';
 import { Ctx, View, avatar, emptyState, errorState, esc, field, fmtDate, fmtTime, go, icon, len, req, skeleton, states, toast, validate } from '../ui';
 

@@ -1,4 +1,4 @@
-import { store } from '../store';
+import { store } from '../../demo/store';
 import { Ctx, View, avatar, bindCounters, emptyState, errorState, esc, field, fmtDate, icon, len, money, req, skeleton, states, toast, validate } from '../ui';
 
 // ---------------------------------------------------------------- A1 Weryfikacja mentorów

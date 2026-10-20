@@ -30,7 +30,7 @@ npm run dev                   # http://localhost:3000
 | `npm run db:migration:create` | Nowa migracja z różnicy encji i snapshotu schematu |
 | `npm run db:migration:up` / `db:migration:down` | Zastosowanie / cofnięcie migracji |
 
-Adresy: `/` — aplikacja (mockup Kompas, ekrany pod hashem, np. `/#/mentorzy`; dane demo, bez bazy), `/admin` — panel, `/api/health` — stan aplikacji i bazy (200 / 503).
+Adresy (dane demo, bez bazy): `/` — strona główna, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja` — strony React; `/app#/…` — ekrany jeszcze w `src/legacy` (np. `/app#/sesje`, `/app#/mapa`); `/admin` — panel; `/api/health` — stan aplikacji i bazy (200 / 503).
 
 ## Architektura
 
@@ -58,7 +58,9 @@ Podścieżki bezpieczne w przeglądarce (bez Awilixa i MikroORM):
 | `@devmentor/core/domain` | Typy domenowe (`Mentor`, `Session`, `Role`…), katalog (`CATEGORIES`, `PLAN_OPTIONS`), reguły z jawnym `now` (`weekSlots`, `canJoin`, `canCancelFree`, `commissionRate`, `planPrice`…) |
 | `@devmentor/db/fixtures` | Dane demo (`MENTORS`, `SESSIONS`, …, `DEMO_NOW`) — dziś źródło danych aplikacji, docelowo seed bazy |
 | `@devmentor/ui/lib/format`, `@devmentor/ui/lib/icons` | Formatowanie dat/kwot (pl), ścieżki ikon SVG |
-| `@devmentor/ui/kompas.css` | System wizualny Kompasu (przejściowo, do czasu przepisania ekranów na Tailwind) |
+| `@devmentor/ui/frontend.css` | Tailwind z tokenami Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `shadow-card`, `font-serif`…) + przejściowo `kompas.css` w warstwie `kompas`, bez preflightu |
+| `@devmentor/ui/frontend/*` | Komponenty React stron publicznych: `Icon`, `Avatar`, `Rating`, `buttonVariants`/`Button`, `chipVariants`, `Tag`, `Skeleton`, `EmptyState`/`ErrorState`, `Field`, `Notice`, `Toaster`/`toast()` |
+| `@devmentor/core/validation` | Walidatory wartości pól (`required`, `length`, `email`, `range`) |
 
 ### Zależności między pakietami
 
@@ -79,14 +81,15 @@ Next.js App Router w `packages/app/src/app`:
 
 | Ścieżka | Rola |
 |---|---|
-| `(legacy)/` | Root layout z `kompas.css` (bez Tailwinda) i strona `/`, która montuje aplikację z `src/legacy` |
-| `(backend)/` | Root layout z Tailwindem; `admin/` — panel na shadcn/ui z `@devmentor/ui/backend` |
-| `(frontend)/` | (od fazy 2) strony publiczne przepisane na React — Tailwind + `@devmentor/ui/frontend` |
+| `(frontend)/` | Root layout stron publicznych (`frontend.css`, `Toaster`); `(public)/` — strony React z nagłówkiem i paskiem mockupu (`/`, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja`); `app/` — strona `/app` montująca `src/legacy` |
+| `(backend)/` | Root layout z Tailwindem i preflightem; `admin/` — panel na shadcn/ui z `@devmentor/ui/backend` |
 | `api/` | Route handlery (np. `api/health`) |
-| `src/legacy/` | Aplikacja przeniesiona z mockupu: router na hashu, stan w pamięci, 22 ekrany jako HTML; start przez `startKompasApp(root)` |
+| `src/views/` | Widoki ekranów (komponenty klienckie), np. `views/public/search-view.tsx` |
+| `src/demo/` | Stan demo w pamięci (`store.ts` + `useDemoStore()`), nawigacja mockupu (`navigation.ts`: role, menu, `toUrl()`), pasek mockupu i nagłówek (`demo-chrome.tsx`), stany ekranu (`use-view-state.ts`) |
+| `src/legacy/` | Ekrany jeszcze nieprzepisane z mockupu: router na hashu, widoki jako HTML; start przez `startKompasApp(root, { navigate })` |
 | `src/server/container.ts` | Composition root kontenera Awilix (`server-only`) |
 
-Grupy tras nie wpływają na adresy URL. `(legacy)` i `(backend)` mają osobne root layouty, bo preflight Tailwinda zmieniłby wygląd ekranów Kompasu; przejście między nimi to pełne przeładowanie strony. Ekrany z `src/legacy` są kolejno przepisywane na React (fazy 2–4), a dane demo zastępowane bazą (faza 5).
+Grupy tras nie wpływają na adresy URL. Strony React i `/app` dzielą root layout `(frontend)`, więc przejścia między nimi to nawigacja klienta — stan demo w pamięci (rola, sesje, `returnTo`) zostaje, jak w mockupie. Trasa mockupu prowadzi na właściwy adres przez `toUrl()`: ekran przepisany → prawdziwa ścieżka, reszta → `/app#/…`; `src/legacy` sam przekierowuje trasy przepisanych ekranów. `(backend)` ma osobny root layout z preflightem Tailwinda (shadcn/ui). Ekrany z `src/legacy` są kolejno przepisywane na React (fazy 3–4), a dane demo zastępowane bazą (faza 5).
 
 ### Dependency Injection (Awilix)
 

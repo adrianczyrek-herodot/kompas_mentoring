@@ -17,7 +17,10 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-20** — DevMentor: TypeScript 7 (natywny) działa z Next.js 16 (`next build` i `tsc --noEmit` przechodzą); augmentacja `declare module "@devmentor/core"` poprawnie rozszerza `Cradle` reeksportowany przez `export *`.
 - **2026-10-20** — `next dev` (Next.js 16) sam tworzy i odtwarza `packages/app/AGENTS.md` z regułami Next.js — commituj go razem ze zmianą, nie usuwaj (wróci jako niezacommitowana zmiana).
 
-- **2026-10-20** — Przenosząc ekrany (`src/legacy` → React) weryfikuj regresje zrzutami ekranu przed/po: Playwright (przeglądarki są w `~/Library/Caches/ms-playwright`) + `pixelmatch`, skrypty trzymaj poza repo (np. katalog tmp cezar); stary build odtwórz przez `git archive <commit> <ścieżka>`. Pasek dev Next.js (lewy dolny róg, ~38×38 px) daje różnicę w `next dev` — porównuj na `next start`.
+- **2026-10-20** — Przenosząc ekrany (`src/legacy` → React) weryfikuj regresje zrzutami ekranu przed/po: Playwright (przeglądarki są w `~/Library/Caches/ms-playwright`) + `pixelmatch`, skrypty trzymaj poza repo (np. katalog tmp cezar); stary build odtwórz przez `git archive <commit> <ścieżka>`. Pasek dev Next.js (lewy dolny róg, ~38×38 px) daje różnicę w `next dev` — porównuj na `next start`. Katalog tmp cezar bywa czyszczony między sesjami — skrypty trzeba wtedy odtworzyć (opis w runach faz 1–2).
 - **2026-10-20** — Aplikacja z `src/legacy` i strony Tailwind muszą mieć osobne root layouty (`(legacy)`, `(backend)`): preflight Tailwinda psuje wygląd `kompas.css`. Moduły `legacy` ładuj dynamicznym `import()` w `useEffect` — dotykają `window` przy imporcie (SSR padnie).
+
+- **2026-10-20** — `frontend.css` nie ma preflightu (współistnienie z `kompas.css`): surowe `<button>`/`<input>` mają natywną ramkę i tło — dawaj im jawnie `border-0 bg-transparent`. Warianty `cva` zwracaj przez `cn()` (tailwind-merge), inaczej `border-line` wariantu przegrywa z bazowym `border-transparent` zależnie od kolejności w CSS.
+- **2026-10-20** — Przejście między stronami React a `/app` (legacy) musi być nawigacją klienta (`router.push/replace`, `<Link>`) — pełne przeładowanie zeruje stan demo w pamięci. Dlatego oba żyją w jednym root layoucie `(frontend)`.
 
 ## Błędy i ich przyczyny

@@ -1,4 +1,5 @@
 // Widoki mockupu jako stringi HTML (warstwa przejściowa — ekrany są stopniowo przepisywane na React).
+import { email, length, range as rangeRule, required } from '@devmentor/core/validation';
 import { DEMO_NOW as NOW } from '@devmentor/db/fixtures';
 import { initials } from '@devmentor/ui/lib/format';
 import { ICON_PATHS } from '@devmentor/ui/lib/icons';
@@ -94,18 +95,11 @@ export function closeModal(): void {
 
 export type Rule = (value: string, form: HTMLFormElement) => string | null;
 
-export const req = (msg = 'To pole jest wymagane.'): Rule => (v) => (v.trim() ? null : msg);
-export const len = (min: number, max: number): Rule => (v) => {
-  const n = v.trim().length;
-  if (n < min) return `Wpisz co najmniej ${min} znaków (teraz: ${n}).`;
-  if (n > max) return `Maksymalnie ${max} znaków (teraz: ${n}).`;
-  return null;
-};
-export const emailRule: Rule = (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? null : 'Podaj poprawny adres e-mail.');
-export const range = (min: number, max: number, unit = ''): Rule => (v) => {
-  const n = Number(v);
-  return Number.isFinite(n) && v !== '' && n >= min && n <= max ? null : `Podaj wartość od ${min} do ${max}${unit}.`;
-};
+// Walidatory wartości z `@devmentor/core/validation`, w sygnaturze reguły formularza.
+export const req = (msg?: string): Rule => (v) => required(msg)(v);
+export const len = (min: number, max: number): Rule => (v) => length(min, max)(v);
+export const emailRule: Rule = (v) => email(v);
+export const range = (min: number, max: number, unit = ''): Rule => (v) => rangeRule(min, max, unit)(v);
 
 export function validate(form: HTMLFormElement, rules: Record<string, Rule[]>): boolean {
   let ok = true;

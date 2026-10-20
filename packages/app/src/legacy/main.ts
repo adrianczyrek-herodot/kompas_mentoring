@@ -1,7 +1,7 @@
 import type { Role } from '@devmentor/core/domain';
-import { DEFAULT_ROUTE, applyDemoStudent, store } from './store';
+import { applyDemoStudent, store } from '../demo/store';
+import { DEFAULT_ROUTE, NAV, ROLE_LABEL, matchPattern, publicScreen, toUrl } from '../demo/navigation';
 import { Ctx, View, ViewState, closeModal, esc, icon } from './ui';
-import { auth, home, profile, search } from './screens/public';
 import { checkout, confirmation, pickSlot, plans, progress, review, room, sessionDetail, sessions } from './screens/student';
 import { earnings, mentorCalendar, mentorDashboard, mentorStudent, mentorStudents, onboarding } from './screens/mentor';
 import { disputes, verification } from './screens/admin';
@@ -13,11 +13,6 @@ type Access = 'public' | 'auth' | Role;
 interface Route { pattern: string; id: string; title: string; access: Access; screen: Screen; bare?: boolean; }
 
 const ROUTES: Route[] = [
-  { pattern: '/', id: 'P1', title: 'Strona główna', access: 'public', screen: home },
-  { pattern: '/mentorzy', id: 'P2', title: 'Wyszukiwarka mentorów', access: 'public', screen: search },
-  { pattern: '/mentorzy/:id', id: 'P3', title: 'Profil mentora', access: 'public', screen: profile },
-  { pattern: '/logowanie', id: 'P4', title: 'Logowanie', access: 'public', screen: (c) => auth({ ...c, params: { mode: 'logowanie' } }) },
-  { pattern: '/rejestracja', id: 'P4', title: 'Rejestracja', access: 'public', screen: (c) => auth({ ...c, params: { mode: 'rejestracja' } }) },
   { pattern: '/rezerwacja/:mentorId', id: 'U1', title: 'Wybór terminu', access: 'public', screen: pickSlot },
   { pattern: '/rezerwacja/:mentorId/platnosc', id: 'U2', title: 'Checkout', access: 'student', screen: checkout },
   { pattern: '/potwierdzenie/:id', id: 'U3', title: 'Potwierdzenie rezerwacji', access: 'student', screen: confirmation },
@@ -42,22 +37,10 @@ const ROUTES: Route[] = [
   { pattern: '/mapa', id: '—', title: 'Mapa ekranów', access: 'public', screen: screenMap },
 ];
 
-const ROLE_LABEL: Record<Role, string> = { guest: 'Gość', student: 'Uczeń', mentor: 'Mentor', admin: 'Admin' };
-
-const NAV: Record<Role, [string, string, string][]> = {
-  guest: [['#/mentorzy', 'Znajdź mentora', 'search'], ['#/mentor/onboarding/1', 'Zostań mentorem', 'user']],
-  student: [['#/mentorzy', 'Szukaj', 'search'], ['#/sesje', 'Sesje', 'cal'], ['#/wiadomosci', 'Wiadomości', 'chat'], ['#/postepy', 'Postępy', 'target'], ['#/plany', 'Plany', 'wallet']],
-  mentor: [['#/mentor', 'Panel', 'home'], ['#/mentor/kalendarz', 'Kalendarz', 'cal'], ['#/mentor/uczniowie', 'Uczniowie', 'users'], ['#/wiadomosci', 'Wiadomości', 'chat'], ['#/mentor/zarobki', 'Zarobki', 'wallet']],
-  admin: [['#/admin/weryfikacja', 'Weryfikacja', 'shield'], ['#/admin/spory', 'Spory', 'flag']],
-};
-
 function match(path: string): { route: Route; params: Record<string, string> } | null {
-  const parts = path.split('/').filter(Boolean);
   for (const route of ROUTES) {
-    const rp = route.pattern.split('/').filter(Boolean);
-    if (rp.length !== parts.length) continue;
-    const params: Record<string, string> = {};
-    if (rp.every((p, i) => (p.startsWith(':') ? ((params[p.slice(1)] = decodeURIComponent(parts[i]!)), true) : p === parts[i]))) return { route, params };
+    const params = matchPattern(route.pattern, path);
+    if (params) return { route, params };
   }
   return null;
 }
@@ -72,8 +55,9 @@ function parseHash(): { path: string; query: URLSearchParams } {
   return { path: path || '/', query };
 }
 
-// Element, w którym renderowana jest aplikacja — ustawiany przez startKompasApp().
+// Element, w którym renderowana jest aplikacja, i nawigacja do stron React — ustawiane przez startKompasApp().
 let app: HTMLElement;
+let navigate: (url: string) => void;
 let navToken = 0;
 
 function header(route: Route): string {
@@ -121,6 +105,11 @@ function guard(route: Route): string | null {
 function render(fresh: boolean): void {
   closeModal();
   const { path, query } = parseHash();
+  // Ekrany publiczne (P1–P4) są już stronami React — przejście pod prawdziwy adres zamiast renderu tutaj.
+  if (publicScreen(path)) {
+    navigate(toUrl(location.hash));
+    return;
+  }
   const m = match(path);
   const route = m?.route ?? ROUTES.find((r) => r.pattern === '/mapa')!;
   const forced = query.get('state') as ViewState | null;
@@ -175,11 +164,13 @@ function bindChrome(): void {
 const onHashChange = (): void => render(true);
 
 /**
- * Uruchamia aplikację (router na hashu) w podanym elemencie.
+ * Uruchamia aplikację (router na hashu) w podanym elemencie. `navigate` przenosi na strony React
+ * (router Next.js, bez przeładowania — stan demo zostaje w pamięci).
  * Zwraca funkcję sprzątającą — wywoływaną przy odmontowaniu komponentu React.
  */
-export function startKompasApp(root: HTMLElement): () => void {
+export function startKompasApp(root: HTMLElement, options: { navigate: (url: string) => void }): () => void {
   app = root;
+  navigate = options.navigate;
   window.addEventListener('hashchange', onHashChange);
   render(true);
   return () => {

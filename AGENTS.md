@@ -7,7 +7,7 @@ Ten plik obowiązuje **każdego** agenta AI pracującego w tym repozytorium (Cla
 **DevMentor** — aplikacja portalu mentoringu 1:1, monorepo w `packages/`. Opis architektury: `README.md`.
 
 - Koncepcja produktu (punkt odniesienia dla ekranów i reguł domenowych): `kompas-mentoring/KONCEPCJA.md`, `kompas-mentoring/README.md`.
-- Aplikacja powstaje z klikalnego mockupu Kompas przenoszonego fazami — plan i postęp: `.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`. Kod mockupu: `packages/app/src/legacy/`.
+- Aplikacja powstaje z klikalnego mockupu Kompas przenoszonego fazami — plan i postęp: `.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`. Ekrany przepisane: `packages/app/src/views/`; jeszcze nieprzepisane: `packages/app/src/legacy/` (pod `/app#/…`).
 - Sprawdzenie zmian (z korzenia repo): `npm run typecheck && npm run build`.
 
 ## Stos technologiczny i architektura DevMentor
@@ -44,7 +44,7 @@ Zasady:
 3. **Pakiety wewnętrzne to źródła TS** bez kroku budowania (`exports` wskazuje na `src/`); nowy pakiet dopisz do `transpilePackages` w `packages/app/next.config.ts`.
 4. Nowy pakiet w `packages/` dodawaj tylko po decyzji użytkownika; nazwa `@devmentor/<nazwa>`, `tsconfig.json` rozszerzający `../../tsconfig.base.json`, skrypt `typecheck`.
 5. **Podścieżki dla przeglądarki:** kod kliencki importuje z pakietów tylko moduły bez zależności serwerowych: `@devmentor/core/domain`, `@devmentor/db/fixtures`, `@devmentor/ui/*`. Nigdy `@devmentor/core` (Awilix) ani `@devmentor/db` (MikroORM) w komponentach `"use client"`.
-6. **`src/legacy` (przejściowo):** ekrany mockupu jako HTML ze stringów. Nie rozbudowuj ich o nowe funkcje — nowy kod pisz w React (`(frontend)`/`(backend)`), a przepisany ekran usuń z `legacy`. Zmiany w `legacy` weryfikuj zrzutami ekranu przed/po.
+6. **`src/legacy` (przejściowo):** ekrany mockupu jako HTML ze stringów. Nie rozbudowuj ich o nowe funkcje — nowy kod pisz w React (`(frontend)`/`(backend)`), a przepisany ekran usuń z `legacy`. Przepisując ekran: dodaj stronę i widok w `src/views/`, wpisz trasę do `PUBLIC_SCREENS` w `src/demo/navigation.ts` (wtedy `toUrl()` i przekierowanie w `legacy` kierują na nią same), usuń trasę z `ROUTES` w `legacy/main.ts`. Linki do ekranów buduj przez `toUrl('#/…')`, a po zmianie `store` w React wywołaj `notify()`. Zmiany w `legacy` weryfikuj zrzutami ekranu przed/po.
 7. Przed pisaniem kodu Next.js sprawdź API w dokumentacji zainstalowanej wersji (`node_modules/next/dist/docs/`) — wersja może być nowsza niż Twoja wiedza. `packages/app/AGENTS.md` generuje `next dev`; nie usuwaj go i nie edytuj ręcznie.
 
 ### Dependency Injection (Awilix)
@@ -65,7 +65,8 @@ Zasady:
 
 ### UI: Tailwind (frontend) i shadcn/ui (backend)
 
-1. **Strony frontendowe** (publiczne, grupa tras `src/app/(frontend)/`): Tailwind + komponenty z `@devmentor/ui/frontend`. Nie importuj tu `@devmentor/ui/backend`.
+1. **Strony frontendowe** (publiczne, grupa tras `src/app/(frontend)/`): Tailwind + komponenty z `@devmentor/ui/frontend`, kolory i typografia z tokenów Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `font-serif` — `@devmentor/ui/frontend.css`). Nie importuj tu `@devmentor/ui/backend`.
+   - Dopóki istnieje `src/legacy`, `frontend.css` nie ma preflightu: surowe `<button>`/`<input>` dostają jawnie `border-0 bg-transparent` (albo `buttonVariants`/`inputClass`). Nie używaj nazw klas z `kompas.css` i nie wyłączaj `@source not` dla `src/legacy`.
 2. **Strony backendowe** (panel, `src/app/(backend)/admin/`): komponenty shadcn/ui z `@devmentor/ui/backend`, kolory przez tokeny motywu (`bg-card`, `text-muted-foreground`), nie surowe palety.
 3. Nowy komponent shadcn dodawaj CLI z katalogu pakietu UI: `cd packages/ui && npx shadcn@latest add <komponent>` (konfiguracja w `packages/ui/components.json`); wygenerowany kod wolno dostosować.
 4. Komponent używany w więcej niż jednym miejscu przenieś do `@devmentor/ui`; komponenty jednorazowe zostają w `packages/app`. Klasy łącz przez `cn()`.

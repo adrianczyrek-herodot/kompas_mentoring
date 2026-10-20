@@ -1,0 +1,4 @@
+@import "@devmentor/ui/frontend.css";
+
+/* Ekrany z src/legacy używają klas z kompas.css — Tailwind nie może generować dla nich utilities. */
+@source not "../../legacy";

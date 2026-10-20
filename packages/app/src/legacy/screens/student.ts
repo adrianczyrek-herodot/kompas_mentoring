@@ -1,6 +1,6 @@
 import { PLAN_OPTIONS, type Session } from '@devmentor/core/domain';
 import { DEMO_NOW as NOW, MENTORS } from '@devmentor/db/fixtures';
-import { mentorById, sessionById, store } from '../store';
+import { mentorById, sessionById, store } from '../../demo/store';
 import {
   FREE_CANCEL_HOURS, HOLD_MINUTES, canCancelFree, canJoin, hasStarted, nextFreeWeek, planPrice, transferSessions, weekSlots,
 } from '@devmentor/core/domain';

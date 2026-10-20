@@ -12,10 +12,12 @@ Klikalne mockupy zostały przeniesione do monorepo DevMentor (zob. [`README.md`]
 
 | Ścieżka | Co to jest |
 |---|---|
-| `packages/app/src/legacy/` | Router, pasek mockupu, stan w pamięci i ekrany (`screens/*`) — widoki jako HTML, stopniowo przepisywane na React |
+| `packages/app/src/views/public/` | P1–P4 (strona główna, wyszukiwarka, profil, logowanie/rejestracja) przepisane na React + Tailwind |
+| `packages/app/src/legacy/` | Pozostałe ekrany (`screens/*`) i ich router — widoki jako HTML, stopniowo przepisywane na React |
+| `packages/app/src/demo/` | Stan demo w pamięci, role i nawigacja, pasek mockupu |
 | `packages/core/src/domain/` | Typy domenowe i reguły jako czyste funkcje (dawniej `domain.ts`) |
 | `packages/db/src/fixtures/` | Dane demo (dawniej `mocks.ts`) |
-| `packages/ui/src/styles/kompas.css`, `packages/ui/src/lib/` | Style, formatowanie i ikony |
+| `packages/ui/src/styles/`, `packages/ui/src/lib/`, `packages/ui/src/frontend/` | Style (Tailwind z tokenami Kompasu, `kompas.css`), formatowanie, ikony, komponenty React |
 
 ## Jak uruchomić
 
@@ -23,7 +25,7 @@ Z korzenia repozytorium:
 
 ```bash
 npm install
-npm run dev         # http://localhost:3000 — mockup pod /, panel pod /admin
+npm run dev         # http://localhost:3000 — strony publiczne pod /, pozostałe ekrany pod /app#/…, panel pod /admin
 npm run typecheck
 npm run build
 ```

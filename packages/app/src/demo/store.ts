@@ -1,4 +1,5 @@
-// Stan aplikacji w pamięci (mockupy nie mają backendu).
+// Stan aplikacji demo w pamięci (bez backendu) — wspólny dla stron React i ekranów z `src/legacy`.
+// Moduł żyje przez całą sesję karty: nawigacja klienta Next.js go nie resetuje, przeładowanie strony — tak (jak w mockupie).
 import type { Role, Session, Thread } from '@devmentor/core/domain';
 import { MENTORS, SESSIONS, THREADS, REQUESTS, APPLICATIONS, DISPUTES, NOTIFICATIONS } from '@devmentor/db/fixtures';
 
@@ -48,12 +49,6 @@ export const store = {
 export const mentorById = (id: string | undefined) => MENTORS.find((m) => m.id === id);
 export const sessionById = (id: string | undefined) => store.sessions.find((s) => s.id === id);
 
-export const DEFAULT_ROUTE: Record<Role, string> = {
-  guest: '#/',
-  student: '#/sesje',
-  mentor: '#/mentor',
-  admin: '#/admin/weryfikacja',
-};
 
 /** Persona demo: uczeń z historią sesji, planem i saldem u Kasi. */
 export function applyDemoStudent(): void {
@@ -72,3 +67,21 @@ export function applyFreshStudent(): void {
 }
 
 applyDemoStudent();
+
+// ---- Subskrypcja zmian (dla komponentów React) --------------------------------
+
+const listeners = new Set<() => void>();
+let version = 0;
+
+/** Powiadamia subskrybentów po zmianie `store` (ekrany `legacy` przerysowują się same i tego nie potrzebują). */
+export function notify(): void {
+  version++;
+  listeners.forEach((l) => l());
+}
+
+export function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+export const getVersion = (): number => version;

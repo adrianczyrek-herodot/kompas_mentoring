@@ -38,15 +38,30 @@ Jedyną działającą aplikacją w repo jest klikalny mockup `kompas-mentoring/m
 - [x] Brak odwołań do `kompas-mentoring/mockupy` w kodzie i dokumentacji poza historią (`.ai/runs`, specyfikacje wdrożone).
 - [x] `core` nie importuje `db`/`ui`; `ui` nie importuje `db`/`core`; `db` nie importuje React.
 
-### Faza 2 — ekrany publiczne w React + Tailwind (następna)
+### Faza 2 — ekrany publiczne w React + Tailwind
 P1–P4 (strona główna, wyszukiwarka, profil, logowanie/rejestracja) jako strony Next.js w `(frontend)` z komponentami `@devmentor/ui/frontend`; prawdziwe adresy URL zamiast hasha; usunięcie odpowiedników z `legacy`.
-**Kryteria:** ekrany zgodne funkcjonalnie z mockupem, stany loading/empty/error, typecheck/build.
 
-### Faza 3 — ekrany ucznia (U1–U9) i współdzielone (S1–S3) w React
+**Projekt fazy 2**
+- Trasy: `/` (P1), `/mentorzy` (P2, filtry w query: `topic`, `priceMax`, `verified`, `time`, `sort`), `/mentorzy/[id]` (P3), `/logowanie`, `/rejestracja` (P4, `?jako=mentor`). Pozostałe ekrany mockupu przechodzą pod `/app#/…` (np. `/app#/sesje`).
+- Jeden root layout `(frontend)` dla stron React i `/app`: przejścia między nimi są nawigacją klienta (bez przeładowania), więc stan demo w pamięci (rola, sesje, ulubieni, `returnTo`) przeżywa przejście jak w mockupie. Grupa `(legacy)` znika. CSS: `@devmentor/ui/frontend.css` = motyw Tailwinda (tokeny Kompasu) + `kompas.css` w warstwie `kompas` + utilities — **bez preflightu**; utilities wygrywają z `kompas.css`, a `src/legacy` jest wyłączone ze skanowania Tailwinda (`@source not`).
+- Stan demo: `src/legacy/store.ts` → `src/demo/store.ts` z `subscribe`/`notify` i hookiem `useDemoStore()` (React). Nawigacja mockupu (`NAV`, `ROLE_LABEL`, `DEFAULT_ROUTE`, tabela ekranów publicznych) → `src/demo/navigation.ts`; `toUrl('#/…')` zamienia trasę mockupu na adres: publiczne → prawdziwa ścieżka, reszta → `/app#/…`.
+- Legacy: trasy P1–P4 i `screens/public.ts` usunięte; `render()` przekierowuje trasę publiczną przez `navigate(toUrl(…))` (router Next.js, `replace`), więc istniejące linki `#/mentorzy`, `go('#/rejestracja')`, `DEFAULT_ROUTE.guest` działają bez zmian. Stare adresy `/#/…` przekierowuje strona główna.
+- Chrome dla stron React (pasek MOCKUP: rola, stany, mapa; topbar z nawigacją wg roli; bottomnav; stopka) jako komponent React w Tailwindzie; `/app` zachowuje chrome z `legacy` do fazy 4.
+- `@devmentor/ui/frontend`: `Icon`, `Avatar`, `Rating`, `buttonVariants`, `Tag`, `Chip`, `Skeleton`, `EmptyState`, `ErrorState`, `Field`, `Toaster`/`toast()`. Walidatory wartości (`required`, `length`, `email`) → `@devmentor/core/validation` (używane przez React i `legacy`).
+- Stany ekranu: `?state=loading|empty|error` jak w mockupie; przy wejściu na stronę 280 ms „loading”, jak w mockupie.
+
+**Kryteria ukończenia fazy 2** — ✅ ukończona 2026-10-20 (run: `.ai/runs/2026-10-20-migracja-faza-2-ekrany-publiczne.md`)
+- [x] `npm run typecheck` i `npm run build` zielone.
+- [x] P1–P4 pod prawdziwymi adresami, w React + Tailwind, funkcjonalnie zgodne z mockupem — 28 automatycznych sprawdzeń przepływów (`next start` i `next dev`); wyniki wyszukiwarki identyczne z mockupem dla 8 kombinacji filtrów; zrzuty porównane wizualnie z mockupem.
+- [x] Przejścia React ↔ `/app` zachowują stan demo (rola, `returnTo`, toast); przełącznik roli działa na obu; wstecz z `/mentorzy` wraca do `/app#/sesje`.
+- [x] Ekrany pozostałe w `legacy` (pod `/app`) identyczne co do piksela z mockupem — 24/24 przy 1280 i 360 px.
+- [x] `src/legacy` nie zawiera P1–P4; brak kolizji klas utilities z `kompas.css` (sprawdzone na zbudowanym CSS), brak preflightu.
+
+### Faza 3 — ekrany ucznia (U1–U9) i współdzielone (S1–S3) w React (następna)
 Stan klienta (rezerwacja, saldo, sesje) przeniesiony ze `store` do warstwy serwisów z DI; komponenty wspólne do `@devmentor/ui`.
 
 ### Faza 4 — panel mentora (M1–M5) i admina (A1–A2) na shadcn/ui
-Ekrany backendowe w `(backend)` na komponentach `@devmentor/ui/backend`; usunięcie `src/legacy` i `kompas.css`.
+Ekrany backendowe w `(backend)` na komponentach `@devmentor/ui/backend`; usunięcie `src/legacy` i `kompas.css`. Przy usuwaniu `kompas.css`: przenieść do warstwy `base` w `frontend.css` style elementów, na których dziś polegają też strony React (tło i font `body`, marginesy `p`/`h*`, `font: inherit` dla kontrolek) albo włączyć preflight i sprawdzić zrzuty P1–P4.
 
 ### Faza 5 — dane w PostgreSQL
 Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `@devmentor/db/fixtures`; serwisy w `core`/`db` rejestrowane w Awilix; ekrany czytają dane przez `getRequestScope()`.
@@ -59,3 +74,8 @@ Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `
 - 2026-10-20 — Faza 1: `noUncheckedIndexedAccess` z `tsconfig.base.json` objął kod mockupu — ~35 miejsc poprawionych jawnie (`!` tam, gdzie mockup zakładał obecność elementu, `?? 0`/`?? ''` przy wartościach domyślnych); bez zmiany zachowania (zrzuty identyczne). Lookupi `mentorById`/`sessionById` przyjmują `string | undefined`.
 - 2026-10-20 — Faza 1: walidacja formularzy (`req`, `len`, `validate`…) zostaje w `src/legacy/ui.ts` — jest związana z DOM (`HTMLFormElement`); przeniesienie razem z ekranami w fazach 2–4.
 - 2026-10-20 — Faza 1: komponenty `@devmentor/ui/frontend` (`Container`, `Hero`) chwilowo nieużywane (strona `/` to teraz aplikacja z `legacy`); zostają jako baza fazy 2.
+- 2026-10-20 — Faza 2: strony React i `/app` w jednym root layoucie `(frontend)` (zamiast osobnych `(legacy)`), żeby przejścia były nawigacją klienta i stan demo w pamięci przeżywał je jak w mockupie. Konsekwencja: `frontend.css` bez preflightu do końca fazy 4.
+- 2026-10-20 — Faza 2: przekierowanie tras przepisanych ekranów w `legacy/main.ts` (`render()` → `navigate(toUrl(hash))`, `router.replace`) zamiast przepisywania kilkudziesięciu linków `#/…` w ekranach — jedno miejsce, linki i `go()` działają bez zmian, a historia „wstecz” nie zapętla się.
+- 2026-10-20 — Faza 2: logika wyszukiwarki (filtry z adresu, sortowanie, aktywne filtry, podobni mentorzy) → `@devmentor/core/domain/search.ts`; walidatory → `@devmentor/core/validation` (używa ich też `legacy`).
+- 2026-10-20 — Faza 2: `/app` bez hasha prowadzi na `/` (dawne `/` mockupu = P1); stare adresy `/#/…` przekierowuje P1.
+- 2026-10-20 — Faza 2: znana drobna różnica wizualna — placeholder wideo w P3 jest wyższy niż w mockupie (proporcja 16:9 z Tailwinda; w mockupie siatka spłaszczała go); poza tym strony P1–P4 wyglądają jak w mockupie.

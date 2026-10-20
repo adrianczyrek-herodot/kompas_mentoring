@@ -1,6 +1,6 @@
 import { CATEGORIES, commissionRate, nextTier } from '@devmentor/core/domain';
 import { EARNINGS, STUDENTS } from '@devmentor/db/fixtures';
-import { store } from '../store';
+import { store } from '../../demo/store';
 import {
   Ctx, View, avatar, bindCounters, closeModal, dayShort, emptyState, errorState, esc, field, fmtDate, fmtDateLong, fmtTime,
   go, icon, len, money, openModal, range, req, skeleton, states, toast, validate,
