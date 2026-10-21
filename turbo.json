@@ -25,7 +25,7 @@
     "test:e2e": {
       "dependsOn": ["build"],
       "cache": false,
-      "env": ["CI", "DATABASE_URL", "E2E_EXPECT_DB"]
+      "env": ["CI", "DATABASE_URL", "E2E_EXPECT_DB", "E2E_PORT", "E2E_REUSE_SERVER"]
     }
   }
 }

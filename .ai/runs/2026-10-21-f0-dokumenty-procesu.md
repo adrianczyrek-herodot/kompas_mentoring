@@ -3,6 +3,7 @@ title: F0 część B — dokumenty procesu (ADR, CODE_REVIEW, SDLC, BC, agentic.
 date: 2026-10-21
 agent: Claude Code (Sonnet 5.5) przez cezar, zadanie podrzędne ae621dfa
 status: done
+spec: .ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md
 spec: .ai/specs/2026-10-21-f0-szkielet-i-harness.md
 branch: cez/ae621dfa
 ---

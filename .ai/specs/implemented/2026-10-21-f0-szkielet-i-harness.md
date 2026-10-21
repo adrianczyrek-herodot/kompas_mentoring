@@ -1,8 +1,8 @@
 ---
 title: F0 — szkielet monorepo i harness dla agentów
-status: in-progress      # draft | approved | in-progress | implemented | archived
+status: implemented      # draft | approved | in-progress | implemented | archived
 created: 2026-10-21
-implemented:
+implemented: 2026-10-21
 related:
   - .ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md
   - .ai/runs/2026-10-21-wdrozenie-standardow-f0.md
@@ -38,14 +38,14 @@ Pierwsza faza planu z `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.
 
 ## Kryteria akceptacji
 
-- [ ] Wymaganie 1 spełnione lokalnie (wynik komend w runie).
-- [ ] Naruszenie granicy modułu (np. import `modules/scheduling/domain` z `apps/web`) daje błąd ESLint z komunikatem naprawy — sprawdzone testem lub ręcznie i zapisane w runie.
-- [ ] `new Date()` w `domain/**` daje błąd ESLint.
-- [ ] Testy jednostkowe Money/Clock/Result/ID i `canCancelFree` zielone.
-- [ ] Test integracyjny z Testcontainers istnieje i jest pomijany z czytelnym komunikatem, gdy Docker niedostępny (w CI uruchamiany).
-- [ ] Smoke e2e Playwright: strona główna i `/api/health`.
-- [ ] Dokumenty z części B utworzone; `AGENTS.md` zawiera słownik, reguły modułów i komendy weryfikacji.
-- [ ] Mockupy (`kompas-mentoring/mockupy`) nadal przechodzą `npm run typecheck && npm run build`.
+- [x] Wymaganie 1 spełnione lokalnie (wynik komend w runie).
+- [x] Naruszenie granicy modułu (np. import `modules/scheduling/domain` z `apps/web`) daje błąd ESLint z komunikatem naprawy — sprawdzone testem lub ręcznie i zapisane w runie.
+- [x] `new Date()` w `domain/**` daje błąd ESLint.
+- [x] Testy jednostkowe Money/Clock/Result/ID i `canCancelFree` zielone.
+- [x] Test integracyjny z Testcontainers istnieje i jest pomijany z czytelnym komunikatem, gdy Docker niedostępny (w CI uruchamiany — job `integration` jeszcze nie wykonany, repo bez uruchomionego CI).
+- [x] Smoke e2e Playwright: strona główna i `/api/health`.
+- [x] Dokumenty z części B utworzone; `AGENTS.md` zawiera słownik, reguły modułów i komendy weryfikacji.
+- [x] Mockupy (`kompas-mentoring/mockupy`) nadal przechodzą `npm run typecheck && npm run build`.
 
 ## Projekt rozwiązania
 
@@ -61,3 +61,8 @@ Struktura repozytorium zgodnie z §2.2 spec stacku. Mockupy zostają osobnym pak
 
 - 2026-10-21 — Na potrzeby F0 przyjęte rekomendacje spec stacku dla Q1 (MikroORM 7 + Awilix), Q2 (bez Open Mercato jako frameworka) i Q8 (Frankfurt) — polecenie wdrożenia spec stacku od właściciela. Pozostałe pytania (Q3–Q7, Q9–Q12) nie dotyczą F0 i pozostają otwarte.
 - 2026-10-21 — Docker niedostępny na maszynie wykonującej przebieg: testy integracyjne Testcontainers muszą się pomijać lokalnie bez Dockera, a uruchamiać w CI.
+- 2026-10-21 — Wersje inne niż w spec stacku: pnpm 11.28.6 (pnpm 12 wymaga corepack ≥ 0.36), TypeScript 6.0.3 (typescript-eslint wymaga TS < 6.1); turbo 2.11.9, typescript-eslint 8.71.2, dependency-cruiser 18.6.0, knip 6.41.0, commitlint 21.2.3 — nowsze wydania miały < 3 dni (`minimumReleaseAge`).
+- 2026-10-21 — Rozmieszczenie: `SystemClock` w `shared/infrastructure` (lint domeny zabrania `Temporal.Now`); funkcje `Money` jako przestrzeń nazw `money`; migracja inicjalna w `shared/infrastructure/db/migrations`; lefthook instalowany przez `pnpm hooks:install` (bez `prepare`); `pnpm test` = jednostkowe, `pnpm test:integration` osobno.
+- 2026-10-21 — Playwright: port przez `E2E_PORT`, reuse serwera tylko przy `E2E_REUSE_SERVER=1`, domyślny `DATABASE_URL` z docker-compose (po wykryciu, że lokalnie testy trafiały w obcy serwer na porcie 3100).
+- 2026-10-21 — `BACKWARD_COMPATIBILITY.md`: okres wygaszania 6 mies. to propozycja spoza spec stacku — do potwierdzenia przez właściciela. Blok `humanReview` w `.ai/agentic.config.json` to nasze rozszerzenie (skille go nie egzekwują) — egzekwowanie przez CODEOWNERS / ochronę gałęzi po założeniu repo w GitHub.
+- 2026-10-21 — Po przeglądzie (516f417a, approve): ORM przeniesiony do kontenera DI — `@kompas/core` nie eksportuje już `createOrm`/`Orm`, aplikacje dostają tylko `databaseHealth` (§2.4 reguła 4); reguła czystości domeny rozszerzona o destrukturyzację `Temporal.Now`, `performance.now()`, `crypto.randomUUID()/getRandomValues()`. Odłożone: kontrola waluty w `money.add/subtract/equals` (dopiero przy drugiej walucie).

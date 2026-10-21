@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 3100;
+// E2E_PORT overrides the port when 3100 is taken (e.g. by another worktree's dev server).
+const PORT = Number(process.env['E2E_PORT'] ?? 3100);
 
 export default defineConfig({
   testDir: './e2e',
@@ -22,7 +23,12 @@ export default defineConfig({
   webServer: {
     command: `pnpm exec next start --port ${PORT}`,
     url: `http://127.0.0.1:${PORT}`,
-    reuseExistingServer: process.env['CI'] !== 'true',
+    // Reuse only on request: silently reusing whatever listens on PORT tests a foreign app.
+    reuseExistingServer: process.env['E2E_REUSE_SERVER'] === '1',
     timeout: 120_000,
+    // Defaults to the docker-compose database (.env.example), so the app boots without a local .env.
+    env: {
+      DATABASE_URL: process.env['DATABASE_URL'] ?? 'postgres://kompas:kompas@localhost:5432/kompas',
+    },
   },
 });

@@ -1,19 +1,18 @@
 import { contract } from '@kompas/contracts';
-import { checkDatabase } from '@kompas/core';
 import { implement } from '@orpc/server';
-import { getRuntime } from './runtime.ts';
+import { getContainer } from './runtime.ts';
 
 const os = implement(contract);
 
 const health = os.health.handler(async () => {
-  const { orm, container } = getRuntime();
-  const db = await checkDatabase(orm);
+  const { databaseHealth, clock } = getContainer().cradle;
+  const db = await databaseHealth();
   return {
     status: db === 'up' ? 'ok' : 'degraded',
     app: 'ok',
     db,
     version: process.env['APP_VERSION'] ?? 'dev',
-    time: container.cradle.clock.now().toString(),
+    time: clock.now().toString(),
   } as const;
 });
 

@@ -7,7 +7,7 @@ related:
   - kompas-mentoring/KONCEPCJA.md
   - kompas-mentoring/mockupy/src/domain.ts
   - AGENTS.md
-  - .ai/specs/2026-10-21-f0-szkielet-i-harness.md
+  - .ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md
 ---
 
 # Tech stack, architektura, standardy inżynieryjne i wzorce projektowe — Kompas MVP
@@ -662,11 +662,11 @@ Ceny do ponownego sprawdzenia przed zakupem (część z cenników stron trzecich
 ## Kryteria akceptacji
 
 - [ ] Specyfikacja zaakceptowana przez właściciela (`status: approved`), odpowiedzi na Q1–Q12 wpisane w „Decyzje i zmiany”.
-- [ ] ADR-y 0001–0005 utworzone w `docs/decisions/` na podstawie §1–§4.
-- [ ] Faza F0 (szkielet) spełnia definicję ukończenia z §10.5 i zawiera: monorepo, oba procesy, Postgres w docker compose, pierwszą migrację, kontener DI, `/api/health`, lint/typecheck/test/build, testy architektury, smoke e2e, CI z preview.
+- [x] ADR-y 0001–0005 utworzone w `docs/decisions/` na podstawie §1–§4.
+- [ ] Faza F0 (szkielet) spełnia definicję ukończenia z §10.5 i zawiera: monorepo, oba procesy, Postgres w docker compose, pierwszą migrację, kontener DI, `/api/health`, lint/typecheck/test/build, testy architektury, smoke e2e, CI z preview. — *2026-10-21: wszystko poza preview (deploy Cloud Run + Neon wymaga kont i sekretów; w CI wyłączony szkic) i pierwszym zielonym przebiegiem CI z Dockerem (`docker compose`, `db:migrate`, testy integracyjne). Spec F0 w `implemented/`.*
 - [ ] Moduł wzorcowy `scheduling` (F3) ma: maszynę stanów z §4.3, oba ograniczenia wykluczające i indeks sesji próbnej z testami integracyjnymi (równoległe holdy, wygasły hold, wyścig przełożeń), testy właściwości slotów przez DST.
 - [ ] Specyfikacja F4 zawiera pełną tabelę księgowań (§4.5) dla każdego zdarzenia płatniczego, łącznie z próbną, zwrotem, wygaśnięciem i chargebackiem.
-- [ ] `AGENTS.md` uzupełniony o słownik domeny (§6.2), reguły modułów (§2.4) i komendy weryfikacji; `.ai/agentic.config.json`, `CODE_REVIEW.md`, `SDLC.md`, `BACKWARD_COMPATIBILITY.md` utworzone.
+- [x] `AGENTS.md` uzupełniony o słownik domeny (§6.2), reguły modułów (§2.4) i komendy weryfikacji; `.ai/agentic.config.json`, `CODE_REVIEW.md`, `SDLC.md`, `BACKWARD_COMPATIBILITY.md` utworzone.
 
 ## Projekt rozwiązania
 
@@ -715,7 +715,7 @@ Każda faza zostawia działającą aplikację i ma własną specyfikację w `.ai
 
 - 2026-10-21 — Wersja robocza na podstawie researchu (stan rynku i przepisów na 2026-10-21).
 - 2026-10-21 — Po niezależnym przeglądzie: dodany stan `hold` i rozgałęzienie próbna/plan w maszynie `Booking`; wygaszanie nieaktualnych holdów w komendzie `createHold`; indeks sesji próbnej nie blokuje ponownej próby; ograniczenie nakładania dla ucznia; rozliczenie po zamknięciu okna sporu (72 h); rezerwacja kredytu przy umawianiu, partie kredytu z datą ważności i tabela księgowań z kontem `stripe_clearing`; CSP z nonce tylko na trasach zalogowanych; Better Auth przez adapter Kysely; TS 6 zamiast TS 6 + TS 7; tsconfig per środowisko; pg-boss: `web` tylko wysyła przez pooler, outbox = zadania w transakcji; uproszczenia MVP (11 modułów zamiast 14, widoki SQL zamiast projekcji, Stryker od F8, bez Bunny/OpenFeature/Grafany/passkeys w MVP, 5 ADR). Czeka na akceptację właściciela i odpowiedzi Q1–Q12.
-- 2026-10-21 — Właściciel zlecił wdrożenie spec (status `in-progress`). Start od F0 i dokumentów procesu (spec `.ai/specs/2026-10-21-f0-szkielet-i-harness.md`); dla F0 przyjęte rekomendacje Q1 (MikroORM + Awilix), Q2 (bez Open Mercato), Q8 (Frankfurt). Q3–Q7 i Q9–Q12 nadal otwarte — blokują dopiero F4–F7.
+- 2026-10-21 — Właściciel zlecił wdrożenie spec (status `in-progress`). Start od F0 i dokumentów procesu (spec `.ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md`); dla F0 przyjęte rekomendacje Q1 (MikroORM + Awilix), Q2 (bez Open Mercato), Q8 (Frankfurt). Q3–Q7 i Q9–Q12 nadal otwarte — blokują dopiero F4–F7.
 
 ## Źródła
 
