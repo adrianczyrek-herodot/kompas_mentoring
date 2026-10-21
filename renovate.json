@@ -1,0 +1,76 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":pinAllExceptPeerDependencies"
+  ],
+  "timezone": "Europe/Warsaw",
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "rangeStrategy": "pin",
+  "ignorePaths": ["kompas-mentoring/**"],
+  "vulnerabilityAlerts": {
+    "minimumReleaseAge": null
+  },
+  "packageRules": [
+    {
+      "groupName": "mikro-orm",
+      "matchPackageNames": ["/^@mikro-orm\\//"]
+    },
+    {
+      "groupName": "orpc",
+      "matchPackageNames": ["/^@orpc\\//"]
+    },
+    {
+      "groupName": "commitlint",
+      "matchPackageNames": ["/^@commitlint\\//"]
+    },
+    {
+      "groupName": "tailwind",
+      "matchPackageNames": ["tailwindcss", "/^@tailwindcss\\//"]
+    },
+    {
+      "groupName": "testcontainers",
+      "matchPackageNames": ["testcontainers", "/^@testcontainers\\//"]
+    },
+    {
+      "groupName": "react and next",
+      "matchPackageNames": [
+        "next",
+        "@next/*",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ]
+    },
+    {
+      "groupName": "lint tooling",
+      "matchPackageNames": [
+        "eslint",
+        "@eslint/*",
+        "typescript-eslint",
+        "eslint-plugin-*",
+        "eslint-import-resolver-typescript",
+        "@biomejs/biome",
+        "knip",
+        "dependency-cruiser"
+      ]
+    },
+    {
+      "groupName": "test tooling",
+      "matchPackageNames": ["vitest", "@vitest/*", "@playwright/test"]
+    },
+    {
+      "description": "Node stays on the active LTS line (spec \u00a71.1)",
+      "matchPackageNames": ["node", "@types/node"],
+      "allowedVersions": "<25"
+    },
+    {
+      "description": "Actions are pinned by SHA and grouped",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# Git hooks (spec §1.5). Install once per clone: `pnpm hooks:install`.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      glob: '*.{js,mjs,cjs,ts,tsx,json,jsonc,css}'
+      run: pnpm exec biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+    - name: typecheck
+      glob: '*.{ts,tsx}'
+      run: pnpm exec turbo run typecheck --affected
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
