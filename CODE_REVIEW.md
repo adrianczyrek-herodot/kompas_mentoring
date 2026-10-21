@@ -39,7 +39,7 @@ Niezależnie od wyniku agentów zatwierdza człowiek, gdy PR dotyka:
 
 ## 4. Idempotencja i współbieżność (§4.4, §4.6)
 
-- [ ] `POST /checkout`, `/bookings/holds`, `/bookings/:id/cancel`, `/balances/transfer`, `/mentor/payouts` wymagają `Idempotency-Key` (równoległe → 409, inny ciało → 422); klucz przekazany do Stripe.
+- [ ] `POST /checkout`, `/bookings/holds`, `/bookings/:id/cancel`, `/balances/transfer`, `/mentor/payouts` wymagają `Idempotency-Key` (równoległe → 409, ten sam klucz z innym ciałem żądania → 422); klucz przekazany do Stripe.
 - [ ] Handler zadania/webhooka jest idempotentny (inbox z unikalnym `event_id`); test: duplikat nie daje drugiego efektu.
 - [ ] Zdarzenie domenowe wysłane jako zadanie pg-boss w tej samej transakcji co zmiana stanu.
 - [ ] Agregaty edytowane przez wiele stron mają `version`; konflikt → 409 (`ETag`/`If-Match` w API).
