@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": ["kompas-mentoring/**"],
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/*.mjs"]
+    },
+    "apps/web": {},
+    "apps/worker": {},
+    "packages/core": {
+      "entry": ["src/modules/*/index.ts", "src/shared/infrastructure/db/cli/*.ts"]
+    },
+    "packages/config": {
+      "ignoreDependencies": ["eslint-import-resolver-typescript"]
+    }
+  }
+}
