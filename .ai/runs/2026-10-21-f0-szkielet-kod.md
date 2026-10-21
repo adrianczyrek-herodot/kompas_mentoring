@@ -4,6 +4,7 @@ date: 2026-10-21
 agent: Claude Code (Opus 5.5) przez cezar, zadanie dispatch 6f7b7de5
 status: done
 spec: .ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md
+spec: .ai/specs/2026-10-21-f0-szkielet-i-harness.md
 branch: cez/6f7b7de5
 ---
 
@@ -23,6 +24,7 @@ Zaimplementować część A (kod) fazy F0 wg spec F0 i spec stacku: monorepo pnp
 - 10:15 — dependency-cruiser 18 CLI odmawia pracy na Node 25 (nieparzysta wersja) → uruchamiany przez API (`scripts/check-dependencies.mjs`). Wykrył cykl typów `booking.state ↔ booking.errors` — naprawiony.
 - 10:25 — Biome: `useLiteralKeys` wyłączone (konflikt z `noPropertyAccessFromIndexSignature`), dyrektywy Tailwind w parserze CSS.
 - 10:30 — Redakcja pino `*.message` ukrywała `err.message` → redakcja treści wiadomości tylko na najwyższym poziomie + test.
+- 11:00 — Push `cez/6f7b7de5` odrzucony: token `gh` bez zakresu `workflow` (blokuje `.github/workflows/ci.yml`), brak klucza SSH. PR otwarty z gałęzi `feat/f0-szkielet-harness` bez pliku CI; `ci.yml` czeka w commicie `8bc1fcb` na lokalnej gałęzi `cez/6f7b7de5`.
 - 10:35 — cezar zrobił w trakcie commit „cezar autosave”; cofnięty `git reset --soft` (gałąź lokalna) i zastąpiony logicznymi commitami.
 
 ## Wynik
@@ -84,6 +86,7 @@ Kryteria akceptacji spec F0 (część A):
 - [x] Mockupy nadal przechodzą `npm run typecheck && npm run build`.
 
 ## Problemy i otwarte kwestie
+- **CI nie jest w PR:** `.github/workflows/ci.yml` (commit `8bc1fcb` na `cez/6f7b7de5`) wymaga pushu tokenem z zakresem `workflow`: `gh auth refresh -h github.com -s workflow`, potem `git checkout 8bc1fcb -- .github/workflows/ci.yml` na gałęzi PR, commit i push.
 - **Nie zweryfikowano lokalnie (brak Dockera):** test integracyjny Testcontainers (migracja na Postgres 17), `docker compose up -d && pnpm db:migrate && pnpm db:seed`, worker z prawdziwą kolejką (cron, SIGTERM w trakcie zadania), `/api/health` z `db: up`. Wszystko to uruchamia CI (joby `integration`, `e2e` z usługą Postgres).
 - Workflow CI i `renovate.json` nie zostały uruchomione (brak `actionlint` / walidatora Renovate lokalnie); YAML sparsowany poprawnie.
 - `pnpm db:seed` to szkielet z TODO dla F2 (tylko sprawdza połączenie).
