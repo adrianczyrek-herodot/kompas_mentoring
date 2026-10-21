@@ -23,4 +23,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-20** — `frontend.css` nie ma preflightu (współistnienie z `kompas.css`): surowe `<button>`/`<input>` mają natywną ramkę i tło — dawaj im jawnie `border-0 bg-transparent`. Warianty `cva` zwracaj przez `cn()` (tailwind-merge), inaczej `border-line` wariantu przegrywa z bazowym `border-transparent` zależnie od kolejności w CSS.
 - **2026-10-20** — Przejście między stronami React a `/app` (legacy) musi być nawigacją klienta (`router.push/replace`, `<Link>`) — pełne przeładowanie zeruje stan demo w pamięci. Dlatego oba żyją w jednym root layoucie `(frontend)`.
 
+- **2026-10-21** — Testy E2E stron React z rolą demo: przełącz rolę w pasku, a potem nawiguj `page.evaluate(p => window.next.router.push(p), path)` — `page.goto()` przeładowuje stronę i zeruje stan demo. Przy porównaniach z mockupem sprawdzaj oczekiwania z danymi (np. Ewa = `m3` ma już wątek `t2`), zanim uznasz różnicę za błąd.
+- **2026-10-21** — `kompas.css` ma reguły kontekstowe na końcu pliku (`.layout-profile .video-ph { height: 300px }`, karta mentora ≤480 px) — przepisując ekran, przeszukaj cały arkusz po klasach ekranu, nie tylko jego sekcję.
+
 ## Błędy i ich przyczyny

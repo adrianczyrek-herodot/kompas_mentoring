@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { toUrl } from "@/demo/navigation";
-import { notify, store } from "@/demo/store";
+import { startMentorOnboarding } from "@/demo/actions";
 import { useViewState } from "@/demo/use-view-state";
 import { MentorMiniCard } from "./mentor-cards";
 
@@ -92,7 +92,7 @@ export function HomeView() {
         <Link
           className={buttonVariants({ variant: "light" })}
           href={toUrl("#/mentor/onboarding/1")}
-          onClick={() => { if (store.role === "student") { store.role = "mentor"; notify(); } }}
+          onClick={startMentorOnboarding}
         >
           Zostań mentorem
         </Link>

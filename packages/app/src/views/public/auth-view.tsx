@@ -11,7 +11,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { toUrl } from "@/demo/navigation";
-import { applyDemoStudent, applyFreshStudent, notify, store } from "@/demo/store";
+import { logIn } from "@/demo/actions";
+import { store } from "@/demo/store";
 import { useForcedState } from "@/demo/use-view-state";
 
 type Mode = "login" | "register";
@@ -37,14 +38,9 @@ export function AuthView({ mode }: { mode: Mode }) {
   const submitLabel = mode === "register" ? "Załóż konto" : "Zaloguj się";
 
   const finish = (role: "student" | "mentor", fresh: boolean) => {
-    if (fresh) applyFreshStudent(); else applyDemoStudent();
-    store.loggedIn = true;
-    store.role = role;
-    const back = store.returnTo;
-    store.returnTo = "";
-    notify();
+    const next = logIn(role, fresh);
     toast("Zalogowano");
-    router.push(toUrl(back || (role === "mentor" ? "#/mentor/onboarding/1" : "#/sesje")));
+    router.push(toUrl(next));
   };
 
   const submit = (e: FormEvent<HTMLFormElement>) => {

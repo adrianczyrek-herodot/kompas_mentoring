@@ -3,6 +3,7 @@
 import type { Mentor } from "@devmentor/core/domain";
 import { Avatar } from "@devmentor/ui/frontend/avatar";
 import { buttonVariants } from "@devmentor/ui/frontend/button";
+import { cardClass } from "@devmentor/ui/frontend/card";
 import { Icon } from "@devmentor/ui/frontend/icon";
 import { Rating } from "@devmentor/ui/frontend/rating";
 import { Tag, TagList } from "@devmentor/ui/frontend/tag";
@@ -11,10 +12,8 @@ import { money } from "@devmentor/ui/lib/format";
 import { cn } from "@devmentor/ui/lib/utils";
 import Link from "next/link";
 import { toUrl } from "@/demo/navigation";
-import { notify, store } from "@/demo/store";
+import { toggleFavorite } from "@/demo/actions";
 import { useDemoStore } from "@/demo/use-demo-store";
-
-export const cardClass = "rounded-card border border-line bg-surface p-[18px] shadow-card";
 
 export function VerifiedMark() {
   return <span className="inline-flex text-ok" title="Zweryfikowany"><Icon name="shield" /></span>;
@@ -36,11 +35,7 @@ export function MentorMiniCard({ mentor: m }: { mentor: Mentor }) {
 function FavoriteButton({ id }: { id: string }) {
   const { favorites } = useDemoStore();
   const on = favorites.has(id);
-  const toggle = () => {
-    if (store.favorites.has(id)) store.favorites.delete(id); else store.favorites.add(id);
-    notify();
-    toast(store.favorites.has(id) ? "Dodano do ulubionych" : "Usunięto z ulubionych");
-  };
+  const toggle = () => toast(toggleFavorite(id) ? "Dodano do ulubionych" : "Usunięto z ulubionych");
   return (
     <button type="button" data-fav={id} onClick={toggle} aria-pressed={on} aria-label="Ulubiony"
       className={cn("cursor-pointer border-0 bg-transparent p-1 text-[1.3rem]", on ? "text-accent" : "text-line")}>♥</button>
@@ -50,8 +45,8 @@ function FavoriteButton({ id }: { id: string }) {
 /** Karta mentora na liście wyników (P2). */
 export function MentorCard({ mentor: m }: { mentor: Mentor }) {
   return (
-    <article className={cn(cardClass, "grid grid-cols-[88px_1fr] gap-3.5 md:grid-cols-[88px_1fr_190px]")}>
-      <Link href={`/mentorzy/${m.id}`} className="relative block size-[88px]" aria-label={`Profil: ${m.name}`}>
+    <article className={cn(cardClass, "grid grid-cols-[64px_1fr] gap-3.5 min-[481px]:grid-cols-[88px_1fr] md:grid-cols-[88px_1fr_190px]")}>
+      <Link href={`/mentorzy/${m.id}`} className="relative block size-16 max-[480px]:[--avatar-size:64px] min-[481px]:size-[88px]" aria-label={`Profil: ${m.name}`}>
         <Avatar name={m.name} hue={m.hue} size={88} />
         <span className="absolute -right-0.5 -bottom-0.5 grid size-7 place-items-center rounded-full bg-ink text-white"><Icon name="play" className="size-3" /></span>
       </Link>

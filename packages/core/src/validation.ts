@@ -22,3 +22,9 @@ export const range = (min: number, max: number, unit = ''): Validator => (v) => 
 /** Pierwszy błąd z listy walidatorów albo `null`. */
 export const firstError = (value: string, validators: Validator[]): string | null =>
   validators.map((check) => check(value)).find(Boolean) ?? null;
+
+// ---- Dane karty (pola osadzane przez operatora płatności; w mockupie walidowane lokalnie) ----
+
+export const cardNumber: Validator = (v) => (/^\d{16}$/.test(v.replace(/\s/g, '')) ? null : 'Podaj 16 cyfr numeru karty.');
+export const cardExpiry: Validator = (v) => (/^(0[1-9]|1[0-2])\/\d{2}$/.test(v.trim()) ? null : 'Format MM/RR.');
+export const cardCvc: Validator = (v) => (/^\d{3,4}$/.test(v.trim()) ? null : '3 lub 4 cyfry.');

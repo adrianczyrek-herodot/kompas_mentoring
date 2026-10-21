@@ -4,6 +4,7 @@ import { similarMentors, weekSlots } from "@devmentor/core/domain";
 import { DEMO_NOW, MENTORS } from "@devmentor/db/fixtures";
 import { Avatar } from "@devmentor/ui/frontend/avatar";
 import { buttonVariants } from "@devmentor/ui/frontend/button";
+import { cardClass } from "@devmentor/ui/frontend/card";
 import { Icon } from "@devmentor/ui/frontend/icon";
 import { Skeleton, SkeletonBlock } from "@devmentor/ui/frontend/skeleton";
 import { EmptyState, ErrorState } from "@devmentor/ui/frontend/state";
@@ -14,7 +15,7 @@ import Link from "next/link";
 import { toUrl } from "@/demo/navigation";
 import { mentorById } from "@/demo/store";
 import { useSetViewState, useViewState } from "@/demo/use-view-state";
-import { MentorMiniCard, VerifiedMark, cardClass } from "./mentor-cards";
+import { MentorMiniCard, VerifiedMark } from "./mentor-cards";
 
 const h2Class = "mb-[0.4em] font-serif text-[1.4rem] font-semibold";
 // Rozkład ocen w mockupie jest stały (wartości poglądowe).
@@ -56,7 +57,7 @@ export function ProfileView({ id }: { id: string }) {
               <p className="text-[0.85rem] text-ink-2">{m.country} · {m.languages.join(", ")} · {m.yearsExp} lat doświadczenia · {m.companies.join(", ")}</p>
             </div>
           </section>
-          <div className="grid aspect-video content-center place-items-center gap-2 rounded-card bg-[radial-gradient(circle_at_30%_30%,#2a6b5e,#0f2e29)] text-center text-[#e7f0ec]" role="img" aria-label="Wideo powitalne">
+          <div className="grid h-[300px] max-h-[300px] content-center place-items-center gap-2 rounded-card bg-[radial-gradient(circle_at_30%_30%,#2a6b5e,#0f2e29)] text-center text-[#e7f0ec]" role="img" aria-label="Wideo powitalne">
             <Icon name="play" className="size-[46px] rounded-full bg-white/15 p-3" /><span>Wideo powitalne · 1:42</span>
           </div>
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-4">

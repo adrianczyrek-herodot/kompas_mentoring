@@ -19,15 +19,31 @@ export const DEFAULT_ROUTE: Record<Role, string> = {
   admin: '#/admin/weryfikacja',
 };
 
-export interface ScreenInfo { id: string; title: string; }
+export type Access = 'public' | 'auth' | Role;
+
+export interface ScreenInfo { id: string; title: string; access: Access; bare?: boolean; }
 
 /** Ekrany przepisane na React — mają prawdziwe adresy (ta sama ścieżka co trasa mockupu). */
-const PUBLIC_SCREENS: (ScreenInfo & { pattern: string })[] = [
-  { pattern: '/', id: 'P1', title: 'Strona główna' },
-  { pattern: '/mentorzy', id: 'P2', title: 'Wyszukiwarka mentorów' },
-  { pattern: '/mentorzy/:id', id: 'P3', title: 'Profil mentora' },
-  { pattern: '/logowanie', id: 'P4', title: 'Logowanie' },
-  { pattern: '/rejestracja', id: 'P4', title: 'Rejestracja' },
+const SCREENS: (ScreenInfo & { pattern: string })[] = [
+  { pattern: '/', id: 'P1', title: 'Strona główna', access: 'public' },
+  { pattern: '/mentorzy', id: 'P2', title: 'Wyszukiwarka mentorów', access: 'public' },
+  { pattern: '/mentorzy/:id', id: 'P3', title: 'Profil mentora', access: 'public' },
+  { pattern: '/logowanie', id: 'P4', title: 'Logowanie', access: 'public' },
+  { pattern: '/rejestracja', id: 'P4', title: 'Rejestracja', access: 'public' },
+  { pattern: '/rezerwacja/:mentorId', id: 'U1', title: 'Wybór terminu', access: 'public' },
+  { pattern: '/rezerwacja/:mentorId/platnosc', id: 'U2', title: 'Checkout', access: 'student' },
+  { pattern: '/potwierdzenie/:id', id: 'U3', title: 'Potwierdzenie rezerwacji', access: 'student' },
+  { pattern: '/sesje', id: 'U4', title: 'Moje sesje', access: 'student' },
+  { pattern: '/sesje/:id', id: 'U5', title: 'Szczegóły sesji', access: 'student' },
+  { pattern: '/sesje/:id/pokoj', id: 'U6', title: 'Pokój sesji', access: 'auth', bare: true },
+  { pattern: '/sesje/:id/ocena', id: 'U7', title: 'Ocena sesji', access: 'student' },
+  { pattern: '/plany', id: 'U8', title: 'Plany i saldo', access: 'student' },
+  { pattern: '/postepy', id: 'U9', title: 'Postępy', access: 'student' },
+  { pattern: '/wiadomosci', id: 'S1', title: 'Wiadomości', access: 'auth' },
+  { pattern: '/wiadomosci/:id', id: 'S1', title: 'Wiadomości', access: 'public' },
+  { pattern: '/powiadomienia', id: 'S2', title: 'Powiadomienia', access: 'auth' },
+  { pattern: '/konto', id: 'S3', title: 'Konto i ustawienia', access: 'auth' },
+  { pattern: '/mapa', id: '—', title: 'Mapa ekranów', access: 'public' },
 ];
 
 /** Adres, pod którym działają ekrany jeszcze nieprzepisane z `src/legacy` (router na hashu). */
@@ -43,15 +59,15 @@ export function matchPattern(pattern: string, path: string): Record<string, stri
   return ok ? params : null;
 }
 
-/** Ekran publiczny (React) dla ścieżki, np. `/mentorzy/m1` → P3. */
-export function publicScreen(path: string): ScreenInfo | null {
-  const s = PUBLIC_SCREENS.find((x) => matchPattern(x.pattern, path));
-  return s ? { id: s.id, title: s.title } : null;
+/** Ekran React dla ścieżki, np. `/mentorzy/m1` → P3; `null` — ekran jest jeszcze w `src/legacy`. */
+export function reactScreen(path: string): ScreenInfo | null {
+  const s = SCREENS.find((x) => matchPattern(x.pattern, path));
+  return s ? { id: s.id, title: s.title, access: s.access, bare: s.bare } : null;
 }
 
 /** Trasa mockupu (`#/mentorzy?topic=X`, `/sesje`) → adres w aplikacji (`/mentorzy?topic=X`, `/app#/sesje`). */
 export function toUrl(route: string): string {
   const raw = route.replace(/^#/, '') || '/';
   const path = raw.split('?')[0] || '/';
-  return publicScreen(path) ? raw : `${LEGACY_BASE}#${raw}`;
+  return reactScreen(path) ? raw : `${LEGACY_BASE}#${raw}`;
 }

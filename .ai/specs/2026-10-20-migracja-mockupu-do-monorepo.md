@@ -57,10 +57,23 @@ P1–P4 (strona główna, wyszukiwarka, profil, logowanie/rejestracja) jako stro
 - [x] Ekrany pozostałe w `legacy` (pod `/app`) identyczne co do piksela z mockupem — 24/24 przy 1280 i 360 px.
 - [x] `src/legacy` nie zawiera P1–P4; brak kolizji klas utilities z `kompas.css` (sprawdzone na zbudowanym CSS), brak preflightu.
 
-### Faza 3 — ekrany ucznia (U1–U9) i współdzielone (S1–S3) w React (następna)
-Stan klienta (rezerwacja, saldo, sesje) przeniesiony ze `store` do warstwy serwisów z DI; komponenty wspólne do `@devmentor/ui`.
+### Faza 3 — ekrany ucznia (U1–U9) i współdzielone (S1–S3) w React
+U1–U9 (rezerwacja, płatność, potwierdzenie, sesje, szczegóły, pokój, ocena, plany, postępy), S1–S3 (wiadomości, powiadomienia, konto) i mapa ekranów jako strony React + Tailwind; w `legacy` zostają tylko M1–M5 i A1–A2.
 
-### Faza 4 — panel mentora (M1–M5) i admina (A1–A2) na shadcn/ui
+**Projekt fazy 3**
+- Trasy (te same ścieżki co w mockupie, bez hasha): `/rezerwacja/[mentorId]` (`?w=`, `?d=`), `/rezerwacja/[mentorId]/platnosc`, `/potwierdzenie/[id]`, `/sesje` (`?tab=minione`), `/sesje/[id]`, `/sesje/[id]/pokoj` (`?krok=pokoj`, bez stopki i ramki treści), `/sesje/[id]/ocena`, `/plany` (`?m=`), `/postepy`, `/wiadomosci`, `/wiadomosci/[id]` (`nowa?m=`), `/powiadomienia`, `/konto`, `/mapa`.
+- Tabela ekranów React w `src/demo/navigation.ts` dostaje `access` (`public` | `auth` | rola) i `bare`; `PUBLIC_SCREENS`/`publicScreen` → `SCREENS`/`reactScreen`, grupa tras `(public)` → `(site)`. Chrome React pokazuje strażnika dostępu jak `legacy` (gość → „Zaloguj się…”, zapis `returnTo`; zła rola → „Przełącz na…”).
+- Zmiany stanu demo jako nazwane akcje w `src/demo/actions.ts` (rezerwacja, anulowanie, przełożenie, zgłoszenie, nieobecność, zakończenie, ocena, plan, wstrzymanie, przeniesienie salda, wiadomość, przeczytane) — każda kończy się `notify()`. Obliczenia bez stanu → `@devmentor/core/domain` (podział sesji na nadchodzące/minione, warunki anulowania, cena sesji próbnej z opłatą i kodem rabatowym) i `@devmentor/core/validation` (karta, data ważności, CVC).
+- `@devmentor/ui/frontend`: `Modal`, `Badge`, `Spinner`, `CountedTextarea`, klasy listy i tabeli.
+- Poprawki z fazy 2: wysokość wideo w P3 (300 px jak w `kompas.css`) i karta mentora ≤480 px (awatar 64 px).
+
+**Kryteria ukończenia fazy 3** — ✅ ukończona 2026-10-21 (run: `.ai/runs/2026-10-21-migracja-faza-3-ekrany-ucznia.md`)
+- [x] `npm run typecheck` i `npm run build` zielone (23 trasy).
+- [x] U1–U9, S1–S3 i mapa pod prawdziwymi adresami, funkcjonalnie zgodne z mockupem — 69 automatycznych sprawdzeń (F1 z `KOMPAS10` i walidacją karty, F2, F3, F6, symulacje 409 / odrzucenia / wygaśnięcia, wiadomości, plany, postępy, powiadomienia, konto, strażnicy, mapa, przejścia legacy ↔ React, stany) — ALL PASS na `next start` i `next dev`; zrzuty 24 ekranów porównane z mockupem obok siebie.
+- [x] Ekrany pozostałe w `legacy` (M1–M5, A1–A2) identyczne co do piksela z mockupem — 12/12 przy 1280 i 360 px.
+- [x] `src/legacy` nie zawiera U1–U9, S1–S3 ani mapy (`screens/student.ts`, `screens/shared.ts` usunięte); brak kolizji klas utilities (533) z `kompas.css`.
+
+### Faza 4 — panel mentora (M1–M5) i admina (A1–A2) na shadcn/ui (następna)
 Ekrany backendowe w `(backend)` na komponentach `@devmentor/ui/backend`; usunięcie `src/legacy` i `kompas.css`. Przy usuwaniu `kompas.css`: przenieść do warstwy `base` w `frontend.css` style elementów, na których dziś polegają też strony React (tło i font `body`, marginesy `p`/`h*`, `font: inherit` dla kontrolek) albo włączyć preflight i sprawdzić zrzuty P1–P4.
 
 ### Faza 5 — dane w PostgreSQL
@@ -79,3 +92,8 @@ Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `
 - 2026-10-20 — Faza 2: logika wyszukiwarki (filtry z adresu, sortowanie, aktywne filtry, podobni mentorzy) → `@devmentor/core/domain/search.ts`; walidatory → `@devmentor/core/validation` (używa ich też `legacy`).
 - 2026-10-20 — Faza 2: `/app` bez hasha prowadzi na `/` (dawne `/` mockupu = P1); stare adresy `/#/…` przekierowuje P1.
 - 2026-10-20 — Faza 2: znana drobna różnica wizualna — placeholder wideo w P3 jest wyższy niż w mockupie (proporcja 16:9 z Tailwinda; w mockupie siatka spłaszczała go); poza tym strony P1–P4 wyglądają jak w mockupie.
+- 2026-10-21 — Faza 3: „stan klienta w warstwie serwisów z DI” zrealizowany jako akcje stanu demo (`src/demo/actions.ts`) + czyste reguły w `core`. Kontener Awilix działa na serwerze, a stan demo żyje w przeglądarce — serwisy z DI dla sesji, planów i wiadomości powstaną w fazie 5 razem z bazą (akcje mają odpowiadające im nazwy, żeby zamiana była mechaniczna).
+- 2026-10-21 — Faza 3: mapa ekranów (pomoc do przeglądu mockupu) przepisana razem z S1–S3, bo leży w tym samym module (`screens/shared.ts`).
+- 2026-10-21 — Faza 3: test sprzętu w U6 ma zwykłą szerokość treści (z marginesami). W mockupie trasa pokoju była „bare” w całości, więc test sprzętu przylegał do krawędzi okna — skutek uboczny, nie zamysł; sam pokój rozmowy zostaje na całą szerokość.
+- 2026-10-21 — Faza 3: przycisk „Załóż konto” w nagłówku jest ukryty ≤480 px, jak zamierzał mockup (`.hide-s`); w mockupie reguła nie działała, bo nadpisywała ją późniejsza `.btn`.
+- 2026-10-21 — Faza 3: nieudane wiadomości („błąd”) zostają w wątku do ponowienia (w mockupie znikały przy kolejnym przerysowaniu).

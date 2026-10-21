@@ -1,31 +1,17 @@
 import type { Role } from '@devmentor/core/domain';
 import { applyDemoStudent, store } from '../demo/store';
-import { DEFAULT_ROUTE, NAV, ROLE_LABEL, matchPattern, publicScreen, toUrl } from '../demo/navigation';
+import { DEFAULT_ROUTE, NAV, ROLE_LABEL, matchPattern, reactScreen, toUrl } from '../demo/navigation';
 import { Ctx, View, ViewState, closeModal, esc, icon } from './ui';
-import { checkout, confirmation, pickSlot, plans, progress, review, room, sessionDetail, sessions } from './screens/student';
 import { earnings, mentorCalendar, mentorDashboard, mentorStudent, mentorStudents, onboarding } from './screens/mentor';
 import { disputes, verification } from './screens/admin';
-import { account, messages, notifications, screenMap } from './screens/shared';
 
 type Screen = (ctx: Ctx) => View;
 type Access = 'public' | 'auth' | Role;
 
 interface Route { pattern: string; id: string; title: string; access: Access; screen: Screen; bare?: boolean; }
 
+// Ekrany jeszcze nieprzepisane na React (M1–M5, A1–A2); pozostałe trasy prowadzą do stron React (`reactScreen`).
 const ROUTES: Route[] = [
-  { pattern: '/rezerwacja/:mentorId', id: 'U1', title: 'Wybór terminu', access: 'public', screen: pickSlot },
-  { pattern: '/rezerwacja/:mentorId/platnosc', id: 'U2', title: 'Checkout', access: 'student', screen: checkout },
-  { pattern: '/potwierdzenie/:id', id: 'U3', title: 'Potwierdzenie rezerwacji', access: 'student', screen: confirmation },
-  { pattern: '/sesje', id: 'U4', title: 'Moje sesje', access: 'student', screen: sessions },
-  { pattern: '/sesje/:id', id: 'U5', title: 'Szczegóły sesji', access: 'student', screen: sessionDetail },
-  { pattern: '/sesje/:id/pokoj', id: 'U6', title: 'Pokój sesji', access: 'auth', screen: room, bare: true },
-  { pattern: '/sesje/:id/ocena', id: 'U7', title: 'Ocena sesji', access: 'student', screen: review },
-  { pattern: '/plany', id: 'U8', title: 'Plany i saldo', access: 'student', screen: plans },
-  { pattern: '/postepy', id: 'U9', title: 'Postępy', access: 'student', screen: progress },
-  { pattern: '/wiadomosci', id: 'S1', title: 'Wiadomości', access: 'auth', screen: messages },
-  { pattern: '/wiadomosci/:id', id: 'S1', title: 'Wiadomości', access: 'public', screen: messages },
-  { pattern: '/powiadomienia', id: 'S2', title: 'Powiadomienia', access: 'auth', screen: notifications },
-  { pattern: '/konto', id: 'S3', title: 'Konto i ustawienia', access: 'auth', screen: account },
   { pattern: '/mentor/onboarding/:step', id: 'M1', title: 'Onboarding mentora', access: 'public', screen: onboarding },
   { pattern: '/mentor', id: 'M2', title: 'Panel mentora', access: 'mentor', screen: mentorDashboard },
   { pattern: '/mentor/kalendarz', id: 'M3', title: 'Kalendarz i dostępność', access: 'mentor', screen: mentorCalendar },
@@ -34,8 +20,9 @@ const ROUTES: Route[] = [
   { pattern: '/mentor/zarobki', id: 'M5', title: 'Zarobki i wypłaty', access: 'mentor', screen: earnings },
   { pattern: '/admin/weryfikacja', id: 'A1', title: 'Weryfikacja mentorów', access: 'admin', screen: verification },
   { pattern: '/admin/spory', id: 'A2', title: 'Spory i zwroty', access: 'admin', screen: disputes },
-  { pattern: '/mapa', id: '—', title: 'Mapa ekranów', access: 'public', screen: screenMap },
 ];
+
+const NOT_FOUND: Route = { pattern: '', id: '—', title: 'Nie znaleziono', access: 'public', screen: () => ({ html: '' }) };
 
 function match(path: string): { route: Route; params: Record<string, string> } | null {
   for (const route of ROUTES) {
@@ -105,13 +92,13 @@ function guard(route: Route): string | null {
 function render(fresh: boolean): void {
   closeModal();
   const { path, query } = parseHash();
-  // Ekrany publiczne (P1–P4) są już stronami React — przejście pod prawdziwy adres zamiast renderu tutaj.
-  if (publicScreen(path)) {
+  // Ekran przepisany na React — przejście pod prawdziwy adres zamiast renderu tutaj.
+  if (reactScreen(path)) {
     navigate(toUrl(location.hash));
     return;
   }
   const m = match(path);
-  const route = m?.route ?? ROUTES.find((r) => r.pattern === '/mapa')!;
+  const route = m?.route ?? NOT_FOUND;
   const forced = query.get('state') as ViewState | null;
   const token = ++navToken;
 

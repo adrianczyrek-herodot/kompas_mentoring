@@ -12,6 +12,7 @@ const buttonBase = cva(
         light: "bg-white text-brand",
         social: "w-full border-line bg-surface text-ink",
         danger: "bg-err text-white",
+        dangerGhost: "border-[#efc5bf] bg-surface text-err",
       },
       size: {
         md: "min-h-[42px] px-[18px] py-2.5",

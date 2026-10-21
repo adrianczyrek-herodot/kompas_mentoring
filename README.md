@@ -30,7 +30,7 @@ npm run dev                   # http://localhost:3000
 | `npm run db:migration:create` | Nowa migracja z różnicy encji i snapshotu schematu |
 | `npm run db:migration:up` / `db:migration:down` | Zastosowanie / cofnięcie migracji |
 
-Adresy (dane demo, bez bazy): `/` — strona główna, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja` — strony React; `/app#/…` — ekrany jeszcze w `src/legacy` (np. `/app#/sesje`, `/app#/mapa`); `/admin` — panel; `/api/health` — stan aplikacji i bazy (200 / 503).
+Adresy (dane demo, bez bazy): strony React — publiczne (`/`, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja`), ucznia (`/rezerwacja/[mentorId]`, `/rezerwacja/[mentorId]/platnosc`, `/potwierdzenie/[id]`, `/sesje`, `/sesje/[id]`, `/sesje/[id]/pokoj`, `/sesje/[id]/ocena`, `/plany`, `/postepy`), wspólne (`/wiadomosci`, `/wiadomosci/[id]`, `/powiadomienia`, `/konto`) i `/mapa` (mapa ekranów mockupu); `/app#/…` — ekrany mentora i admina jeszcze w `src/legacy` (np. `/app#/mentor`); `/admin` — panel; `/api/health` — stan aplikacji i bazy (200 / 503).
 
 ## Architektura
 
@@ -59,8 +59,8 @@ Podścieżki bezpieczne w przeglądarce (bez Awilixa i MikroORM):
 | `@devmentor/db/fixtures` | Dane demo (`MENTORS`, `SESSIONS`, …, `DEMO_NOW`) — dziś źródło danych aplikacji, docelowo seed bazy |
 | `@devmentor/ui/lib/format`, `@devmentor/ui/lib/icons` | Formatowanie dat/kwot (pl), ścieżki ikon SVG |
 | `@devmentor/ui/frontend.css` | Tailwind z tokenami Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `shadow-card`, `font-serif`…) + przejściowo `kompas.css` w warstwie `kompas`, bez preflightu |
-| `@devmentor/ui/frontend/*` | Komponenty React stron publicznych: `Icon`, `Avatar`, `Rating`, `buttonVariants`/`Button`, `chipVariants`, `Tag`, `Skeleton`, `EmptyState`/`ErrorState`, `Field`, `Notice`, `Toaster`/`toast()` |
-| `@devmentor/core/validation` | Walidatory wartości pól (`required`, `length`, `email`, `range`) |
+| `@devmentor/ui/frontend/*` | Komponenty React stron frontendowych: `Icon`, `Avatar`, `Rating`, `Badge`, `buttonVariants`/`Button`, `chipVariants`, `Tag`, `Skeleton`, `Spinner`, `EmptyState`/`ErrorState`, `Field`, `TextareaField`, `Notice`, `Modal`, `Toaster`/`toast()`; klasy `cardClass`, `listClass`/`listItemClass`/`tableClass`, nagłówki `h1Class`…`h4Class` |
+| `@devmentor/core/validation` | Walidatory wartości pól (`required`, `length`, `email`, `range`, dane karty) |
 
 ### Zależności między pakietami
 
@@ -81,11 +81,11 @@ Next.js App Router w `packages/app/src/app`:
 
 | Ścieżka | Rola |
 |---|---|
-| `(frontend)/` | Root layout stron publicznych (`frontend.css`, `Toaster`); `(public)/` — strony React z nagłówkiem i paskiem mockupu (`/`, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja`); `app/` — strona `/app` montująca `src/legacy` |
+| `(frontend)/` | Root layout stron publicznych (`frontend.css`, `Toaster`); `(site)/` — strony React z nagłówkiem, paskiem mockupu i strażnikiem dostępu (wszystkie trasy z `SCREENS` w `src/demo/navigation.ts`); `app/` — strona `/app` montująca `src/legacy` |
 | `(backend)/` | Root layout z Tailwindem i preflightem; `admin/` — panel na shadcn/ui z `@devmentor/ui/backend` |
 | `api/` | Route handlery (np. `api/health`) |
-| `src/views/` | Widoki ekranów (komponenty klienckie), np. `views/public/search-view.tsx` |
-| `src/demo/` | Stan demo w pamięci (`store.ts` + `useDemoStore()`), nawigacja mockupu (`navigation.ts`: role, menu, `toUrl()`), pasek mockupu i nagłówek (`demo-chrome.tsx`), stany ekranu (`use-view-state.ts`) |
+| `src/views/` | Widoki ekranów (komponenty klienckie): `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa) |
+| `src/demo/` | Stan demo w pamięci (`store.ts` + `useDemoStore()`), jego zmiany (`actions.ts` — jedyne miejsce mutacji z React), nawigacja mockupu (`navigation.ts`: role, menu, tabela ekranów `SCREENS` z dostępem, `toUrl()`), pasek mockupu, nagłówek i strażnik dostępu (`demo-chrome.tsx`), stany ekranu (`use-view-state.ts`) |
 | `src/legacy/` | Ekrany jeszcze nieprzepisane z mockupu: router na hashu, widoki jako HTML; start przez `startKompasApp(root, { navigate })` |
 | `src/server/container.ts` | Composition root kontenera Awilix (`server-only`) |
 
