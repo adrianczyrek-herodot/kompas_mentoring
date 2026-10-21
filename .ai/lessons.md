@@ -9,6 +9,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-20** — `.ai/cezar/` to katalog roboczy orkiestratora cezar (worktree, załączniki); jest w `.gitignore` i nie należy do struktury `.ai/` — nie zapisuj tam specyfikacji, runów ani lekcji.
 - **2026-10-20** — W przebiegach cezar (Claude Code headless) WebFetch bywa zablokowany; publiczną stronę da się odczytać przez `curl -sL <url>` z usunięciem tagów HTML.
 - **2026-10-21** — pnpm uruchamiamy przez corepack: `corepack enable --install-directory <katalog> pnpm` i ten katalog na `PATH` (Turborepo wymaga `pnpm` na `PATH`). pnpm 12 wymaga corepack ≥ 0.36 — z Node 25 (corepack 0.32) zostajemy na pnpm 11. pnpm 11 przerywa instalację na niezatwierdzonych skryptach budowania — dopisz je do `allowBuilds`.
+- **2026-10-21** — Push zmieniający `.github/workflows/*` wymaga zakresu `workflow` w tokenie gh (`gh auth refresh -h github.com -s workflow`, interaktywnie przez człowieka); bez niego GitHub odrzuca cały push.
 - **2026-10-21** — Przed merge gałęzi dziecka cezar sprawdź `git log` pod kątem commitów „cezar autosave” — dziecko może przepisać historię lokalnie.
 - **2026-10-21** — Turborepo filtruje zmienne środowiskowe: każdą zmienną potrzebną zadaniu (np. `E2E_PORT`) dopisz do `env` zadania w `turbo.json`, inaczej po cichu nie dotrze.
 
