@@ -1,12 +1,13 @@
 ---
 title: Tech stack, architektura, standardy inżynieryjne i wzorce projektowe — Kompas MVP
-status: draft            # draft | approved | in-progress | implemented | archived
+status: in-progress      # draft | approved | in-progress | implemented | archived
 created: 2026-10-21
 implemented:
 related:
   - kompas-mentoring/KONCEPCJA.md
   - kompas-mentoring/mockupy/src/domain.ts
   - AGENTS.md
+  - .ai/specs/2026-10-21-f0-szkielet-i-harness.md
 ---
 
 # Tech stack, architektura, standardy inżynieryjne i wzorce projektowe — Kompas MVP
@@ -714,6 +715,7 @@ Każda faza zostawia działającą aplikację i ma własną specyfikację w `.ai
 
 - 2026-10-21 — Wersja robocza na podstawie researchu (stan rynku i przepisów na 2026-10-21).
 - 2026-10-21 — Po niezależnym przeglądzie: dodany stan `hold` i rozgałęzienie próbna/plan w maszynie `Booking`; wygaszanie nieaktualnych holdów w komendzie `createHold`; indeks sesji próbnej nie blokuje ponownej próby; ograniczenie nakładania dla ucznia; rozliczenie po zamknięciu okna sporu (72 h); rezerwacja kredytu przy umawianiu, partie kredytu z datą ważności i tabela księgowań z kontem `stripe_clearing`; CSP z nonce tylko na trasach zalogowanych; Better Auth przez adapter Kysely; TS 6 zamiast TS 6 + TS 7; tsconfig per środowisko; pg-boss: `web` tylko wysyła przez pooler, outbox = zadania w transakcji; uproszczenia MVP (11 modułów zamiast 14, widoki SQL zamiast projekcji, Stryker od F8, bez Bunny/OpenFeature/Grafany/passkeys w MVP, 5 ADR). Czeka na akceptację właściciela i odpowiedzi Q1–Q12.
+- 2026-10-21 — Właściciel zlecił wdrożenie spec (status `in-progress`). Start od F0 i dokumentów procesu (spec `.ai/specs/2026-10-21-f0-szkielet-i-harness.md`); dla F0 przyjęte rekomendacje Q1 (MikroORM + Awilix), Q2 (bez Open Mercato), Q8 (Frankfurt). Q3–Q7 i Q9–Q12 nadal otwarte — blokują dopiero F4–F7.
 
 ## Źródła
 
