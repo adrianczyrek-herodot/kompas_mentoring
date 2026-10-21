@@ -26,3 +26,4 @@ Obowiązkowo:
 5. Wnioski dotyczące **projektu** zapisuj w `.ai/lessons.md`, a nie (tylko) w prywatnej pamięci Claude Code — `.ai/` jest współdzielone z innymi agentami i ludźmi.
 6. Nazwy plików: `YYYY-MM-DD-slug.md`, slug w kebab-case bez polskich znaków.
 7. Złożone zadanie → tryb planowania i plan w specyfikacji; przed raportem weryfikacja zmian; korekta od użytkownika → reguła w `.ai/lessons.md`. Szczegóły: `AGENTS.md` → „Sposób pracy”.
+8. Standardy i proces: `docs/decisions/` (ADR), `SDLC.md`, `CODE_REVIEW.md`, `BACKWARD_COMPATIBILITY.md`, `.ai/agentic.config.json` — zob. `AGENTS.md` → „Standardy inżynieryjne”.

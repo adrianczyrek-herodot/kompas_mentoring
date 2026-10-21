@@ -7,7 +7,52 @@ Ten plik obowiązuje **każdego** agenta AI pracującego w tym repozytorium (Cla
 Kompas — koncepcja i klikalne mockupy portalu mentoringu 1:1. Szczegóły w `kompas-mentoring/README.md` i `kompas-mentoring/KONCEPCJA.md`.
 
 - Mockupy: `kompas-mentoring/mockupy/` (TypeScript, bundle w `dist/app.js`).
-- Sprawdzenie zmian w kodzie: `cd kompas-mentoring/mockupy && npm run typecheck && npm run build`.
+- Sprawdzenie zmian w mockupach: `cd kompas-mentoring/mockupy && npm run typecheck && npm run build`.
+- Aplikacja (monorepo pnpm + Turborepo, docelowa struktura wg §2.2 spec stacku):
+
+```
+apps/web (Next.js 16), apps/worker (pg-boss)
+packages/core (moduły domenowe w src/modules/*, DI, shared/domain), contracts (zod, oRPC, zdarzenia),
+         ui, testing (FakeClock, fake'i portów), config
+docs/decisions (ADR), kompas-mentoring (koncepcja i mockupy), docker-compose.yml
+```
+
+- Weryfikacja aplikacji: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. Lokalnie: `docker compose up -d`, `pnpm db:migrate`, `pnpm db:seed`.
+
+## Standardy inżynieryjne
+
+Wiążące dla każdej specyfikacji funkcjonalnej: `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md` (stack, architektura, wzorce) i ADR w [`docs/decisions/`](docs/decisions/README.md). Proces: [`SDLC.md`](SDLC.md), przegląd: [`CODE_REVIEW.md`](CODE_REVIEW.md), kontrakty: [`BACKWARD_COMPATIBILITY.md`](BACKWARD_COMPATIBILITY.md). Odejście od stacku lub wzorców wymaga wpisu w „Decyzje i zmiany” specyfikacji (i ADR).
+
+**Reguły modułów** (`packages/core/src/modules/<x>/`, wymuszane lintem):
+
+1. `domain/` importuje tylko własne `domain/` i `packages/core/shared/domain` (Money, Clock, Result, typy ID).
+2. `application/` importuje `domain/` i porty, nigdy adaptery.
+3. Inny moduł importujesz wyłącznie z `modules/<x>/index.ts`.
+4. `apps/web` i `apps/worker` importują tylko `index.ts` modułów i `contracts`, bez encji i EntityManagera.
+5. Zakaz cykli między modułami — reakcja innego modułu to zdarzenie domenowe.
+
+**Pieniądze i czas:** kwoty zawsze jako `Money` (`bigint`, grosze; w bazie `bigint` + `currency`), nigdy `number`/`float`. Czas w domenie przez `Clock` i Temporal; **zakaz `Date.now()`, `new Date()`, `Math.random()` w `domain/**`**. Zmiany salda tylko przez ledger. Webhooki i komendy finansowe są idempotentne.
+
+**Język:** kod, identyfikatory, komentarze, commity i nazwy plików po angielsku; UI, specyfikacje, ADR i `AGENTS.md` po polsku; teksty UI tylko w `messages/pl.json`. Commity: Conventional Commits z zakresem = moduł (`feat(booking): …`).
+
+**Słownik domeny:**
+
+| PL (UI, specyfikacje) | EN (kod) |
+|---|---|
+| uczeń | `student` |
+| mentor | `mentor` |
+| sesja (umówiona) | `booking`; pokój / przebieg sesji: `session` |
+| sesja próbna | `trial booking` |
+| blokada terminu | `hold` |
+| plan | `subscription` |
+| saldo / kredyt | `credit` (konto `student_credit`) |
+| przełożenie / anulowanie | `reschedule` / `cancel` |
+| prowizja | `commission` |
+| wypłata | `payout`; transfer do mentora: `transfer` |
+| spór / zgłoszenie problemu | `dispute` |
+| cel / kamień milowy / zadanie | `goal` / `milestone` / `action item` |
+| notatka po sesji | `session note` |
+| weryfikacja mentora | `mentor application` |
 
 ## Katalog `.ai/` — pamięć i proces pracy agentów
 
