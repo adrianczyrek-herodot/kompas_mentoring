@@ -11,6 +11,7 @@ declare global {
 
 /** Czeka, aż zniknie sztuczne „loading” (280 ms) i szkielety. */
 export async function settle(page: Page): Promise<void> {
+  await page.waitForLoadState("networkidle");
   await page.waitForTimeout(350);
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
 }
@@ -27,7 +28,12 @@ export async function open(page: Page, path = "/"): Promise<void> {
  * `page.goto()` przeładowałoby stronę i zresetowało rolę.
  */
 export async function go(page: Page, path: string): Promise<void> {
-  await page.evaluate((p) => window.next.router.push(p), path);
+  await page.evaluate((p) => {
+    // W obrębie `/app` zmieniamy tylko hash: `router.push` robi `pushState`, które nie wywołuje `hashchange`,
+    // więc router ekranów z `src/legacy` by go nie zauważył.
+    if (location.pathname === "/app" && p.startsWith("/app#")) location.hash = p.slice("/app".length);
+    else window.next.router.push(p);
+  }, path);
   await page.waitForURL((u) => u.pathname + u.search + u.hash === path);
   await settle(page);
 }

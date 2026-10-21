@@ -31,7 +31,7 @@ export function ConfirmationView({ id }: { id: string }) {
 
   if (state === "loading") {
     return (
-      <div className={cn(cardClass, "mx-auto flex max-w-[640px] flex-col items-center gap-3 text-center")}>
+      <div aria-busy="true" className={cn(cardClass, "mx-auto flex max-w-[640px] flex-col items-center gap-3 text-center")}>
         <Spinner large />
         <h1 className={h2Class}>Potwierdzamy płatność…</h1>
         <p className="text-ink-2">To zwykle trwa kilka sekund. Jeśli potrwa dłużej, potwierdzimy rezerwację e-mailem.</p>

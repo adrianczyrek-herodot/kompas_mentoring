@@ -8,7 +8,7 @@ Ten plik obowiązuje **każdego** agenta AI pracującego w tym repozytorium (Cla
 
 - Koncepcja produktu (punkt odniesienia dla ekranów i reguł domenowych): `kompas-mentoring/KONCEPCJA.md`, `kompas-mentoring/README.md`.
 - Aplikacja powstaje z klikalnego mockupu Kompas przenoszonego fazami — plan i postęp: `.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`. Ekrany przepisane: `packages/app/src/views/`; jeszcze nieprzepisane: `packages/app/src/legacy/` (pod `/app#/…`).
-- Sprawdzenie zmian (z korzenia repo): `npm run typecheck && npm run build`.
+- Sprawdzenie zmian (z korzenia repo): `npm run typecheck && npm run e2e` (`e2e` buduje aplikację i uruchamia Playwright: przepływy + regresja wizualna). Zamierzona zmiana wyglądu → `npm run e2e:update`, przejrzyj zmienione pliki w `e2e/__screenshots__/` i commituj je razem ze zmianą. Nowy ekran lub przepływ → dopisz go do `e2e/visual.spec.ts` / `e2e/flows/`. Stany ładowania oznaczaj `aria-busy="true"` — testy na tym czekają.
 
 ## Stos technologiczny i architektura DevMentor
 

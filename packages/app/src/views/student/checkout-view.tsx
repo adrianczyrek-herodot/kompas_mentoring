@@ -58,7 +58,7 @@ export function CheckoutView({ mentorId }: { mentorId: string }) {
   useEffect(() => { if (ready && !d?.holdExpires) holdDraft(); }, [ready, d?.holdExpires]);
 
   if (!m) return <ErrorState text="Nie znaleziono mentora." />;
-  if (bookedId) return <div className="grid place-items-center py-16"><Spinner large /></div>;
+  if (bookedId) return <div aria-busy="true" className="grid place-items-center py-16"><Spinner large /></div>;
   if (!ready || !d?.startsAt) {
     return (
       <div className="mx-auto max-w-[640px]">

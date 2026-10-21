@@ -44,7 +44,7 @@ export function RoomView({ id }: { id: string }) {
   }
   if (state === "loading") {
     return (
-      <div className="flex min-h-[calc(100vh-92px)] flex-col items-center justify-center gap-3 bg-mock text-[#e7f0ec]">
+      <div aria-busy="true" className="flex min-h-[calc(100vh-92px)] flex-col items-center justify-center gap-3 bg-mock text-[#e7f0ec]">
         <Spinner large className="text-white" /><p>Łączenie z pokojem…</p>
       </div>
     );

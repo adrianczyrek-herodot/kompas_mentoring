@@ -26,7 +26,9 @@ npm run dev                   # http://localhost:3000
 | Polecenie | Co robi |
 |---|---|
 | `npm run dev` / `build` / `start` | Aplikacja Next.js (`@devmentor/app`) |
-| `npm run typecheck` | `tsc` we wszystkich pakietach |
+| `npm run typecheck` | `tsc` we wszystkich pakietach i w testach E2E |
+| `npm run e2e` | Buduje aplikację i uruchamia testy Playwright (`e2e/`): przepływy i regresję wizualną (1280 i 360 px) |
+| `npm run e2e:update` | Jak wyżej, ale nadpisuje wzorcowe zrzuty w `e2e/__screenshots__/` — tylko po zamierzonej zmianie wyglądu |
 | `npm run db:migration:create` | Nowa migracja z różnicy encji i snapshotu schematu |
 | `npm run db:migration:up` / `db:migration:down` | Zastosowanie / cofnięcie migracji |
 
@@ -117,6 +119,13 @@ getContainer()  ── singleton na proces: clock, orm, dbHealthCheck, serwisy�
 - `@devmentor/ui/frontend/*` — komponenty stron publicznych w czystym Tailwindzie (`Container`, `Hero`).
 - `@devmentor/ui/backend/*` — komponenty shadcn/ui (`Button`, `Card`); nowe dodaje się przez `npx shadcn@latest add <komponent>` w `packages/ui` (konfiguracja w `components.json`).
 - `@devmentor/ui/lib/utils` — `cn()` do łączenia klas.
+
+### Testy (Playwright)
+
+- `playwright.config.ts` uruchamia zbudowaną aplikację (`next start`, port 3100) i dwa projekty: `desktop` (1280 px — przepływy i zrzuty) oraz `mobile` (360 px — zrzuty).
+- `e2e/flows/*.spec.ts` — przepływy użytkownika (wyszukiwanie, rezerwacja z płatnością, sesje, plany, wiadomości, strażnicy dostępu…).
+- `e2e/visual.spec.ts` — zrzut każdego ekranu w roli, w której jest używany, porównywany z wzorcem z `e2e/__screenshots__/`.
+- `e2e/support.ts` — `open()`, `asRole()`, `go()` (nawigacja klienta, która zachowuje stan demo w pamięci), `settle()` (czeka, aż zniknie `aria-busy`).
 
 ## Praca z agentami AI
 
