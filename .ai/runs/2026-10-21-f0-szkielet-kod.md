@@ -3,7 +3,7 @@ title: F0 część A — szkielet monorepo i harness (kod)
 date: 2026-10-21
 agent: Claude Code (Opus 5.5) przez cezar, zadanie dispatch 6f7b7de5
 status: done
-spec: .ai/specs/2026-10-21-f0-szkielet-i-harness.md
+spec: .ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md
 branch: cez/6f7b7de5
 ---
 

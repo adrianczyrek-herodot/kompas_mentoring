@@ -9,12 +9,7 @@ export {
   type RequestScope,
 } from './container.ts';
 export * from './shared/domain/index.ts';
-export {
-  checkDatabase,
-  createOrm,
-  type DatabaseStatus,
-  type Orm,
-} from './shared/infrastructure/db/orm.ts';
+export type { DatabaseStatus } from './shared/infrastructure/db/orm.ts';
 export { directDatabaseUrl, type Env, parseEnv } from './shared/infrastructure/env.ts';
 export {
   type BossRole,

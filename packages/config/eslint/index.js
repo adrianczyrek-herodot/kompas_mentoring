@@ -32,6 +32,22 @@ const domainPurity = [
     message:
       'Temporal.Now is banned in domain/** (spec §4.10). Fix: accept `now: Temporal.Instant` as a parameter, or inject Clock in application/.',
   },
+  {
+    selector: "VariableDeclarator[init.name='Temporal'] > ObjectPattern > Property[key.name='Now']",
+    message:
+      'Destructuring Temporal.Now is banned in domain/** (spec §4.10). Fix: accept `now: Temporal.Instant` as a parameter, or inject Clock in application/.',
+  },
+  {
+    selector: "CallExpression[callee.object.name='performance'][callee.property.name='now']",
+    message:
+      'performance.now() is banned in domain/** — domain must be deterministic. Fix: accept time as a parameter or inject Clock in application/.',
+  },
+  {
+    selector:
+      "CallExpression[callee.object.name='crypto'][callee.property.name=/^(randomUUID|getRandomValues)$/]",
+    message:
+      'crypto randomness is banned in domain/** — domain must be deterministic. Fix: pass IDs in from application/ (newId) or inject a random source through a port.',
+  },
 ];
 
 /** Money amounts are never plain numbers inside core (spec §6.1, §6.3). */
