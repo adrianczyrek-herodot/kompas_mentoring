@@ -1,0 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Supply chain (spec §8): do not install versions younger than 3 days (in minutes).
+minimumReleaseAge: 4320
+
+# Install scripts are blocked by default (spec §8). None of these are needed:
+# native fallbacks have prebuilt binaries, lefthook hooks are installed explicitly
+# with `pnpm hooks:install`.
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  cpu-features: false
+  lefthook: false
+  protobufjs: false
+  ssh2: false
+  unrs-resolver: false
