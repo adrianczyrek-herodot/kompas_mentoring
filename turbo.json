@@ -1,0 +1,31 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": ["packages/config/tsconfig/*.json"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.test.ts", "!e2e/**"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": ["NEXT_OUTPUT"]
+    },
+    "typegen": {
+      "cache": false
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    },
+    "test:integration": {
+      "cache": false,
+      "env": ["CI", "DOCKER_HOST", "TESTCONTAINERS_*"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["CI", "DATABASE_URL", "E2E_EXPECT_DB"]
+    }
+  }
+}

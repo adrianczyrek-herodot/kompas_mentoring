@@ -1,0 +1,33 @@
+{
+  "name": "@kompas/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": {
+      "types": "./eslint/index.d.ts",
+      "default": "./eslint/index.js"
+    },
+    "./vitest": {
+      "types": "./vitest/preset.d.ts",
+      "default": "./vitest/preset.js"
+    },
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/bundler.json": "./tsconfig/bundler.json",
+    "./tsconfig/nodenext.json": "./tsconfig/nodenext.json",
+    "./biome-preset.json": "./biome-preset.json"
+  },
+  "dependencies": {
+    "@eslint/js": "10.0.1",
+    "@next/eslint-plugin-next": "16.4.2",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-boundaries": "7.2.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "typescript-eslint": "8.71.2"
+  },
+  "peerDependencies": {
+    "eslint": "10.13.0",
+    "vitest": "5.0.5"
+  }
+}
