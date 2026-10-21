@@ -5,69 +5,13 @@ import { buttonVariants } from "@devmentor/ui/frontend/button";
 import { Icon } from "@devmentor/ui/frontend/icon";
 import { cn } from "@devmentor/ui/lib/utils";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Suspense, useEffect, type ReactNode } from "react";
-import { DEFAULT_ROUTE, NAV, ROLE_LABEL, reactScreen, toUrl, type Access } from "./navigation";
-import { assumeRole, rememberReturnTo, switchRole } from "./actions";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+import { AVATAR, useAccess } from "./access";
+import { assumeRole } from "./actions";
+import { MockBar } from "./mock-bar";
+import { DEFAULT_ROUTE, NAV, ROLE_LABEL, screenInfo, toUrl, type Access } from "./navigation";
 import { useDemoStore } from "./use-demo-store";
-import { VIEW_STATES, useForcedState, useSetViewState } from "./use-view-state";
-
-const STATE_LABEL = { success: "domyślny", loading: "loading", empty: "empty", error: "error" };
-const AVATAR: Record<Role, { initials: string; hue: number }> = {
-  guest: { initials: "", hue: 0 }, student: { initials: "AC", hue: 12 }, mentor: { initials: "KN", hue: 168 }, admin: { initials: "AD", hue: 0 },
-};
-
-/** Przełączniki stanu ekranu (czytają `?state=`, więc w osobnej granicy Suspense). */
-function StateSwitch() {
-  const forced = useForcedState() ?? "success";
-  const setState = useSetViewState();
-  return (
-    <span className="inline-flex overflow-hidden rounded-md border border-[#34413e]" role="group" aria-label="Stan ekranu">
-      {VIEW_STATES.map((s) => (
-        <button
-          key={s}
-          type="button"
-          onClick={() => setState(s)}
-          className={cn("cursor-pointer border-0 bg-transparent px-[9px] py-[3px] [&+&]:border-l [&+&]:border-[#34413e]", forced === s ? "bg-[#2c3a37] text-white" : "text-[#b9c4c1]")}
-        >
-          {STATE_LABEL[s]}
-        </button>
-      ))}
-    </span>
-  );
-}
-
-/** Pasek MOCKUP: ekran, rola, stan, mapa ekranów. */
-function MockBar({ pathname }: { pathname: string }) {
-  const { role } = useDemoStore();
-  const router = useRouter();
-  const screen = reactScreen(pathname);
-  const changeRole = (r: Role) => {
-    switchRole(r);
-    router.push(toUrl(DEFAULT_ROUTE[r]));
-  };
-  return (
-    <div className="flex items-center gap-3 overflow-x-auto bg-mock px-4 py-1.5 text-[0.78rem] whitespace-nowrap text-[#d9e2df]" role="region" aria-label="Pasek mockupu">
-      <span className="rounded bg-accent px-[7px] py-px font-bold tracking-[0.05em] text-[#1a0f05]">MOCKUP</span>
-      {screen && <span><b className="text-white">{screen.id}</b> {screen.title}</span>}
-      <label>
-        Rola{" "}
-        <select
-          data-role
-          value={role}
-          onChange={(e) => changeRole(e.target.value as Role)}
-          className="ml-1 rounded-md border border-[#34413e] bg-[#1f2a28] px-1.5 py-0.5 text-white"
-        >
-          {(Object.keys(ROLE_LABEL) as Role[]).map((k) => <option key={k} value={k}>{ROLE_LABEL[k]}</option>)}
-        </select>
-      </label>
-      <Suspense fallback={null}><StateSwitch /></Suspense>
-      <Link href={toUrl("#/mapa")} className="inline-flex items-center gap-1 text-[#d9e2df] no-underline">
-        <Icon name="map" className="size-3.5" /> Mapa ekranów
-      </Link>
-    </div>
-  );
-}
 
 function NavLinks({ role, pathname, mobile = false }: { role: Role; pathname: string; mobile?: boolean }) {
   const cur = `#${pathname}`;
@@ -92,13 +36,11 @@ function NavLinks({ role, pathname, mobile = false }: { role: Role; pathname: st
 
 const guardCard = "mx-auto flex max-w-[640px] flex-col items-center gap-3 rounded-card border border-line bg-surface p-[18px] text-center shadow-card";
 
-/** Strażnik dostępu (jak w `legacy`): gość → zaloguj się (z zapamiętaniem trasy), zła rola → przełącz. */
-function AccessGuard({ access, role }: { access: Access; role: Role }) {
-  const blockedGuest = access !== "public" && role === "guest";
-  useEffect(() => {
-    if (blockedGuest) rememberReturnTo(`#${location.pathname}${location.search}`);
-  }, [blockedGuest]);
-  if (blockedGuest) {
+/** Strażnik dostępu (wygląd stron frontendowych): gość → zaloguj się, zła rola → przełącz. */
+function AccessGuard({ access, role, children }: { access: Access; role: Role; children: ReactNode }) {
+  const check = useAccess(access, role);
+  if (check.kind === "ok") return children;
+  if (check.kind === "guest") {
     return (
       <div className={guardCard}>
         <Icon name="user" />
@@ -111,28 +53,23 @@ function AccessGuard({ access, role }: { access: Access; role: Role }) {
       </div>
     );
   }
-  const needed = access as Role;
   return (
     <div className={guardCard}>
       <Icon name="alert" />
-      <h1 className="mb-0 font-serif text-[1.4rem] font-semibold">Ten ekran jest dla roli: {ROLE_LABEL[needed]}</h1>
+      <h1 className="mb-0 font-serif text-[1.4rem] font-semibold">Ten ekran jest dla roli: {ROLE_LABEL[check.needed]}</h1>
       <p className="text-ink-2">W mockupie możesz przełączyć rolę.</p>
-      <button type="button" data-switch={needed} className={buttonVariants()} onClick={() => assumeRole(needed)}>Przełącz na: {ROLE_LABEL[needed]}</button>
+      <button type="button" data-switch={check.needed} className={buttonVariants()} onClick={() => assumeRole(check.needed)}>Przełącz na: {ROLE_LABEL[check.needed]}</button>
     </div>
   );
 }
 
-/** Czy rola ma dostęp do ekranu. */
-const allowed = (access: Access, role: Role): boolean =>
-  access === "public" || (role !== "guest" && (access === "auth" || access === role));
-
-/** Nagłówek, nawigacja i stopka stron React (odpowiednik chrome z `src/legacy`). */
+/** Nagłówek, nawigacja i stopka stron frontendowych. */
 export function DemoChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { role, notifications } = useDemoStore();
   const unread = notifications.filter((n) => n.unread).length;
   const avatar = AVATAR[role];
-  const screen = reactScreen(pathname);
+  const screen = screenInfo(pathname);
   const access = screen?.access ?? "public";
   const bare = screen?.bare ?? false;
   return (
@@ -172,8 +109,8 @@ export function DemoChrome({ children }: { children: ReactNode }) {
           <NavLinks role={role} pathname={pathname} mobile />
         </nav>
       )}
-      <main id="main" className={cn(bare ? "" : "mx-auto min-h-[70vh] max-w-[1160px] px-4 pt-5 pb-12", role !== "guest" && "pb-24 md:pb-12")}>
-        {allowed(access, role) ? children : <AccessGuard access={access} role={role} />}
+      <main id="main" data-path={pathname} className={cn(bare ? "" : "mx-auto min-h-[70vh] max-w-[1160px] px-4 pt-5 pb-12", role !== "guest" && "pb-24 md:pb-12")}>
+        <AccessGuard access={access} role={role}>{children}</AccessGuard>
       </main>
       {!bare && <footer className="mx-auto flex max-w-[1160px] justify-between border-t border-line px-4 pt-5 pb-[110px] text-[0.8rem] text-ink-3 md:pb-7">
         <span>Kompas · mockup koncepcji · dane fikcyjne</span>

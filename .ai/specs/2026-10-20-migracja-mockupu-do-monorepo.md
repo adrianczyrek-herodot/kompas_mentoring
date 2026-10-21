@@ -73,8 +73,22 @@ U1–U9 (rezerwacja, płatność, potwierdzenie, sesje, szczegóły, pokój, oce
 - [x] Ekrany pozostałe w `legacy` (M1–M5, A1–A2) identyczne co do piksela z mockupem — 12/12 przy 1280 i 360 px.
 - [x] `src/legacy` nie zawiera U1–U9, S1–S3 ani mapy (`screens/student.ts`, `screens/shared.ts` usunięte); brak kolizji klas utilities (533) z `kompas.css`.
 
-### Faza 4 — panel mentora (M1–M5) i admina (A1–A2) na shadcn/ui (następna)
-Ekrany backendowe w `(backend)` na komponentach `@devmentor/ui/backend`; usunięcie `src/legacy` i `kompas.css`. Przy usuwaniu `kompas.css`: przenieść do warstwy `base` w `frontend.css` style elementów, na których dziś polegają też strony React (tło i font `body`, marginesy `p`/`h*`, `font: inherit` dla kontrolek) albo włączyć preflight i sprawdzić zrzuty P1–P4.
+### Faza 4 — panel mentora (M1–M5) i admina (A1–A2) na shadcn/ui
+Ekrany mentora i admina jako strony React na komponentach shadcn/ui; usunięcie `src/legacy`, `/app` i `kompas.css`.
+
+**Projekt fazy 4**
+- **Jeden root layout** (`src/app/layout.tsx`) dla całej aplikacji. Osobny root layout panelu oznaczałby przeładowanie przy każdym przejściu strona ↔ panel, a stan demo (rola) żyje w pamięci. Grupy: `(site)` — strony frontendowe (Tailwind + `@devmentor/ui/frontend`, opakowanie `.kompas`), `(panel)` — panel mentora i admina (shadcn/ui z `@devmentor/ui/backend`, opakowanie `.backend`).
+- **Jeden arkusz** `@devmentor/ui/styles.css`: Tailwind z preflightem; tokeny Kompasu globalnie (`@theme`); motyw shadcn/ui (zmienne `--background`, `--primary`… i promienie) działa w zakresie `.backend` — kolidujące nazwy (`--color-accent`, `--radius-*`) są nadpisywane tylko tam. Style bazowe stron Kompasu (font, kolor, marginesy akapitów i nagłówków, podkreślone linki, listy) w warstwie `base` pod `:where(.kompas)`. `kompas.css` i `frontend.css` znikają.
+- **Trasy panelu** (te same ścieżki co w mockupie): `/mentor/onboarding/[step]` (`1`–`6`, `wyslano`; dostęp: wszyscy), `/mentor`, `/mentor/kalendarz`, `/mentor/uczniowie` (`?f=`), `/mentor/uczniowie/[id]`, `/mentor/zarobki` (mentor), `/admin/weryfikacja` (`?id=`), `/admin/spory` (`?id=`) (admin), `/admin` — pulpit stanu systemu ze szkieletu (admin, pozycja „Pulpit” w menu). Layout panelu: pasek MOCKUP (wspólny z `(site)`), nagłówek, menu boczne z `NAV[rola]`, strażnik dostępu w stylu shadcn.
+- `toUrl()` bez gałęzi `/app`; tabela `SCREENS` obejmuje wszystkie ekrany. Usunięte: `src/legacy/`, strona `/app`, `kompas.css`, `frontend.css`, `globals.css` panelu (zastąpione wspólnym arkuszem).
+- Stan: nowe akcje w `src/demo/actions.ts` (szkic i wysłanie onboardingu, szablon dostępności, akceptacja/odrzucenie prośby, wypłata, decyzja weryfikacji, rozstrzygnięcie sporu). Reguły bez stanu → `@devmentor/core/domain`: walidacja kroków onboardingu, wyliczenia zarobków (dostępne/oczekujące, minimum wypłaty, podgląd zarobku po prowizji), warunki decyzji moderacji.
+- Komponenty shadcn/ui dodane CLI w `packages/ui` (m.in. badge, input, textarea, label, checkbox, radio-group, table, dialog, progress, skeleton, alert, sonner, toggle-group, separator); edytor dostępności (siatka godzin z przeciąganiem) jako komponent panelu.
+
+**Kryteria ukończenia fazy 4**
+- [ ] `npm run typecheck` i `npm run e2e` zielone.
+- [ ] M1–M5, A1–A2 jako strony React na shadcn/ui, funkcjonalnie zgodne z mockupem (testy E2E: onboarding 6 kroków z walidacją → wysłanie → zgłoszenie w kolejce admina → zatwierdzenie; prośby akceptuj/odrzuć z powodem; kalendarz: malowanie siatki, ustawienia, wyjątek; notatka dla ucznia; wypłata; spór: zwrot częściowy z limitem; stany loading/empty/error).
+- [ ] Strony `(site)` bez regresji wizualnej po przejściu na wspólny arkusz (zrzuty E2E; zamierzone różnice przejrzane).
+- [ ] Brak `src/legacy`, `/app`, `kompas.css`; dokumentacja (`README.md`, `AGENTS.md`) bez odwołań do warstwy przejściowej.
 
 ### Faza 5 — dane w PostgreSQL
 Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `@devmentor/db/fixtures`; serwisy w `core`/`db` rejestrowane w Awilix; ekrany czytają dane przez `getRequestScope()`.
@@ -97,3 +111,6 @@ Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `
 - 2026-10-21 — Faza 3: test sprzętu w U6 ma zwykłą szerokość treści (z marginesami). W mockupie trasa pokoju była „bare” w całości, więc test sprzętu przylegał do krawędzi okna — skutek uboczny, nie zamysł; sam pokój rozmowy zostaje na całą szerokość.
 - 2026-10-21 — Faza 3: przycisk „Załóż konto” w nagłówku jest ukryty ≤480 px, jak zamierzał mockup (`.hide-s`); w mockupie reguła nie działała, bo nadpisywała ją późniejsza `.btn`.
 - 2026-10-21 — Faza 3: nieudane wiadomości („błąd”) zostają w wątku do ponowienia (w mockupie znikały przy kolejnym przerysowaniu).
+- 2026-10-21 — Faza 4: jeden root layout dla stron i panelu (zamiast osobnego `(backend)`), motyw shadcn/ui w zakresie `.backend` — powód: przejścia strona ↔ panel muszą zachować stan demo w pamięci; tokeny Kompasu i shadcn mają kolidujące nazwy (`accent`, `radius-*`).
+- 2026-10-21 — Faza 4: onboarding mentora (M1) w panelu na shadcn/ui jak reszta M1–M5 (zgodnie z planem), mimo że zaczyna go gość — to formularz wieloetapowy, a nie strona marketingowa.
+- 2026-10-21 — Faza 4: po przejściu stron na wspólny arkusz z preflightem 40/62 zrzutów `(site)` identycznych, 22 z drobnymi zmianami przyjętymi świadomie: preflight zeruje domyślne marginesy natywnych kontrolek (checkbox, radio, suwak, wewnętrzny odstęp pola), co przesuwa sąsiedni tekst o 2–4 px; znika też reguła mockupu `section + section { margin-top: 20px }`, która przesuwała drugą kartę w siatkach dwukolumnowych (mapa, postępy) — teraz karty są wyrównane. Bez odtwarzania domyślnych stylów przeglądarki w systemie wizualnym.

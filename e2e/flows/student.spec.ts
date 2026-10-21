@@ -1,6 +1,6 @@
 // U1–U9, S1–S3: rezerwacja, sesje, pokój, ocena, plany, postępy, wiadomości, powiadomienia, konto, strażnicy dostępu.
 import { expect, test } from "@playwright/test";
-import { asRole, go, open, toasts } from "../support";
+import { asRole, expectToast, go, open } from "../support";
 
 test("F1: gość → termin → rejestracja → płatność z KOMPAS10 → potwierdzenie", async ({ page }) => {
   await open(page, "/mentorzy/m1");
@@ -8,7 +8,7 @@ test("F1: gość → termin → rejestracja → płatność z KOMPAS10 → potwi
   await expect(page).toHaveURL(/\/rezerwacja\/m1$/);
   await expect(page.locator("[data-continue]")).toBeDisabled();
   await page.click("[data-sim409]");
-  await expect(toasts(page).last()).toContainText("Najpierw wybierz termin");
+  await expectToast(page, "Najpierw wybierz termin");
   const slot = page.locator("[data-slot]:not([disabled])").first();
   const iso = await slot.getAttribute("data-slot");
   await slot.click();
@@ -43,7 +43,7 @@ test("F1: gość → termin → rejestracja → płatność z KOMPAS10 → potwi
   await page.fill("#f-cvc", "123");
   await page.check("input[name=simDecline]");
   await page.click("form button[type=submit]");
-  await expect(toasts(page).last()).toContainText("Płatność odrzucona");
+  await expectToast(page, "Płatność odrzucona");
   await expect(page).toHaveURL(/\/platnosc$/);
   await page.uncheck("input[name=simDecline]");
   await page.click("form button[type=submit]");
@@ -97,7 +97,7 @@ test("F2: sesja → test sprzętu → pokój → zakończ → ocena → plan", a
   await expect(page.locator("[data-plan-pay]")).toContainText("720");
   await page.click("[data-plan-pay]");
   await expect(page).toHaveURL(/\/rezerwacja\/m1$/);
-  await expect(toasts(page).last()).toContainText("Dodano 8 sesji");
+  await expectToast(page, "Dodano 8 sesji");
 });
 
 test("F3: przełożenie i anulowanie (bezpłatne i z utratą)", async ({ page }) => {
@@ -106,7 +106,7 @@ test("F3: przełożenie i anulowanie (bezpłatne i z utratą)", async ({ page })
   await go(page, "/sesje/s2");
   await page.click("[data-reschedule]");
   await page.locator("[data-new]").first().click();
-  await expect(toasts(page).last()).toContainText("Przełożono na");
+  await expectToast(page, "Przełożono na");
   await page.click("[data-cancel]");
   await expect(page.getByRole("dialog")).toContainText("Sesja wróci do salda");
   await page.click("[data-confirm]");
@@ -141,7 +141,7 @@ test("U8–U9, S2–S3: plan, saldo, postępy, powiadomienia, konto", async ({ p
   await page.locator("[data-transfer]").first().click();
   await expect(page.getByRole("dialog")).toContainText(/→ \d+ u /);
   await page.click('[role="dialog"] [data-ok]');
-  await expect(toasts(page).last()).toContainText("Saldo przeniesione");
+  await expectToast(page, "Saldo przeniesione");
   await page.click("[data-cancel-sub]");
   await page.click('[role="dialog"] [data-ok]');
   await expect(page.locator("main")).toContainText("Nie masz aktywnego planu");

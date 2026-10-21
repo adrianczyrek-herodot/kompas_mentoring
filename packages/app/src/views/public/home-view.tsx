@@ -28,7 +28,7 @@ export function HomeView() {
   const [error, setError] = useState<string | null>(null);
   const featured = MENTORS.filter((m) => m.verified).slice(0, 4);
 
-  // Stare adresy mockupu (`/#/sesje`) prowadzą pod nowe (`/app#/sesje`, `/mentorzy`…).
+  // Stare adresy mockupu (`/#/sesje`) prowadzą pod nowe (`/sesje`).
   useEffect(() => {
     if (location.hash.startsWith("#/")) router.replace(toUrl(location.hash));
   }, [router]);

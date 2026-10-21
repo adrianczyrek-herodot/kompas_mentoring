@@ -192,3 +192,59 @@ export function startMentorOnboarding(): void {
   if (store.role === 'student') store.role = 'mentor';
   notify();
 }
+
+// ---- Panel mentora (M1–M5) -----------------------------------------------------------------
+
+/** Zapis kroku onboardingu (pola formularza) i flag spoza formularza (zdjęcie, wideo, KYC). */
+export function saveOnboarding(values: Record<string, string>): void {
+  Object.assign(store.onboarding.data, values);
+  notify();
+}
+
+/** Wysłanie profilu do weryfikacji — zgłoszenie trafia na początek kolejki admina. */
+export function submitOnboarding(): void {
+  const d = store.onboarding.data;
+  store.onboarding.status = 'submitted';
+  store.applications.unshift({
+    id: 'a-new', name: d.name ?? '', headline: d.headline ?? '', submitted: '2026-10-20', kyc: 'zweryfikowano', linkedin: true, hue: 168,
+    categories: (d.cat ?? '').split(','),
+  });
+  notify();
+}
+
+/** „Przejdź do panelu mentora” po wysłaniu profilu (w mockupie bez weryfikacji). */
+export function enterMentorPanel(): void {
+  store.role = 'mentor';
+  notify();
+}
+
+/** Godzina w siatce dostępności (`dzień-godzina`): onboarding albo szablon tygodniowy mentora. */
+export function setAvailability(which: 'onboarding' | 'template', key: string, on: boolean): void {
+  const set = which === 'onboarding' ? store.onboarding.availability : store.mentorTemplate;
+  if (on) set.add(key); else set.delete(key);
+  notify();
+}
+
+/** Akceptacja albo odrzucenie prośby o sesję próbną — znika z listy. */
+export function answerTrialRequest(id: string): void {
+  store.requests = store.requests.filter((r) => r.id !== id);
+  notify();
+}
+
+export function requestPayout(): void {
+  store.payoutDone = true;
+  notify();
+}
+
+// ---- Panel admina (A1–A2) ------------------------------------------------------------------
+
+/** Decyzja w sprawie zgłoszenia mentora (każda zdejmuje je z kolejki). */
+export function decideApplication(id: string): void {
+  store.applications = store.applications.filter((a) => a.id !== id);
+  notify();
+}
+
+export function resolveDispute(id: string): void {
+  store.disputes = store.disputes.filter((d) => d.id !== id);
+  notify();
+}

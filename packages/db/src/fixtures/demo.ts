@@ -144,3 +144,20 @@ export const NOTIFICATIONS: Notification[] = [
   { text: 'Oceń sesję próbną z 9 października', at: '2026-10-10T09:00:00+02:00', link: '#/sesje/s5/ocena', unread: false },
   { text: 'Plan odnowiony: 4 sesje dodane do salda', at: '2026-10-06T08:00:00+02:00', link: '#/plany', unread: false },
 ];
+
+// Panel mentorki demo (Kasia Nowicka, m1)
+/** Sesje w bieżącym tygodniu kalendarza: `dzień-godzina` (0 = pon) → uczeń. */
+export const MENTOR_BOOKED_SLOTS: Record<string, string> = {
+  '1-17': 'Julia M.', '1-14': 'Adrian C.', '3-18': 'Adrian C.', '2-9': 'Paweł R. (próbna)', '4-10': 'Iga T. (próbna)',
+};
+
+/** Przepracowane godziny (próg prowizji). */
+export const MENTOR_HOURS_WORKED = 176;
+
+/** Wskaźniki na pulpicie mentora: [etykieta, wartość, komentarz, wzrost?]. */
+export const MENTOR_KPIS: [string, string, string, boolean][] = [
+  ['Godziny w tym tygodniu', '9', '+2 vs poprz.', true],
+  ['Przychód (paź)', '3240 zł', '+12%', true],
+  ['Próbne → plan (90 dni)', '64%', '14 z 22', false],
+  ['Ocena', '4,9', '87 opinii', false],
+];

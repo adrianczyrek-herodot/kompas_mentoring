@@ -1,4 +1,4 @@
-// Stan aplikacji demo w pamięci (bez backendu) — wspólny dla stron React i ekranów z `src/legacy`.
+// Stan aplikacji demo w pamięci (bez backendu) — wspólny dla stron i panelu.
 // Moduł żyje przez całą sesję karty: nawigacja klienta Next.js go nie resetuje, przeładowanie strony — tak (jak w mockupie).
 import type { Role, Session, Thread } from '@devmentor/core/domain';
 import { MENTORS, SESSIONS, THREADS, REQUESTS, APPLICATIONS, DISPUTES, NOTIFICATIONS } from '@devmentor/db/fixtures';
@@ -73,7 +73,7 @@ applyDemoStudent();
 const listeners = new Set<() => void>();
 let version = 0;
 
-/** Powiadamia subskrybentów po zmianie `store` (ekrany `legacy` przerysowują się same i tego nie potrzebują). */
+/** Powiadamia subskrybentów (komponenty React) po zmianie `store` — wywoływane przez akcje z `actions.ts`. */
 export function notify(): void {
   version++;
   listeners.forEach((l) => l());

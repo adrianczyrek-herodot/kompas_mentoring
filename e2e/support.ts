@@ -11,7 +11,9 @@ declare global {
 
 /** Czeka, aż zniknie sztuczne „loading” (280 ms) i szkielety. */
 export async function settle(page: Page): Promise<void> {
-  await page.waitForLoadState("networkidle");
+  // `main[data-path]` = ścieżka wyrenderowanej strony — czekamy, aż nowa trasa faktycznie się zamontuje.
+  const pathname = new URL(page.url()).pathname;
+  await page.waitForSelector(`main[data-path="${pathname}"]`);
   await page.waitForTimeout(350);
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
 }
@@ -28,13 +30,10 @@ export async function open(page: Page, path = "/"): Promise<void> {
  * `page.goto()` przeładowałoby stronę i zresetowało rolę.
  */
 export async function go(page: Page, path: string): Promise<void> {
-  await page.evaluate((p) => {
-    // W obrębie `/app` zmieniamy tylko hash: `router.push` robi `pushState`, które nie wywołuje `hashchange`,
-    // więc router ekranów z `src/legacy` by go nie zauważył.
-    if (location.pathname === "/app" && p.startsWith("/app#")) location.hash = p.slice("/app".length);
-    else window.next.router.push(p);
-  }, path);
-  await page.waitForURL((u) => u.pathname + u.search + u.hash === path);
+  await page.evaluate((p) => window.next.router.push(p), path);
+  // Porównanie po normalizacji przez URL (np. `?f=próbny` w adresie jest zakodowane procentowo).
+  const want = new URL(path, "http://x");
+  await page.waitForURL((u) => u.pathname + u.search + u.hash === want.pathname + want.search + want.hash);
   await settle(page);
 }
 
@@ -54,5 +53,10 @@ export const path = (page: Page): string => {
   return u.pathname + u.search + u.hash;
 };
 
-/** Treść komunikatów `toast` widocznych na ekranie. */
-export const toasts = (page: Page) => page.locator('[role="status"]');
+/** Komunikaty `toast` widoczne na ekranie (strony: `role=status`, panel: sonner). */
+export const toasts = (page: Page) => page.locator('[role="status"], [data-sonner-toast]');
+
+/** Czeka na komunikat `toast` z tekstem (kolejność w DOM zależy od biblioteki — sonner wstawia najnowszy na górę). */
+export async function expectToast(page: Page, text: string | RegExp): Promise<void> {
+  await expect(toasts(page).filter({ hasText: text }).first()).toBeVisible();
+}

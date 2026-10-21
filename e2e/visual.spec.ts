@@ -15,8 +15,11 @@ const SCREENS: Record<Role, string[]> = {
     "/sesje/s5/ocena", "/rezerwacja/m1", "/plany", "/plany?m=m1", "/plany?state=error", "/postepy", "/postepy?state=empty",
     "/wiadomosci", "/wiadomosci/t1", "/powiadomienia", "/konto",
   ],
-  mentor: ["/app#/mentor", "/app#/mentor/kalendarz", "/app#/mentor/uczniowie", "/app#/mentor/uczniowie/st1", "/app#/mentor/zarobki", "/app#/mentor/onboarding/1"],
-  admin: ["/app#/admin/weryfikacja", "/app#/admin/spory"],
+  mentor: [
+    "/mentor", "/mentor?state=empty", "/mentor/kalendarz", "/mentor/uczniowie", "/mentor/uczniowie?f=próbny", "/mentor/uczniowie/st1",
+    "/mentor/zarobki", "/mentor/zarobki?state=error", "/mentor/onboarding/1", "/mentor/onboarding/3", "/mentor/onboarding/5", "/mentor/onboarding/6",
+  ],
+  admin: ["/admin", "/admin/weryfikacja", "/admin/weryfikacja?id=a3", "/admin/spory", "/admin/spory?state=empty"],
 };
 
 const fileName = (role: Role, path: string) => `${role}${path.replace(/[^a-z0-9]+/gi, "_").replace(/_$/, "")}.png`;

@@ -1,6 +1,6 @@
 // P1–P4: wyszukiwanie, filtry, profil, logowanie/rejestracja, przełącznik roli i stany ekranu.
 import { expect, test } from "@playwright/test";
-import { asRole, go, open, path, toasts } from "../support";
+import { asRole, expectToast, go, open, path } from "../support";
 
 test("P1: walidacja i wyszukiwanie", async ({ page }) => {
   await open(page, "/");
@@ -24,7 +24,7 @@ test("P2: filtry, sortowanie, czyszczenie, ulubieni, stany", async ({ page }) =>
   await page.click('button:has-text("Zweryfikowani")');
   await expect(page).not.toHaveURL(/verified/);
   await page.click("[data-fav=m1]");
-  await expect(toasts(page).last()).toContainText("ulubionych");
+  await expectToast(page, "ulubionych");
   await page.click('[aria-label="Stan ekranu"] button:has-text("empty")');
   await expect(page.locator("main")).toContainText("Brak mentorów dla tych filtrów");
   await page.click('[aria-label="Stan ekranu"] button:has-text("error")');
@@ -68,19 +68,19 @@ test("P4: logowanie — błąd, logowanie społecznościowe, stare adresy", asyn
 test("P1: „Zostań mentorem” prowadzi do onboardingu", async ({ page }) => {
   await open(page, "/");
   await page.locator('a:has-text("Zostań mentorem")').last().click();
-  await expect(page).toHaveURL(/\/app#\/mentor\/onboarding\/1$/);
+  await expect(page).toHaveURL(/\/mentor\/onboarding\/1$/);
 });
 
-test("rola zachowana przy przejściach React ↔ /app, „wstecz”", async ({ page }) => {
+test("rola zachowana przy przejściach strony ↔ panel, „wstecz”", async ({ page }) => {
   await open(page, "/mentorzy");
   await asRole(page, "mentor");
-  await expect(page).toHaveURL(/\/app#\/mentor$/);
-  await expect(page.locator(".mockbar [data-role]")).toHaveValue("mentor");
-  await page.click('.topnav a[href="#/wiadomosci"]');
+  await expect(page).toHaveURL(/\/mentor$/);
+  await expect(page.locator("[data-role]")).toHaveValue("mentor");
+  await page.click('nav[aria-label="Panel"] a[href="/wiadomosci"]');
   await expect(page).toHaveURL(/\/wiadomosci$/);
   await expect(page.locator("[data-role]")).toHaveValue("mentor");
   await page.goBack();
-  await expect(page).toHaveURL(/\/app#\/mentor$/);
+  await expect(page).toHaveURL(/\/mentor$/);
   await go(page, "/mapa");
   expect(path(page)).toBe("/mapa");
 });

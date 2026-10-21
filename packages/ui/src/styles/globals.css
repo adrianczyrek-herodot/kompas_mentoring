@@ -1,13 +1,64 @@
 /*
- * Wspólne style Tailwind CSS v4 + motyw shadcn/ui.
- * Importowane przez aplikację: `@import "@devmentor/ui/styles.css";`
+ * Jeden arkusz całej aplikacji: Tailwind CSS v4 (z preflightem), tokeny identyfikacji Kompasu
+ * dla stron frontendowych (`.kompas`) i motyw shadcn/ui dla panelu (`.backend`).
+ * Importowany w root layoucie aplikacji: `import "@devmentor/ui/styles.css";`
  */
 @import "tailwindcss";
+@import "tw-animate-css";
 
-/* Klasy używane w komponentach tego pakietu (pakiet jest w node_modules, więc nie jest skanowany automatycznie). */
-@source "../";
+/* Klasy z komponentów pakietu (pakiet jest w node_modules, więc nie jest skanowany automatycznie). */
+@source "../frontend";
+@source "../backend";
 
 @custom-variant dark (&:is(.dark *));
+
+/* ---- Tokeny Kompasu (strony frontendowe) ------------------------------------------------ */
+
+@theme {
+  --color-ink: #17201e;
+  --color-ink-2: #4a5552;
+  --color-ink-3: #7b8582;
+  --color-paper: #f6f3ec;
+  --color-surface: #ffffff;
+  --color-line: #e3ddd1;
+  --color-line-2: #efeae0;
+  --color-brand: #13463d;
+  --color-brand-2: #1d5f53;
+  --color-brand-soft: #e3efe9;
+  /* Kolor akcentu Kompasu. W panelu (`.backend`) ta sama nazwa wskazuje akcent shadcn/ui — patrz niżej. */
+  --color-accent: #e07b2f;
+  --color-accent-soft: #fbeadb;
+  --color-ok: #2f7a4a;
+  --color-ok-soft: #e2f2e7;
+  --color-warn: #9a6400;
+  --color-warn-soft: #fdf1d6;
+  --color-err: #b4352a;
+  --color-err-soft: #fbe5e2;
+  --color-mock: #0e1615;
+
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-card: 14px;
+  --radius-field: 9px;
+  --shadow-card: 0 1px 2px rgba(23, 32, 30, 0.06), 0 4px 16px rgba(23, 32, 30, 0.05);
+
+  --animate-shimmer: shimmer 1.2s infinite;
+  --animate-meter: meter 1s ease-in-out infinite alternate;
+  @keyframes shimmer {
+    to { background-position: -200% 0; }
+  }
+  @keyframes meter {
+    from { width: 20%; }
+    to { width: 75%; }
+  }
+  @keyframes modal-up {
+    from { transform: translateY(20px); opacity: 0; }
+  }
+}
+
+/* ---- Motyw shadcn/ui (panel) ----------------------------------------------------------------- */
 
 :root {
   --radius: 0.625rem;
@@ -31,32 +82,7 @@
   --ring: oklch(0.708 0 0);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-}
-
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -69,7 +95,6 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
@@ -77,8 +102,58 @@
   --color-ring: var(--ring);
 }
 
+/*
+ * Nazwy wspólne z tokenami Kompasu (`accent`, promienie) nadpisujemy tylko w panelu — utilities
+ * czytają je ze zmiennych, więc `bg-accent` czy `rounded-md` w `.backend` mają wartości shadcn/ui.
+ */
+.backend {
+  --color-accent: var(--accent);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ---- Style bazowe ------------------------------------------------------------------------------ */
+
 @layer base {
-  * {
+  .backend *,
+  .backend *::before,
+  .backend *::after {
     @apply border-border outline-ring/50;
+  }
+
+  /* Strony Kompasu: typografia i odstępy elementów. Specyficzność elementu (jak preflight, ale później w kodzie) — wygrywa z preflightem; utilities wygrywają warstwą. */
+  :where(.kompas) {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font: 15px/1.55 var(--font-sans);
+  }
+  :where(.kompas) :is(h1, h2, h3, h4) {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0 0 0.4em;
+    letter-spacing: -0.01em;
+  }
+  :where(.kompas) h1 { font-size: 1.85rem; }
+  :where(.kompas) h2 { font-size: 1.4rem; }
+  :where(.kompas) h3 { font-size: 1.12rem; }
+  :where(.kompas) h4 { font-size: 1rem; }
+  :where(.kompas) p { margin: 0 0 0.7em; }
+  :where(.kompas) a { text-decoration: underline; }
+  :where(.kompas) ol { list-style: decimal; }
+  :where(.kompas) ul { list-style: disc; }
+  :where(.kompas) code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--color-line-2);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  :where(.kompas) ::placeholder { color: #757575; }
+  :where(.kompas) :where(:focus-visible) {
+    outline: 3px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+    outline-offset: 2px;
   }
 }
