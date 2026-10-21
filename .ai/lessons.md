@@ -9,6 +9,8 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-20** — `.ai/cezar/` to katalog roboczy orkiestratora cezar (worktree, załączniki); jest w `.gitignore` i nie należy do struktury `.ai/` — nie zapisuj tam specyfikacji, runów ani lekcji.
 - **2026-10-20** — W przebiegach cezar (Claude Code headless) WebFetch bywa zablokowany; publiczną stronę da się odczytać przez `curl -sL <url>` z usunięciem tagów HTML.
 
+- **2026-10-21** — Zanim zaczniesz szkielet lub zmianę architektury, sprawdź `git fetch && git log HEAD..origin/main` i otwarte PR-y: równoległe zadanie cezar zbudowało na `main` inny szkielet tego projektu (pnpm/Turborepo, `apps/*`) niż gałąź `cez/d24e11ee` (npm, `packages/{app,core,db,ui}`) — PR #7 wymaga decyzji o kierunku.
+
 ## Domena i produkt
 
 ## Kod i mockupy
