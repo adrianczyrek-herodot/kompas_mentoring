@@ -1,2 +1,24 @@
 # Katalog roboczy orkiestratora cezar (worktree, załączniki, pliki tymczasowe)
 .ai/cezar/
+
+# Dependencies and build output
+node_modules/
+.pnpm-store/
+.next/
+next-env.d.ts
+.turbo/
+dist/
+!kompas-mentoring/mockupy/dist/
+coverage/
+*.tsbuildinfo
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
+# Local environment
+.env
+.env.*
+!.env.example
+.DS_Store
