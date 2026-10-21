@@ -84,13 +84,13 @@ Ekrany mentora i admina jako strony React na komponentach shadcn/ui; usunięcie 
 - Stan: nowe akcje w `src/demo/actions.ts` (szkic i wysłanie onboardingu, szablon dostępności, akceptacja/odrzucenie prośby, wypłata, decyzja weryfikacji, rozstrzygnięcie sporu). Reguły bez stanu → `@devmentor/core/domain`: walidacja kroków onboardingu, wyliczenia zarobków (dostępne/oczekujące, minimum wypłaty, podgląd zarobku po prowizji), warunki decyzji moderacji.
 - Komponenty shadcn/ui dodane CLI w `packages/ui` (m.in. badge, input, textarea, label, checkbox, radio-group, table, dialog, progress, skeleton, alert, sonner, toggle-group, separator); edytor dostępności (siatka godzin z przeciąganiem) jako komponent panelu.
 
-**Kryteria ukończenia fazy 4**
-- [ ] `npm run typecheck` i `npm run e2e` zielone.
-- [ ] M1–M5, A1–A2 jako strony React na shadcn/ui, funkcjonalnie zgodne z mockupem (testy E2E: onboarding 6 kroków z walidacją → wysłanie → zgłoszenie w kolejce admina → zatwierdzenie; prośby akceptuj/odrzuć z powodem; kalendarz: malowanie siatki, ustawienia, wyjątek; notatka dla ucznia; wypłata; spór: zwrot częściowy z limitem; stany loading/empty/error).
-- [ ] Strony `(site)` bez regresji wizualnej po przejściu na wspólny arkusz (zrzuty E2E; zamierzone różnice przejrzane).
-- [ ] Brak `src/legacy`, `/app`, `kompas.css`; dokumentacja (`README.md`, `AGENTS.md`) bez odwołań do warstwy przejściowej.
+**Kryteria ukończenia fazy 4** — ✅ ukończona 2026-10-21 (run: `.ai/runs/2026-10-21-playwright-i-faza-4.md`)
+- [x] `npm run typecheck` i `npm run e2e` zielone (118 testów: 30 przepływów, 88 zrzutów).
+- [x] M1–M5, A1–A2 jako strony React na shadcn/ui, funkcjonalnie zgodne z mockupem (testy E2E: onboarding 6 kroków z walidacją → zgłoszenie w kolejce admina → zatwierdzenie; zmiany/brak KYC; prośby akceptuj/odrzuć z powodem; siatka dostępności, ustawienia, wyjątek; notatka dla ucznia; wypłata; spór ze zwrotem częściowym; strażnicy i stany).
+- [x] Strony `(site)` po przejściu na wspólny arkusz: 40/62 zrzutów bez zmian, 22 z przejrzanymi drobnymi zmianami (opis w „Decyzjach”).
+- [x] Brak `src/legacy`, `/app`, `kompas.css`, `frontend.css`; `README.md`, `AGENTS.md`, `kompas-mentoring/README.md` opisują docelową architekturę.
 
-### Faza 5 — dane w PostgreSQL
+### Faza 5 — dane w PostgreSQL (następna)
 Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `@devmentor/db/fixtures`; serwisy w `core`/`db` rejestrowane w Awilix; ekrany czytają dane przez `getRequestScope()`.
 
 ## Decyzje i zmiany
@@ -114,3 +114,5 @@ Encje MikroORM i migracje dla mentorów, sesji, planów, wiadomości; seeder z `
 - 2026-10-21 — Faza 4: jeden root layout dla stron i panelu (zamiast osobnego `(backend)`), motyw shadcn/ui w zakresie `.backend` — powód: przejścia strona ↔ panel muszą zachować stan demo w pamięci; tokeny Kompasu i shadcn mają kolidujące nazwy (`accent`, `radius-*`).
 - 2026-10-21 — Faza 4: onboarding mentora (M1) w panelu na shadcn/ui jak reszta M1–M5 (zgodnie z planem), mimo że zaczyna go gość — to formularz wieloetapowy, a nie strona marketingowa.
 - 2026-10-21 — Faza 4: po przejściu stron na wspólny arkusz z preflightem 40/62 zrzutów `(site)` identycznych, 22 z drobnymi zmianami przyjętymi świadomie: preflight zeruje domyślne marginesy natywnych kontrolek (checkbox, radio, suwak, wewnętrzny odstęp pola), co przesuwa sąsiedni tekst o 2–4 px; znika też reguła mockupu `section + section { margin-top: 20px }`, która przesuwała drugą kartę w siatkach dwukolumnowych (mapa, postępy) — teraz karty są wyrównane. Bez odtwarzania domyślnych stylów przeglądarki w systemie wizualnym.
+- 2026-10-21 — Faza 4: panel ma własny wygląd shadcn/ui (neutralny motyw), nie odwzorowuje kolorów Kompasu — zgodnie z założeniem „shadcn/ui dla stron backendowych”; zgodność z mockupem jest funkcjonalna (testy E2E), nie wizualna. Pulpit admina ze szkieletu (`/admin`) został w panelu jako pozycja „Pulpit” w menu admina.
+- 2026-10-21 — Faza 4: przy weryfikacji/sporach po rozpatrzeniu ostatniego zgłoszenia panel pokazuje stan pusty (w mockupie ekran się wywracał na pustej liście).

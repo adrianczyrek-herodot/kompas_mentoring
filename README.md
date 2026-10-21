@@ -32,7 +32,7 @@ npm run dev                   # http://localhost:3000
 | `npm run db:migration:create` | Nowa migracja z różnicy encji i snapshotu schematu |
 | `npm run db:migration:up` / `db:migration:down` | Zastosowanie / cofnięcie migracji |
 
-Adresy (dane demo, bez bazy): strony React — publiczne (`/`, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja`), ucznia (`/rezerwacja/[mentorId]`, `/rezerwacja/[mentorId]/platnosc`, `/potwierdzenie/[id]`, `/sesje`, `/sesje/[id]`, `/sesje/[id]/pokoj`, `/sesje/[id]/ocena`, `/plany`, `/postepy`), wspólne (`/wiadomosci`, `/wiadomosci/[id]`, `/powiadomienia`, `/konto`) i `/mapa` (mapa ekranów mockupu); `/app#/…` — ekrany mentora i admina jeszcze w `src/legacy` (np. `/app#/mentor`); `/admin` — panel; `/api/health` — stan aplikacji i bazy (200 / 503).
+Adresy (dane demo, bez bazy): strony frontendowe — publiczne (`/`, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja`), ucznia (`/rezerwacja/[mentorId]`, `/rezerwacja/[mentorId]/platnosc`, `/potwierdzenie/[id]`, `/sesje`, `/sesje/[id]`, `/sesje/[id]/pokoj`, `/sesje/[id]/ocena`, `/plany`, `/postepy`), wspólne (`/wiadomosci`, `/wiadomosci/[id]`, `/powiadomienia`, `/konto`) i `/mapa` (mapa ekranów mockupu); panel mentora (`/mentor`, `/mentor/onboarding/[1–6]`, `/mentor/kalendarz`, `/mentor/uczniowie`, `/mentor/uczniowie/[id]`, `/mentor/zarobki`) i admina (`/admin`, `/admin/weryfikacja`, `/admin/spory`); `/api/health` — stan aplikacji i bazy (200 / 503). Rolę demo zmienia pasek MOCKUP na górze.
 
 ## Architektura
 
@@ -57,11 +57,12 @@ Podścieżki bezpieczne w przeglądarce (bez Awilixa i MikroORM):
 
 | Import | Zawartość |
 |---|---|
-| `@devmentor/core/domain` | Typy domenowe (`Mentor`, `Session`, `Role`…), katalog (`CATEGORIES`, `PLAN_OPTIONS`), reguły z jawnym `now` (`weekSlots`, `canJoin`, `canCancelFree`, `commissionRate`, `planPrice`…) |
+| `@devmentor/core/domain` | Typy domenowe (`Mentor`, `Session`, `Role`…), katalog (`CATEGORIES`, `PLAN_OPTIONS`), reguły z jawnym `now` (`weekSlots`, `canJoin`, `cancellationPolicy`, `trialCharge`, `commissionRate`…), wyszukiwarka, onboarding mentora (`onboardingErrors`), zarobki, moderacja (`verificationErrors`, `resolutionErrors`) |
 | `@devmentor/db/fixtures` | Dane demo (`MENTORS`, `SESSIONS`, …, `DEMO_NOW`) — dziś źródło danych aplikacji, docelowo seed bazy |
 | `@devmentor/ui/lib/format`, `@devmentor/ui/lib/icons` | Formatowanie dat/kwot (pl), ścieżki ikon SVG |
-| `@devmentor/ui/frontend.css` | Tailwind z tokenami Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `shadow-card`, `font-serif`…) + przejściowo `kompas.css` w warstwie `kompas`, bez preflightu |
-| `@devmentor/ui/frontend/*` | Komponenty React stron frontendowych: `Icon`, `Avatar`, `Rating`, `Badge`, `buttonVariants`/`Button`, `chipVariants`, `Tag`, `Skeleton`, `Spinner`, `EmptyState`/`ErrorState`, `Field`, `TextareaField`, `Notice`, `Modal`, `Toaster`/`toast()`; klasy `cardClass`, `listClass`/`listItemClass`/`tableClass`, nagłówki `h1Class`…`h4Class` |
+| `@devmentor/ui/styles.css` | Jeden arkusz: Tailwind z preflightem, tokeny Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `font-serif`…), style bazowe `.kompas`, motyw shadcn/ui w `.backend` |
+| `@devmentor/ui/frontend/*` | Komponenty React stron frontendowych (Tailwind): `Icon`, `Avatar`, `Rating`, `Badge`, `buttonVariants`/`Button`, `chipVariants`, `Tag`, `Skeleton`, `Spinner`, `EmptyState`/`ErrorState`, `Field`, `TextareaField`, `Notice`, `Modal`, `Toaster`/`toast()`; klasy `cardClass`, `listClass`/`listItemClass`/`tableClass`, nagłówki `h1Class`…`h4Class` |
+| `@devmentor/ui/backend/*` | Komponenty shadcn/ui panelu: `Button`, `Card`, `Badge`, `Input`, `Textarea`, `Label`, `Checkbox`, `RadioGroup`, `NativeSelect`, `Table`, `Dialog`, `Progress`, `Skeleton`, `Alert`, `Avatar`, `ToggleGroup`, `Separator`, `Toaster`/`toast` (sonner), `EmptyState`/`ErrorState`/`PageHeader` |
 | `@devmentor/core/validation` | Walidatory wartości pól (`required`, `length`, `email`, `range`, dane karty) |
 
 ### Zależności między pakietami
@@ -83,15 +84,16 @@ Next.js App Router w `packages/app/src/app`:
 
 | Ścieżka | Rola |
 |---|---|
-| `(frontend)/` | Root layout stron publicznych (`frontend.css`, `Toaster`); `(site)/` — strony React z nagłówkiem, paskiem mockupu i strażnikiem dostępu (wszystkie trasy z `SCREENS` w `src/demo/navigation.ts`); `app/` — strona `/app` montująca `src/legacy` |
-| `(backend)/` | Root layout z Tailwindem i preflightem; `admin/` — panel na shadcn/ui z `@devmentor/ui/backend` |
+| `layout.tsx` | Jedyny root layout: `@devmentor/ui/styles.css`, `Toaster` stron — przejścia strony ↔ panel to nawigacja klienta, stan demo zostaje |
+| `(site)/` | Strony frontendowe (Tailwind, opakowanie `.kompas`) z nagłówkiem, paskiem mockupu i strażnikiem dostępu |
+| `(panel)/` | Panel mentora i admina (shadcn/ui, opakowanie `.backend`): pasek mockupu, menu boczne wg roli, strażnik dostępu, `Toaster` sonner |
 | `api/` | Route handlery (np. `api/health`) |
-| `src/views/` | Widoki ekranów (komponenty klienckie): `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa) |
-| `src/demo/` | Stan demo w pamięci (`store.ts` + `useDemoStore()`), jego zmiany (`actions.ts` — jedyne miejsce mutacji z React), nawigacja mockupu (`navigation.ts`: role, menu, tabela ekranów `SCREENS` z dostępem, `toUrl()`), pasek mockupu, nagłówek i strażnik dostępu (`demo-chrome.tsx`), stany ekranu (`use-view-state.ts`) |
-| `src/legacy/` | Ekrany jeszcze nieprzepisane z mockupu: router na hashu, widoki jako HTML; start przez `startKompasApp(root, { navigate })` |
+| `src/views/` | Widoki ekranów (komponenty klienckie): `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa), `mentor/` (M1–M5), `admin/` (A1–A2) |
+| `src/demo/` | Stan demo w pamięci (`store.ts` + `useDemoStore()`), jego zmiany (`actions.ts` — jedyne miejsce mutacji z React), nawigacja mockupu (`navigation.ts`: role, menu, tabela ekranów `SCREENS` z dostępem, `toUrl()`), pasek mockupu (`mock-bar.tsx`), strażnik dostępu (`access.ts`), nagłówek stron (`demo-chrome.tsx`), stany ekranu (`use-view-state.ts`) |
+| `src/panel/` | Elementy panelu: `panel-chrome.tsx` (menu, strażnik), `availability-grid.tsx` (siatka godzin z przeciąganiem), pola formularzy, awatar |
 | `src/server/container.ts` | Composition root kontenera Awilix (`server-only`) |
 
-Grupy tras nie wpływają na adresy URL. Strony React i `/app` dzielą root layout `(frontend)`, więc przejścia między nimi to nawigacja klienta — stan demo w pamięci (rola, sesje, `returnTo`) zostaje, jak w mockupie. Trasa mockupu prowadzi na właściwy adres przez `toUrl()`: ekran przepisany → prawdziwa ścieżka, reszta → `/app#/…`; `src/legacy` sam przekierowuje trasy przepisanych ekranów. `(backend)` ma osobny root layout z preflightem Tailwinda (shadcn/ui). Ekrany z `src/legacy` są kolejno przepisywane na React (fazy 3–4), a dane demo zastępowane bazą (faza 5).
+Grupy tras nie wpływają na adresy URL. Strony i panel dzielą jeden root layout, więc przejścia między nimi to nawigacja klienta — stan demo w pamięci (rola, sesje, `returnTo`) zostaje, jak w mockupie. Motyw shadcn/ui obowiązuje tylko w `.backend`: nazwy wspólne z tokenami Kompasu (`accent`, promienie `rounded-*`) są tam nadpisywane zmiennymi CSS. Dane demo zastąpi baza w fazie 5.
 
 ### Dependency Injection (Awilix)
 
@@ -115,9 +117,9 @@ getContainer()  ── singleton na proces: clock, orm, dbHealthCheck, serwisy�
 
 ### UI (Tailwind + shadcn/ui)
 
-- `@devmentor/ui/styles.css` — Tailwind CSS v4 i tokeny motywu shadcn/ui (zmienne CSS, tryb `.dark`); importowany w `packages/app/src/app/globals.css`.
-- `@devmentor/ui/frontend/*` — komponenty stron publicznych w czystym Tailwindzie (`Container`, `Hero`).
-- `@devmentor/ui/backend/*` — komponenty shadcn/ui (`Button`, `Card`); nowe dodaje się przez `npx shadcn@latest add <komponent>` w `packages/ui` (konfiguracja w `components.json`).
+- `@devmentor/ui/styles.css` — jedyny arkusz aplikacji (importowany w `packages/app/src/app/layout.tsx`): Tailwind CSS v4 z preflightem, `tw-animate-css`, tokeny Kompasu, motyw shadcn/ui w zakresie `.backend`, style bazowe stron Kompasu pod `:where(.kompas)`.
+- `@devmentor/ui/frontend/*` — komponenty stron frontendowych w czystym Tailwindzie.
+- `@devmentor/ui/backend/*` — komponenty shadcn/ui panelu; nowe dodaje się przez `npx shadcn@latest add <komponent>` w `packages/ui` (konfiguracja w `components.json`, poprawki po CLI — zob. `AGENTS.md`).
 - `@devmentor/ui/lib/utils` — `cn()` do łączenia klas.
 
 ### Testy (Playwright)

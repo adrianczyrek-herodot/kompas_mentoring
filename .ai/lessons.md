@@ -17,15 +17,17 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-20** — DevMentor: TypeScript 7 (natywny) działa z Next.js 16 (`next build` i `tsc --noEmit` przechodzą); augmentacja `declare module "@devmentor/core"` poprawnie rozszerza `Cradle` reeksportowany przez `export *`.
 - **2026-10-20** — `next dev` (Next.js 16) sam tworzy i odtwarza `packages/app/AGENTS.md` z regułami Next.js — commituj go razem ze zmianą, nie usuwaj (wróci jako niezacommitowana zmiana).
 
-- **2026-10-20** — Aplikacja z `src/legacy` i strony Tailwind muszą mieć osobne root layouty (`(legacy)`, `(backend)`): preflight Tailwinda psuje wygląd `kompas.css`. Moduły `legacy` ładuj dynamicznym `import()` w `useEffect` — dotykają `window` przy imporcie (SSR padnie).
 
-- **2026-10-20** — `frontend.css` nie ma preflightu (współistnienie z `kompas.css`): surowe `<button>`/`<input>` mają natywną ramkę i tło — dawaj im jawnie `border-0 bg-transparent`. Warianty `cva` zwracaj przez `cn()` (tailwind-merge), inaczej `border-line` wariantu przegrywa z bazowym `border-transparent` zależnie od kolejności w CSS.
-- **2026-10-20** — Przejście między stronami React a `/app` (legacy) musi być nawigacją klienta (`router.push/replace`, `<Link>`) — pełne przeładowanie zeruje stan demo w pamięci. Dlatego oba żyją w jednym root layoucie `(frontend)`.
+- **2026-10-20** — Warianty `cva` zwracaj przez `cn()` (tailwind-merge), inaczej np. `border-line` wariantu przegrywa z bazowym `border-transparent` zależnie od kolejności w CSS.
+- **2026-10-20** — Stan demo żyje w pamięci przeglądarki: wszystkie strony (także panel) muszą być w jednym root layoucie i przechodzić nawigacją klienta (`<Link>`, `router.push`) — osobny root layout albo pełne przeładowanie zeruje rolę i dane.
 
-- **2026-10-21** — `kompas.css` ma reguły kontekstowe na końcu pliku (`.layout-profile .video-ph { height: 300px }`, karta mentora ≤480 px) — przepisując ekran, przeszukaj cały arkusz po klasach ekranu, nie tylko jego sekcję.
 
 - **2026-10-21** — Regresję i przepływy sprawdza `npm run e2e` (Playwright w `e2e/`, wzorce zrzutów w repo) — nie pisz skryptów do katalogu tmp (cezar go czyści). Nawigacja w testach przez `go()` z `e2e/support.ts`: `page.goto()` przeładowuje stronę i zeruje stan demo.
-- **2026-10-21** — Pod `/app` zmieniaj w testach tylko `location.hash`: `window.next.router.push('/app#/…')` robi `pushState` bez zdarzenia `hashchange`, więc router `legacy` nie przerysuje ekranu — zrzuty wyszły identyczne dla różnych tras. Po wygenerowaniu wzorców sprawdzaj, czy nie ma duplikatów (`md5 -r … | uniq -d`).
 - **2026-10-21** — Każdy stan ładowania (szkielet, spinner „łączenie…”) musi mieć `aria-busy="true"`: `settle()` w testach czeka na jego zniknięcie, inaczej zrzut łapie stan przejściowy (tak było z pokojem sesji przy 360 px).
+
+- **2026-10-21** — Style bazowe pod `:where(.kompas) :where(a)` mają zerową specyficzność i przegrywają z preflightem Tailwinda (`a { text-decoration: inherit }`) — używaj `:where(.kompas) a` (specyficzność elementu, później w kodzie). Utilities i tak wygrywają warstwą.
+- **2026-10-21** — Tokeny Kompasu i motyw shadcn/ui mają wspólne nazwy (`--color-accent`, `--radius-*`): w `@theme` zostają wartości Kompasu, a w `.backend` nadpisujemy zmienne — utilities czytają je przez `var()`, więc `bg-accent`/`rounded-md` zmieniają znaczenie tylko w panelu. Nie dawaj tych kluczy do `@theme inline`.
+- **2026-10-21** — `npx shadcn add` w `packages/ui` generuje `import { cn } from "cn"` (i dodaje do zależności niepowiązany pakiet `cn`) oraz importy `@devmentor/ui/backend/x` — po CLI zamień na `../lib/utils` i `./x`, odinstaluj `cn`; doinstaluj `lucide-react`, a `sonner.tsx` uwolnij od `next-themes`.
+- **2026-10-21** — sonner wstawia najnowszy toast na początek listy — w testach nie używaj `.last()`, tylko `expectToast(page, tekst)` z `e2e/support.ts`. `body` bez `antialiased` — ta klasa zmienia rendering tekstu i rozjeżdża wzorce zrzutów.
 
 ## Błędy i ich przyczyny

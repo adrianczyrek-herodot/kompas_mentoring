@@ -12,12 +12,11 @@ Klikalne mockupy zostały przeniesione do monorepo DevMentor (zob. [`README.md`]
 
 | Ścieżka | Co to jest |
 |---|---|
-| `packages/app/src/views/` | Ekrany przepisane na React + Tailwind: `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa ekranów) |
-| `packages/app/src/legacy/` | Ekrany mentora i admina (M1–M5, A1–A2) i ich router — widoki jako HTML, do przepisania w fazie 4 |
+| `packages/app/src/views/` | Ekrany w React: `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa ekranów) — Tailwind; `mentor/` (M1–M5), `admin/` (A1–A2) — shadcn/ui |
 | `packages/app/src/demo/` | Stan demo w pamięci i akcje, role i nawigacja, pasek mockupu |
 | `packages/core/src/domain/` | Typy domenowe i reguły jako czyste funkcje (dawniej `domain.ts`) |
 | `packages/db/src/fixtures/` | Dane demo (dawniej `mocks.ts`) |
-| `packages/ui/src/styles/`, `packages/ui/src/lib/`, `packages/ui/src/frontend/` | Style (Tailwind z tokenami Kompasu, `kompas.css`), formatowanie, ikony, komponenty React |
+| `packages/ui/src/styles/`, `packages/ui/src/lib/`, `packages/ui/src/frontend/` | Arkusz (Tailwind z tokenami Kompasu, motyw shadcn/ui), formatowanie, ikony, komponenty React (`frontend/`, `backend/`) |
 
 ## Jak uruchomić
 
@@ -25,7 +24,7 @@ Z korzenia repozytorium:
 
 ```bash
 npm install
-npm run dev         # http://localhost:3000 — mapa ekranów: /mapa; ekrany mentora i admina pod /app#/…, panel pod /admin
+npm run dev         # http://localhost:3000 — mapa ekranów: /mapa; panel mentora /mentor, admina /admin
 npm run typecheck
 npm run build
 ```
