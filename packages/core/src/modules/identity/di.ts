@@ -5,7 +5,18 @@ import { UserId } from '../../shared/domain/index.ts';
 import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
 import type { Env } from '../../shared/infrastructure/env.ts';
 import type { Logger } from '../../shared/infrastructure/logger.ts';
+import {
+  type DataRequestRepository,
+  makeRequestPersonalData,
+  makeSetMarketingConsent,
+  type RequestPersonalData,
+  type SetMarketingConsent,
+} from './application/account.commands.ts';
 import type { EmailVerificationSender } from './application/email-verification-sender.port.ts';
+import {
+  type GetAccountOverview,
+  makeGetAccountOverview,
+} from './application/get-account-overview.query.ts';
 import {
   type GetCurrentUser,
   makeGetCurrentUser,
@@ -19,15 +30,19 @@ import {
 import { BetterAuthSessionReader } from './infrastructure/auth/better-auth-session-reader.ts';
 import { type Auth, createAuth } from './infrastructure/auth/create-auth.ts';
 import { ConsentRecord } from './infrastructure/consent.record.ts';
+import { DataRequestRecord } from './infrastructure/data-request.record.ts';
 import { LoggingEmailVerificationSender } from './infrastructure/email/logging-email-verification-sender.ts';
 import { MikroOrmConsentRepository } from './infrastructure/mikro-orm-consent.repository.ts';
+import { MikroOrmDataRequestRepository } from './infrastructure/mikro-orm-data-request.repository.ts';
 import { UserRecord } from './infrastructure/user.record.ts';
 import { Migration20261110000000IdentityAuth } from './migrations/Migration20261110000000IdentityAuth.ts';
+import { Migration20261110120000AccountRequests } from './migrations/Migration20261110120000AccountRequests.ts';
 
 /** Picked up by the ORM configuration (explicit lists, no globbing). */
-export const identityEntities = [UserRecord, ConsentRecord];
+export const identityEntities = [UserRecord, ConsentRecord, DataRequestRecord];
 export const identityMigrations = [
   { name: 'Migration20261110000000IdentityAuth', class: Migration20261110000000IdentityAuth },
+  { name: 'Migration20261110120000AccountRequests', class: Migration20261110120000AccountRequests },
 ];
 
 export interface IdentityCradle {
@@ -40,6 +55,10 @@ export interface IdentityCradle {
   getCurrentUser: GetCurrentUser;
   consentRepository: ConsentRepository;
   recordRegistrationConsents: RecordRegistrationConsents;
+  dataRequestRepository: DataRequestRepository;
+  getAccountOverview: GetAccountOverview;
+  setMarketingConsent: SetMarketingConsent;
+  requestPersonalData: RequestPersonalData;
 }
 
 type Deps = IdentityCradle & DatabaseCradle & { env: Env; logger: Logger; clock: Clock };
@@ -71,5 +90,9 @@ export const registerIdentityModule = (container: AwilixContainer<Deps>): void =
     getCurrentUser: asFunction(makeGetCurrentUser).scoped(),
     consentRepository: asClass(MikroOrmConsentRepository).scoped(),
     recordRegistrationConsents: asFunction(makeRecordRegistrationConsents).scoped(),
+    dataRequestRepository: asClass(MikroOrmDataRequestRepository).scoped(),
+    getAccountOverview: asFunction(makeGetAccountOverview).scoped(),
+    setMarketingConsent: asFunction(makeSetMarketingConsent).scoped(),
+    requestPersonalData: asFunction(makeRequestPersonalData).scoped(),
   });
 };

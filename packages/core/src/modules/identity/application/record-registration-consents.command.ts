@@ -5,9 +5,11 @@ import type { RequiredConsentMissing } from '../domain/identity.errors.ts';
 import { CONSENT_DOCUMENT_VERSIONS } from '../domain/policies/config.ts';
 import { missingRequiredConsent } from '../domain/policies/consent.policy.ts';
 
-/** Port: persistence of consents (MikroORM adapter in `infrastructure/`, F1 step 3). */
+/** Port: persistence of consent decisions (MikroORM adapter in `infrastructure/`). */
 export interface ConsentRepository {
   saveAll(consents: readonly Consent[]): Promise<void>;
+  /** The most recent decision about the document, or `null` when there was none. */
+  latest(userId: UserId, document: ConsentDocument): Promise<Consent | null>;
 }
 
 export interface RegistrationConsentInput {
@@ -30,7 +32,7 @@ export const makeRecordRegistrationConsents =
     if (missing !== null) {
       return err({ code: 'identity.required_consent_missing', document: missing });
     }
-    const givenAt = clock.now();
+    const decidedAt = clock.now();
     const accepted = (Object.keys(CONSENT_DOCUMENT_VERSIONS) as ConsentDocument[]).filter(
       (d) => input[d],
     );
@@ -38,7 +40,8 @@ export const makeRecordRegistrationConsents =
       userId,
       document,
       version: CONSENT_DOCUMENT_VERSIONS[document],
-      givenAt,
+      granted: true,
+      decidedAt,
     }));
     await consentRepository.saveAll(consents);
     return ok(consents);
