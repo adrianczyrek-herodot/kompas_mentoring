@@ -1,0 +1,11 @@
+{
+  "extends": "./packages/config/tsconfig/bundler.json",
+  "compilerOptions": { "jsx": "react-jsx" },
+  "include": [
+    "apps/*/**/*.ts",
+    "apps/*/**/*.tsx",
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx"
+  ],
+  "exclude": ["**/node_modules", "**/.next"]
+}

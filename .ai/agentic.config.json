@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "baseBranch": "main",
+  "tracker": "github",
+  "browser": { "provider": "playwright" },
+  "validation": {
+    "commands": ["pnpm lint", "pnpm typecheck", "pnpm test", "pnpm build"]
+  },
+  "labels": {
+    "enabled": true,
+    "pipeline": ["review", "changes-requested", "qa", "qa-failed", "merge-queue", "blocked", "do-not-merge"],
+    "category": ["bug", "feature", "refactor", "security", "dependencies", "documentation"],
+    "meta": ["needs-qa", "skip-qa", "qa-approved", "qa-self-verified", "in-progress", "ci-monitoring"],
+    "priority": ["priority-low", "priority-medium", "priority-high", "priority-extreme"],
+    "risk": ["risk-low", "risk-medium", "risk-high"]
+  },
+  "qaGate": true,
+  "ci": { "maxWaitMinutes": 40 },
+  "paths": {
+    "runs": ".ai/runs",
+    "analysis": ".ai/analysis",
+    "specs": ".ai/specs",
+    "lessons": ".ai/lessons.md",
+    "lessonsDir": ".ai/lessons",
+    "decisions": "docs/decisions"
+  },
+  "humanReview": {
+    "required": true,
+    "paths": [
+      "packages/core/src/modules/billing/**",
+      "packages/core/src/modules/ledger/**",
+      "packages/core/src/modules/payouts/**",
+      "packages/core/src/modules/identity/**",
+      "**/migrations/**"
+    ],
+    "note": "Zmiany w tych ścieżkach wymagają przeglądu człowieka niezależnie od wyniku agentów (SDLC.md, CODE_REVIEW.md §1)."
+  },
+  "reviewChecklist": "CODE_REVIEW.md",
+  "closeKeywords": ["zamyka", "naprawia", "rozwiązuje"]
+}

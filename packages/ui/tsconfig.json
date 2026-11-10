@@ -7,5 +7,7 @@
       "@devmentor/ui/*": ["./src/*"]
     }
   },
+  "extends": "@kompas/config/tsconfig/bundler.json",
+  "compilerOptions": { "jsx": "react-jsx" },
   "include": ["src"]
 }
