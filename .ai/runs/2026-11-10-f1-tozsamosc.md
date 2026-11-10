@@ -14,7 +14,10 @@ Wdrożyć specyfikację F1 po odpowiedziach właściciela na Q1–Q8: PR-y 1–7
 
 ## Przebieg
 - Odpowiedzi Q1–Q8 zapisane w specyfikacji (wszystkie zgodne z rekomendacjami), status `in-progress`.
-- PR #9 (revert #7) jeszcze nie scalony — gałęzie kroków budowane na `cez/d24e11ee-revert-pr7`.
+- PR #9 (revert #7) jeszcze nie scalony — gałęzie kroków budowane na `cez/d24e11ee-revert-pr7` (stos PR-ów).
+- Toolchain: pnpm 11.28.6 przez corepack (katalog tmp agenta), `pnpm install --frozen-lockfile`; stan wyjściowy: lint/typecheck/test/build zielone.
+- Krok 1 (PR #11): shadcn Base UI (`base-nova`) przez CLI w `packages/ui` — znów `import { cn } from "cn"` + pakiet `cn` (poprawione), brakujące zależności doinstalowane z dokładnymi wersjami; motyw z tokenami Kompasu (jasny/ciemny); cele dotykowe 44 px przywrócone; knip: `tailwindcss` przeniesiony do `packages/ui`. CI zielone.
+- Krok 2 (PR #12): domena `identity` (role, `safeReturnTo`, hasło, sesje/2FA, zgody) + 31 testów; DI przeniesione do kroku 3 (wpis w spec). Brak `@vitest/coverage-v8` — progu pokrycia nie da się zmierzyć.
 
 ## Wynik
 
