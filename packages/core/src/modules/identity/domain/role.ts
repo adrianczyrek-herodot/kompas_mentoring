@@ -4,6 +4,7 @@ export const ROLES = ['student', 'mentor', 'admin_trust', 'admin_finance'] as co
 export type Role = (typeof ROLES)[number];
 
 const ADMIN_ROLES = ['admin_trust', 'admin_finance'] as const satisfies readonly Role[];
+export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 export type Permission =
   | 'account.manage.own' // S3: own profile, password, consents, sessions

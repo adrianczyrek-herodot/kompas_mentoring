@@ -8,6 +8,7 @@ export type AuthFailure =
   | 'passwordCompromised'
   | 'consentMissing'
   | 'invalidPassword'
+  | 'invalidCode'
   | 'tooManyAttempts'
   | 'unexpected';
 
@@ -19,6 +20,8 @@ const FAILURES: Record<string, AuthFailure> = {
   PASSWORD_COMPROMISED: 'passwordCompromised',
   REQUIRED_CONSENT_MISSING: 'consentMissing',
   INVALID_PASSWORD: 'invalidPassword',
+  INVALID_CODE: 'invalidCode',
+  INVALID_TWO_FACTOR_COOKIE: 'unexpected',
 };
 
 const post = async (path: string, body: object): Promise<Response> =>
@@ -39,14 +42,37 @@ const failureOf = async (response: Response): Promise<AuthFailure | null> => {
 export const callAuthApi = async (path: string, body: object = {}): Promise<AuthFailure | null> =>
   failureOf(await post(path, body));
 
-export const signInWithEmail = async (credentials: Credentials): Promise<AuthFailure | null> =>
-  failureOf(
-    await post('/sign-in/email', {
-      email: credentials.email,
-      password: credentials.password,
-      rememberMe: true,
-    }),
-  );
+/** Better Auth answers a correct password of a 2FA account with a TOTP challenge instead. */
+export const TWO_FACTOR_REQUIRED = 'twoFactorRequired';
+
+export const signInWithEmail = async (
+  credentials: Credentials,
+): Promise<AuthFailure | typeof TWO_FACTOR_REQUIRED | null> => {
+  const response = await post('/sign-in/email', {
+    email: credentials.email,
+    password: credentials.password,
+    rememberMe: true,
+  });
+  if (!response.ok) return failureOf(response);
+  const body = (await response.json()) as { twoFactorRedirect?: boolean };
+  return body.twoFactorRedirect === true ? TWO_FACTOR_REQUIRED : null;
+};
+
+export interface TwoFactorEnrollment {
+  totpURI: string;
+  backupCodes: string[];
+}
+
+/** Starts TOTP setup (Q4): the secret for the authenticator app and one-time backup codes. */
+export const enableTwoFactor = async (
+  password: string,
+): Promise<{ ok: true; data: TwoFactorEnrollment } | { ok: false; failure: AuthFailure }> => {
+  const response = await post('/two-factor/enable', { password });
+  const failure = await failureOf(response);
+  return failure === null
+    ? { ok: true, data: (await response.json()) as TwoFactorEnrollment }
+    : { ok: false, failure };
+};
 
 /** Sign-up body: Better Auth fields + role choice and consents read by the identity hooks. */
 export const signUpWithEmail = async (credentials: Credentials): Promise<AuthFailure | null> =>

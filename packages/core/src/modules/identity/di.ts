@@ -27,6 +27,10 @@ import {
   makeRecordRegistrationConsents,
   type RecordRegistrationConsents,
 } from './application/record-registration-consents.command.ts';
+import {
+  type CreateAdminAccount,
+  makeCreateAdminAccount,
+} from './infrastructure/auth/admin-accounts.ts';
 import { BetterAuthSessionReader } from './infrastructure/auth/better-auth-session-reader.ts';
 import { type Auth, createAuth } from './infrastructure/auth/create-auth.ts';
 import { ConsentRecord } from './infrastructure/consent.record.ts';
@@ -52,6 +56,8 @@ export interface IdentityCradle {
   authPlugins: readonly BetterAuthPlugin[];
   emailVerificationSender: EmailVerificationSender;
   sessionReader: SessionReader;
+  /** CLI only (`pnpm admin:create`), Q4. */
+  createAdminAccount: CreateAdminAccount;
   getCurrentUser: GetCurrentUser;
   consentRepository: ConsentRepository;
   recordRegistrationConsents: RecordRegistrationConsents;
@@ -87,6 +93,7 @@ export const registerIdentityModule = (container: AwilixContainer<Deps>): void =
       }),
     ).singleton(),
     sessionReader: asClass(BetterAuthSessionReader).singleton(),
+    createAdminAccount: asFunction(makeCreateAdminAccount).singleton(),
     getCurrentUser: asFunction(makeGetCurrentUser).scoped(),
     consentRepository: asClass(MikroOrmConsentRepository).scoped(),
     recordRegistrationConsents: asFunction(makeRecordRegistrationConsents).scoped(),

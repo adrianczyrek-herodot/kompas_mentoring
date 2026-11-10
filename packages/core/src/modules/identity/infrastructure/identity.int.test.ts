@@ -139,4 +139,31 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
       pendingRequests: ['export'],
     });
   });
+
+  it('creates admins only through the CLI command, with consents left out (Q4)', async () => {
+    const created = await container.cradle.createAdminAccount({
+      email: 'admin@example.com',
+      name: 'Admin',
+      password: PASSWORD,
+      role: 'admin_trust',
+    });
+    expect(created).toBe('created');
+    const scope = scopeOf('int-admin');
+    const admin = await scope.cradle.getCurrentUser(await signIn('admin@example.com'));
+    expect(admin).toMatchObject({ roles: ['admin_trust'], twoFactorEnabled: false });
+    expect(await consentsOf(admin?.id ?? '')).toEqual([]);
+
+    await signUp('promote@example.com');
+    const promoted = await container.cradle.createAdminAccount({
+      email: 'promote@example.com',
+      name: 'Promoted',
+      password: 'another-strong-password',
+      role: 'admin_finance',
+    });
+    expect(promoted).toBe('promoted');
+    const user = await scope.cradle.getCurrentUser(
+      await signIn('promote@example.com', 'another-strong-password'),
+    );
+    expect(user?.roles).toEqual(['admin_finance']);
+  });
 });
