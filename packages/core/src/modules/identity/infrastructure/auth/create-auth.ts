@@ -10,6 +10,8 @@ import {
   PASSWORD_MIN_LENGTH,
   USER_SESSION_TTL,
 } from '../../domain/policies/config.ts';
+import { type RecordSignUpConsents, registrationHooks } from './registration-hooks.ts';
+import { socialProviderCredentials } from './social-providers.ts';
 import { TimestampParsingPlugin } from './timestamp-parsing.plugin.ts';
 
 /** Better Auth tables live in the module's own schema (spec §2.3). */
@@ -23,20 +25,13 @@ export interface AuthDeps {
   db: Kysely<unknown>;
   env: Env;
   emailVerificationSender: EmailVerificationSender;
+  /** Records the consents given at sign-up (runs after the new user is committed). */
+  recordSignUpConsents: RecordSignUpConsents;
   /** HIBP k-anonymity check of new passwords (Q8, `AUTH_BREACHED_PASSWORD_CHECK`). */
   checkBreachedPasswords: boolean;
   /** Framework plugins appended last, e.g. `nextCookies()` from apps/web (must stay last). */
   plugins: readonly BetterAuthPlugin[];
 }
-
-const socialProviders = (env: Env) => ({
-  ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
-    ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } }
-    : {}),
-  ...(env.LINKEDIN_CLIENT_ID && env.LINKEDIN_CLIENT_SECRET
-    ? { linkedin: { clientId: env.LINKEDIN_CLIENT_ID, clientSecret: env.LINKEDIN_CLIENT_SECRET } }
-    : {}),
-});
 
 /** Better Auth instance of the identity module: e-mail + password, social sign-in, 2FA, roles. */
 export const createAuth = (deps: AuthDeps) => {
@@ -58,7 +53,7 @@ export const createAuth = (deps: AuthDeps) => {
       sendVerificationEmail: ({ user, url }) =>
         deps.emailVerificationSender.sendVerificationLink({ to: user.email, url }),
     },
-    socialProviders: socialProviders(deps.env),
+    socialProviders: socialProviderCredentials(deps.env),
     user: {
       additionalFields: {
         roles: { type: 'string[]', required: false, defaultValue: ['student'], input: false },
@@ -67,6 +62,7 @@ export const createAuth = (deps: AuthDeps) => {
     // Q5: 30 days renewed on use. Better Auth renews every session by `expiresIn`, so the
     // 12 h admin limit is a policy applied when reading the session (`sessionExpiresAt`).
     session: { expiresIn: USER_SESSION_TTL.total('seconds') },
+    databaseHooks: { user: { create: registrationHooks(deps.recordSignUpConsents) } },
     plugins: [
       twoFactor({ issuer: 'Kompas' }),
       ...(deps.checkBreachedPasswords ? [haveIBeenPwned()] : []),

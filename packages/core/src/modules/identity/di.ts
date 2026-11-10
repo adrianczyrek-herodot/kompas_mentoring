@@ -1,5 +1,7 @@
 import { type AwilixContainer, asClass, asFunction } from 'awilix';
 import type { BetterAuthPlugin } from 'better-auth';
+import type { Clock } from '../../shared/domain/index.ts';
+import { UserId } from '../../shared/domain/index.ts';
 import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
 import type { Env } from '../../shared/infrastructure/env.ts';
 import type { Logger } from '../../shared/infrastructure/logger.ts';
@@ -40,17 +42,27 @@ export interface IdentityCradle {
   recordRegistrationConsents: RecordRegistrationConsents;
 }
 
-type Deps = IdentityCradle & DatabaseCradle & { env: Env; logger: Logger };
+type Deps = IdentityCradle & DatabaseCradle & { env: Env; logger: Logger; clock: Clock };
 
 /** Registers the identity module: Better Auth on the shared pool, consents per request scope. */
 export const registerIdentityModule = (container: AwilixContainer<Deps>): void => {
   container.register({
     emailVerificationSender: asClass(LoggingEmailVerificationSender).singleton(),
-    auth: asFunction(({ orm, env, emailVerificationSender, authPlugins }: Deps) =>
+    auth: asFunction(({ orm, env, clock, emailVerificationSender, authPlugins }: Deps) =>
       createAuth({
         db: orm.em.getConnection().getClient(),
         env,
         emailVerificationSender,
+        // Runs outside any request scope (Better Auth hook), so it uses its own EntityManager fork.
+        recordSignUpConsents: async (userId, consents) => {
+          const record = makeRecordRegistrationConsents({
+            clock,
+            consentRepository: new MikroOrmConsentRepository({ em: orm.em.fork() }),
+          });
+          const result = await record(UserId.parse(userId), consents);
+          // The `before` hook already rejected sign-ups without the required consents.
+          if (result.isErr()) throw new Error(`Unexpected consent error: ${result.error.code}`);
+        },
         checkBreachedPasswords: env.AUTH_BREACHED_PASSWORD_CHECK === 'on',
         plugins: authPlugins,
       }),

@@ -3,6 +3,7 @@ import { err, ok, type Result } from '../../../shared/domain/index.ts';
 import type { Consent, ConsentDocument } from '../domain/consent.entity.ts';
 import type { RequiredConsentMissing } from '../domain/identity.errors.ts';
 import { CONSENT_DOCUMENT_VERSIONS } from '../domain/policies/config.ts';
+import { missingRequiredConsent } from '../domain/policies/consent.policy.ts';
 
 /** Port: persistence of consents (MikroORM adapter in `infrastructure/`, F1 step 3). */
 export interface ConsentRepository {
@@ -25,10 +26,9 @@ export const makeRecordRegistrationConsents =
     userId: UserId,
     input: RegistrationConsentInput,
   ): Promise<Result<readonly Consent[], RequiredConsentMissing>> => {
-    for (const document of ['terms', 'privacy'] as const) {
-      if (!input[document]) {
-        return err({ code: 'identity.required_consent_missing', document });
-      }
+    const missing = missingRequiredConsent(input);
+    if (missing !== null) {
+      return err({ code: 'identity.required_consent_missing', document: missing });
     }
     const givenAt = clock.now();
     const accepted = (Object.keys(CONSENT_DOCUMENT_VERSIONS) as ConsentDocument[]).filter(

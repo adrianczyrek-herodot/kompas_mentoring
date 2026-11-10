@@ -14,7 +14,7 @@ const EnvSchema = z
     SENTRY_DSN: z.url().optional(),
     /** Signs session cookies; required in production (outside it a fixed development secret is used). */
     BETTER_AUTH_SECRET: z.string().min(32).optional(),
-    /** Public origin of the web app; Better Auth infers it from the request when unset. */
+    /** Public origin of the web app; required in production, inferred from requests elsewhere. */
     BETTER_AUTH_URL: z.url().optional(),
     /** HIBP k-anonymity check of new passwords (Q8); `off` only in tests that must stay offline. */
     AUTH_BREACHED_PASSWORD_CHECK: z.enum(['on', 'off']).default('on'),
@@ -27,6 +27,11 @@ const EnvSchema = z
   .refine((env) => env.NODE_ENV !== 'production' || env.BETTER_AUTH_SECRET !== undefined, {
     message: 'BETTER_AUTH_SECRET is required in production',
     path: ['BETTER_AUTH_SECRET'],
+  })
+  // Origin checks (CSRF) and OAuth callbacks need the public origin, not one guessed per request.
+  .refine((env) => env.NODE_ENV !== 'production' || env.BETTER_AUTH_URL !== undefined, {
+    message: 'BETTER_AUTH_URL is required in production',
+    path: ['BETTER_AUTH_URL'],
   });
 
 export type Env = z.infer<typeof EnvSchema>;

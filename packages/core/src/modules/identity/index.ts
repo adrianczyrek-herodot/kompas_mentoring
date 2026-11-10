@@ -14,3 +14,7 @@ export { mustSetUpTwoFactor, sessionExpiresAt } from './domain/policies/session.
 export { hasPermission, isAdmin, type Permission, ROLES, type Role } from './domain/role.ts';
 export type { Auth } from './infrastructure/auth/create-auth.ts';
 export { hasSessionCookie } from './infrastructure/auth/session-cookie.ts';
+export {
+  enabledSocialProviders,
+  type SocialProvider,
+} from './infrastructure/auth/social-providers.ts';
