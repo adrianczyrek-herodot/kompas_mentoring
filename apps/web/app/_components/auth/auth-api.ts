@@ -7,6 +7,7 @@ export type AuthFailure =
   | 'accountExists'
   | 'passwordCompromised'
   | 'consentMissing'
+  | 'invalidPassword'
   | 'tooManyAttempts'
   | 'unexpected';
 
@@ -17,6 +18,7 @@ const FAILURES: Record<string, AuthFailure> = {
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: 'accountExists',
   PASSWORD_COMPROMISED: 'passwordCompromised',
   REQUIRED_CONSENT_MISSING: 'consentMissing',
+  INVALID_PASSWORD: 'invalidPassword',
 };
 
 const post = async (path: string, body: object): Promise<Response> =>
@@ -32,6 +34,10 @@ const failureOf = async (response: Response): Promise<AuthFailure | null> => {
   const body = (await response.json().catch(() => ({}))) as { code?: string };
   return FAILURES[body.code ?? ''] ?? 'unexpected';
 };
+
+/** Any Better Auth endpoint called from the browser (rate limit and origin check apply). */
+export const callAuthApi = async (path: string, body: object = {}): Promise<AuthFailure | null> =>
+  failureOf(await post(path, body));
 
 export const signInWithEmail = async (credentials: Credentials): Promise<AuthFailure | null> =>
   failureOf(
