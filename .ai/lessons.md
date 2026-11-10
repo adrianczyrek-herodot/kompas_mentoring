@@ -20,6 +20,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 
 ## Kod i mockupy
 
+- **2026-11-10** — Lokalne e2e używają bazy z docker-compose, której testy nie migrują — po dodaniu migracji uruchom `pnpm db:migrate`, inaczej rejestracja kończy się 500 (hook zapisu zgód) i padają niezwiązane testy.
 - **2026-11-10** — W RSC wywołuj `await headers()`/`cookies()` **przed** `getContainer()`: inaczej `next build` próbuje prerenderować stronę, buduje kontener i pada na walidacji env (brak `DATABASE_URL`).
 
 - **2026-10-21** — Playwright: nie używaj `reuseExistingServer` domyślnie — w worktree port bywa zajęty przez serwer innej sesji i testy po cichu sprawdzają obcą aplikację. U nas reuse tylko przy `E2E_REUSE_SERVER=1`, port przez `E2E_PORT`.

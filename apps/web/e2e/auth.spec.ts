@@ -95,6 +95,7 @@ test.describe('P4 — sign-in', () => {
     await page.getByLabel('Hasło').fill(PASSWORD);
     await page.getByRole('button', { name: 'Zaloguj się' }).click();
     await expect(page).toHaveURL('/konto');
+    await expect(page.getByRole('heading', { level: 1, name: 'Konto i ustawienia' })).toBeVisible();
   });
 
   test('ignores an external returnTo', async ({ page, request }) => {

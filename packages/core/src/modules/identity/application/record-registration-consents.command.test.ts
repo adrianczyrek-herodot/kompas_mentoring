@@ -16,6 +16,7 @@ const setup = () => {
         saved.push(...consents);
         return Promise.resolve();
       },
+      latest: () => Promise.resolve(null),
     },
   });
   return { record, saved, clock };
@@ -27,9 +28,11 @@ describe('recordRegistrationConsents (P4, Q6)', () => {
     const result = await record(userId, { terms: true, privacy: true, marketing: false });
     expect(result.isOk()).toBe(true);
     expect(saved.map((c) => c.document)).toEqual(['terms', 'privacy']);
-    expect(saved.every((c) => c.version === '2026-11-10' && c.givenAt.equals(clock.now()))).toBe(
-      true,
-    );
+    expect(
+      saved.every(
+        (c) => c.version === '2026-11-10' && c.granted && c.decidedAt.equals(clock.now()),
+      ),
+    ).toBe(true);
   });
 
   it('stores the optional marketing consent', async () => {

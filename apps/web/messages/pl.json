@@ -50,7 +50,36 @@
       "passwordCompromised": "To hasło pojawiło się w znanym wycieku danych. Wybierz inne.",
       "consentMissing": "Akceptacja regulaminu jest wymagana.",
       "tooManyAttempts": "Za dużo nieudanych prób. Spróbuj ponownie za kilka minut.",
-      "unexpected": "Coś poszło nie tak. Spróbuj ponownie."
+      "unexpected": "Coś poszło nie tak. Spróbuj ponownie.",
+      "invalidPassword": "Obecne hasło jest nieprawidłowe."
     }
+  },
+  "Account": {
+    "title": "Konto i ustawienia",
+    "profile": "Profil",
+    "name": "Imię",
+    "nameLength": "Imię musi mieć od 2 do 50 znaków.",
+    "email": "E-mail: {email}",
+    "save": "Zapisz",
+    "saved": "Zapisano.",
+    "password": "Hasło",
+    "currentPassword": "Obecne hasło",
+    "newPassword": "Nowe hasło",
+    "passwordHint": "Min. 10 znaków. Po zmianie wylogujemy Cię na innych urządzeniach.",
+    "passwordLength": "Hasło musi mieć od 10 do 128 znaków.",
+    "changePassword": "Zmień hasło",
+    "consents": "Zgody",
+    "marketing": "Chcę dostawać wskazówki i oferty",
+    "sessions": "Sesje logowania",
+    "signOutEverywhere": "Wyloguj ze wszystkich urządzeń",
+    "privacy": "Prywatność",
+    "requestExport": "Pobierz moje dane",
+    "exportPending": "Przyjęliśmy prośbę o eksport danych — link wyślemy e-mailem.",
+    "requestDeletion": "Usuń konto",
+    "deletionWarning": "Usunięcie konta jest nieodwracalne. Aktywny plan zostanie anulowany, a dane usunięte zgodnie z polityką prywatności.",
+    "confirmDeletion": "Tak, usuń moje konto",
+    "cancel": "Anuluj",
+    "deletionPending": "Przyjęliśmy prośbę o usunięcie konta — potwierdzimy ją e-mailem.",
+    "actionFailed": "Nie udało się zapisać zmiany. Spróbuj ponownie."
   }
 }

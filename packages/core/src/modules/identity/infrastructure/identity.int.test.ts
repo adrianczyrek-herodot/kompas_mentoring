@@ -34,6 +34,8 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
         [userId],
       );
 
+  const scopeOf = (requestId: string) => createRequestScope(container, { requestId });
+
   /** Signs in and returns the request headers of a browser holding the session cookie. */
   const signIn = async (email: string, password = PASSWORD): Promise<Headers> => {
     const { headers } = await container.cradle.auth.api.signInEmail({
@@ -118,5 +120,23 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
   it('gives the mentor role to those who want to mentor (Q3)', async () => {
     const { user } = await signUp('mentor@example.com', PASSWORD, { as: 'mentor' });
     expect(user.roles).toEqual(['mentor']);
+  });
+
+  it('keeps the latest marketing decision and pending data requests (S3)', async () => {
+    await signUp('account@example.com', PASSWORD, { marketing: true });
+    const headers = await signIn('account@example.com');
+    const actor = await scopeOf('int-s3-actor').cradle.getCurrentUser(headers);
+    if (actor === null) throw new Error('expected a signed-in user');
+
+    await scopeOf('int-s3-withdraw').cradle.setMarketingConsent(actor, false);
+    const first = await scopeOf('int-s3-export').cradle.requestPersonalData(actor, 'export');
+    const again = await scopeOf('int-s3-export-again').cradle.requestPersonalData(actor, 'export');
+    expect(again._unsafeUnwrap().id).toBe(first._unsafeUnwrap().id);
+
+    const overview = await scopeOf('int-s3-overview').cradle.getAccountOverview(actor, actor.id);
+    expect(overview._unsafeUnwrap()).toEqual({
+      marketingConsent: false,
+      pendingRequests: ['export'],
+    });
   });
 });
