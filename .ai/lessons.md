@@ -13,6 +13,9 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-21** — Przed merge gałęzi dziecka cezar sprawdź `git log` pod kątem commitów „cezar autosave” — dziecko może przepisać historię lokalnie.
 - **2026-10-21** — Turborepo filtruje zmienne środowiskowe: każdą zmienną potrzebną zadaniu (np. `E2E_PORT`) dopisz do `env` zadania w `turbo.json`, inaczej po cichu nie dotrze.
 
+- **2026-11-10** — Konflikt scalenia rozwiązany przez „zostaw obie strony” sklejył dwa szkielety (PR #7 → `e4aa59c`): cztery `package.json`/`tsconfig.json` stały się niepoprawnym JSON-em, CI na `main` padło na `pnpm/action-setup`. Przy konfliktach `add/add` w plikach konfiguracyjnych wybierz jedną stronę; przed scaleniem PR z konfliktami sprawdź lokalnie `node -e "JSON.parse(...)"`/`pnpm install`. Naprawa: `git revert -m 1 <merge>` na gałęzi + PR.
+- **2026-11-10** — Konto `gh` w środowisku cezar może się zmienić między sesjami (było `adrianczyrek-herodot`, jest `aczyrek` bez uprawnień push → 403). Przed pushem sprawdź `gh api repos/<owner>/<repo> --jq .permissions`; przełączenie konta to decyzja człowieka.
+
 ## Domena i produkt
 
 ## Kod i mockupy
