@@ -43,7 +43,7 @@ Ekrany P4 (logowanie/rejestracja) i S3 (konto) istnieją już jako klikalna impl
 
 ## Kryteria akceptacji
 
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` zielone; testy integracyjne i E2E w CI zielone. — lokalnie zielone na każdym kroku (integracyjne 12, e2e 44); CI rusza dopiero dla PR-ów do `main` (stos #13–#20).
+- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` zielone; testy integracyjne i E2E w CI zielone. — lokalnie zielone na każdym kroku (integracyjne 12, e2e 44); CI rusza dopiero dla PR-ów do `main` (stos #10–#20).
 - [x] Rejestracja → zalogowany użytkownik z rolą `student` albo kandydat na mentora (Q3); wylogowanie kończy sesję w bazie.
 - [x] Logowanie e-mailem: poprawne, błędne hasło (komunikat bez wskazania pola), limit prób.
 - [ ] Google i LinkedIn działają z kluczami w środowisku; bez kluczy przyciski są ukryte, a aplikacja startuje (Q1). — bez kluczy: sprawdzone; z kluczami: niesprawdzone (brak aplikacji OAuth).

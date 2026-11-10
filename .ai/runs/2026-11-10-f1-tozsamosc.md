@@ -28,7 +28,7 @@ Wdrożyć specyfikację F1 po odpowiedziach właściciela na Q1–Q8: PR-y 1–7
 ## Wynik
 
 F1 zaimplementowany w stosie PR-ów (każdy na poprzednim; baza stosu: #9 revert PR #7 → `main`):
-#10 specyfikacja · #11 fundament UI · #12 domena `identity` · #13 Better Auth + migracja · #14 `/api/auth`, `proxy.ts`, nagłówek · #15 hooki rejestracji · #16 P4 · #17 komendy konta + migracja · #18 S3 · 7a/7b (2FA adminów, CLI). Moduł `identity` i migracje wymagają przeglądu człowieka (spec §10.2); scalanie — człowiek, od dołu stosu.
+#10 specyfikacja · #11 fundament UI · #12 domena `identity` · #13 Better Auth + migracja · #14 `/api/auth`, `proxy.ts`, nagłówek · #15 hooki rejestracji · #16 P4 · #17 komendy konta + migracja · #18 S3 · #19 CLI adminów · #20 2FA adminów. Moduł `identity` i migracje wymagają przeglądu człowieka (spec §10.2); scalanie — człowiek, od dołu stosu.
 
 ## Weryfikacja
 
