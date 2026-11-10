@@ -1,0 +1,117 @@
+/*
+ * Kompas design tokens on top of Tailwind CSS 4 + shadcn/ui (Base UI).
+ * Imported once by apps/web: `@import "@kompas/ui/styles.css";`
+ * Palette and typography carried over from the clickable mockup (PR #7): deep green brand,
+ * amber signal colour, warm paper background, serif headings.
+ */
+@import "tailwindcss";
+
+/* Classes used by this package (it lives in node_modules from the app's point of view). */
+@source "../";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+  --background: #f6f3ec; /* paper */
+  --foreground: #17201e; /* ink */
+  --card: #ffffff;
+  --card-foreground: #17201e;
+  --popover: #ffffff;
+  --popover-foreground: #17201e;
+  --primary: #13463d; /* brand */
+  --primary-foreground: #ffffff;
+  --secondary: #e3efe9; /* brand-soft */
+  --secondary-foreground: #13463d;
+  --muted: #efeae0;
+  --muted-foreground: #4a5552; /* ink-2 */
+  --accent: #efeae0;
+  --accent-foreground: #17201e;
+  --destructive: #b4352a;
+  --border: #e3ddd1;
+  --input: #e3ddd1;
+  --ring: #1d5f53; /* brand-2 */
+  --signal: #e07b2f; /* amber: highlights, ratings, the MOCKUP tag */
+  --signal-soft: #fbeadb;
+  --success: #2f7a4a;
+  --success-soft: #e2f2e7;
+  --warning: #9a6400;
+  --warning-soft: #fdf1d6;
+}
+
+.dark {
+  --background: #0e1615;
+  --foreground: #e7efec;
+  --card: #152120;
+  --card-foreground: #e7efec;
+  --popover: #152120;
+  --popover-foreground: #e7efec;
+  --primary: #7cc4b0;
+  --primary-foreground: #0e1615;
+  --secondary: #1d332f;
+  --secondary-foreground: #cfe6dd;
+  --muted: #1c2826;
+  --muted-foreground: #a9b6b2;
+  --accent: #1f2d2a;
+  --accent-foreground: #e7efec;
+  --destructive: #f07b6f;
+  --border: #2a3532;
+  --input: #34413e;
+  --ring: #7cc4b0;
+  --signal: #f0a060;
+  --signal-soft: #3a2a1c;
+  --success: #6fcf8f;
+  --success-soft: #1b3324;
+  --warning: #e8b85a;
+  --warning-soft: #3a2f16;
+}
+
+@theme inline {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-signal: var(--signal);
+  --color-signal-soft: var(--signal-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-serif font-semibold tracking-tight;
+  }
+}

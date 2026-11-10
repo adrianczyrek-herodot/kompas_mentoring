@@ -13,7 +13,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const locale = await getLocale();
   return (
     <html lang={locale}>
-      <body className="min-h-dvh bg-slate-50 text-slate-900 antialiased">
+      <body className="min-h-dvh">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
