@@ -27,3 +27,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-10-21** — `pnpm test` to tylko testy jednostkowe; integracyjne (`pnpm test:integration`, Testcontainers) pomijają się bez Dockera z komunikatem, a w CI są obowiązkowe. Aplikacja web wymaga `DATABASE_URL` (walidacja env) — e2e dostaje domyślny URL z docker-compose.
 
 ## Błędy i ich przyczyny
+
+- **2026-11-10** — Pula `pg` z MikroORM 7 zwraca `date`/`timestamp(tz)`/`interval` jako tekst (własne parsery typów). Kod spoza MikroORM na tej puli (Kysely z `getClient()`, Better Auth) dostaje stringi zamiast `Date` — Better Auth wtedy psuje sprawdzanie wygaśnięcia sesji. Rozwiązanie: plugin Kysely konwertujący kolumny czasu (`TimestampParsingPlugin` w `identity`).
+- **2026-11-10** — Better Auth przy odświeżaniu sesji (`getSession`, po `updateAge`) ustawia `expiresAt = now + expiresIn` niezależnie od tego, co ustawił hook `session.create.before` — krótszych sesji dla wybranych ról nie da się zrobić hookiem; limit egzekwuj przy odczycie sesji.
+- **2026-11-10** — Gdy MikroORM ma encje, `migrator.up()` zapisuje `.snapshot-<baza>.json` w katalogu roboczym — u nas `snapshot: false` (migracje nie są generowane z różnic).

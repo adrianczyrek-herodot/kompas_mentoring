@@ -8,5 +8,6 @@ export type { Consent, ConsentDocument } from './domain/consent.entity.ts';
 export type { IdentityError } from './domain/identity.errors.ts';
 export { checkPasswordLength } from './domain/policies/password.policy.ts';
 export { safeReturnTo } from './domain/policies/return-to.policy.ts';
-export { mustSetUpTwoFactor, sessionTtlFor } from './domain/policies/session.policy.ts';
+export { mustSetUpTwoFactor, sessionExpiresAt } from './domain/policies/session.policy.ts';
 export { hasPermission, isAdmin, type Permission, ROLES, type Role } from './domain/role.ts';
+export type { Auth } from './infrastructure/auth/create-auth.ts';

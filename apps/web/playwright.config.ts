@@ -29,6 +29,9 @@ export default defineConfig({
     // Defaults to the docker-compose database (.env.example), so the app boots without a local .env.
     env: {
       DATABASE_URL: process.env['DATABASE_URL'] ?? 'postgres://kompas:kompas@localhost:5432/kompas',
+      // `next start` runs in production mode, where the env schema requires a secret.
+      BETTER_AUTH_SECRET:
+        process.env['BETTER_AUTH_SECRET'] ?? 'e2e-only-secret-not-for-real-use-000',
     },
   },
 });
