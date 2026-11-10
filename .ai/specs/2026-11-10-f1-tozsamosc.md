@@ -1,6 +1,6 @@
 ---
 title: F1 — tożsamość (logowanie, rejestracja, role, zgody, konto)
-status: draft            # draft | approved | in-progress | implemented | archived
+status: in-progress      # draft | approved | in-progress | implemented | archived
 created: 2026-11-10
 implemented:
 related:
@@ -87,3 +87,4 @@ Każdy krok to osobny PR (≤ ~400 linii poza migracjami i zrzutami), w tej kole
 ## Decyzje i zmiany
 
 - 2026-11-10 — Specyfikacja robocza. Ekrany P4/S3, strażnik dostępu (`returnTo`) i scenariusze E2E przenosimy z PR #7 (gałąź `cez/d24e11ee`) jako materiał źródłowy, bez mechanizmu stanu demo — decyzja właściciela: przenoszenie fazami F1–F8 na szkielet z `main`.
+- 2026-11-10 — Odpowiedzi właściciela (wszystkie zgodne z rekomendacjami): **Q1** Google i LinkedIn w kodzie, przyciski tylko przy ustawionych kluczach; **Q2** weryfikacja e-maila wymagana przed pierwszą rezerwacją (w F1 port `EmailSender` z adapterem testowym, SES w F3); **Q3** rejestracja „mentorować” → rola `mentor` + profil `draft` w `catalog` (F2); **Q4** admini tylko z seeda/CLI, role `admin_trust`/`admin_finance`, 2FA przy pierwszym logowaniu; **Q5** sesje 30 dni (odnawiane), admini 12 h; **Q6** w F1 tylko zapis wersji dokumentów; **Q7** S3: imię, zmiana hasła, zgoda marketingowa, wyloguj wszędzie, eksport i usunięcie jako zapisane żądania (realizacja F8); **Q8** HIBP (k-anonimity). Status `in-progress`.
