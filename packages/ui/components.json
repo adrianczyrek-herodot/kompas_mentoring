@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@kompas/ui/components",
+    "ui": "@kompas/ui/components",
+    "utils": "@kompas/ui/lib/utils",
+    "lib": "@kompas/ui/lib",
+    "hooks": "@kompas/ui/hooks"
+  }
+}

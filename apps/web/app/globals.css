@@ -1,2 +1,1 @@
-@import "tailwindcss";
-@source "../../../packages/ui/src";
+@import "@kompas/ui/styles.css";
