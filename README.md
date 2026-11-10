@@ -1,0 +1,134 @@
+# DevMentor
+
+Portal mentoringu 1:1 dla programistów. Koncepcja produktu i przepływy: [`kompas-mentoring/`](kompas-mentoring/README.md). Aplikacja powstaje z klikalnego mockupu Kompas, przenoszonego do monorepo fazami — plan: [`.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`](.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md).
+
+## Stos
+
+- **Next.js** (App Router, Turbopack), **React**, **TypeScript** (`strict`) — najnowsze stabilne wersje
+- **PostgreSQL** + **MikroORM** — encje, migracje, pula połączeń
+- **Awilix** — kontener Dependency Injection
+- **Tailwind CSS** — strony frontendowe (publiczne)
+- **shadcn/ui** — strony backendowe (panel `/admin`)
+- **npm workspaces** — monorepo
+
+## Szybki start
+
+Wymagania: Node.js 22+, Docker (lokalna baza).
+
+```bash
+npm install
+cp .env.example .env
+docker compose up -d          # PostgreSQL na localhost:5432 (inny port: POSTGRES_PORT=5433 + DATABASE_URL w .env)
+npm run db:migration:up
+npm run dev                   # http://localhost:3000
+```
+
+| Polecenie | Co robi |
+|---|---|
+| `npm run dev` / `build` / `start` | Aplikacja Next.js (`@devmentor/app`) |
+| `npm run typecheck` | `tsc` we wszystkich pakietach i w testach E2E |
+| `npm run e2e` | Buduje aplikację i uruchamia testy Playwright (`e2e/`): przepływy i regresję wizualną (1280 i 360 px) |
+| `npm run e2e:update` | Jak wyżej, ale nadpisuje wzorcowe zrzuty w `e2e/__screenshots__/` — tylko po zamierzonej zmianie wyglądu |
+| `npm run db:migration:create` | Nowa migracja z różnicy encji i snapshotu schematu |
+| `npm run db:migration:up` / `db:migration:down` | Zastosowanie / cofnięcie migracji |
+
+Adresy (dane demo, bez bazy): strony frontendowe — publiczne (`/`, `/mentorzy`, `/mentorzy/[id]`, `/logowanie`, `/rejestracja`), ucznia (`/rezerwacja/[mentorId]`, `/rezerwacja/[mentorId]/platnosc`, `/potwierdzenie/[id]`, `/sesje`, `/sesje/[id]`, `/sesje/[id]/pokoj`, `/sesje/[id]/ocena`, `/plany`, `/postepy`), wspólne (`/wiadomosci`, `/wiadomosci/[id]`, `/powiadomienia`, `/konto`) i `/mapa` (mapa ekranów mockupu); panel mentora (`/mentor`, `/mentor/onboarding/[1–6]`, `/mentor/kalendarz`, `/mentor/uczniowie`, `/mentor/uczniowie/[id]`, `/mentor/zarobki`) i admina (`/admin`, `/admin/weryfikacja`, `/admin/spory`); `/api/health` — stan aplikacji i bazy (200 / 503). Rolę demo zmienia pasek MOCKUP na górze.
+
+## Architektura
+
+### Monorepo
+
+```
+.
+├── packages/
+│   ├── app/    @devmentor/app   aplikacja Next.js, composition root DI
+│   ├── core/   @devmentor/core  części wielokrotnego użytku (DI, domena: typy i reguły)
+│   ├── db/     @devmentor/db    MikroORM: konfiguracja, encje, migracje; dane demo
+│   └── ui/     @devmentor/ui    komponenty UI: Tailwind i shadcn/ui
+├── kompas-mentoring/            koncepcja produktu (KONCEPCJA.md)
+├── compose.yaml                 lokalny PostgreSQL
+├── tsconfig.base.json           wspólne ustawienia TypeScript
+└── .env.example                 zmienne środowiskowe (jeden .env w korzeniu)
+```
+
+Pakiety wewnętrzne są dostarczane jako źródła TypeScript (pole `exports` wskazuje na `src/`) i transpilowane przez Next.js (`transpilePackages`) — nie mają własnego kroku budowania.
+
+Podścieżki bezpieczne w przeglądarce (bez Awilixa i MikroORM):
+
+| Import | Zawartość |
+|---|---|
+| `@devmentor/core/domain` | Typy domenowe (`Mentor`, `Session`, `Role`…), katalog (`CATEGORIES`, `PLAN_OPTIONS`), reguły z jawnym `now` (`weekSlots`, `canJoin`, `cancellationPolicy`, `trialCharge`, `commissionRate`…), wyszukiwarka, onboarding mentora (`onboardingErrors`), zarobki, moderacja (`verificationErrors`, `resolutionErrors`) |
+| `@devmentor/db/fixtures` | Dane demo (`MENTORS`, `SESSIONS`, …, `DEMO_NOW`) — dziś źródło danych aplikacji, docelowo seed bazy |
+| `@devmentor/ui/lib/format`, `@devmentor/ui/lib/icons` | Formatowanie dat/kwot (pl), ścieżki ikon SVG |
+| `@devmentor/ui/styles.css` | Jeden arkusz: Tailwind z preflightem, tokeny Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `font-serif`…), style bazowe `.kompas`, motyw shadcn/ui w `.backend` |
+| `@devmentor/ui/frontend/*` | Komponenty React stron frontendowych (Tailwind): `Icon`, `Avatar`, `Rating`, `Badge`, `buttonVariants`/`Button`, `chipVariants`, `Tag`, `Skeleton`, `Spinner`, `EmptyState`/`ErrorState`, `Field`, `TextareaField`, `Notice`, `Modal`, `Toaster`/`toast()`; klasy `cardClass`, `listClass`/`listItemClass`/`tableClass`, nagłówki `h1Class`…`h4Class` |
+| `@devmentor/ui/backend/*` | Komponenty shadcn/ui panelu: `Button`, `Card`, `Badge`, `Input`, `Textarea`, `Label`, `Checkbox`, `RadioGroup`, `NativeSelect`, `Table`, `Dialog`, `Progress`, `Skeleton`, `Alert`, `Avatar`, `ToggleGroup`, `Separator`, `Toaster`/`toast` (sonner), `EmptyState`/`ErrorState`/`PageHeader` |
+| `@devmentor/core/validation` | Walidatory wartości pól (`required`, `length`, `email`, `range`, dane karty) |
+
+### Zależności między pakietami
+
+```
+        ┌──────────── app ────────────┐
+        ▼              ▼              ▼
+       db ──────────▶ core            ui
+```
+
+- **core** — niezależny od frameworka: nie zna React, Next.js ani MikroORM.
+- **db** — zależy tylko od `core`; nie zna React ani Next.js.
+- **ui** — tylko komponenty prezentacyjne; bez dostępu do danych i logiki biznesowej.
+- **app** — skleja wszystko; jedyny pakiet, który zna pozostałe trzy.
+
+### `@devmentor/app` — aplikacja
+
+Next.js App Router w `packages/app/src/app`:
+
+| Ścieżka | Rola |
+|---|---|
+| `layout.tsx` | Jedyny root layout: `@devmentor/ui/styles.css`, `Toaster` stron — przejścia strony ↔ panel to nawigacja klienta, stan demo zostaje |
+| `(site)/` | Strony frontendowe (Tailwind, opakowanie `.kompas`) z nagłówkiem, paskiem mockupu i strażnikiem dostępu |
+| `(panel)/` | Panel mentora i admina (shadcn/ui, opakowanie `.backend`): pasek mockupu, menu boczne wg roli, strażnik dostępu, `Toaster` sonner |
+| `api/` | Route handlery (np. `api/health`) |
+| `src/views/` | Widoki ekranów (komponenty klienckie): `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa), `mentor/` (M1–M5), `admin/` (A1–A2) |
+| `src/demo/` | Stan demo w pamięci (`store.ts` + `useDemoStore()`), jego zmiany (`actions.ts` — jedyne miejsce mutacji z React), nawigacja mockupu (`navigation.ts`: role, menu, tabela ekranów `SCREENS` z dostępem, `toUrl()`), pasek mockupu (`mock-bar.tsx`), strażnik dostępu (`access.ts`), nagłówek stron (`demo-chrome.tsx`), stany ekranu (`use-view-state.ts`) |
+| `src/panel/` | Elementy panelu: `panel-chrome.tsx` (menu, strażnik), `availability-grid.tsx` (siatka godzin z przeciąganiem), pola formularzy, awatar |
+| `src/server/container.ts` | Composition root kontenera Awilix (`server-only`) |
+
+Grupy tras nie wpływają na adresy URL. Strony i panel dzielą jeden root layout, więc przejścia między nimi to nawigacja klienta — stan demo w pamięci (rola, sesje, `returnTo`) zostaje, jak w mockupie. Motyw shadcn/ui obowiązuje tylko w `.backend`: nazwy wspólne z tokenami Kompasu (`accent`, promienie `rounded-*`) są tam nadpisywane zmiennymi CSS. Dane demo zastąpi baza w fazie 5.
+
+### Dependency Injection (Awilix)
+
+```
+getContainer()  ── singleton na proces: clock, orm, dbHealthCheck, serwisy…
+   └─ getRequestScope()  ── scope per żądanie: em (EntityManager.fork())
+```
+
+- `@devmentor/core` dostarcza `createContainer()` (tryb `PROXY`, `strict`) i interfejs `Cradle`, który każdy pakiet rozszerza o swoje rejestracje (`declare module "@devmentor/core"`), więc `resolve()` i wstrzykiwanie są typowane.
+- Pakiety eksportują klasy i funkcje rejestrujące (`registerDb(container, orm)`); kontener składa tylko `packages/app/src/server/container.ts`.
+- Zależności trafiają do konstruktora jako jeden obiekt: `constructor({ em, clock })`.
+- Route handlery, server actions i Server Components rozwiązują zależności z `getRequestScope()`, dzięki czemu każde żądanie ma własny `EntityManager` (Unit of Work, mapa tożsamości).
+
+### Dane (MikroORM + PostgreSQL)
+
+- `packages/db/src/config.ts` — wspólna konfiguracja (`DATABASE_URL`, pula `DATABASE_POOL_MAX`) dla aplikacji i CLI.
+- `packages/db/src/entities/` — encje w `defineEntity` (bez dekoratorów, więc bez `reflect-metadata` i problemów z bundlerem); lista encji jest jawna.
+- `packages/db/src/orm.ts` — `getOrm()`: jedna instancja ORM i pula połączeń na proces (odporna na hot reload). MikroORM łączy się leniwie, przy pierwszym zapytaniu.
+- `packages/db/src/migrations/` — migracje i snapshot schematu, generowane przez `@mikro-orm/cli` (`packages/db/mikro-orm.config.ts`).
+- Pakiety MikroORM są w `serverExternalPackages` — ładuje je Node.js, nie bundler.
+
+### UI (Tailwind + shadcn/ui)
+
+- `@devmentor/ui/styles.css` — jedyny arkusz aplikacji (importowany w `packages/app/src/app/layout.tsx`): Tailwind CSS v4 z preflightem, `tw-animate-css`, tokeny Kompasu, motyw shadcn/ui w zakresie `.backend`, style bazowe stron Kompasu pod `:where(.kompas)`.
+- `@devmentor/ui/frontend/*` — komponenty stron frontendowych w czystym Tailwindzie.
+- `@devmentor/ui/backend/*` — komponenty shadcn/ui panelu; nowe dodaje się przez `npx shadcn@latest add <komponent>` w `packages/ui` (konfiguracja w `components.json`, poprawki po CLI — zob. `AGENTS.md`).
+- `@devmentor/ui/lib/utils` — `cn()` do łączenia klas.
+
+### Testy (Playwright)
+
+- `playwright.config.ts` uruchamia zbudowaną aplikację (`next start`, port 3100) i dwa projekty: `desktop` (1280 px — przepływy i zrzuty) oraz `mobile` (360 px — zrzuty).
+- `e2e/flows/*.spec.ts` — przepływy użytkownika (wyszukiwanie, rezerwacja z płatnością, sesje, plany, wiadomości, strażnicy dostępu…).
+- `e2e/visual.spec.ts` — zrzut każdego ekranu w roli, w której jest używany, porównywany z wzorcem z `e2e/__screenshots__/`.
+- `e2e/support.ts` — `open()`, `asRole()`, `go()` (nawigacja klienta, która zachowuje stan demo w pamięci), `settle()` (czeka, aż zniknie `aria-busy`).
+
+## Praca z agentami AI
+
+Zasady dla agentów kodujących (stos, granice pakietów, DI, migracje, proces SDD) są w [`AGENTS.md`](AGENTS.md); specyfikacje, logi przebiegów i wnioski — w `.ai/`.

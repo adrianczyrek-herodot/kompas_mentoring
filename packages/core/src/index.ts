@@ -1,3 +1,14 @@
+export * from "./di";
+export * from "./clock";
+export * from "./errors";
+
+import type { Clock } from "./clock";
+
+declare module "./di" {
+  interface Cradle {
+    clock: Clock;
+  }
+}
 // Core entry point for apps: container, configuration and platform services.
 // Module APIs are imported from `@kompas/core/<module>` (spec §2.4 rule 4).
 export {

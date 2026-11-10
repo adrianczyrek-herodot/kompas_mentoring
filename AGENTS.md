@@ -4,8 +4,72 @@ Ten plik obowiązuje **każdego** agenta AI pracującego w tym repozytorium (Cla
 
 ## Projekt
 
-Kompas — koncepcja i klikalne mockupy portalu mentoringu 1:1. Szczegóły w `kompas-mentoring/README.md` i `kompas-mentoring/KONCEPCJA.md`.
+**DevMentor** — aplikacja portalu mentoringu 1:1, monorepo w `packages/`. Opis architektury: `README.md`.
 
+- Koncepcja produktu (punkt odniesienia dla ekranów i reguł domenowych): `kompas-mentoring/KONCEPCJA.md`, `kompas-mentoring/README.md`.
+- Aplikacja powstaje z klikalnego mockupu Kompas przenoszonego fazami — plan i postęp: `.ai/specs/2026-10-20-migracja-mockupu-do-monorepo.md`. Fazy 1–4 wdrożone (wszystkie ekrany w React: `packages/app/src/views/`); faza 5 (dane w PostgreSQL) przed nami.
+- Sprawdzenie zmian (z korzenia repo): `npm run typecheck && npm run e2e` (`e2e` buduje aplikację i uruchamia Playwright: przepływy + regresja wizualna). Zamierzona zmiana wyglądu → `npm run e2e:update`, przejrzyj zmienione pliki w `e2e/__screenshots__/` i commituj je razem ze zmianą. Nowy ekran lub przepływ → dopisz go do `e2e/visual.spec.ts` / `e2e/flows/`. Stany ładowania oznaczaj `aria-busy="true"` — testy na tym czekają.
+
+## Stos technologiczny i architektura DevMentor
+
+Założenia są wiążące. Odejście od nich (nowa biblioteka zastępująca element stosu, nowy pakiet, zmiana kierunku zależności) wymaga decyzji użytkownika i specyfikacji w `.ai/specs/`.
+
+### Stos
+
+| Obszar | Technologia | Uwagi |
+|---|---|---|
+| Framework | **Next.js** (najnowsza stabilna, App Router, Turbopack) | Bez Pages Routera. Server Components domyślnie, `"use client"` tylko tam, gdzie potrzebna interakcja. |
+| Język | **TypeScript** (najnowsza stabilna), tryb `strict` | Bez `any` i `@ts-ignore` bez uzasadnienia w komentarzu. Wspólne ustawienia w `tsconfig.base.json`. |
+| UI | **React** (najnowsza stabilna) | Komponenty funkcyjne. |
+| Baza danych | **PostgreSQL** | Lokalnie: `docker compose up -d` (`compose.yaml`). |
+| ORM | **MikroORM** (`@mikro-orm/postgresql`) | Migracje, pula połączeń, Unit of Work. Encje przez `defineEntity` + `setClass` — **bez dekoratorów** i `reflect-metadata`. |
+| DI | **Awilix** | Tryb `PROXY` + `strict` (`createContainer()` z `@devmentor/core`). |
+| Style — strony frontendowe | **Tailwind CSS** (v4) | Strony publiczne: czysty Tailwind + `@devmentor/ui/frontend`. |
+| Style — strony backendowe | **shadcn/ui** (na Tailwindzie) | Panel `/admin`: komponenty z `@devmentor/ui/backend`. |
+| Monorepo | **npm workspaces** | Jeden `package-lock.json` w korzeniu. Instalacja: `npm i <pakiet> -w @devmentor/<nazwa>`. |
+
+### Pakiety (`packages/`)
+
+| Pakiet | Nazwa | Odpowiedzialność | Może zależeć od |
+|---|---|---|---|
+| `packages/app` | `@devmentor/app` | Aplikacja Next.js: trasy, strony, route handlery, server actions; **jedyny composition root** kontenera DI (`src/server/container.ts`). | `core`, `db`, `ui` |
+| `packages/core` | `@devmentor/core` | Części wielokrotnego użytku niezależne od frameworka: kontener DI i typ `Cradle`, błędy domenowe, abstrakcje (np. `Clock`); `domain/` — typy domenowe i reguły jako czyste funkcje z jawnym `now`. | tylko biblioteki zewnętrzne bez React/Next/MikroORM |
+| `packages/db` | `@devmentor/db` | Dane: konfiguracja MikroORM, encje, migracje, repozytoria, `registerDb()`; `fixtures/` — dane demo. | `core` |
+| `packages/ui` | `@devmentor/ui` | Komponenty UI wielokrotnego użytku bez logiki biznesowej i dostępu do danych: `frontend/` (Tailwind), `backend/` (shadcn/ui), `lib/` (`cn`, formatowanie, ikony), `styles/globals.css` (jeden arkusz: Tailwind, tokeny Kompasu, motyw shadcn/ui w `.backend`). | biblioteki UI (React jako peer) |
+
+Zasady:
+
+1. **Kierunek zależności:** `core` ← `db` ← `app`, `ui` ← `app`. Zakazane są importy w przeciwną stronę i cykle (`core` nie importuje `db`/`ui`, `ui` nie importuje `db`, `db` nie importuje React/Next).
+2. **Importy między pakietami tylko przez nazwę pakietu** i jego `exports` (`@devmentor/db`, `@devmentor/ui/backend/button`) — nigdy ścieżką względną do innego pakietu ani do jego `src/`.
+3. **Pakiety wewnętrzne to źródła TS** bez kroku budowania (`exports` wskazuje na `src/`); nowy pakiet dopisz do `transpilePackages` w `packages/app/next.config.ts`.
+4. Nowy pakiet w `packages/` dodawaj tylko po decyzji użytkownika; nazwa `@devmentor/<nazwa>`, `tsconfig.json` rozszerzający `../../tsconfig.base.json`, skrypt `typecheck`.
+5. **Podścieżki dla przeglądarki:** kod kliencki importuje z pakietów tylko moduły bez zależności serwerowych: `@devmentor/core/domain`, `@devmentor/db/fixtures`, `@devmentor/ui/*`. Nigdy `@devmentor/core` (Awilix) ani `@devmentor/db` (MikroORM) w komponentach `"use client"`.
+6. **Ekrany i stan demo:** strona = `page.tsx` w `src/app/(site)` (strony frontendowe) albo `src/app/(panel)` (panel) + widok w `src/views/`; trasę (z `access` i ewentualnie `bare`) wpisz do `SCREENS` w `src/demo/navigation.ts` — wtedy działa strażnik dostępu i pasek mockupu. Linki z danych w formie mockupu (`#/…`) zamieniaj przez `toUrl()`. Stan demo zmieniaj wyłącznie przez akcje z `src/demo/actions.ts` (kończą się `notify()`); reguły bez stanu trafiają do `@devmentor/core/domain`. Przejścia między stronami muszą być nawigacją klienta (`<Link>`, `router.push`) — pełne przeładowanie zeruje stan demo.
+7. Przed pisaniem kodu Next.js sprawdź API w dokumentacji zainstalowanej wersji (`node_modules/next/dist/docs/`) — wersja może być nowsza niż Twoja wiedza. `packages/app/AGENTS.md` generuje `next dev`; nie usuwaj go i nie edytuj ręcznie.
+
+### Dependency Injection (Awilix)
+
+1. Kontener składa **wyłącznie** `packages/app/src/server/container.ts` (`import "server-only"`). Pakiety eksportują klasy, fabryki i funkcje `registerX(container)`; nie tworzą własnych kontenerów ani singletonów modułowych z zależnościami.
+2. Zależności wstrzykiwane przez konstruktor jako jeden obiekt: `constructor({ em, clock }: { em: EntityManager; clock: Clock })`. Bez `container.resolve()` wewnątrz serwisów (service locator).
+3. Każdą rejestrację typuj, rozszerzając `Cradle`: `declare module "@devmentor/core" { interface Cradle { mentorService: MentorService } }`.
+4. Czas życia: serwisy bezstanowe i `orm` — `singleton`; `em` i wszystko, co od niego zależy — `scoped`. W route handlerach, server actions i Server Components używaj `getRequestScope()` (scope per żądanie). Tryb `strict` zgłosi singleton zależny od zależności scoped — nie wyłączaj go.
+5. Czas bieżący bierz z wstrzykiwanego `clock`, nie z `new Date()` w logice domenowej.
+
+### Dane (MikroORM + PostgreSQL)
+
+1. Encja = plik `packages/db/src/entities/<nazwa>.entity.ts` (`defineEntity` + `setClass`) dopisany do tablicy `entities` w `entities/index.ts` — bez skanowania folderów (nie działa po zbundlowaniu).
+2. Każda zmiana schematu = migracja: `npm run db:migration:create`, przejrzyj wygenerowany SQL, `npm run db:migration:up`. Commituj migrację razem z `.snapshot-*.json`. Nie edytuj zastosowanych migracji i nie używaj `schema:update` poza eksperymentami lokalnymi.
+3. Jedna instancja ORM i pula połączeń na proces (`getOrm()`); nie wywołuj `MikroORM.init` gdzie indziej. Do zapytań w żądaniu używaj `em` ze scope'u (fork z własną mapą tożsamości), nie globalnego `orm.em`.
+4. Kod z `@devmentor/db` uruchamiaj tylko po stronie serwera — nigdy w komponentach `"use client"`. Wyjątek: `@devmentor/db/fixtures` (czyste dane demo) do czasu przejścia ekranów na bazę.
+5. Konfiguracja przez zmienne środowiskowe w jednym pliku `.env` w korzeniu (wzór: `.env.example`). Sekretów nie commituj.
+
+### UI: Tailwind (frontend) i shadcn/ui (backend)
+
+1. **Jeden root layout i jeden arkusz** (`@devmentor/ui/styles.css`, Tailwind z preflightem) dla całej aplikacji. Strony frontendowe są w opakowaniu `.kompas`, panel w `.backend` — motyw shadcn/ui (m.in. `accent`, promienie `rounded-*`) obowiązuje tylko w `.backend`, tokeny Kompasu globalnie.
+2. **Strony frontendowe** (grupa tras `src/app/(site)/`): Tailwind + komponenty z `@devmentor/ui/frontend`, kolory i typografia z tokenów Kompasu (`bg-brand`, `text-ink-2`, `rounded-card`, `font-serif`). Nie importuj tu `@devmentor/ui/backend`.
+3. **Strony backendowe** (panel mentora i admina, `src/app/(panel)/`): komponenty shadcn/ui z `@devmentor/ui/backend`, kolory przez tokeny motywu (`bg-card`, `text-muted-foreground`, `bg-primary/15`), nie surowe palety. Komunikaty: `toast` z `@devmentor/ui/backend/sonner`.
+4. Nowy komponent shadcn dodawaj CLI z katalogu pakietu UI: `cd packages/ui && npx shadcn@latest add <komponent>` (konfiguracja w `packages/ui/components.json`); po CLI popraw importy (`from "cn"` → `../lib/utils`, `@devmentor/ui/backend/x` → `./x`) i usuń z zależności pakiet `cn`, jeśli CLI go dodał.
+5. Komponent używany w więcej niż jednym miejscu przenieś do `@devmentor/ui`; komponenty jednorazowe zostają w `packages/app`. Klasy łącz przez `cn()`.
 - Mockupy: `kompas-mentoring/mockupy/` (TypeScript, bundle w `dist/app.js`).
 - Sprawdzenie zmian w mockupach: `cd kompas-mentoring/mockupy && npm run typecheck && npm run build`.
 - Aplikacja (monorepo pnpm + Turborepo, docelowa struktura wg §2.2 spec stacku):
@@ -96,7 +160,7 @@ Wszystkie pliki w `specs/`, `runs/` i `lessons/` **MUSZĄ** mieć nazwę `YYYY-M
 Praktyki uzupełniające zasady obowiązkowe (na podstawie wskazówek zespołu Claude Code — Boris Cherny).
 
 1. **Najpierw plan, potem kod.** Złożone zadanie zaczynaj od planu (w Claude Code — tryb planowania) i zapisz go w specyfikacji („Projekt rozwiązania”, „Plan wdrożenia”) tak dokładnie, żeby implementacja przeszła za jednym podejściem. Gdy coś idzie nie tak, zatrzymaj się i przeplanuj (zasada 3), zamiast brnąć dalej. Przy dużej zmianie poproś sub-agenta o krytyczny przegląd planu.
-2. **Weryfikuj, zanim ogłosisz koniec.** Po zmianie w mockupach uruchom sprawdzenie z sekcji „Projekt” i przejdź zmieniony przepływ w przeglądarce (`npm run dev`); odhacz kryteria akceptacji specyfikacji. Nie raportuj sukcesu bez wyniku komend — jeśli czegoś nie dało się sprawdzić, napisz to wprost.
+2. **Weryfikuj, zanim ogłosisz koniec.** Po zmianie w kodzie uruchom sprawdzenie z sekcji „Projekt” i przejdź zmieniony przepływ w przeglądarce (`npm run dev`); odhacz kryteria akceptacji specyfikacji. Nie raportuj sukcesu bez wyniku komend — jeśli czegoś nie dało się sprawdzić, napisz to wprost.
 3. **Korekta = reguła.** Gdy użytkownik poprawia Twój wynik lub sposób pracy, zapisz regułę zapobiegającą powtórce w `.ai/lessons.md` (zasada 6); jeśli dotyczy procesu wszystkich agentów, zaproponuj zmianę w `AGENTS.md`.
 4. **Błędy naprawiaj samodzielnie, od przyczyny.** Zgłoszony błąd albo czerwony typecheck/build to wystarczające polecenie: odtwórz, znajdź przyczynę, napraw, zweryfikuj — nie dopytuj o to, co da się ustalić z kodu.
 5. **Po doraźnej poprawce — zrób to porządnie.** Jeśli fix wyszedł obejściem lub przypadkiem specjalnym, odrzuć go i wdróż eleganckie rozwiązanie z wiedzą, którą już masz.

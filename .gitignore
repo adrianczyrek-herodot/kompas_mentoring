@@ -1,6 +1,17 @@
 # Katalog roboczy orkiestratora cezar (worktree, załączniki, pliki tymczasowe)
 .ai/cezar/
 
+# DevMentor (monorepo)
+node_modules/
+.next/
+*.tsbuildinfo
+next-env.d.ts
+.env
+.env*.local
+
+# Playwright
+test-results/
+playwright-report/
 # Dependencies and build output
 node_modules/
 .pnpm-store/

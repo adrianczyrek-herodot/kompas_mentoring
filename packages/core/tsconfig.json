@@ -1,4 +1,6 @@
 {
+  "extends": "../../tsconfig.base.json",
+  "include": ["src"]
   "extends": "@kompas/config/tsconfig/nodenext.json",
   "include": ["src", "vitest.config.ts"]
 }
