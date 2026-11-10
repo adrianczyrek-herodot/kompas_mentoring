@@ -1,6 +1,7 @@
 import { createRequestScope } from '@kompas/core';
-import type { CurrentUser } from '@kompas/core/identity';
+import { type CurrentUser, hasPermission } from '@kompas/core/identity';
 import { headers } from 'next/headers';
+import { forbidden, redirect } from 'next/navigation';
 import { cache } from 'react';
 import { getContainer } from './runtime.ts';
 
@@ -11,3 +12,11 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const scope = createRequestScope(getContainer(), { requestId: crypto.randomUUID() });
   return scope.cradle.getCurrentUser(requestHeaders);
 });
+
+/** Admin routes: guests sign in first, other roles get 403 (spec §8); 2FA is checked by pages. */
+export const requireAdmin = async (path: string): Promise<CurrentUser> => {
+  const user = await getCurrentUser();
+  if (user === null) redirect(`/logowanie?returnTo=${encodeURIComponent(path)}`);
+  if (!hasPermission(user.roles, 'admin.access')) forbidden();
+  return user;
+};

@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
     'pino',
   ],
   poweredByHeader: false,
+  // `forbidden()` renders app/forbidden.tsx with HTTP 403 for signed-in users without the role.
+  experimental: { authInterrupts: true },
 };
 
 export default withNextIntl(nextConfig);

@@ -14,7 +14,8 @@
     "signIn": "Zaloguj się",
     "signUp": "Załóż konto",
     "account": "Konto: {name}",
-    "signOut": "Wyloguj"
+    "signOut": "Wyloguj",
+    "admin": "Administracja"
   },
   "Auth": {
     "loginTitle": "Logowanie — Kompas",
@@ -51,8 +52,13 @@
       "consentMissing": "Akceptacja regulaminu jest wymagana.",
       "tooManyAttempts": "Za dużo nieudanych prób. Spróbuj ponownie za kilka minut.",
       "unexpected": "Coś poszło nie tak. Spróbuj ponownie.",
-      "invalidPassword": "Obecne hasło jest nieprawidłowe."
-    }
+      "invalidPassword": "Obecne hasło jest nieprawidłowe.",
+      "invalidCode": "Nieprawidłowy kod. Sprawdź aplikację i spróbuj ponownie."
+    },
+    "totpTitle": "Weryfikacja dwuetapowa",
+    "totpLead": "Wpisz 6-cyfrowy kod z aplikacji uwierzytelniającej.",
+    "totpCode": "Kod z aplikacji",
+    "totpSubmit": "Potwierdź"
   },
   "Account": {
     "title": "Konto i ustawienia",
@@ -81,5 +87,26 @@
     "cancel": "Anuluj",
     "deletionPending": "Przyjęliśmy prośbę o usunięcie konta — potwierdzimy ją e-mailem.",
     "actionFailed": "Nie udało się zapisać zmiany. Spróbuj ponownie."
+  },
+  "Forbidden": {
+    "title": "Brak dostępu",
+    "body": "Twoje konto nie ma uprawnień do tej strony.",
+    "home": "Wróć na stronę główną"
+  },
+  "Admin": {
+    "title": "Panel administracyjny",
+    "placeholder": "Narzędzia administracyjne pojawią się w kolejnych fazach."
+  },
+  "TwoFactorSetup": {
+    "title": "Włącz weryfikację dwuetapową",
+    "lead": "Konto administratora wymaga drugiego składnika logowania (TOTP).",
+    "password": "Hasło",
+    "start": "Dalej",
+    "scan": "Dodaj konto w aplikacji uwierzytelniającej (np. Google Authenticator, 1Password) — wpisz ten klucz albo otwórz link na telefonie:",
+    "openInApp": "Otwórz w aplikacji uwierzytelniającej",
+    "verify": "Włącz weryfikację",
+    "done": "Weryfikacja dwuetapowa jest włączona.",
+    "backupCodes": "Zapisz kody zapasowe w bezpiecznym miejscu — każdy działa raz, gdy nie masz telefonu:",
+    "toAdmin": "Przejdź do panelu administracyjnego"
   }
 }

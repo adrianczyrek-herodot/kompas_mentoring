@@ -10,6 +10,7 @@ import {
   signInWithEmail,
   signInWithProvider,
   signUpWithEmail,
+  TWO_FACTOR_REQUIRED,
 } from './auth-api.ts';
 import { type FieldErrors, readCredentials, validateCredentials } from './auth-validation.ts';
 import { CredentialFields } from './credential-fields.tsx';
@@ -40,6 +41,10 @@ function useAuthSubmit(mode: AuthMode, returnTo: string) {
     setBusy(true);
     const result =
       mode === 'login' ? await signInWithEmail(credentials) : await signUpWithEmail(credentials);
+    if (result === TWO_FACTOR_REQUIRED) {
+      router.push(`/logowanie/2fa?returnTo=${encodeURIComponent(returnTo)}`);
+      return;
+    }
     if (result === null) {
       router.push(returnTo);
       router.refresh();
