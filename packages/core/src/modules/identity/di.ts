@@ -1,0 +1,49 @@
+import { type AwilixContainer, asClass, asFunction } from 'awilix';
+import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
+import type { Env } from '../../shared/infrastructure/env.ts';
+import type { Logger } from '../../shared/infrastructure/logger.ts';
+import type { EmailVerificationSender } from './application/email-verification-sender.port.ts';
+import {
+  type ConsentRepository,
+  makeRecordRegistrationConsents,
+  type RecordRegistrationConsents,
+} from './application/record-registration-consents.command.ts';
+import { type Auth, createAuth } from './infrastructure/auth/create-auth.ts';
+import { ConsentRecord } from './infrastructure/consent.record.ts';
+import { LoggingEmailVerificationSender } from './infrastructure/email/logging-email-verification-sender.ts';
+import { MikroOrmConsentRepository } from './infrastructure/mikro-orm-consent.repository.ts';
+import { UserRecord } from './infrastructure/user.record.ts';
+import { Migration20261110000000IdentityAuth } from './migrations/Migration20261110000000IdentityAuth.ts';
+
+/** Picked up by the ORM configuration (explicit lists, no globbing). */
+export const identityEntities = [UserRecord, ConsentRecord];
+export const identityMigrations = [
+  { name: 'Migration20261110000000IdentityAuth', class: Migration20261110000000IdentityAuth },
+];
+
+export interface IdentityCradle {
+  /** Better Auth instance (one per process); apps mount its handler and read sessions with it. */
+  auth: Auth;
+  emailVerificationSender: EmailVerificationSender;
+  consentRepository: ConsentRepository;
+  recordRegistrationConsents: RecordRegistrationConsents;
+}
+
+type Deps = IdentityCradle & DatabaseCradle & { env: Env; logger: Logger };
+
+/** Registers the identity module: Better Auth on the shared pool, consents per request scope. */
+export const registerIdentityModule = (container: AwilixContainer<Deps>): void => {
+  container.register({
+    emailVerificationSender: asClass(LoggingEmailVerificationSender).singleton(),
+    auth: asFunction(({ orm, env, emailVerificationSender }: Deps) =>
+      createAuth({
+        db: orm.em.getConnection().getClient(),
+        env,
+        emailVerificationSender,
+        checkBreachedPasswords: env.NODE_ENV !== 'test',
+      }),
+    ).singleton(),
+    consentRepository: asClass(MikroOrmConsentRepository).scoped(),
+    recordRegistrationConsents: asFunction(makeRecordRegistrationConsents).scoped(),
+  });
+};
