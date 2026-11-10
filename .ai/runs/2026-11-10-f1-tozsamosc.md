@@ -22,6 +22,7 @@ Wdrożyć specyfikację F1 po odpowiedziach właściciela na Q1–Q8: PR-y 1–7
 - Krok 3 → PR #13 (CI nie rusza dla PR-ów na gałęzie stosu — weryfikacja lokalna). Cezar zrobił „autosave” z lockfile — złączony z commitem kroku.
 - Krok 4: `/api/auth/*`, `getCurrentUser` w RSC (`cache`), `proxy.ts` z `returnTo`, nagłówek gość/zalogowany + wylogowanie (server action z `nextCookies`). Pułapka: `getCurrentUser` w layoucie budował kontener przed `headers()` → `next build` prerenderował `/` i padał na walidacji env; najpierw `await headers()`.
 - Krok 4 → PR #14. Krok 5: P4 `/logowanie`, `/rejestracja` (wygląd i walidacje z PR #7), hooki rejestracji (rola, zgody), e2e P4 + axe (28/28). Pułapki: `auth.api` z serwera omija limit prób i kontrolę Origin; bez `BETTER_AUTH_URL` origin `localhost` ≠ `127.0.0.1` przeglądarki → `INVALID_ORIGIN`; limit 3 prób/10 s per IP dławił równoległe e2e — fixture z losowym `x-forwarded-for` per test; Next.js ma własny `role="alert"` (route announcer) — w testach zawężać do `main`. Zrzuty P4: artefakty `f1-p4/`.
+- Krok 5 rozdzielony na PR #15 (5a, core) i #16 (5b, strony). Krok 6: S3 `/konto` — core (decyzje o zgodach, żądania danych, `requirePermission`, `getAccountOverview`, migracja) i web (profil, hasło, zgoda, wyloguj wszędzie, eksport/usunięcie). E2E 40/40. Pułapka: lokalna baza bez nowej migracji → rejestracja 500 w e2e — po dodaniu migracji `pnpm db:migrate` przed e2e. Zrzuty: `f1-s3/`.
 
 ## Wynik
 
