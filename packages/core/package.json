@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./scheduling": "./src/modules/scheduling/index.ts"
+    "./scheduling": "./src/modules/scheduling/index.ts",
+    "./identity": "./src/modules/identity/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -19,7 +20,9 @@
     "@mikro-orm/migrations": "7.2.5",
     "@mikro-orm/postgresql": "7.2.5",
     "awilix": "13.0.5",
+    "better-auth": "1.7.18",
     "dinero.js": "2.0.2",
+    "kysely": "0.29.6",
     "neverthrow": "8.2.0",
     "pg-boss": "12.38.0",
     "pino": "10.4.0",

@@ -1,15 +1,38 @@
 import { z } from 'zod';
 
-const EnvSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-  /** Pooled connection (web: queries and job sending). */
-  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
-  /** Direct connection for the worker (job fetching, cron, maintenance) and migrations. */
-  DATABASE_DIRECT_URL: z.url({ protocol: /^postgres(ql)?$/ }).optional(),
-  WORKER_PORT: z.coerce.number().int().min(1).max(65_535).default(8081),
-  SENTRY_DSN: z.url().optional(),
-});
+const EnvSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    LOG_LEVEL: z
+      .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
+      .default('info'),
+    /** Pooled connection (web: queries and job sending). */
+    DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    /** Direct connection for the worker (job fetching, cron, maintenance) and migrations. */
+    DATABASE_DIRECT_URL: z.url({ protocol: /^postgres(ql)?$/ }).optional(),
+    WORKER_PORT: z.coerce.number().int().min(1).max(65_535).default(8081),
+    SENTRY_DSN: z.url().optional(),
+    /** Signs session cookies; required in production (outside it a fixed development secret is used). */
+    BETTER_AUTH_SECRET: z.string().min(32).optional(),
+    /** Public origin of the web app; required in production, inferred from requests elsewhere. */
+    BETTER_AUTH_URL: z.url().optional(),
+    /** HIBP k-anonymity check of new passwords (Q8); `off` only in tests that must stay offline. */
+    AUTH_BREACHED_PASSWORD_CHECK: z.enum(['on', 'off']).default('on'),
+    /** Social sign-in buttons appear only when both keys of a provider are set (F1 Q1). */
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    LINKEDIN_CLIENT_ID: z.string().min(1).optional(),
+    LINKEDIN_CLIENT_SECRET: z.string().min(1).optional(),
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || env.BETTER_AUTH_SECRET !== undefined, {
+    message: 'BETTER_AUTH_SECRET is required in production',
+    path: ['BETTER_AUTH_SECRET'],
+  })
+  // Origin checks (CSRF) and OAuth callbacks need the public origin, not one guessed per request.
+  .refine((env) => env.NODE_ENV !== 'production' || env.BETTER_AUTH_URL !== undefined, {
+    message: 'BETTER_AUTH_URL is required in production',
+    path: ['BETTER_AUTH_URL'],
+  });
 
 export type Env = z.infer<typeof EnvSchema>;
 

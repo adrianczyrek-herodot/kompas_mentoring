@@ -1,13 +1,16 @@
-import { type AwilixContainer, asValue, createContainer, InjectionMode } from 'awilix';
+import { type AwilixContainer, asFunction, asValue, createContainer, InjectionMode } from 'awilix';
+import type { BetterAuthPlugin } from 'better-auth';
+import { type IdentityCradle, registerIdentityModule } from './modules/identity/di.ts';
 import { registerSchedulingModule } from './modules/scheduling/di.ts';
 import type { SchedulingCradle } from './modules/scheduling/index.ts';
 import type { Clock } from './shared/domain/index.ts';
+import type { DatabaseCradle } from './shared/infrastructure/db/database-cradle.ts';
 import { checkDatabase, createOrm, type DatabaseStatus } from './shared/infrastructure/db/orm.ts';
 import type { Env } from './shared/infrastructure/env.ts';
 import type { Logger } from './shared/infrastructure/logger.ts';
 import { SystemClock } from './shared/infrastructure/system-clock.ts';
 
-export interface AppCradle extends SchedulingCradle {
+export interface AppCradle extends SchedulingCradle, IdentityCradle, DatabaseCradle {
   env: Env;
   logger: Logger;
   clock: Clock;
@@ -29,6 +32,8 @@ export const createAppContainer = (deps: {
   env: Env;
   logger: Logger;
   clock?: Clock;
+  /** Better Auth plugins of the hosting framework (web: `nextCookies()`); the worker has none. */
+  authPlugins?: readonly BetterAuthPlugin[];
 }): AppContainer => {
   // strict: scoped services cannot be resolved from the root, which forces a request/job scope.
   const container = createContainer<AppCradle>({
@@ -39,11 +44,15 @@ export const createAppContainer = (deps: {
   const orm = createOrm(deps.env.DATABASE_URL);
   container.register({
     env: asValue(deps.env),
+    orm: asValue(orm),
+    em: asFunction(() => orm.em.fork()).scoped(),
     databaseHealth: asValue(() => checkDatabase(orm)),
     logger: asValue(deps.logger),
     clock: asValue(deps.clock ?? new SystemClock()),
+    authPlugins: asValue(deps.authPlugins ?? []),
   });
   registerSchedulingModule(container);
+  registerIdentityModule(container);
   return container;
 };
 
