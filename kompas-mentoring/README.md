@@ -7,26 +7,22 @@ Wstępna koncepcja i klikalne mockupy portalu mentoringu 1:1, wzorowanego funkcj
 | Ścieżka | Co to jest |
 |---|---|
 | `KONCEPCJA.md` | Użytkownicy i potrzeby, use case'y, przepływy z błędami, mapa ekranów, specyfikacja 22 ekranów (cel, funkcje, komponenty, stany, walidacje, API), model danych, ryzyka |
-
-Klikalne mockupy zostały przeniesione do monorepo DevMentor (zob. [`README.md`](../README.md) w korzeniu):
-
-| Ścieżka | Co to jest |
-|---|---|
-| `packages/app/src/views/` | Ekrany w React: `public/` (P1–P4), `student/` (U1–U9), `shared/` (S1–S3, mapa ekranów) — Tailwind; `mentor/` (M1–M5), `admin/` (A1–A2) — shadcn/ui |
-| `packages/app/src/demo/` | Stan demo w pamięci i akcje, role i nawigacja, pasek mockupu |
-| `packages/core/src/domain/` | Typy domenowe i reguły jako czyste funkcje (dawniej `domain.ts`) |
-| `packages/db/src/fixtures/` | Dane demo (dawniej `mocks.ts`) |
-| `packages/ui/src/styles/`, `packages/ui/src/lib/`, `packages/ui/src/frontend/` | Arkusz (Tailwind z tokenami Kompasu, motyw shadcn/ui), formatowanie, ikony, komponenty React (`frontend/`, `backend/`) |
+| `mockupy/index.html` | Klikalne mockupy — otwórz w przeglądarce |
+| `mockupy/src/` | Kod TypeScript: `main.ts` (router, pasek mockupu), `mocks.ts` (dane), `domain.ts` (reguły jako czyste funkcje), `screens/*` |
+| `mockupy/dist/app.js` | Gotowy zbudowany bundle — nic nie trzeba instalować |
 
 ## Jak uruchomić
 
-Z korzenia repozytorium:
+**Bez instalacji:** otwórz `mockupy/index.html` dwuklikiem. Działa offline.
+
+**Z przebudową po zmianach w kodzie:**
 
 ```bash
+cd mockupy
 npm install
-npm run dev         # http://localhost:3000 — mapa ekranów: /mapa; panel mentora /mentor, admina /admin
+npm run build       # przebudowuje dist/app.js
+npm run dev         # serwer z auto-przebudową: http://localhost:8000
 npm run typecheck
-npm run build
 ```
 
 ## Jak przeglądać
