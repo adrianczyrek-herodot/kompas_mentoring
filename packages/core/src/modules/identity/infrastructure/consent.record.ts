@@ -1,6 +1,6 @@
 import { defineEntity, p } from '@mikro-orm/core';
 
-/** Persistence shape of a recorded consent (table `identity.consent`). */
+/** Persistence shape of a consent decision (table `identity.consent`). */
 export const ConsentRecord = defineEntity({
   name: 'ConsentRecord',
   tableName: 'consent',
@@ -10,6 +10,7 @@ export const ConsentRecord = defineEntity({
     userId: p.string(),
     document: p.string(),
     version: p.string(),
-    givenAt: p.datetime(),
+    granted: p.boolean(),
+    decidedAt: p.datetime(),
   },
 });

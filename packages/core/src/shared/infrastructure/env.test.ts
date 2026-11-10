@@ -14,9 +14,10 @@ describe('parseEnv', () => {
     expect(() => parseEnv({ DATABASE_URL: 'mysql://nope' })).toThrow(/DATABASE_URL/);
   });
 
-  it('requires the Better Auth secret in production only', () => {
+  it('requires the Better Auth secret and URL in production only', () => {
     const base = { DATABASE_URL: 'postgres://kompas:kompas@localhost:5432/kompas' };
     expect(() => parseEnv({ ...base, NODE_ENV: 'production' })).toThrow(/BETTER_AUTH_SECRET/);
+    expect(() => parseEnv({ ...base, NODE_ENV: 'production' })).toThrow(/BETTER_AUTH_URL/);
     expect(parseEnv({ ...base, NODE_ENV: 'test' }).BETTER_AUTH_SECRET).toBeUndefined();
   });
 });

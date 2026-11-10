@@ -10,5 +10,15 @@ export type RequiredConsentMissing = DomainError<'identity.required_consent_miss
   readonly document: 'terms' | 'privacy';
 };
 
+/** The actor lacks the permission (→ 403, spec §8). */
+export type Forbidden = DomainError<'identity.forbidden'>;
+/** Someone else's resource, or none at all — indistinguishable on purpose (→ 404, spec §8). */
+export type NotFound = DomainError<'identity.not_found'>;
+
 /** Every expected identity failure; mapped to RFC 9457 problems at the API edge (spec §4.9). */
-export type IdentityError = PasswordTooShort | PasswordTooLong | RequiredConsentMissing;
+export type IdentityError =
+  | PasswordTooShort
+  | PasswordTooLong
+  | RequiredConsentMissing
+  | Forbidden
+  | NotFound;

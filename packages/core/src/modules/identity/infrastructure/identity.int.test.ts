@@ -20,8 +20,21 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
   let container: AppContainer;
   const sentLinks: string[] = [];
 
-  const signUp = (email: string, password = PASSWORD) =>
-    container.cradle.auth.api.signUpEmail({ body: { name: 'Ola Nowak', email, password } });
+  /** P4 body: Better Auth fields plus the role choice and consents read by the sign-up hooks. */
+  const signUp = (email: string, password = PASSWORD, extra: Record<string, unknown> = {}) => {
+    const body = { name: 'Ola Nowak', email, password, terms: true, privacy: true, ...extra };
+    return container.cradle.auth.api.signUpEmail({ body });
+  };
+
+  const consentsOf = (userId: string) =>
+    container.cradle.orm.em
+      .getConnection()
+      .execute<{ document: string; version: string }[]>(
+        `select "document", "version" from "identity"."consent" where "user_id" = ? order by "document"`,
+        [userId],
+      );
+
+  const scopeOf = (requestId: string) => createRequestScope(container, { requestId });
 
   /** Signs in and returns the request headers of a browser holding the session cookie. */
   const signIn = async (email: string, password = PASSWORD): Promise<Headers> => {
@@ -89,24 +102,41 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
     await expect(signIn('ola@example.com', 'wrong-password-123')).rejects.toThrow();
   });
 
-  it('records registration consents with document versions', async () => {
-    const { user } = await signUp('consents@example.com');
-    const scope = createRequestScope(container, { requestId: 'int-consents' });
-    const result = await scope.cradle.recordRegistrationConsents(UserId.parse(user.id), {
-      terms: true,
-      privacy: true,
-      marketing: false,
+  it('records consents given at sign-up with document versions', async () => {
+    const { user } = await signUp('consents@example.com', PASSWORD, { marketing: true });
+    await expect
+      .poll(() => consentsOf(user.id))
+      .toEqual([
+        { document: 'marketing', version: '2026-11-10' },
+        { document: 'privacy', version: '2026-11-10' },
+        { document: 'terms', version: '2026-11-10' },
+      ]);
+  });
+
+  it('refuses sign-up without the required consents', async () => {
+    await expect(signUp('no-terms@example.com', PASSWORD, { terms: false })).rejects.toThrow();
+  });
+
+  it('gives the mentor role to those who want to mentor (Q3)', async () => {
+    const { user } = await signUp('mentor@example.com', PASSWORD, { as: 'mentor' });
+    expect(user.roles).toEqual(['mentor']);
+  });
+
+  it('keeps the latest marketing decision and pending data requests (S3)', async () => {
+    await signUp('account@example.com', PASSWORD, { marketing: true });
+    const headers = await signIn('account@example.com');
+    const actor = await scopeOf('int-s3-actor').cradle.getCurrentUser(headers);
+    if (actor === null) throw new Error('expected a signed-in user');
+
+    await scopeOf('int-s3-withdraw').cradle.setMarketingConsent(actor, false);
+    const first = await scopeOf('int-s3-export').cradle.requestPersonalData(actor, 'export');
+    const again = await scopeOf('int-s3-export-again').cradle.requestPersonalData(actor, 'export');
+    expect(again._unsafeUnwrap().id).toBe(first._unsafeUnwrap().id);
+
+    const overview = await scopeOf('int-s3-overview').cradle.getAccountOverview(actor, actor.id);
+    expect(overview._unsafeUnwrap()).toEqual({
+      marketingConsent: false,
+      pendingRequests: ['export'],
     });
-    expect(result.isOk()).toBe(true);
-    const rows = await container.cradle.orm.em
-      .getConnection()
-      .execute<{ document: string; version: string }[]>(
-        `select "document", "version" from "identity"."consent" where "user_id" = ? order by "document"`,
-        [user.id],
-      );
-    expect(rows).toEqual([
-      { document: 'privacy', version: '2026-11-10' },
-      { document: 'terms', version: '2026-11-10' },
-    ]);
   });
 });
