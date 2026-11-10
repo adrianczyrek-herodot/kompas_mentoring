@@ -1,4 +1,4 @@
-import { betterAuth } from 'better-auth';
+import { type BetterAuthPlugin, betterAuth } from 'better-auth';
 import { haveIBeenPwned } from 'better-auth/plugins/haveibeenpwned';
 import { twoFactor } from 'better-auth/plugins/two-factor';
 import type { Kysely } from 'kysely';
@@ -23,8 +23,10 @@ export interface AuthDeps {
   db: Kysely<unknown>;
   env: Env;
   emailVerificationSender: EmailVerificationSender;
-  /** HIBP k-anonymity check of new passwords (Q8); off in tests that must not reach the network. */
+  /** HIBP k-anonymity check of new passwords (Q8, `AUTH_BREACHED_PASSWORD_CHECK`). */
   checkBreachedPasswords: boolean;
+  /** Framework plugins appended last, e.g. `nextCookies()` from apps/web (must stay last). */
+  plugins: readonly BetterAuthPlugin[];
 }
 
 const socialProviders = (env: Env) => ({
@@ -68,6 +70,7 @@ export const createAuth = (deps: AuthDeps) => {
     plugins: [
       twoFactor({ issuer: 'Kompas' }),
       ...(deps.checkBreachedPasswords ? [haveIBeenPwned()] : []),
+      ...deps.plugins,
     ],
   });
 };

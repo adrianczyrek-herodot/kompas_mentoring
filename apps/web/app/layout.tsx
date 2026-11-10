@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { SiteHeader } from './_components/site-header.tsx';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,7 +15,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang={locale}>
       <body className="min-h-dvh">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <SiteHeader />
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

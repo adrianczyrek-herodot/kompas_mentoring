@@ -36,7 +36,10 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
   beforeAll(async () => {
     database = await new PostgreSqlContainer(POSTGRES_IMAGE).start();
     container = createAppContainer({
-      env: parseEnv({ DATABASE_URL: database.getConnectionUri(), NODE_ENV: 'test' }),
+      env: parseEnv({
+        DATABASE_URL: database.getConnectionUri(),
+        AUTH_BREACHED_PASSWORD_CHECK: 'off',
+      }),
       logger: createLogger({ level: 'silent' }),
     });
     container.register({
@@ -73,6 +76,13 @@ describe.skipIf(!dockerAvailable)(integrationSuite('identity: Better Auth on Pos
     expect(current?.user.email).toBe('ola@example.com');
     const ttl = (current?.session.expiresAt.getTime() ?? 0) - Date.now();
     expect(ttl).toBeGreaterThan(29 * 24 * HOUR_MS);
+  });
+
+  it('resolves the signed-in user of a request scope', async () => {
+    const scope = createRequestScope(container, { requestId: 'int-current-user' });
+    const user = await scope.cradle.getCurrentUser(await signIn('ola@example.com'));
+    expect(user).toMatchObject({ email: 'ola@example.com', roles: ['student'] });
+    expect(await scope.cradle.getCurrentUser(new Headers())).toBeNull();
   });
 
   it('rejects a wrong password', async () => {

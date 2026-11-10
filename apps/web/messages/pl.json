@@ -7,5 +7,13 @@
     "heading": "Kompas",
     "lead": "Mentoring 1:1 z doświadczonymi praktykami. Wkrótce otwieramy zapisy.",
     "cta": "Powiadom mnie o starcie"
+  },
+  "Header": {
+    "navLabel": "Główna nawigacja",
+    "brand": "Kompas",
+    "signIn": "Zaloguj się",
+    "signUp": "Załóż konto",
+    "account": "Konto: {name}",
+    "signOut": "Wyloguj"
   }
 }

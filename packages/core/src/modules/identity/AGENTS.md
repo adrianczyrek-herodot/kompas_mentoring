@@ -9,7 +9,7 @@ Odpowiada za: konta i sesje logowania (Better Auth), role i uprawnienia, `return
 ## Niezmienniki
 - Rola i uprawnienie sprawdzane w każdej komendzie i zapytaniu (nie tylko w UI); brak uprawnień → 403, cudzy zasób → 404 (spec §8).
 - `returnTo` tylko ścieżki wewnętrzne — `domain/policies/return-to.policy.ts` (ochrona przed open redirect).
-- Hasło 10–128 znaków (`password.policy.ts`); sprawdzenie w bazie wycieków (HIBP, plugin Better Auth, wyłączone przy `NODE_ENV=test`) — przy awarii HIBP rejestracja jest odrzucana (fail closed, Q8).
+- Hasło 10–128 znaków (`password.policy.ts`); sprawdzenie w bazie wycieków (HIBP, plugin Better Auth; `AUTH_BREACHED_PASSWORD_CHECK=off` tylko w testach) — przy awarii HIBP rejestracja jest odrzucana (fail closed, Q8).
 - Sesje: 30 dni odnawiane; admini 12 h od zalogowania — Better Auth przedłuża każdą sesję o `expiresIn`, więc limit admina egzekwuje `sessionExpiresAt` przy odczycie sesji; admin bez 2FA nie wchodzi na trasy admina (`session.policy.ts`, Q4–Q5).
 - Zgody zapisujemy z wersją dokumentu z `domain/policies/config.ts` i czasem z `Clock` (Q6).
 - Zmiany w tym module wymagają przeglądu człowieka (spec §10.2).

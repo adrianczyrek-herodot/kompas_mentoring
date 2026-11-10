@@ -32,6 +32,8 @@ export default defineConfig({
       // `next start` runs in production mode, where the env schema requires a secret.
       BETTER_AUTH_SECRET:
         process.env['BETTER_AUTH_SECRET'] ?? 'e2e-only-secret-not-for-real-use-000',
+      // E2E stays offline: no HIBP calls for test passwords.
+      AUTH_BREACHED_PASSWORD_CHECK: 'off',
     },
   },
 });

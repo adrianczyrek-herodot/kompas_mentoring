@@ -1,13 +1,20 @@
 import { type AwilixContainer, asClass, asFunction } from 'awilix';
+import type { BetterAuthPlugin } from 'better-auth';
 import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
 import type { Env } from '../../shared/infrastructure/env.ts';
 import type { Logger } from '../../shared/infrastructure/logger.ts';
 import type { EmailVerificationSender } from './application/email-verification-sender.port.ts';
 import {
+  type GetCurrentUser,
+  makeGetCurrentUser,
+  type SessionReader,
+} from './application/get-current-user.query.ts';
+import {
   type ConsentRepository,
   makeRecordRegistrationConsents,
   type RecordRegistrationConsents,
 } from './application/record-registration-consents.command.ts';
+import { BetterAuthSessionReader } from './infrastructure/auth/better-auth-session-reader.ts';
 import { type Auth, createAuth } from './infrastructure/auth/create-auth.ts';
 import { ConsentRecord } from './infrastructure/consent.record.ts';
 import { LoggingEmailVerificationSender } from './infrastructure/email/logging-email-verification-sender.ts';
@@ -24,7 +31,11 @@ export const identityMigrations = [
 export interface IdentityCradle {
   /** Better Auth instance (one per process); apps mount its handler and read sessions with it. */
   auth: Auth;
+  /** Framework plugins for Better Auth given by the app (e.g. `nextCookies()` in web). */
+  authPlugins: readonly BetterAuthPlugin[];
   emailVerificationSender: EmailVerificationSender;
+  sessionReader: SessionReader;
+  getCurrentUser: GetCurrentUser;
   consentRepository: ConsentRepository;
   recordRegistrationConsents: RecordRegistrationConsents;
 }
@@ -35,14 +46,17 @@ type Deps = IdentityCradle & DatabaseCradle & { env: Env; logger: Logger };
 export const registerIdentityModule = (container: AwilixContainer<Deps>): void => {
   container.register({
     emailVerificationSender: asClass(LoggingEmailVerificationSender).singleton(),
-    auth: asFunction(({ orm, env, emailVerificationSender }: Deps) =>
+    auth: asFunction(({ orm, env, emailVerificationSender, authPlugins }: Deps) =>
       createAuth({
         db: orm.em.getConnection().getClient(),
         env,
         emailVerificationSender,
-        checkBreachedPasswords: env.NODE_ENV !== 'test',
+        checkBreachedPasswords: env.AUTH_BREACHED_PASSWORD_CHECK === 'on',
+        plugins: authPlugins,
       }),
     ).singleton(),
+    sessionReader: asClass(BetterAuthSessionReader).singleton(),
+    getCurrentUser: asFunction(makeGetCurrentUser).scoped(),
     consentRepository: asClass(MikroOrmConsentRepository).scoped(),
     recordRegistrationConsents: asFunction(makeRecordRegistrationConsents).scoped(),
   });

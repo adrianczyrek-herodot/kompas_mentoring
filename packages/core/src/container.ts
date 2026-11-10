@@ -1,4 +1,5 @@
 import { type AwilixContainer, asFunction, asValue, createContainer, InjectionMode } from 'awilix';
+import type { BetterAuthPlugin } from 'better-auth';
 import { type IdentityCradle, registerIdentityModule } from './modules/identity/di.ts';
 import { registerSchedulingModule } from './modules/scheduling/di.ts';
 import type { SchedulingCradle } from './modules/scheduling/index.ts';
@@ -31,6 +32,8 @@ export const createAppContainer = (deps: {
   env: Env;
   logger: Logger;
   clock?: Clock;
+  /** Better Auth plugins of the hosting framework (web: `nextCookies()`); the worker has none. */
+  authPlugins?: readonly BetterAuthPlugin[];
 }): AppContainer => {
   // strict: scoped services cannot be resolved from the root, which forces a request/job scope.
   const container = createContainer<AppCradle>({
@@ -46,6 +49,7 @@ export const createAppContainer = (deps: {
     databaseHealth: asValue(() => checkDatabase(orm)),
     logger: asValue(deps.logger),
     clock: asValue(deps.clock ?? new SystemClock()),
+    authPlugins: asValue(deps.authPlugins ?? []),
   });
   registerSchedulingModule(container);
   registerIdentityModule(container);
