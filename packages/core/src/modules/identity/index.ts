@@ -1,4 +1,6 @@
 // Public API of the identity module — the only file other modules and apps may import.
+
+export type { CurrentUser } from './application/get-current-user.query.ts';
 export type {
   ConsentRepository,
   RecordRegistrationConsents,
@@ -11,3 +13,4 @@ export { safeReturnTo } from './domain/policies/return-to.policy.ts';
 export { mustSetUpTwoFactor, sessionExpiresAt } from './domain/policies/session.policy.ts';
 export { hasPermission, isAdmin, type Permission, ROLES, type Role } from './domain/role.ts';
 export type { Auth } from './infrastructure/auth/create-auth.ts';
+export { hasSessionCookie } from './infrastructure/auth/session-cookie.ts';

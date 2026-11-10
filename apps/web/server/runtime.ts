@@ -1,4 +1,5 @@
 import { type AppContainer, createAppContainer, createLogger, parseEnv } from '@kompas/core';
+import { nextCookies } from 'better-auth/next-js';
 
 let container: AppContainer | undefined;
 
@@ -10,7 +11,8 @@ export const getContainer = (): AppContainer => {
   if (container === undefined) {
     const env = parseEnv();
     const logger = createLogger({ level: env.LOG_LEVEL, module: 'web' });
-    container = createAppContainer({ env, logger });
+    // nextCookies: auth calls from server actions set and clear the session cookie.
+    container = createAppContainer({ env, logger, authPlugins: [nextCookies()] });
   }
   return container;
 };

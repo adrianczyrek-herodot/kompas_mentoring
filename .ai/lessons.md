@@ -20,6 +20,8 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 
 ## Kod i mockupy
 
+- **2026-11-10** — W RSC wywołuj `await headers()`/`cookies()` **przed** `getContainer()`: inaczej `next build` próbuje prerenderować stronę, buduje kontener i pada na walidacji env (brak `DATABASE_URL`).
+
 - **2026-10-21** — Playwright: nie używaj `reuseExistingServer` domyślnie — w worktree port bywa zajęty przez serwer innej sesji i testy po cichu sprawdzają obcą aplikację. U nas reuse tylko przy `E2E_REUSE_SERVER=1`, port przez `E2E_PORT`.
 - **2026-10-21** — `eslint-plugin-boundaries` 7: wzorce elementów dopasowują katalogi, nie pliki — `index.ts`/`di.ts` klasyfikuj przez `boundaries/files`; komunikat polityki pojawia się tylko, gdy decyduje jej `disallow`, więc per strefa: „disallow all z komunikatem, potem allow wyjątki”.
 - **2026-10-21** — CLI dependency-cruiser 18 odmawia działania na nieparzystych wydaniach Node (25) — uruchamiamy go przez API (`scripts/check-dependencies.mjs`).

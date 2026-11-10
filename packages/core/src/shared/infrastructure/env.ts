@@ -16,6 +16,8 @@ const EnvSchema = z
     BETTER_AUTH_SECRET: z.string().min(32).optional(),
     /** Public origin of the web app; Better Auth infers it from the request when unset. */
     BETTER_AUTH_URL: z.url().optional(),
+    /** HIBP k-anonymity check of new passwords (Q8); `off` only in tests that must stay offline. */
+    AUTH_BREACHED_PASSWORD_CHECK: z.enum(['on', 'off']).default('on'),
     /** Social sign-in buttons appear only when both keys of a provider are set (F1 Q1). */
     GOOGLE_CLIENT_ID: z.string().min(1).optional(),
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
