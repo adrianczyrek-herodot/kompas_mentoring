@@ -13,7 +13,8 @@
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "db:migrate": "node --env-file-if-exists=../../.env src/shared/infrastructure/db/cli/migrate.ts",
-    "db:seed": "node --env-file-if-exists=../../.env src/shared/infrastructure/db/cli/seed.ts"
+    "db:seed": "node --env-file-if-exists=../../.env src/shared/infrastructure/db/cli/seed.ts",
+    "admin:create": "node --env-file-if-exists=../../.env src/shared/infrastructure/db/cli/create-admin.ts"
   },
   "dependencies": {
     "@mikro-orm/core": "7.2.5",

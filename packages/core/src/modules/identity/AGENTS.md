@@ -18,3 +18,4 @@ Odpowiada za: konta i sesje logowania (Better Auth), role i uprawnienia, `return
 - `domain/` czysty TS · `application/` komendy (fabryki z zależnościami, porty jako interfejsy) · `infrastructure/` Better Auth + Kysely, repozytoria · `migrations/` SQL Better Auth (schemat `identity`) i tabele modułu.
 - Better Auth dostaje Kysely z puli MikroORM (`orm.em.getConnection().getClient()`) z `TimestampParsingPlugin` — pula MikroORM zwraca `timestamptz` jako tekst, a Better Auth porównuje daty. Tabele Better Auth mają kolumny camelCase; tabele modułu (`consent`) — snake_case.
 - SQL Better Auth w `migrations/` generujemy, nie piszemy: `getMigrations(auth.options).compileMigrations()` na pustej bazie (Testcontainers) po każdej zmianie konfiguracji auth (pluginy, pola dodatkowe).
+- Konta adminów tylko przez CLI: `ADMIN_PASSWORD=… pnpm admin:create --email … [--name …] [--role admin_trust|admin_finance]` (Q4); 2FA admin włącza przy pierwszym wejściu na `/admin`.

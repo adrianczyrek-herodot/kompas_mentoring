@@ -43,7 +43,7 @@ const registrationOf = (ctx: GenericEndpointContext) => {
  * `after` hooks then), so the `consent → user` foreign key holds.
  */
 export const registrationHooks = (recordConsents: RecordSignUpConsents) => ({
-  before: (user: User, ctx: GenericEndpointContext | null) => {
+  before: (user: User, ctx: GenericEndpointContext | null | undefined) => {
     if (ctx?.path !== EMAIL_SIGN_UP) return Promise.resolve();
     const registration = registrationOf(ctx);
     const missing = missingRequiredConsent(registration);
@@ -55,9 +55,10 @@ export const registrationHooks = (recordConsents: RecordSignUpConsents) => ({
     }
     return Promise.resolve({ data: { ...user, roles: [registration.as] } });
   },
-  after: async (user: User, ctx: GenericEndpointContext | null) => {
-    // No endpoint context: users created by scripts (admin seed) record no consents.
-    if (ctx === null) return;
+  // Better Auth types the context as nullable, but passes `undefined` outside endpoints.
+  after: async (user: User, ctx: GenericEndpointContext | null | undefined) => {
+    // No endpoint context: users created by scripts (admin CLI) record no consents.
+    if (ctx === null || ctx === undefined) return;
     await recordConsents(
       user.id,
       ctx.path === EMAIL_SIGN_UP ? registrationOf(ctx) : SOCIAL_SIGN_UP_CONSENTS,

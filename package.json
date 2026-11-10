@@ -18,6 +18,7 @@
     "test:e2e": "turbo run test:e2e",
     "db:migrate": "pnpm --filter @kompas/core run db:migrate",
     "db:seed": "pnpm --filter @kompas/core run db:seed",
+    "admin:create": "pnpm --filter @kompas/core run admin:create",
     "hooks:install": "lefthook install"
   },
   "devDependencies": {
