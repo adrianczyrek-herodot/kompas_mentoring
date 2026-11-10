@@ -15,5 +15,42 @@
     "signUp": "Załóż konto",
     "account": "Konto: {name}",
     "signOut": "Wyloguj"
+  },
+  "Auth": {
+    "loginTitle": "Logowanie — Kompas",
+    "registerTitle": "Rejestracja — Kompas",
+    "tabsLabel": "Logowanie lub rejestracja",
+    "tabLogin": "Logowanie",
+    "tabRegister": "Rejestracja",
+    "continueWith": "Kontynuuj z {provider}",
+    "socialConsent": "Kontynuując, akceptujesz regulamin i politykę prywatności.",
+    "orEmail": "lub e-mailem",
+    "name": "Imię",
+    "email": "E-mail",
+    "password": "Hasło",
+    "passwordHint": "Min. 10 znaków",
+    "want": "Chcę",
+    "asStudent": "się uczyć",
+    "asMentor": "mentorować",
+    "terms": "Akceptuję regulamin i politykę prywatności",
+    "marketing": "Chcę dostawać wskazówki i oferty (opcjonalnie)",
+    "submitLogin": "Zaloguj się",
+    "submitRegister": "Załóż konto",
+    "busy": "Chwileczkę…",
+    "errors": {
+      "required": "To pole jest wymagane.",
+      "email": "Podaj poprawny adres e-mail.",
+      "nameLength": "Imię musi mieć od 2 do 50 znaków.",
+      "passwordLength": "Hasło musi mieć od 10 do 128 znaków.",
+      "terms": "Akceptacja regulaminu jest wymagana."
+    },
+    "failure": {
+      "invalidCredentials": "Nieprawidłowy e-mail lub hasło.",
+      "accountExists": "To konto już istnieje. Zaloguj się w zakładce Logowanie.",
+      "passwordCompromised": "To hasło pojawiło się w znanym wycieku danych. Wybierz inne.",
+      "consentMissing": "Akceptacja regulaminu jest wymagana.",
+      "tooManyAttempts": "Za dużo nieudanych prób. Spróbuj ponownie za kilka minut.",
+      "unexpected": "Coś poszło nie tak. Spróbuj ponownie."
+    }
   }
 }

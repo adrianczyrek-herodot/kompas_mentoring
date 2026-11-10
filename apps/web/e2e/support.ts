@@ -17,14 +17,14 @@ export const test = base.extend({
 /* eslint-enable no-empty-pattern */
 export { expect };
 
-const PASSWORD = 'kompas-e2e-password';
+export const PASSWORD = 'kompas-e2e-password';
 
 /** Flows that create accounts need Postgres (CI sets E2E_EXPECT_DB=up). */
 export const requireDatabase = () => {
   test.skip(process.env['E2E_EXPECT_DB'] !== 'up', 'needs the database (E2E_EXPECT_DB=up)');
 };
 
-const uniqueEmail = () => `e2e-${crypto.randomUUID()}@example.com`;
+export const uniqueEmail = () => `e2e-${crypto.randomUUID()}@example.com`;
 
 /**
  * Creates an account through the Better Auth API. With `page.request` the session cookie lands in
