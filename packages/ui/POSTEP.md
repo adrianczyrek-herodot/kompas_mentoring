@@ -6,8 +6,8 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 
 | Etap | Stan | Data |
 |---|---|---|
-| 0. Inwentaryzacja i plan | **czeka na decyzje właściciela** (pytania Q1–Q5, zmiany Z1–Z9) | 2026-11-11 |
-| 1. Fundamenty | nie zaczęty — blokuje Q1 (brak `tokeny.md`) | — |
+| 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
+| 1. Fundamenty | w toku — **tabela tokenów czeka na zatwierdzenie** (nic nie zapisano w kodzie) | 2026-11-11 |
 | 2. Komponenty bazowe | nie zaczęty | — |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
@@ -21,12 +21,12 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | Brief i badania | `.ai/specs/product-brief.md`, `kompas-mentoring/KONCEPCJA.md` | wywiadów brak (brief, referencje) |
 | Backlog i specyfikacje | `.ai/specs/backlog.md`, `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md`, `.ai/specs/2026-11-10-f1-tozsamosc.md`, mockupy `kompas-mentoring/mockupy/` | |
 | Referencje | `lekcja-06/referencje.md` (R01–R06, A01–A04, K1–K6) | |
-| Tokeny | **brak `lekcja-06/tokeny.md`** — istnieją tylko tokeny w `packages/ui/src/styles/globals.css` (z mockupu, PR #7) | pytanie Q1 |
+| Tokeny | brak `lekcja-06/tokeny.md` — agent proponuje tabelę w etapie 1, po zatwierdzeniu zapis do `lekcja-06/tokeny.md` (Q1) | punkt wyjścia: `packages/ui/src/styles/globals.css` |
 | Audyt z ćwiczenia 1 | brak (`lekcja-06/audyt.md` nie istnieje) | |
 | Baza komponentów | shadcn/ui w wariancie Base UI (`@base-ui/react` 1.9.0, styl `base-nova`) | już wybrane w spec stacku §2.1 i F1 |
 | Design system | `packages/ui` (`@kompas/ui`) | istnieje |
 | Storybook | `packages/ui/.storybook` | nie istnieje |
-| Język UI / dokumentacji | polski / polski (kod i identyfikatory po angielsku) | `AGENTS.md` → „Język”; do potwierdzenia w Q4 |
+| Język UI / dokumentacji | polski / polski (kod i identyfikatory po angielsku) | `AGENTS.md` → „Język”; potwierdzone (Q4) |
 
 ## Inwentaryzacja repozytorium
 
@@ -189,16 +189,18 @@ Szacunek: ok. 30 stron przewodnika i podstaw + 75 stron komponentów; ok. 220 st
 
 ## Otwarte pytania (do właściciela)
 
-- **Q1.** Brak `lekcja-06/tokeny.md`. Czy w etapie 1 mam najpierw przygotować tabelę tokenów z `referencje.md` (wg `od-decyzji-do-tokenow-devmentor.txt`, do zatwierdzenia), czy zrobisz ćwiczenie 2 osobno?
-- **Q2.** Barwa akcentu (K4, R06.2) — zieleń z mockupu czy ciepły akcent?
-- **Q3.** Krój pisma (K6) — propozycja IBM Plex Sans + Plex Mono (+ Plex Serif dla P1/P3).
-- **Q4.** Storybook mimo „nie w MVP” w spec stacku — wpis w „Decyzje i zmiany” + ADR 0006; dokumentacja po polsku.
-- **Q5.** Zakres: produkt i ekrany tylko dla Now (E1–E3), Later na stronie „Czego brakuje”; oba motywy (jasny i ciemny) w testach.
+- Zatwierdzenie tabeli tokenów (etap 1, krok 2) — przedstawiona w rozmowie 2026-11-11; propozycje oznaczone „P-T…”.
+- Z6 (rozmiary przycisków < 44 px) i Z8 (`role` w `Alert`) — decyzja przy etapie 2.
 
 ## Zatwierdzone decyzje
 
-(brak — czekam na odpowiedzi do etapu 0)
+- 2026-11-11 Q1 — tabelę tokenów proponuje agent (wg `od-decyzji-do-tokenow-devmentor.txt`), właściciel zatwierdza przed zapisem.
+- 2026-11-11 Q2 — **ciepły akcent zamiast zieleni** dla akcji głównej i stanów; zieleń najwyżej jako kolor sukcesu.
+- 2026-11-11 Q3 — krój **IBM Plex**: Sans (tekst, dane), Mono (kod), Serif (duże nagłówki P1 i P3).
+- 2026-11-11 Q4 — Storybook w MVP: wpis w spec stacku + [ADR-0006](../../docs/decisions/0006-design-system-storybook.md); dokumentacja i menu po polsku.
+- 2026-11-11 Q5 — zakres **Now (E1–E3)**, testy w **obu motywach**; Later na stronie „Czego brakuje”.
+- Specyfikacja: `.ai/specs/2026-11-11-design-system-storybook.md` (in-progress).
 
 ## Następny krok
 
-Po odpowiedziach na Q1–Q5 i decyzjach Z1–Z9: utworzyć specyfikację `.ai/specs/2026-11-11-design-system-storybook.md` z zatwierdzonym planem, potem etap 1 (Storybook, tokeny w trzech warstwach, Podstawy, skrypt `check:tokens`).
+Po zatwierdzeniu tabeli tokenów: zapis do `lekcja-06/tokeny.md`, potem etap 1 — instalacja Storybooka i dodatków, `src/styles/tokens.css` (3 warstwy, oba motywy, aliasy shadcn), fonty IBM Plex z `@fontsource`, przełącznik motywu, strony Podstaw, `check:tokens`, testy stories w obu motywach.

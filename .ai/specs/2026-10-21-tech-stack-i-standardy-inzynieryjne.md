@@ -122,7 +122,7 @@ Wersje: aktualne stabilne na 2026-10-21, przypięte dokładnie w `package.json` 
 | Zależności | **Renovate** (grupowanie, `minimumReleaseAge` 3 dni, pinowanie akcji GitHub po SHA) + Socket.dev na PR |
 | Git hooks | **lefthook** (Biome + typecheck zmienionych pakietów + commitlint) |
 | Commity | **Conventional Commits** + commitlint |
-| Storybook | Nie w MVP (koszt utrzymania > zysk przy małym zespole); stany komponentów pokazujemy w Playwright + mockupach. |
+| Storybook | ~~Nie w MVP~~ — od 2026-11-11 **Storybook 10** w `packages/ui` jako dokumentacja design systemu i testy stanów (a11y, interakcje), [ADR-0006](../../docs/decisions/0006-design-system-storybook.md). |
 
 ---
 
@@ -716,6 +716,7 @@ Każda faza zostawia działającą aplikację i ma własną specyfikację w `.ai
 - 2026-10-21 — Wersja robocza na podstawie researchu (stan rynku i przepisów na 2026-10-21).
 - 2026-10-21 — Po niezależnym przeglądzie: dodany stan `hold` i rozgałęzienie próbna/plan w maszynie `Booking`; wygaszanie nieaktualnych holdów w komendzie `createHold`; indeks sesji próbnej nie blokuje ponownej próby; ograniczenie nakładania dla ucznia; rozliczenie po zamknięciu okna sporu (72 h); rezerwacja kredytu przy umawianiu, partie kredytu z datą ważności i tabela księgowań z kontem `stripe_clearing`; CSP z nonce tylko na trasach zalogowanych; Better Auth przez adapter Kysely; TS 6 zamiast TS 6 + TS 7; tsconfig per środowisko; pg-boss: `web` tylko wysyła przez pooler, outbox = zadania w transakcji; uproszczenia MVP (11 modułów zamiast 14, widoki SQL zamiast projekcji, Stryker od F8, bez Bunny/OpenFeature/Grafany/passkeys w MVP, 5 ADR). Czeka na akceptację właściciela i odpowiedzi Q1–Q12.
 - 2026-10-21 — Właściciel zlecił wdrożenie spec (status `in-progress`). Start od F0 i dokumentów procesu (spec `.ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md`); dla F0 przyjęte rekomendacje Q1 (MikroORM + Awilix), Q2 (bez Open Mercato), Q8 (Frankfurt). Q3–Q7 i Q9–Q12 nadal otwarte — blokują dopiero F4–F7.
+- 2026-11-11 — Storybook wchodzi do MVP (decyzja właściciela, [ADR-0006](../../docs/decisions/0006-design-system-storybook.md)): design system w `packages/ui` z dokumentacją w Storybooku 10, testy dostępności i interakcji stories w Vitest, oba motywy. Zmienia wiersz „Storybook” w tabeli narzędzi. Specyfikacja: `.ai/specs/2026-11-11-design-system-storybook.md`.
 
 ## Źródła
 
