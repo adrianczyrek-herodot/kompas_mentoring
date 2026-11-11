@@ -136,7 +136,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm db:migrate
-      - run: pnpm --filter @kompas/web exec playwright install --with-deps chromium
+      # The browser comes from the Playwright CDN; system packages come from the Ubuntu apt mirror,
+      # which can be unreachable from the runner. The runner image already has Chromium's libraries,
+      # so the apt step is best-effort and must not block the tests.
+      - run: pnpm --filter @kompas/web exec playwright install chromium
+      - run: timeout 300 pnpm --filter @kompas/web exec playwright install-deps chromium
+        continue-on-error: true
       - run: pnpm test:e2e
       - if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
