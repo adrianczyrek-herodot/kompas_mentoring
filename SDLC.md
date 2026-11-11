@@ -7,7 +7,7 @@ Proces dla ludzi i agentów AI (cezar + skille `open-mercato/skills`). Źródło
 | Etap | Co się dzieje | Narzędzie / właściciel | Wyjście |
 |---|---|---|---|
 | Specyfikacja | Jedna specyfikacja na fazę w `.ai/specs/` (szablon w `AGENTS.md`) z sekcją Open Questions. Implementacja startuje dopiero po odpowiedziach (bramka). Poprawka błędu nie wymaga specyfikacji. Decyzje trudne do odwrócenia → ADR w `docs/decisions/`. | `om-spec-writing`; człowiek akceptuje (`status: approved`) | Zaakceptowana spec |
-| Backlog | Spec dzielona na zadania o rozłącznym zakresie modułów. | `om-backlog` | Zadania/issues |
+| Backlog | Spec dzielona na zadania o rozłącznym zakresie modułów; pozycje w `.ai/specs/backlog.md` (§2a). | `om-backlog` | Zadania/issues |
 | Implementacja | Fazami, w osobnym worktree z własną gałęzią Neon; test w tym samym PR co kod; walidacja lokalna. Autonomiczny przebieg ma log w `.ai/runs/`. | `om-auto-implement-spec`, cezar; człowiek | PR (≤ ~400 linii) |
 | Review | Przegląd wg [CODE_REVIEW.md](CODE_REVIEW.md). Dla `billing`, `ledger`, `payouts`, `identity` i migracji — obowiązkowo człowiek, niezależnie od agentów. | `om-code-review`; człowiek | Zatwierdzenie |
 | QA | PR z etykietą `needs-qa` czeka na QA w przeglądarce na preview (360 i 1280 px). | `om-auto-qa-pr`; człowiek ustawia `qa-approved` | `qa-approved` |
@@ -21,6 +21,22 @@ Po wdrożeniu spec: `status: implemented`, `git mv` do `.ai/specs/implemented/` 
 - **Conventional Commits** z zakresem = moduł: `feat(booking): …`, `fix(ledger): …`, `docs(adr): …`, `chore(deps): …`. Typy: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`, `perf`. Kod, commity i nazwy plików po angielsku. Egzekwuje commitlint (lefthook).
 - **PR ≤ ~400 zmienionych linii** (bez migracji i snapshotów); jedna faza spec = jeden lub kilka PR.
 - Nigdy bezpośrednio na `main`; zmiany przez PR. Plików w `.ai/` commitujemy razem ze zmianą, której dotyczą.
+
+## 2a. Backlog, zgłoszenia i priorytety
+
+- **Źródła prawdy:** `.ai/specs/product-brief.md` (co i dlaczego, zakres Now/Later) → `.ai/specs/backlog.md` (epiki `E<n>`, historie `E<n>-S<m>`, zadania `E<n>-S<m>-T<k>`, pozycje Later `L<n>`) → GitHub Issues. Zmiana zakresu idzie w tej kolejności.
+- **Zgłoszenia** mają epiki i historie z zakresu Now; tytuł zaczyna się od identyfikatora z backlogu (`[E2-S3] …`, epik: `[E2] Epik: …`), a backlog linkuje numer zgłoszenia. Zadania to lista kontrolna w zgłoszeniu historii. Pozycje Later nie mają zgłoszeń, dopóki nie trafią do Now.
+- **Historia** opisuje: epik, oczekiwany rezultat, kryteria akceptacji, zależności (identyfikatory i numery zgłoszeń), zadania, źródła. **Epik** zawiera cel, listę kontrolną swoich historii z linkami i specyfikację fazy.
+- **Etykiety:** każde zgłoszenie ma dokładnie jedną etykietę `priority-*` i jedną kategorię (`feature`, `bug`, `documentation`, `refactor`, `security`, `dependencies`); etykiety `risk-*` i etapów pipeline'u dotyczą PR-ów.
+
+| Priorytet | Kiedy | Reakcja |
+|---|---|---|
+| `priority-extreme` | Awaria lub regresja na `main`/produkcji, luka bezpieczeństwa, ryzyko utraty pieniędzy lub danych | Natychmiast, przerywa bieżącą pracę |
+| `priority-high` | Ścieżka krytyczna zakresu Now — blokuje inne historie Now albo cel bieżącej fazy | Następna do podjęcia, przed `medium` |
+| `priority-medium` | Zakres Now poza ścieżką krytyczną | W kolejności zależności |
+| `priority-low` | Zakres Now „miło mieć”; pozycja Later, jeśli wyjątkowo ma zgłoszenie | Gdy brak pracy o wyższym priorytecie |
+
+Epik dostaje najwyższy priorytet spośród swoich historii. Błąd zgłoszony spoza backlogu: priorytet wg tabeli + pozycja w backlogu w ramach epiku, którego dotyczy.
 
 ## 3. Definicja ukończenia (każdy PR / faza)
 

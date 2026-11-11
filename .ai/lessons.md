@@ -15,6 +15,8 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 
 - **2026-11-10** — Konflikt scalenia rozwiązany przez „zostaw obie strony” sklejył dwa szkielety (PR #7 → `e4aa59c`): cztery `package.json`/`tsconfig.json` stały się niepoprawnym JSON-em, CI na `main` padło na `pnpm/action-setup`. Przy konfliktach `add/add` w plikach konfiguracyjnych wybierz jedną stronę; przed scaleniem PR z konfliktami sprawdź lokalnie `node -e "JSON.parse(...)"`/`pnpm install`. Naprawa: `git revert -m 1 <merge>` na gałęzi + PR.
 - **2026-11-10** — Konto `gh` w środowisku cezar może się zmienić między sesjami (było `adrianczyrek-herodot`, jest `aczyrek` bez uprawnień push → 403). Przed pushem sprawdź `gh api repos/<owner>/<repo> --jq .permissions`; przełączenie konta to decyzja człowieka.
+- **2026-11-11** — PR ze stosu (base = gałąź innego PR) scalony po scaleniu PR bazowego trafia na gałąź stosu, nie na `main` — tak krok 7 F1 (PR #19, #20) ominął `main`. Przed scaleniem PR-a ze stosu ustaw `gh pr edit <nr> --base main`; po scaleniu stosu sprawdź `git log origin/main..origin/<gałąź>` (puste = wszystko na `main`).
+- **2026-11-11** — Etykiety `priority-*` nadajemy wg tabeli w `SDLC.md` §2a; zgłoszenie z etykietami wymaga konta `gh` z uprawnieniem co najmniej triage (bez niego `gh issue create --label` się nie powiedzie).
 
 ## Domena i produkt
 
