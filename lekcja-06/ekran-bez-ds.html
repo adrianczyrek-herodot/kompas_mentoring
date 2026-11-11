@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kompas — mentoring 1:1 online</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --primary-light: #eef2ff;
+      --accent: #f59e0b;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --bg: #ffffff;
+      --bg-alt: #f9fafb;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+    .skip-link {
+      position: absolute; left: -9999px; top: 0;
+      background: var(--primary); color: #fff; padding: 8px 16px; z-index: 100;
+    }
+    .skip-link:focus { left: 16px; top: 16px; }
+
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.35rem; color: var(--primary); }
+    .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      display: grid; place-items: center; color: #fff; font-size: 1.1rem;
+    }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: var(--text-muted); font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-actions { display: flex; gap: 12px; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: .95rem;
+      border: 2px solid transparent; cursor: pointer; transition: all .2s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn-outline { border-color: var(--border); color: var(--text); background: #fff; }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-lg { padding: 14px 28px; font-size: 1.05rem; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(180deg, var(--primary-light) 0%, #fff 100%);
+      padding: 88px 0 72px;
+    }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; }
+    .badge {
+      display: inline-block; background: #fff; color: var(--primary);
+      border: 1px solid #c7d2fe; padding: 6px 14px; border-radius: 999px;
+      font-size: .85rem; font-weight: 600; margin-bottom: 20px;
+    }
+    .hero h1 { font-size: 3rem; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 20px; }
+    .hero h1 span { color: var(--primary); }
+    .hero p.lead { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 32px; max-width: 540px; }
+
+    .search-box {
+      display: flex; background: #fff; border-radius: var(--radius);
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.15); padding: 8px; gap: 8px;
+      border: 1px solid var(--border); max-width: 560px;
+    }
+    .search-box label { position: absolute; left: -9999px; }
+    .search-box input, .search-box select {
+      border: none; font-size: 1rem; padding: 10px 14px; font-family: inherit; color: var(--text); background: transparent;
+    }
+    .search-box input { flex: 1; min-width: 0; }
+    .search-box select { border-left: 1px solid var(--border); }
+    .search-box input:focus, .search-box select:focus { outline: none; }
+
+    .topics { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .topic {
+      padding: 6px 14px; border-radius: 999px; background: #fff; border: 1px solid var(--border);
+      font-size: .9rem; color: var(--text-muted); transition: all .2s;
+    }
+    .topic:hover { border-color: var(--primary); color: var(--primary); }
+
+    .hero-card {
+      background: #fff; border-radius: 20px; box-shadow: 0 20px 40px -12px rgba(0,0,0,.15);
+      padding: 28px; border: 1px solid var(--border);
+    }
+    .hero-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .hero-card .sub { color: var(--text-muted); font-size: .9rem; margin-bottom: 20px; }
+    .goal-bar { margin-bottom: 18px; }
+    .goal-bar .row { display: flex; justify-content: space-between; font-size: .9rem; margin-bottom: 6px; }
+    .goal-bar .track { height: 8px; background: var(--bg-alt); border-radius: 999px; overflow: hidden; }
+    .goal-bar .fill { height: 100%; background: linear-gradient(90deg, var(--primary), #7c3aed); border-radius: 999px; }
+    .milestones { list-style: none; display: grid; gap: 10px; margin-top: 20px; }
+    .milestones li { display: flex; align-items: center; gap: 10px; font-size: .95rem; }
+    .check {
+      width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+      font-size: .75rem; flex-shrink: 0;
+    }
+    .check.done { background: #d1fae5; color: #047857; }
+    .check.todo { background: var(--bg-alt); color: var(--text-muted); border: 1px solid var(--border); }
+    .note {
+      margin-top: 20px; padding: 14px; background: #fffbeb; border-left: 3px solid var(--accent);
+      border-radius: 8px; font-size: .9rem; color: #78350f;
+    }
+
+    /* Sections */
+    section { padding: 88px 0; }
+    section.alt { background: var(--bg-alt); }
+    .section-head { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+    .eyebrow { color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+    .section-head h2 { font-size: 2.25rem; line-height: 1.2; margin: 10px 0 14px; letter-spacing: -0.01em; }
+    .section-head p { color: var(--text-muted); font-size: 1.1rem; }
+
+    /* Steps */
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; counter-reset: step; }
+    .step {
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 28px 24px; position: relative; transition: transform .2s, box-shadow .2s;
+    }
+    .step:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: var(--primary);
+      display: grid; place-items: center; font-weight: 800; margin-bottom: 16px;
+    }
+    .step h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .step p { color: var(--text-muted); font-size: .95rem; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature { background: #fff; border-radius: var(--radius); padding: 32px 28px; border: 1px solid var(--border); }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+      font-size: 1.5rem; margin-bottom: 18px; background: var(--primary-light);
+    }
+    .feature h3 { font-size: 1.15rem; margin-bottom: 10px; }
+    .feature p { color: var(--text-muted); font-size: .95rem; }
+
+    /* Categories */
+    .categories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .category {
+      padding: 28px 24px; border-radius: var(--radius); border: 1px solid var(--border);
+      background: #fff; transition: all .2s; display: block;
+    }
+    .category:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+    .category .emoji { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .category h3 { font-size: 1.1rem; margin-bottom: 4px; }
+    .category p { color: var(--text-muted); font-size: .9rem; }
+    .category .arrow { color: var(--primary); font-weight: 600; font-size: .9rem; margin-top: 12px; display: inline-block; }
+
+    /* Mentor CTA */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .split h2 { font-size: 2.25rem; line-height: 1.2; margin: 10px 0 16px; }
+    .split p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 24px; }
+    .checklist { list-style: none; display: grid; gap: 14px; margin-bottom: 32px; }
+    .checklist li { display: flex; gap: 12px; align-items: flex-start; }
+    .checklist li::before {
+      content: "✓"; color: #047857; background: #d1fae5; border-radius: 50%;
+      width: 24px; height: 24px; display: grid; place-items: center; flex-shrink: 0; font-size: .8rem; font-weight: 700;
+    }
+    .mentor-panel {
+      background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff;
+      border-radius: 20px; padding: 36px;
+    }
+    .mentor-panel h3 { font-size: 1.3rem; margin-bottom: 20px; }
+    .onboarding { list-style: none; display: grid; gap: 12px; }
+    .onboarding li {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: rgba(255,255,255,.12); border-radius: 10px; font-size: .95rem;
+    }
+    .onboarding li span {
+      width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.25);
+      display: grid; place-items: center; font-weight: 700; font-size: .85rem; flex-shrink: 0;
+    }
+
+    /* Trust */
+    .trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .trust-item {
+      display: flex; gap: 16px; padding: 24px; background: #fff;
+      border-radius: var(--radius); border: 1px solid var(--border);
+    }
+    .trust-item .ico { font-size: 1.6rem; }
+    .trust-item h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .trust-item p { color: var(--text-muted); font-size: .95rem; }
+
+    /* Final CTA */
+    .cta {
+      background: var(--text); color: #fff; border-radius: 24px; padding: 64px 48px; text-align: center;
+    }
+    .cta h2 { font-size: 2.25rem; margin-bottom: 14px; }
+    .cta p { color: #d1d5db; font-size: 1.1rem; margin-bottom: 32px; }
+    .cta .btn-outline { background: transparent; color: #fff; border-color: #4b5563; }
+    .cta .btn-outline:hover { border-color: #fff; color: #fff; }
+    .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 48px 0 32px; color: var(--text-muted); font-size: .9rem; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+    .footer-grid h4 { color: var(--text); font-size: .95rem; margin-bottom: 12px; }
+    .footer-grid ul { list-style: none; display: grid; gap: 8px; }
+    .footer-grid a:hover { color: var(--primary); }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .hero-grid, .split { grid-template-columns: 1fr; }
+      .steps, .categories { grid-template-columns: repeat(2, 1fr); }
+      .features { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero { padding: 56px 0 48px; }
+      .hero h1 { font-size: 2.2rem; }
+      .section-head h2, .split h2, .cta h2 { font-size: 1.75rem; }
+      .steps, .categories, .trust-grid { grid-template-columns: 1fr; }
+      .search-box { flex-direction: column; }
+      .search-box select { border-left: none; border-top: 1px solid var(--border); }
+      .nav-actions .btn-outline { display: none; }
+      .cta { padding: 48px 24px; }
+      section { padding: 64px 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <header>
+    <div class="container nav">
+      <a href="#" class="logo" aria-label="Kompas — strona główna">
+        <span class="logo-icon" aria-hidden="true">🧭</span>
+        Kompas
+      </a>
+      <nav aria-label="Główna nawigacja">
+        <ul class="nav-links">
+          <li><a href="#jak-to-dziala">Jak to działa</a></li>
+          <li><a href="#dziedziny">Dziedziny</a></li>
+          <li><a href="#dla-mentorow">Dla mentorów</a></li>
+          <li><a href="#bezpieczenstwo">Bezpieczeństwo</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-outline">Zaloguj się</a>
+        <a href="#" class="btn btn-primary">Załóż konto</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div>
+          <span class="badge">Mentoring 1:1 online · IT, kariera, biznes, design</span>
+          <h1 id="hero-title">Mentoring, który mierzy się <span>postępem</span>, nie liczbą lekcji</h1>
+          <p class="lead">Znajdź mentora w swoim temacie i budżecie, obejrzyj jego wideo i opinie, a potem zarezerwuj tańszą sesję próbną 30 minut.</p>
+
+          <form class="search-box" role="search" onsubmit="return false;">
+            <label for="q">Czego chcesz się nauczyć?</label>
+            <input id="q" type="search" placeholder="Czego chcesz się nauczyć? np. React, awans, UX">
+            <label for="cat">Dziedzina</label>
+            <select id="cat">
+              <option>Wszystkie dziedziny</option>
+              <option>IT</option>
+              <option>Kariera</option>
+              <option>Biznes</option>
+              <option>Design</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Szukaj mentora</button>
+          </form>
+
+          <div class="topics" aria-label="Popularne dziedziny">
+            <a href="#" class="topic">💻 IT</a>
+            <a href="#" class="topic">🚀 Kariera</a>
+            <a href="#" class="topic">📈 Biznes</a>
+            <a href="#" class="topic">🎨 Design</a>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Przykład: cel i kamienie milowe ucznia">
+          <h3>🎯 Twój cel</h3>
+          <p class="sub">Uczeń ma cel i kamienie milowe — widzisz, dokąd zmierzasz.</p>
+          <div class="goal-bar">
+            <div class="row"><strong>Postęp celu</strong><span>2 z 4 kamieni milowych</span></div>
+            <div class="track"><div class="fill" style="width: 50%"></div></div>
+          </div>
+          <ul class="milestones">
+            <li><span class="check done" aria-hidden="true">✓</span> Sesja próbna — poznajemy się</li>
+            <li><span class="check done" aria-hidden="true">✓</span> Plan sesji tygodniowo</li>
+            <li><span class="check todo" aria-hidden="true">3</span> Zadania z ostatniej sesji</li>
+            <li><span class="check todo" aria-hidden="true">4</span> Kolejny kamień milowy</li>
+          </ul>
+          <div class="note">
+            <strong>📝 Notatka po sesji</strong><br>
+            Po każdej sesji mentor zostawia notatkę i zadania do wykonania.
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="jak-to-dziala" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Jak to działa</span>
+          <h2 id="how-title">Od wyszukania do stałej współpracy</h2>
+          <p>Cztery kroki, żeby trafić na mentora, z którym naprawdę chcesz pracować.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <h3>Znajdź mentora</h3>
+            <p>Przeszukaj mentorów z IT, kariery, biznesu i designu. Porównaj profile, wideo i opinie.</p>
+          </article>
+          <article class="step">
+            <h3>Zarezerwuj sesję próbną</h3>
+            <p>30 minut w obniżonej cenie, by sprawdzić, czy jest „chemia”. Termin wybierzesz w swojej strefie czasowej.</p>
+          </article>
+          <article class="step">
+            <h3>Wybierz plan</h3>
+            <p>1, 2, 3 lub 5 sesji tygodniowo po 30 albo 60 minut, rozliczane co 4 tygodnie.</p>
+          </article>
+          <article class="step">
+            <h3>Śledź postęp</h3>
+            <p>Cel, kamienie milowe, notatki po sesjach i zadania — wszystko w jednym miejscu.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="alt" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Dlaczego Kompas</span>
+          <h2 id="features-title">Przewidywalnie, elastycznie, bez ryzyka</h2>
+          <p>Zaprojektowaliśmy zasady tak, żeby nie bać się o pieniądze ani o dopasowanie.</p>
+        </div>
+        <div class="features">
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">🤝</div>
+            <h3>Sesja próbna bez ryzyka</h3>
+            <p>Maksymalnie jedna sesja próbna z danym mentorem. Jeśli nie pasuje — darmowa zamiana mentora albo zwrot.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">🗓️</div>
+            <h3>Łatwe przełożenie</h3>
+            <p>Przełóż lub anuluj sesję bez kosztów do 12 godzin przed jej rozpoczęciem.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">🎥</div>
+            <h3>Sesje w przeglądarce</h3>
+            <p>Spotykasz się z mentorem w pokoju wideo osadzonym w platformie — bez instalowania czegokolwiek.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">🌍</div>
+            <h3>Twoja strefa czasowa</h3>
+            <p>Wszystkie terminy widzisz w swojej strefie czasowej, niezależnie od tego, gdzie jest mentor.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">💳</div>
+            <h3>Przejrzyste saldo</h3>
+            <p>Opłacone sesje trafiają do salda u mentora. Rozliczenie co 4 tygodnie, bez zawiłości.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">⭐</div>
+            <h3>Prawdziwe opinie</h3>
+            <p>Opinie wystawiają tylko uczniowie po ukończonej i opłaconej sesji — z oznaczeniem „zweryfikowana sesja”.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section id="dziedziny" aria-labelledby="cat-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Dziedziny</span>
+          <h2 id="cat-title">W czym chcesz się rozwinąć?</h2>
+          <p>Junior, osoba przebranżawiająca się czy specjalista szukający awansu — znajdziesz praktyka, który był tam, gdzie Ty chcesz być.</p>
+        </div>
+        <div class="categories">
+          <a href="#" class="category">
+            <span class="emoji" aria-hidden="true">💻</span>
+            <h3>IT</h3>
+            <p>Programowanie, architektura, wejście do branży.</p>
+            <span class="arrow">Zobacz mentorów →</span>
+          </a>
+          <a href="#" class="category">
+            <span class="emoji" aria-hidden="true">🚀</span>
+            <h3>Kariera</h3>
+            <p>Przebranżowienie, awans, rozmowy rekrutacyjne.</p>
+            <span class="arrow">Zobacz mentorów →</span>
+          </a>
+          <a href="#" class="category">
+            <span class="emoji" aria-hidden="true">📈</span>
+            <h3>Biznes</h3>
+            <p>Własna działalność, zarządzanie, sprzedaż.</p>
+            <span class="arrow">Zobacz mentorów →</span>
+          </a>
+          <a href="#" class="category">
+            <span class="emoji" aria-hidden="true">🎨</span>
+            <h3>Design</h3>
+            <p>UX, UI, portfolio i warsztat projektowy.</p>
+            <span class="arrow">Zobacz mentorów →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- For mentors -->
+    <section id="dla-mentorow" class="alt" aria-labelledby="mentor-title">
+      <div class="container split">
+        <div>
+          <span class="eyebrow">Dla mentorów</span>
+          <h2 id="mentor-title">Dziel się doświadczeniem, my zajmiemy się resztą</h2>
+          <p>Jesteś praktykiem — freelancerem albo etatowcem, który chce dorobić? Kompas daje Ci uczniów bez marketingu i mało administracji.</p>
+          <ul class="checklist">
+            <li>Uczniowie trafiają do Ciebie z wyszukiwarki — bez własnego marketingu.</li>
+            <li>Pełna kontrola nad dostępnością, ustawianą w Twoim czasie lokalnym.</li>
+            <li>Regularny przychód dzięki planom sesji tygodniowo.</li>
+            <li>Weryfikacja wniosku w ciągu maksymalnie 2 dni roboczych.</li>
+          </ul>
+          <a href="#" class="btn btn-primary btn-lg">Zostań mentorem</a>
+        </div>
+        <div class="mentor-panel">
+          <h3>Onboarding w 6 krokach</h3>
+          <ol class="onboarding">
+            <li><span>1</span> Załóż konto mentora</li>
+            <li><span>2</span> Uzupełnij profil i zdjęcie</li>
+            <li><span>3</span> Dodaj link do wideo</li>
+            <li><span>4</span> Ustaw dostępność</li>
+            <li><span>5</span> Podaj dane do wypłat</li>
+            <li><span>6</span> Wyślij wniosek do weryfikacji</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust -->
+    <section id="bezpieczenstwo" aria-labelledby="trust-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Bezpieczeństwo i zaufanie</span>
+          <h2 id="trust-title">„Czy to prawdziwy ekspert?” — sprawdzamy to za Ciebie</h2>
+          <p>Zespół zaufania czuwa nad tym, żeby na platformie byli wyłącznie zweryfikowani mentorzy.</p>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <span class="ico" aria-hidden="true">🛡️</span>
+            <div>
+              <h3>Weryfikowani mentorzy</h3>
+              <p>Mentor jest widoczny publicznie dopiero po zatwierdzeniu wniosku: KYC, LinkedIn, dane do wypłat.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="ico" aria-hidden="true">💬</span>
+            <div>
+              <h3>Komunikacja w platformie</h3>
+              <p>Wykrywamy próby przeniesienia kontaktu lub płatności poza platformę — dla Twojego bezpieczeństwa.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="ico" aria-hidden="true">🔒</span>
+            <div>
+              <h3>Prywatność sesji</h3>
+              <p>Nie nagrywamy sesji. Notatki widzą tylko strony sesji. Możesz w każdej chwili wyeksportować lub usunąć swoje dane.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="ico" aria-hidden="true">🇪🇺</span>
+            <div>
+              <h3>Dane i pieniądze w UE</h3>
+              <p>Platforma po polsku, rozliczenia w PLN (także BLIK), dane przechowywane w Unii Europejskiej.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section aria-labelledby="cta-title" style="padding-top: 0;">
+      <div class="container">
+        <div class="cta">
+          <h2 id="cta-title">Zacznij od 30 minut</h2>
+          <p>Sesja próbna to najprostszy sposób, żeby sprawdzić, czy mentor jest dla Ciebie.</p>
+          <div class="cta-actions">
+            <a href="#" class="btn btn-primary btn-lg">Znajdź mentora</a>
+            <a href="#dla-mentorow" class="btn btn-outline btn-lg">Zostań mentorem</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="#" class="logo" style="margin-bottom: 12px;">
+            <span class="logo-icon" aria-hidden="true">🧭</span>
+            Kompas
+          </a>
+          <p>Marketplace mentoringu 1:1 online — IT, kariera, biznes, design.</p>
+        </div>
+        <div>
+          <h4>Uczniowie</h4>
+          <ul>
+            <li><a href="#">Szukaj mentora</a></li>
+            <li><a href="#jak-to-dziala">Jak to działa</a></li>
+            <li><a href="#">Sesja próbna</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Mentorzy</h4>
+          <ul>
+            <li><a href="#dla-mentorow">Zostań mentorem</a></li>
+            <li><a href="#">Weryfikacja</a></li>
+            <li><a href="#">Wypłaty</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Platforma</h4>
+          <ul>
+            <li><a href="#">Regulamin</a></li>
+            <li><a href="#">Polityka prywatności</a></li>
+            <li><a href="#">Zgłoś problem</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Kompas (nazwa robocza)</span>
+        <span>Dane i pieniądze w UE · PLN · BLIK</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
