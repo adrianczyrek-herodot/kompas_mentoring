@@ -17,10 +17,13 @@ Przełożyć karty referencji na plik decyzji `lekcja-06/referencje.md`: obserwa
 - Przeczytane: `.ai/specs/product-brief.md`, `kompas-mentoring/KONCEPCJA.md`. Brak `.ai/specs/research/` i brak zrzutów.
 - Agent przedstawił propozycje P1–P15, konflikty K1–K3 i luki. Użytkownik przyjął wszystkie propozycje, w K1 wybrał „gęsto w listach”, kolor i typografię zostawił do kolejnych kart, zrzutów nie dodaje.
 - Na prośbę użytkownika agent zaproponował karty R03 FT, R04 Notion, R05 GOV.UK i R06 HEY / Basecamp dla luk w kolorze, typografii i tonie. Wszystkie przyjęte, obserwacje oznaczone jako „z pamięci agenta”. Konflikty K4–K6 rozstrzygnął użytkownik.
+- Krok tokenów: istniejące tokeny w `packages/ui/src/styles/globals.css` (brak `tokens.css`). Kontrast policzony skryptem (WCAG 2.x) dla obu motywów; dziś nie przechodzą obramowanie pól (1,35 i 1,55), `--signal` (2,69) i `--warning` (4,46), poprawki są w propozycji. Użytkownik wybrał W1 (rdza jako `primary`), ocieplony ciemny motyw, kroje systemowe i 4 z 5 wartości bez referencji (cień nakładek odrzucony).
+- Na pytanie o produkt w drugim prompcie (DevMentor) użytkownik wybrał osobny plik, ale agent go nie utworzył; przy kroku tokenów użytkownik zdecydował: Kompas.
 - Podpis A01 sprawdzony w `lekcja-06/02-rekrutacja.html` (grep: `linear-gradient`, `background-clip: text`, `backdrop-filter`).
 
 ## Wynik
 - `lekcja-06/referencje.md`: 22 cechy (R01–R06), 4 antyreferencje (A01–A04), 6 rozstrzygniętych konfliktów (K1–K6), luki.
+- `lekcja-06/tokeny.md`: tabela tokenów (surowe, znaczeniowe, komponentów) z pochodzeniem, pary kontrastu dla obu motywów, zasady i cechy komponentów, luki. Do `globals.css` nic jeszcze nie wdrożono.
 
 ## Weryfikacja
 Dokument, bez kodu. `lekcja-06/` jest wykluczony z lintu (biome, ESLint), więc nie było czego uruchamiać.
@@ -28,6 +31,8 @@ Dokument, bez kodu. `lekcja-06/` jest wykluczony z lintu (biome, ESLint), więc 
 ## Problemy i otwarte kwestie
 - Karty R03–R06 nie mają zrzutów, a ich obserwacje pochodzą z pamięci agenta. Barwa akcentu i konkretny krój zostają na krok tokenów.
 - Brak referencji dla ruchu, pokoju U6 i e-maili transakcyjnych.
+- Tokeny nie są wdrożone w `packages/ui/src/styles/globals.css`; reguła szeryfu dla wszystkich h1–h3 jest tam sprzeczna z K6.
+- Plik `lekcja-06/referencje-devmentor.md` nie powstał.
 
 ## Wnioski
 Brak.
