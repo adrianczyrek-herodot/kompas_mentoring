@@ -32,7 +32,6 @@ Dokument, bez kodu. `lekcja-06/` jest wykluczony z lintu (biome, ESLint), więc 
 - Karty R03–R06 nie mają zrzutów, a ich obserwacje pochodzą z pamięci agenta. Barwa akcentu i konkretny krój zostają na krok tokenów.
 - Brak referencji dla ruchu, pokoju U6 i e-maili transakcyjnych.
 - Tokeny nie są wdrożone w `packages/ui/src/styles/globals.css`; reguła szeryfu dla wszystkich h1–h3 jest tam sprzeczna z K6.
-- Plik `lekcja-06/referencje-devmentor.md` nie powstał.
 
 ## Wnioski
-Brak.
+Dodany wpis w `.ai/lessons.md` (Proces i narzędzia): prompty z `lekcja-06/` opisują przykładowy DevMentor; stosujemy je do Kompasu.

@@ -19,6 +19,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-11** — Etykiety `priority-*` nadajemy wg tabeli w `SDLC.md` §2a; zgłoszenie z etykietami wymaga konta `gh` z uprawnieniem co najmniej triage (bez niego `gh issue create --label` się nie powiedzie).
 - **2026-11-11** — E2E w CI padało w `playwright install --with-deps` (`Temporary failure resolving 'azure.archive.ubuntu.com'`, `apt` kod 100) — testy w ogóle nie startowały, a kod nie był winny. Przeglądarkę instalujemy z CDN Playwrighta (`playwright install chromium`), a `install-deps` przez `apt` jest osobnym krokiem z `continue-on-error` (obraz runnera ma biblioteki Chromium). Czerwony job e2e → najpierw sprawdź, który krok padł.
 - **2026-11-11** — Biome (`biome ci .`) lintuje też HTML/CSS/JS spoza pakietów — materiały zewnętrzne dodane do repo (np. `lekcja-06/`) muszą być wykluczone w `files.includes` w `biome.json` (i w `ignores` ESLint), inaczej `pnpm lint` w CI pada. Nie poprawiaj takich materiałów pod lint — mają zostać w oryginale.
+- **2026-11-11** — Materiały kursu w `lekcja-06/` (prompty `*-devmentor.txt`, karty R01/R02/A01) opisują przykładową aplikację DevMentor. Nasz produkt to Kompas: prompt z kontekstem DevMentora wykonuj dla Kompasu (brief `.ai/specs/product-brief.md`, tokeny w `packages/ui/src/styles/globals.css`), nie twórz osobnych plików dla DevMentora.
 
 ## Domena i produkt
 
