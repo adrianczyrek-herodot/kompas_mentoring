@@ -1,0 +1,6 @@
+/*
+ * Storybook entry stylesheet: the package styles plus Storybook-only classes.
+ * `@source` lets Tailwind see classes used in docs blocks and pages (not exported from the package).
+ */
+@import "../src/styles/globals.css";
+@source "./";

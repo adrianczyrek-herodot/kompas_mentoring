@@ -7,7 +7,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | Etap | Stan | Data |
 |---|---|---|
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
-| 1. Fundamenty | w toku — **tabela tokenów czeka na zatwierdzenie** (nic nie zapisano w kodzie) | 2026-11-11 |
+| 1. Fundamenty | **zrobiony, czeka na „dalej”** | 2026-11-11 |
 | 2. Komponenty bazowe | nie zaczęty | — |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
@@ -50,7 +50,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 9. Antyreferencje: A01 generyczny wygląd AI (gradienty, szkło, iskierki, hero + 3 karty, duże zaokrąglenia i cienie wszędzie, zmyślone loga/opinie); A02 sztuczna presja (wyjątek: odliczanie blokady); A03 gamifikacja; A04 drobny druk (zasady 12 h pełnym tekstem przy akcji).
 10. Rozstrzygnięte konflikty K1–K6 jak wyżej (gęstość, rozmowa, postęp bez gamifikacji, ilość koloru, ton, szeryf).
 
-## Plan (propozycja do zatwierdzenia)
+## Plan (zatwierdzony 2026-11-11, Q1–Q5)
 
 ### Technika
 
@@ -187,13 +187,39 @@ Szacunek: ok. 30 stron przewodnika i podstaw + 75 stron komponentów; ok. 220 st
 | Z9 | Klasy przezroczystości (`ring-foreground/10`, `bg-muted/50`, `ring-ring/50`) i `color-mix(...)` w `button.tsx` | **zmień**: tokeny stanów (hover, focus) zamiast mieszania w komponentach | zasada 3 (każda wartość z tokenu) |
 | — | Usunąć | **nic** | — |
 
+## Etap 1 — co powstało
+
+- `lekcja-06/tokeny.md` — zatwierdzona tabela tokenów (3 warstwy, kontrast, decyzje nie-tokenowe).
+- `src/styles/tokens.css` — jedyny plik z surowymi wartościami: warstwa 1 `--raw-*`, warstwa 2 znaczeniowa (komentarz ze źródłem przy każdym tokenie), motyw jasny (`:root`, `.light`) i ciemny (`.dark`), warstwa 3 komponentów.
+- `src/styles/globals.css` — fonty IBM Plex z `@fontsource` (latin + latin-ext), Tailwind bez domyślnej palety i cieni, klasy z tokenów (`bg-surface-panel`, `text-text-muted`, `bg-action-primary`, `text-page-title`, `gap-group`, `p-panel`, `py-row-y`, `rounded-control`, `shadow-overlay`…), aliasy shadcn na tokenach.
+- `.storybook/` — `main.ts` (docs + `remark-gfm`, a11y, vitest; telemetria, komunikaty o nowej wersji i checklisty startowe wyłączone), `preview.tsx` (przełącznik motywu → klasa `dark` na `<html>`, także dla stron MDX; `a11y: { test: 'error' }`; widoki 320 / 768 / 1440; kolejność menu), `manager.ts` + `theme.ts` + `manager-head.html` (tylko nazwa „Kompas”, także w tytule karty), `storybook.css`, `preview.css` (strony dokumentacji w kolorach motywu).
+- Strony **Podstawy**: Kolor (role + zmierzony kontrast obu motywów), Typografia, Odstępy i układ, Kształt i głębia, Ruch, Ikony, Motywy (prawdziwe komponenty obok siebie w obu motywach). Bloki w `.storybook/blocks/` czytają żywe zmienne CSS.
+- Testy: `vitest.config.ts` + `scripts/test-stories-themes.mjs` (każda story w motywie jasnym i ciemnym); stories testowe `Podstawy/Testy podstaw` (pary kontrastu jako tekst — axe `color-contrast`).
+- `scripts/check-tokens.mjs` (`pnpm --filter @kompas/ui check:tokens`) — kolory spoza tokenów, klasy palety, wartości arbitralne, `var(--raw-*)` poza plikiem tokenów, `dark:` w komponentach; kod wyjścia 1.
+- ADR 0006, wpis w spec stacku, spec `.ai/specs/2026-11-11-design-system-storybook.md`.
+
+### Sprawdzone (2026-11-11)
+
+- `pnpm lint` (ESLint, Biome, dependency-cruiser, knip), `pnpm typecheck`, `pnpm test`, `pnpm build` (z `apps/web`) — przechodzą.
+- `pnpm --filter @kompas/ui build-storybook` — przechodzi.
+- `test:stories:themes` — 2 stories × 2 motywy, przechodzą (także z zimną pamięcią podręczną). Bramka a11y sprawdzona celowo złą story (kontrast 1,22 : 1) — test pada w obu motywach. Klasa `dark` na `<html>`, tło motywu i font Plex z polskimi znakami sprawdzone asercją w obu motywach.
+- 7 stron Podstaw w zbudowanym Storybooku w obu motywach, 320 / 768 / 1440 px (Playwright): tabele GFM renderują się (0 surowych `|---`), brak przewijania poziomego strony, brak błędów konsoli; zrzuty obejrzane.
+- `check:tokens` — samotest na podstawionych błędach (5/5 wykrytych, wariant `data-[state=open]:` nie zgłoszony). Na pakiecie: **32 wartości w 6 istniejących komponentach shadcn** (button 16, checkbox 5, card 4, input 4, field 2, alert 1) — do usunięcia w etapie 2.
+- Zbudowany CSS `apps/web`: 10 krojów IBM Plex z plików lokalnych, bez CDN, tokeny obecne.
+
+### Niesprawdzone
+
+- Wygląd ekranów `apps/web` (P4, S3) po zmianie tokenów w przeglądarce i e2e — wymagają Postgresa, a Docker nie działał w tej sesji. Do sprawdzenia: `docker compose up -d && pnpm db:migrate && pnpm test:e2e`.
+
 ## Otwarte pytania (do właściciela)
 
-- Zatwierdzenie tabeli tokenów (etap 1, krok 2) — przedstawiona w rozmowie 2026-11-11; propozycje oznaczone „P-T…”.
 - Z6 (rozmiary przycisków < 44 px) i Z8 (`role` w `Alert`) — decyzja przy etapie 2.
+- Propozycja: dołączyć `test:stories:themes` i `check:tokens` do CI po etapie 2 (dziś `check:tokens` pada na istniejących komponentach).
+- Propozycja (bez źródła w materiałach): „bez wersalików w etykietach, pogrubienie najwyżej 600” na stronie Typografia; „klasa `.light` tylko w dokumentacji” na stronie Motywy.
 
 ## Zatwierdzone decyzje
 
+- 2026-11-11 — tabela tokenów zatwierdzona w całości (P-T1–P-T10), zapis w `lekcja-06/tokeny.md`. Zatwierdzenie rozstrzyga Z1, Z3, Z4, Z5, Z7, Z9.
 - 2026-11-11 Q1 — tabelę tokenów proponuje agent (wg `od-decyzji-do-tokenow-devmentor.txt`), właściciel zatwierdza przed zapisem.
 - 2026-11-11 Q2 — **ciepły akcent zamiast zieleni** dla akcji głównej i stanów; zieleń najwyżej jako kolor sukcesu.
 - 2026-11-11 Q3 — krój **IBM Plex**: Sans (tekst, dane), Mono (kod), Serif (duże nagłówki P1 i P3).
@@ -203,4 +229,4 @@ Szacunek: ok. 30 stron przewodnika i podstaw + 75 stron komponentów; ok. 220 st
 
 ## Następny krok
 
-Po zatwierdzeniu tabeli tokenów: zapis do `lekcja-06/tokeny.md`, potem etap 1 — instalacja Storybooka i dodatków, `src/styles/tokens.css` (3 warstwy, oba motywy, aliasy shadcn), fonty IBM Plex z `@fontsource`, przełącznik motywu, strony Podstaw, `check:tokens`, testy stories w obu motywach.
+Etap 2, przed pierwszą partią: lista różnic kształtu, gęstości i stanów względem shadcn (wysokość kontrolek, promienie, obramowania, odstępy wewnętrzne, fokus) z decyzją przy każdej + pytania o Z6, Z8 i luki. Potem partie po ~6 komponentów (pierwsza: Button, Link, Input, Textarea, Field, Checkbox) ze stroną 13 sekcji, macierzą stanów (`data-preview-state`) i play functions.

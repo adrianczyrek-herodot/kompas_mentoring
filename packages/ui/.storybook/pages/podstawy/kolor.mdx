@@ -1,0 +1,44 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { ColorRoles, ContrastTable } from '../../blocks/color';
+
+<Meta title="Podstawy/Kolor" />
+
+# Kolor
+
+Kompas jest ciepły i rzeczowy: ciepłe, złamane tło, tekst w kolorze atramentu i **jeden** nasycony,
+ciepły akcent zarezerwowany dla akcji głównej i stanów (K4, R03.1, R04.1, R06.2). Kolor nie dekoruje.
+
+## Zasady
+
+| Zasada | Źródło |
+|---|---|
+| W komponentach używaj tylko tokenów znaczeniowych (`bg-surface-panel`, `text-text-muted`, `bg-action-primary`). Surowe wartości `--raw-*` istnieją tylko w `tokens.css`. | prompt, zasada 3; `lekcja-06/tokeny.md` |
+| Akcent (`action-primary`) ma na ekranie dokładnie jedno miejsce: akcję główną. Akcje drugorzędne są neutralne. | R01.6, R05.3, K4 |
+| Tło strony jest ciepłe i złamane, panele jaśniejsze, ale nie czysto białe. | R03.1, R04.1 |
+| Zieleń oznacza tylko sukces. Nie jest kolorem marki ani akcji. | decyzja Q2 (2026-11-11) |
+| Kolor nigdy nie jest jedynym nośnikiem znaczenia: status ma zawsze tekst albo ikonę z podpisem. | WCAG 1.4.1 |
+| Nie ma niebieskiego „info”. Informacja neutralna to `status-neutral-*`. | propozycja P-T3, K4 |
+| Bez gradientów, półprzezroczystego „szkła” i poświaty. | A01 |
+| Paleta domyślna Tailwinda jest wyłączona: `bg-zinc-900` czy `text-white` nie zadziałają. | prompt, zasada 3 |
+
+## Role kolorów
+
+Wartości poniżej są odczytane na żywo z `tokens.css` w obu motywach.
+
+<Unstyled>
+  <ColorRoles />
+</Unstyled>
+
+## Kontrast par tekstu i tła
+
+Każda para, której używamy, zmierzona w przeglądarce. Pary poniżej progu byłyby oznaczone
+„poniżej progu” z ikoną krzyżyka — teraz nie ma żadnej. Najmniejszy zapas mają sukces na własnym
+tle (4,52 : 1 w jasnym motywie) i akcja główna względem tła strony (3,08 : 1): przy każdej zmianie
+tych wartości sprawdź tę tabelę.
+
+<Unstyled>
+  <ContrastTable />
+</Unstyled>
+
+Linia między wierszami (`border-divider`) jest dekoracyjna: wiersze rozróżnia ich treść, więc nie
+podlega progowi 3 : 1. Granice pól i kontrolek używają `border-control` (WCAG 1.4.11).

@@ -1,0 +1,56 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Alert, AlertDescription, AlertTitle, Button, Card, CardContent, CardHeader, CardTitle, Checkbox, Field, FieldDescription, FieldLabel, Input, Label } from '../../../src';
+import { ThemeSideBySide } from '../../blocks/foundations';
+
+<Meta title="Podstawy/Motywy" />
+
+# Motywy
+
+Kompas ma motyw jasny i ciemny (spec stacku, tabela technologii: „tryb jasny/ciemny”; decyzja Q5:
+testy w obu motywach). Motyw to zestaw wartości tokenów znaczeniowych — komponenty się nie zmieniają.
+
+## Jak to działa
+
+| Zasada | Źródło |
+|---|---|
+| Motyw ustawia klasa `dark` na elemencie `<html>`. Dzięki temu dialogi, menu i popovery renderowane poza drzewem komponentu też go dostają. | prompt, zasada 9 |
+| Komponenty używają tylko tokenów znaczeniowych. Nie używaj wariantu `dark:` w komponentach — wartość dla ciemnego motywu jest w `tokens.css`. | prompt, zasada 3 |
+| Klasa `light` wymusza jasny motyw w poddrzewie (używana tylko w dokumentacji, do porównania obok siebie). | propozycja |
+| Każda story jest testowana w obu motywach (`pnpm --filter @kompas/ui test:stories:themes`). | prompt, etap 1 |
+| Aplikacja (`apps/web`) na razie nie ma przełącznika motywu; wybór motywu przez użytkownika to praca w produkcie (strona „Czego brakuje”). | stan repozytorium |
+
+Przełącznik motywu jest w pasku narzędzi Storybooka (ikona kontrastu).
+
+## Komponenty w obu motywach
+
+Prawdziwe komponenty z `@kompas/ui`. Wygląd komponentów bazowych dostosowujemy w etapie 2 — tu
+widać, że tokeny działają w obu motywach.
+
+<Unstyled>
+  <ThemeSideBySide>
+    <Card>
+      <CardHeader>
+        <CardTitle>Sesja próbna z Anną Kowalską</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-body-dense text-text-muted">wt., 18 listopada, 18:00–18:30 (Europa/Warszawa)</p>
+      </CardContent>
+    </Card>
+    <Field>
+      <FieldLabel>Z czym przychodzisz?</FieldLabel>
+      <Input placeholder="np. przygotowanie do rozmowy na stanowisko junior frontend" />
+      <FieldDescription>Od 20 do 500 znaków. Mentor przeczyta to przed sesją.</FieldDescription>
+    </Field>
+    <Label className="gap-inline">
+      <Checkbox /> Akceptuję regulamin i politykę prywatności
+    </Label>
+    <Alert>
+      <AlertTitle>Bezpłatnie przełożysz do 12 godzin przed sesją</AlertTitle>
+      <AlertDescription>Później sesja przepada (reguła 4 briefu).</AlertDescription>
+    </Alert>
+    <div className="flex flex-wrap gap-inline">
+      <Button>Zarezerwuj sesję próbną</Button>
+      <Button variant="outline">Napisz wiadomość</Button>
+    </div>
+  </ThemeSideBySide>
+</Unstyled>

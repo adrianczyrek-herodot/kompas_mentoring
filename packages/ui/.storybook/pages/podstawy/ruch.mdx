@@ -1,0 +1,23 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { MotionTokens } from '../../blocks/foundations';
+
+<Meta title="Podstawy/Ruch" />
+
+# Ruch
+
+Ruch potwierdza, że coś się stało, i nic więcej. Referencji ruchu brak (`referencje.md` → „Luki”),
+więc wartości czasów są **propozycją P-T8**, zatwierdzoną z tabelą tokenów.
+
+<Unstyled>
+  <MotionTokens />
+</Unstyled>
+
+## Zasady
+
+| Zasada | Źródło |
+|---|---|
+| Reakcja na działanie jest natychmiastowa: wysłana wiadomość pojawia się od razu, a przy błędzie dostaje „Ponów”. | R02.2, KONCEPCJA S1 |
+| Przejścia tylko z tokenów `duration-*` i `easing-standard` (klasy `duration-*`/`ease-standard` lub domyślne `transition`). | prompt, zasada 3 |
+| Przy `prefers-reduced-motion: reduce` czasy przejść skracają się do 100 ms, a ruch (przesunięcie, skalowanie) znika: komponenty z animacją przesunięcia dodają `motion-reduce:transform-none` / `motion-reduce:animate-none`. | WCAG 2.3.3 |
+| Bez animacji dekoracyjnych, konfetti i poświaty. | A01, A03 |
+| Jedyne odliczanie w interfejsie to blokada terminu (HoldCountdown) — informacja o rzeczywistej blokadzie, nie presja. | A02, reguła 5 briefu |

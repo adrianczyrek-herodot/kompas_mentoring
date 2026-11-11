@@ -61,7 +61,7 @@ Szczegółowe listy komponentów, wzorców, ekranów i drzewo menu: `packages/ui
 ## Plan wdrożenia
 
 1. Etap 0 — inwentaryzacja i plan (zrobione, decyzje Q1–Q5).
-2. Etap 1 — tabela tokenów do zatwierdzenia → `lekcja-06/tokeny.md`; Storybook i dodatki; tokeny w kodzie; fonty; przełącznik motywu; strony Podstaw; `check:tokens`.
+2. Etap 1 (zrobione 2026-11-11, czeka na „dalej”) — tabela tokenów do zatwierdzenia → `lekcja-06/tokeny.md`; Storybook i dodatki; tokeny w kodzie; fonty; przełącznik motywu; strony Podstaw; `check:tokens`.
 3. Etap 2 — różnice kształtu, gęstości i stanów względem shadcn; komponenty bazowe partiami po ~6.
 4. Etap 3 — komponenty produktu E1–E3, wzorce, ekrany z mapą stanów.
 5. Etap 4 — strony przewodnika i `docs/design-system.md`.
@@ -70,3 +70,6 @@ Szczegółowe listy komponentów, wzorców, ekranów i drzewo menu: `packages/ui
 ## Decyzje i zmiany
 
 - 2026-11-11 — Właściciel (etap 0): tokeny proponuje agent w etapie 1 (brak `tokeny.md`); **ciepły akcent zamiast zieleni** dla akcji głównej i stanów (K4, R06.2) — zieleń zostaje najwyżej jako kolor sukcesu; krój **IBM Plex** (Sans, Mono, Serif); Storybook mimo „nie w MVP” — wpis w spec stacku i [ADR-0006](../../docs/decisions/0006-design-system-storybook.md); zakres **Now (E1–E3), oba motywy**; dokumentacja po polsku.
+- 2026-11-11 — Właściciel zatwierdził tabelę tokenów w całości (z propozycjami P-T1–P-T10); zapisana w `lekcja-06/tokeny.md`.
+- 2026-11-11 — Etap 1, ustalenia techniczne: Storybook **10.6.6** (10.6.7 jest młodsze niż `minimumReleaseAge` 3 dni); `esbuild: false` w `allowBuilds` (binarka z pakietu opcjonalnego, skrypt instalacyjny zbędny); zmienne promieni i cienia nazwane `--shape-*` / `--depth-overlay`, bo `--radius-*` / `--shadow-*` to przestrzeń nazw Tailwinda (klasy bez zmian: `rounded-tag`, `shadow-overlay`); domyślna paleta kolorów i cienie Tailwinda wyłączone (`--color-*: initial`, `--shadow-*: initial`), rozmiary `text-xs…4xl` i promienie `sm…xl` zmapowane na tokeny, żeby `apps/web` działało bez zmian; aliasy shadcn i tokeny komponentów deklarowane na `:root, .light, .dark` (inaczej w poddrzewie z innym motywem zostają wartości z korzenia); klasa `.light` wymusza jasny motyw w poddrzewie (dokumentacja obok siebie); usunięty globalny szeryf w `h1–h3` (K6, Z3).
+- 2026-11-11 — Testy stories (`test:stories:themes`) są skryptem pakietu `@kompas/ui`, nie częścią `pnpm test` ani CI — dołączenie do CI (przeglądarka Playwright w jobie) to propozycja do decyzji właściciela. `check:tokens` kończy się błędem na 32 wartościach w istniejących komponentach shadcn — do usunięcia w etapie 2, więc skryptu jeszcze nie ma w CI.

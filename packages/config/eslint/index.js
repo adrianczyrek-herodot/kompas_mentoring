@@ -72,6 +72,7 @@ export function kompasEslintConfig({ tsconfigRootDir }) {
         '**/.next/**',
         '**/.turbo/**',
         '**/dist/**',
+        '**/storybook-static/**',
         '**/coverage/**',
         '**/playwright-report/**',
         '**/test-results/**',

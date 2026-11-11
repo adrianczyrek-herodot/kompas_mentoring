@@ -52,7 +52,7 @@ module.exports = {
   ],
   options: {
     doNotFollow: { path: ['node_modules'] },
-    exclude: { path: ['\\.next/', 'node_modules/', 'dist/', 'e2e/'] },
+    exclude: { path: ['\\.next/', 'node_modules/', 'dist/', 'e2e/', 'storybook-static/'] },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.depcruise.json' },
     enhancedResolveOptions: {

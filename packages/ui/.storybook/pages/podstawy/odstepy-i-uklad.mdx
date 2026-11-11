@@ -1,0 +1,39 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { LayoutWidths, SpaceRelations, SpacingExample } from '../../blocks/foundations';
+
+<Meta title="Podstawy/Odstępy i układ" />
+
+# Odstępy i układ
+
+Odstęp mówi, co do czego należy. Wybierasz **relację**, a nie liczbę: elementy jednej grupy są blisko,
+grupy dalej, sekcje najdalej. Skala bazowa to 4, 8, 12, 16, 24, 32, 48, 64 px (wartości: propozycja P-T7).
+
+## Relacje
+
+<Unstyled>
+  <SpaceRelations />
+</Unstyled>
+
+## Zasady
+
+| Zasada | Źródło |
+|---|---|
+| Gęsto w listach i tabelach (`py-row-y`, `text-body-dense`), przestronnie w rezerwacji (U1) i pokoju sesji (U6). | K1, R01.1 |
+| Wiersze list dzieli linia `border-divider`, nie odstęp ani cień. | R01.4 |
+| Cel dotyku co najmniej 44 × 44 px (`size-target`, `h-control`), także w gęstych listach — gęstość wynika z tekstu i odstępów, nie z mniejszych przycisków. | K1, WCAG 2.5.8 |
+| Odstępy tylko z klas relacji (`gap-inline`, `gap-group`, `p-panel`, `gap-section`, `py-row-y`) albo skali (`gap-2`, `p-4`). Bez wartości arbitralnych (`p-[13px]`). | prompt, zasada 3 |
+
+## Przykład: lista sesji (U4)
+
+<Unstyled>
+  <SpacingExample />
+</Unstyled>
+
+## Układ na szerokościach
+
+<Unstyled>
+  <LayoutWidths />
+</Unstyled>
+
+Szerokości 320, 768 i 1440 px są w pasku narzędzi Storybooka (ikona widoku). Każda story komponentu
+ma wariant na wąskim ekranie.

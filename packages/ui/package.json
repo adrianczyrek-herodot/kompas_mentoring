@@ -8,19 +8,40 @@
     "./styles.css": "./src/styles/globals.css"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev --port 6006 --no-open",
+    "build-storybook": "storybook build --output-dir storybook-static",
+    "test:stories": "vitest run",
+    "test:stories:themes": "node scripts/test-stories-themes.mjs",
+    "check:tokens": "node scripts/check-tokens.mjs"
   },
   "peerDependencies": {
     "react": "19.3.1"
   },
   "devDependencies": {
     "@kompas/config": "workspace:*",
+    "@storybook/addon-a11y": "10.6.6",
+    "@storybook/addon-docs": "10.6.6",
+    "@storybook/addon-vitest": "10.6.6",
+    "@storybook/react-vite": "10.6.6",
+    "@tailwindcss/vite": "4.3.3",
     "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/browser-playwright": "5.0.5",
+    "playwright": "1.64.1",
     "react": "19.3.1",
-    "typescript": "6.0.3"
+    "react-dom": "19.3.1",
+    "remark-gfm": "4.0.1",
+    "storybook": "10.6.6",
+    "typescript": "6.0.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/ibm-plex-serif": "5.3.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.70.0",
