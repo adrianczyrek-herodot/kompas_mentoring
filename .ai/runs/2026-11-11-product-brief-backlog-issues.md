@@ -22,6 +22,7 @@ Utworzyć `.ai/specs/product-brief.md` (produkt, odbiorcy, cele, reguły, Now/La
 
 - Decyzje właściciela: zgłoszenia tworzone kontem `adrianczyrek-herodot` (token tylko w komendach, bez przełączania aktywnego konta); Now = F1–F3 bez płatności (Q-B2).
 - Zgłoszenia utworzone skryptem poza repozytorium (dwa przebiegi: utworzenie, potem edycja treści z numerami powiązanych zgłoszeń); numery wpisane w backlog.
+- Po otwarciu PR #48: job `e2e smoke` padał 3× w `playwright install --with-deps` (DNS do mirrora Ubuntu na runnerze, `apt` kod 100) — testy nie startowały, kod niewinny. Na prośbę właściciela PR #49 (`ci.yml`: przeglądarka z CDN Playwrighta, `install-deps` osobno z `continue-on-error`, lekcja) — CI zielone, e2e 40 passed. Ponowne uruchomienie e2e na PR #48.
 
 ## Wynik
 - `.ai/specs/product-brief.md`, `.ai/specs/backlog.md` (4 epiki, 22 historie z zadaniami, Later L1–L16).
