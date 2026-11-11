@@ -79,6 +79,7 @@ Wszystkie pliki w `specs/`, `runs/` i `lessons/` **MUSZĄ** mieć nazwę `YYYY-M
 - `slug` — krótki opis w kebab-case: małe litery ASCII, cyfry i myślniki, bez polskich znaków i spacji, maks. ~6 słów. Przykład: `2026-10-20-przekladanie-sesji.md`.
 - Jeśli plik o takiej nazwie już istnieje, dodaj sufiks: `2026-10-20-przekladanie-sesji-2.md`.
 - Przy przenoszeniu (np. do `implemented/`) nazwa pliku się **nie zmienia** — używaj `git mv`.
+- Wyjątek: dokumenty żyjące `.ai/specs/product-brief.md` (produkt, zakres Now/Later) i `.ai/specs/backlog.md` (epiki, historie, zadania, zgłoszenia) mają stałe nazwy i nie są przenoszone. Zasady backlogu i priorytetów: `SDLC.md` §2a.
 
 ## Zasady obowiązkowe
 
