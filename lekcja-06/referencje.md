@@ -1,12 +1,12 @@
 # Referencje: Kompas
 
 - **Data:** 2026-11-11
-- **Kto wybierał:** Adrian Czyrek (karty R01, R02 i A01 przejęte z ćwiczenia DevMentora, uzasadnienia napisane pod Kompas)
+- **Kto wybierał:** Adrian Czyrek (karty R01, R02 i A01 przejęte z ćwiczenia DevMentora, uzasadnienia napisane pod Kompas). Karty R03–R06 zaproponował agent, a Adrian Czyrek przyjął je 2026-11-11.
 - **Źródła wiedzy o produkcie:** `.ai/specs/product-brief.md`, `kompas-mentoring/KONCEPCJA.md`. Wywiadów z użytkownikami brak.
 - **Słowa charakteru (potwierdzone):** czytelny, gęsty, ciepły, uporządkowany, rzeczowy
 - **Antycharakter (potwierdzony):** generyczny, efekciarski, hałaśliwy, bezbarwny, natarczywy
 
-> Do żadnej karty nie ma zrzutu ani linku. Każda obserwacja to parafraza słownego opisu. To, czego bez zrzutu nie wiadomo, jest zaznaczone w obserwacji.
+> Do żadnej karty nie ma zrzutu ani linku. Obserwacje R01 i R02 to parafraza słownego opisu. Obserwacje R03–R06 agent napisał z pamięci i trzeba je sprawdzić na zrzucie. To, czego bez zrzutu nie wiadomo, jest zaznaczone w obserwacji. Karty R03–R06 nie mają wagi od wybierającego, więc w kolumnie „Waga” jest propozycja.
 
 ## Referencje
 
@@ -24,6 +24,16 @@
 | R02.4 | Slack | opis słowny, bez zrzutu | Adrian Czyrek | Dużo powiadomień i oznaczeń nieprzeczytanych („za dużo powiadomień”). | — | Liczników i powiadomień o wszystkim | Powiadamiamy tylko o tym, co wymaga działania albo zmienia termin. Bez liczników przy każdym elemencie (P6). | Mentor chce mieć mało administracji. S3 ma już preferencje powiadomień dla każdego typu. | ruch i reakcja | warto | przyjęte (P6) |
 | R02.5 | Slack | opis słowny, bez zrzutu | Adrian Czyrek | Emoji w wiadomościach, w reakcjach i w interfejsie („emoji wszędzie”). | — | Reakcji emoji i emoji w interfejsie | Ikony tylko funkcyjne (P7) | Płatna relacja z ekspertem, a uczeń boi się straty pieniędzy, więc ton jest rzeczowy. Częściowo to gust. | ton wypowiedzi | warto | przyjęte (P7) |
 | R02.6 | Slack | opis słowny, bez zrzutu | Adrian Czyrek | Boczny pasek z wieloma listami („bałagan w bocznym pasku”). | — | Bocznego paska z listami kanałów | Stała, krótka nawigacja z 5 pozycji, jak w KONCEPCJI §3, np. dla ucznia: Szukaj · Sesje · Wiadomości · Postępy · Konto (P8) | Produkt jest mobile-first (Z9), a dolna nawigacja z 5 pozycji jest już w mapie ekranów. | kompozycja i gęstość | warto | przyjęte (P8) |
+| R03.1 | Financial Times: strona rynków | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Tło strony nie jest białe, tylko ciepłe i złamane (u FT łososiowe). Tekst ciemny, w kolorze atramentu, nie czarny. | Ciepłe, złamane tło zamiast czystej bieli. Tekst w kolorze atramentu. | Łososiowego koloru, bo to znak rozpoznawczy marki FT | Ciepłe tło w odcieniu wspólnym z ciepłymi szarościami (P1) | Kompas obraca pieniędzmi i ma budzić zaufanie (C3). Ciepłe tło realizuje „ciepły” bez dodawania koloru. | kolor | propozycja: musi być | przyjęte (karta agenta); ilość koloru w K4 |
+| R03.2 | Financial Times | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Nagłówki krojem szeryfowym, tekst i dane krojem bezszeryfowym. | Szeryfowe nagłówki przy bezszeryfowym tekście | Krojów marki FT | — | Szeryf w nagłówkach odróżnia Kompas od generycznego wyglądu AI (A01). Uzasadnienie w produkcie jest słabe, to głównie odróżnienie. | typografia | propozycja: warto | przyjęte (karta agenta); konflikt K6 |
+| R03.3 | Financial Times | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Gęste tabele notowań: wiele wierszy liczb wyrównanych w kolumnach, cienkie linie podziału. | Gęste tabele liczb wyrównanych w kolumnach | — | — | Zarobki M5, historia płatności U8 i siatka slotów U1. Wzmacnia R01.1, R01.3 i K1. | kompozycja i gęstość | propozycja: warto | przyjęte (karta agenta) |
+| R04.1 | Notion: strona dokumentu | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Tekst i linie w ciepłych szarościach z domieszką brązu, a nie w chłodnych niebieskawych. Tło jasne. | Ciepłe szarości tekstu, linii i tła | Pustych, bardzo przestronnych stron, które kłócą się z gęstością (K1) | — | Konkretny wzór dla P1 („mało ciepła” w R01). | kolor | propozycja: musi być | przyjęte (karta agenta) |
+| R04.2 | Notion | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Koloru prawie nie ma. Akcent pojawia się tylko w wybranych elementach (np. linki, zaznaczenia). | Akcent używany rzadko, tylko tam, gdzie coś znaczy | Palety bez akcentu, czyli tego samego problemu co „wszystko szare” w R01 (P3) | Akcent zarezerwowany dla akcji głównej (P2) i stanów | Akcent prowadzi do jednego następnego kroku na ekranie (C2). | kolor | propozycja: warto | przyjęte (karta agenta); konflikt K4 |
+| R05.1 | GOV.UK: formularz usługi | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Duży tekst bezszeryfowy, jedno pytanie albo jedna sekcja na ekran, wyraźna hierarchia nagłówków. | Duży, czytelny tekst i jasna hierarchia | Kroju marki (GDS Transport) i urzędowego chłodu | Ciepłe tło i ciepłe szarości (R03.1, R04.1) | WCAG 2.2 AA (C6). Uczeń przebranżawiający się nie zna branżowego żargonu. | typografia | propozycja: musi być | przyjęte (karta agenta); konflikt K6 |
+| R05.2 | GOV.UK | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Prosty język: krótkie zdania, zwracanie się wprost do użytkownika, bez żargonu, komunikaty błędów mówią, co poprawić. | Prosty język i komunikaty błędów z instrukcją | Urzędowego, bezosobowego tonu | — | Uczeń boi się zawiłych rozliczeń, a reguła 12 h musi być zrozumiała od razu (A04). | ton wypowiedzi | propozycja: musi być | przyjęte (karta agenta) |
+| R05.3 | GOV.UK | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Jeden wyraźny przycisk akcji (zielony „Start now”), pozostałe akcje jako linki. | Jeden wyraźny przycisk akcji na ekranie | Zielonego koloru przycisku, bo kolor akcentu jest otwarty (K4) | — | Wzór dla P2 i dla „trudno się zorientować” w R01.6. | komponenty | propozycja: musi być | przyjęte (karta agenta) |
+| R06.1 | HEY / Basecamp (37signals) | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Teksty pisane jak przez człowieka: bezpośrednie, w pierwszej osobie, bez korporacyjnych zwrotów, czasem z humorem. | Bezpośredni, ludzki ton | Żartobliwości w miejscach dotyczących pieniędzy, terminów i sporów | Rzeczowość tam, gdzie chodzi o pieniądze i terminy (K5) | Mentoring to relacja z człowiekiem („chemia”). Ton ludzki, a nie systemowy. | ton wypowiedzi | propozycja: warto | przyjęte (karta agenta); konflikt K5 |
+| R06.2 | HEY / Basecamp | z pamięci agenta, do sprawdzenia | agent, przyjął Adrian Czyrek | Jeden ciepły, nasycony akcent (u Basecampa żółty) na spokojnym tle. Bez zrzutu nie wiadomo, gdzie dokładnie się pojawia. | Jeden ciepły akcent | Konkretnego koloru marki | — | „Ciepły” z charakteru. Jeden akcent wspiera P2. | kolor | propozycja: warto | przyjęte (karta agenta); konflikt K4 |
 
 ## Antyreferencje
 
@@ -41,12 +51,16 @@
 | K1. R01 chce gęstości, a produkt jest mobile-first i ma spełniać WCAG 2.2 AA (cele dotyku) | R01.1, KONCEPCJA Z9, brief C6 | Gęsto w listach i tabelach (lista mentorów, Moje sesje, panel M2, zarobki M5), przestronnie w rezerwacji i w pokoju sesji. Cele dotyku nie mniejsze niż 44 px; tę wartość zaproponował agent. | Adrian Czyrek, 2026-11-11 |
 | K2. R02 stawia rozmowę w centrum, a rdzeń Kompasu to rezerwacja i sesja wideo | R02.1 | Rozmowa w centrum tylko w S1 i w czacie U6 (P9) | Adrian Czyrek, 2026-11-11 |
 | K3. Odrzucenie gamifikacji kontra cel C5 „widać postęp ucznia” | A03, brief C5 | Postęp jako cel, kamienie milowe, notatki i zadania, bez punktów i odznak (P12) | Adrian Czyrek, 2026-11-11 |
+| K4. Ilość koloru: prawie żadnego (Notion) kontra jeden wyraźny, nasycony akcent (HEY / Basecamp) | R04.2, R06.2 | **Otwarte.** Propozycja: ciepłe neutralne tło i tekst (R03.1, R04.1) oraz jeden nasycony akcent wyłącznie dla akcji głównej (P2) i stanów. | otwarte |
+| K5. Ton: ludzki z humorem (HEY / Basecamp) kontra „rzeczowy” w słowach charakteru i prosty język (GOV.UK) | R06.1, R05.2, P14 | **Otwarte.** Propozycja: ton bezpośredni i ludzki wszędzie, humor tylko w pustych stanach i powitaniach, nigdy przy pieniądzach, terminach i sporach. | otwarte |
+| K6. Krój nagłówków: szeryfowy (FT) kontra jedna rodzina bezszeryfowa (GOV.UK i kierunek „jedna rodzina z wersją o stałej szerokości”) | R03.2, R05.1, Luki | **Otwarte.** Propozycja: tekst, dane i kod w jednej rodzinie bezszeryfowej z wersją o stałej szerokości. Szeryf tylko w dużych nagłówkach stron publicznych (start, profil mentora) albo wcale. | otwarte |
 
 ## Luki
 
-- **Kolor, kierunek pozytywny:** karty mówią tylko, czego nie robić (same szarości, fioletowy gradient), i dają kierunek „ciepłe szarości”. Brakuje koloru akcentu i palety. **Czeka na karty R03 i kolejne** (decyzja: „Dodam referencje”).
-- **Typografia, krój główny:** jest tylko krój o stałej szerokości dla kodu i cyfr. Nie ma kroju tekstu ani nagłówków ani skali. **Czeka na karty R03 i kolejne.**
-- **Ton wypowiedzi:** jest tylko negatyw (bez emoji, R02.5). Brakuje referencji dla tonu tekstów: komunikatów błędów, pustych stanów, e-maili.
+- **Kolor:** kierunek jest (R03.1, R04.1, R04.2, R06.2), ale ilość koloru zależy od K4. Barwa akcentu nie wynika z żadnej karty. Wiadomo tylko, że nie fiolet (A01) i że ciepły (R06.2).
+- **Typografia, propozycja (przyjęta jako kierunek):** jedna rodzina kroju z wersją o stałej szerokości i pełnymi polskimi znakami, żeby tekst, cyfry (P5) i kod (P4) do siebie pasowały. Konkretny krój i skalę wybieramy przy tokenach. Rola szeryfu zależy od K6.
+- **Ton wypowiedzi:** karty są (R05.2, R06.1), granice humoru zależą od K5. Brakuje wzoru dla e-maili transakcyjnych.
+- **Karty R03–R06:** wybrał je agent, nie Ty z własnego doświadczenia. Waga i obserwacje są do potwierdzenia na zrzutach.
 - **Ruch i reakcja:** jest tylko R02.2 i R02.4. Brakuje referencji dla animacji, przejść i potwierdzeń (np. „Ten termin został właśnie zajęty”).
 - **Pokój sesji U6 (wideo):** kluczowy ekran bez żadnej referencji.
 - **Zrzuty:** brak. Obserwacje to parafrazy (decyzja: zostawiamy). Otwarte: ile linii ma wiersz w R01, czy wiersze mają naprzemienne tło, jak są podzielone kolumny w R02.
@@ -58,6 +72,10 @@ Brak plików. Po dodaniu zrzutów nazwy powinny wyglądać tak:
 
 - `R01-github-lista-pr.png`
 - `R02-slack-watek.png`
+- `R03-ft-strona-rynkow.png`
+- `R04-notion-dokument.png`
+- `R05-govuk-formularz.png`
+- `R06-basecamp-ton-i-akcent.png`
 - `A01-startup-ai.png`
 
 ---
