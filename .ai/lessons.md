@@ -15,6 +15,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 
 - **2026-11-10** — Konflikt scalenia rozwiązany przez „zostaw obie strony” sklejył dwa szkielety (PR #7 → `e4aa59c`): cztery `package.json`/`tsconfig.json` stały się niepoprawnym JSON-em, CI na `main` padło na `pnpm/action-setup`. Przy konfliktach `add/add` w plikach konfiguracyjnych wybierz jedną stronę; przed scaleniem PR z konfliktami sprawdź lokalnie `node -e "JSON.parse(...)"`/`pnpm install`. Naprawa: `git revert -m 1 <merge>` na gałęzi + PR.
 - **2026-11-10** — Konto `gh` w środowisku cezar może się zmienić między sesjami (było `adrianczyrek-herodot`, jest `aczyrek` bez uprawnień push → 403). Przed pushem sprawdź `gh api repos/<owner>/<repo> --jq .permissions`; przełączenie konta to decyzja człowieka.
+- **2026-11-11** — E2E w CI padało w `playwright install --with-deps` (`Temporary failure resolving 'azure.archive.ubuntu.com'`, `apt` kod 100) — testy w ogóle nie startowały, a kod nie był winny. Przeglądarkę instalujemy z CDN Playwrighta (`playwright install chromium`), a `install-deps` przez `apt` jest osobnym krokiem z `continue-on-error` (obraz runnera ma biblioteki Chromium). Czerwony job e2e → najpierw sprawdź, który krok padł.
 
 ## Domena i produkt
 
