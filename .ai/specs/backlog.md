@@ -35,12 +35,12 @@ E1-S1 ─▶ E2-S4 (admin z 2FA)        E4-S1, E4-S2 — równolegle, bez zależ
 
 ### E1 — Domknięcie tożsamości (F1)
 
-Zgłoszenie epiku: —  ·  P: high  ·  Spec: [F1](2026-11-10-f1-tozsamosc.md)
+Zgłoszenie epiku: [#22](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/22)  ·  P: high  ·  Spec: [F1](2026-11-10-f1-tozsamosc.md)
 
 | ID | Historia | P | Zależy od | Zgłoszenie |
 |---|---|---|---|---|
-| E1-S1 | Krok 7 F1 na `main`: CLI kont administratorów i wymuszone 2FA TOTP | high | — | — |
-| E1-S2 | Zamknięcie specyfikacji F1 (kryteria, logowanie społecznościowe, zrzuty wzorcowe, `implemented/`) | med | E1-S1 | — |
+| E1-S1 | Krok 7 F1 na `main`: CLI kont administratorów i wymuszone 2FA TOTP | high | — | [#26](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/26) |
+| E1-S2 | Zamknięcie specyfikacji F1 (kryteria, logowanie społecznościowe, zrzuty wzorcowe, `implemented/`) | med | E1-S1 | [#27](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/27) |
 
 - **E1-S1** — PR #19 i #20 scalono do gałęzi stosu `cez/f1-6-account`, nie do `main` (commity `3326c2d`, `3a7e47b`, `f5a119e`).
   - T1 PR na `main` z commitami kroku 7 (rebase na `main`, bez konfliktów w JSON-ach — lekcja 2026-11-10).
@@ -53,18 +53,18 @@ Zgłoszenie epiku: —  ·  P: high  ·  Spec: [F1](2026-11-10-f1-tozsamosc.md)
 
 ### E2 — Katalog i onboarding mentora (F2)
 
-Zgłoszenie epiku: —  ·  P: high  ·  Moduły: `catalog`, `trust`
+Zgłoszenie epiku: [#23](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/23)  ·  P: high  ·  Moduły: `catalog`, `trust`
 
 | ID | Historia | P | Zależy od | Zgłoszenie |
 |---|---|---|---|---|
-| E2-S1 | Specyfikacja F2 z otwartymi pytaniami i akceptacją właściciela | high | — | — |
-| E2-S2 | Onboarding mentora M1, kroki 1–4 (O mnie, kompetencje, opis i wideo, stawka) z zapisem szkicu | high | E2-S1 | — |
-| E2-S3 | Onboarding M1, kroki 5–6 (dostępność, weryfikacja i dane do wypłat/DAC7) i wysłanie wniosku | high | E2-S2, E3-S2 | — |
-| E2-S4 | Weryfikacja mentorów A1 (kolejka, decyzje, audyt, publikacja profilu) | high | E2-S3, E1-S1 | — |
-| E2-S5 | Wyszukiwarka mentorów P2 (filtry w URL, sortowanie, paginacja) | high | E2-S4 | — |
-| E2-S6 | Profil mentora P3 | high | E2-S4 | — |
-| E2-S7 | Strona główna P1 (wyszukiwanie tematu, kategorie, wyróżnieni) | med | E2-S5 | — |
-| E2-S8 | Ulubieni mentorzy | low | E2-S5 | — |
+| E2-S1 | Specyfikacja F2 z otwartymi pytaniami i akceptacją właściciela | high | — | [#28](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/28) |
+| E2-S2 | Onboarding mentora M1, kroki 1–4 (O mnie, kompetencje, opis i wideo, stawka) z zapisem szkicu | high | E2-S1 | [#29](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/29) |
+| E2-S3 | Onboarding M1, kroki 5–6 (dostępność, weryfikacja i dane do wypłat/DAC7) i wysłanie wniosku | high | E2-S2, E3-S2 | [#30](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/30) |
+| E2-S4 | Weryfikacja mentorów A1 (kolejka, decyzje, audyt, publikacja profilu) | high | E2-S3, E1-S1 | [#31](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/31) |
+| E2-S5 | Wyszukiwarka mentorów P2 (filtry w URL, sortowanie, paginacja) | high | E2-S4 | [#32](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/32) |
+| E2-S6 | Profil mentora P3 | high | E2-S4 | [#33](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/33) |
+| E2-S7 | Strona główna P1 (wyszukiwanie tematu, kategorie, wyróżnieni) | med | E2-S5 | [#34](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/34) |
+| E2-S8 | Ulubieni mentorzy | low | E2-S5 | [#35](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/35) |
 
 - **E2-S1** — T1 Spec `.ai/specs/YYYY-MM-DD-f2-katalog-onboarding.md`: model `MentorProfile` i `MentorApplication`, maszyna stanów profilu (`draft → submitted → changes_requested/approved/rejected/suspended`), porty `StorageProvider` (R2) i KYC, read model wyszukiwarki (widok SQL, `pg_trgm`, `unaccent`), pola DAC7. T2 Odpowiedzi właściciela (m.in. dostawca KYC przed F4, szyfrowanie danych DAC7), `status: approved`.
 - **E2-S2** — T1 Domena profilu i polityki walidacji (headline 20–80, opis 300–2000, 1–5 kategorii, 3–15 tagów, stawka 40–1000 zł jako `Money`). T2 Port `StorageProvider` + adapter R2 + fake, upload zdjęcia przez presigned URL (JPG/PNG ≥ 400×400, ≤ 5 MB). T3 UI: stepper, kroki 1–4, wideo jako link YouTube/Vimeo, podgląd zarobku, zapis szkicu po każdym kroku. T4 E2E.
@@ -77,20 +77,20 @@ Zgłoszenie epiku: —  ·  P: high  ·  Moduły: `catalog`, `trust`
 
 ### E3 — Dostępność i rezerwacje (F3, moduł wzorcowy)
 
-Zgłoszenie epiku: —  ·  P: high  ·  Moduły: `scheduling`, `notifications`, `identity`
+Zgłoszenie epiku: [#24](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/24)  ·  P: high  ·  Moduły: `scheduling`, `notifications`, `identity`
 
 | ID | Historia | P | Zależy od | Zgłoszenie |
 |---|---|---|---|---|
-| E3-S1 | Specyfikacja F3 z otwartymi pytaniami i akceptacją właściciela | high | — | — |
-| E3-S2 | Dostępność mentora M3 (szablon tygodniowy, wyjątki, wyprzedzenie, bufor, wstrzymanie przyjmowania) | high | E3-S1 | — |
-| E3-S3 | Silnik slotów z poprawną obsługą stref czasowych i DST | high | E3-S2 | — |
-| E3-S4 | Wybór terminu U1 z blokadą 10 min i utworzenie rezerwacji | high | E3-S3, E2-S6 | — |
-| E3-S5 | Moje sesje U4 i szczegóły sesji U5 | med | E3-S4 | — |
-| E3-S6 | Przełożenie i anulowanie sesji z regułą 12 h | high | E3-S5 | — |
-| E3-S7 | Prośby o sesję próbną w panelu mentora M2 (akceptuj / odrzuć, SLA 24 h) | med | E3-S4 | — |
-| E3-S8 | Powiadomienia: e-mail (SES), przypomnienia 24 h i 1 h, lista S2 | med | E3-S4 | — |
-| E3-S9 | Weryfikacja e-maila przed pierwszą rezerwacją, reset hasła, zmiana e-maila | med | E3-S8 | — |
-| E3-S10 | Synchronizacja z Google Calendar (freebusy) | med | E3-S3 | — |
+| E3-S1 | Specyfikacja F3 z otwartymi pytaniami i akceptacją właściciela | high | — | [#36](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/36) |
+| E3-S2 | Dostępność mentora M3 (szablon tygodniowy, wyjątki, wyprzedzenie, bufor, wstrzymanie przyjmowania) | high | E3-S1 | [#37](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/37) |
+| E3-S3 | Silnik slotów z poprawną obsługą stref czasowych i DST | high | E3-S2 | [#38](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/38) |
+| E3-S4 | Wybór terminu U1 z blokadą 10 min i utworzenie rezerwacji | high | E3-S3, E2-S6 | [#39](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/39) |
+| E3-S5 | Moje sesje U4 i szczegóły sesji U5 | med | E3-S4 | [#40](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/40) |
+| E3-S6 | Przełożenie i anulowanie sesji z regułą 12 h | high | E3-S5 | [#41](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/41) |
+| E3-S7 | Prośby o sesję próbną w panelu mentora M2 (akceptuj / odrzuć, SLA 24 h) | med | E3-S4 | [#42](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/42) |
+| E3-S8 | Powiadomienia: e-mail (SES), przypomnienia 24 h i 1 h, lista S2 | med | E3-S4 | [#43](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/43) |
+| E3-S9 | Weryfikacja e-maila przed pierwszą rezerwacją, reset hasła, zmiana e-maila | med | E3-S8 | [#44](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/44) |
+| E3-S10 | Synchronizacja z Google Calendar (freebusy) | med | E3-S3 | [#45](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/45) |
 
 - **E3-S1** — T1 Spec `.ai/specs/YYYY-MM-DD-f3-dostepnosc-rezerwacje.md`: maszyna stanów `Booking` (§4.3 spec stacku), oba ograniczenia wykluczające i indeks sesji próbnej (§4.4), sposób potwierdzania rezerwacji przed F4 (Q-B2 briefu), zdarzenia dla F4 (rezerwacja kredytu). T2 Odpowiedzi właściciela, `status: approved`.
 - **E3-S2** — T1 Domena `AvailabilityRule`/`AvailabilityException` (przedziały bez nakładania, min. 30 min, wyprzedzenie 2–48 h, bufor 0–30 min). T2 UI M3: tydzień, edytor szablonu (klik/przeciągnięcie), wyjątki, ustawienia; pusta dostępność → baner. T3 Konflikt z istniejącą sesją przy usuwaniu dostępności → lista sesji. T4 E2E.
@@ -105,12 +105,12 @@ Zgłoszenie epiku: —  ·  P: high  ·  Moduły: `scheduling`, `notifications`,
 
 ### E4 — Fundamenty i decyzje
 
-Zgłoszenie epiku: —  ·  P: med
+Zgłoszenie epiku: [#25](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/25)  ·  P: med
 
 | ID | Historia | P | Zależy od | Zgłoszenie |
 |---|---|---|---|---|
-| E4-S1 | Środowisko preview per PR (Cloud Run + gałąź Neon) i Sentry z DSN | med | — | — |
-| E4-S2 | Odpowiedzi na otwarte pytania blokujące Later (Q3–Q7, Q9–Q12 spec stacku, Q-B1–Q-B6 briefu) | med | — | — |
+| E4-S1 | Środowisko preview per PR (Cloud Run + gałąź Neon) i Sentry z DSN | med | — | [#46](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/46) |
+| E4-S2 | Odpowiedzi na otwarte pytania blokujące Later (Q3–Q7, Q9–Q12 spec stacku, Q-B1–Q-B6 briefu) | med | — | [#47](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/47) |
 
 - **E4-S1** — T1 Konta i sekrety GCP/Neon (człowiek), OIDC z GitHub Actions. T2 Włączenie szkicu wdrożenia z F0: tagged revision + gałąź Neon + migracje. T3 E2E na preview, link w PR (bramka QA z `SDLC.md`). T4 Sentry DSN dla web i worker.
 - **E4-S2** — T1 Opinia prawna PSD2 (Q3) i doradcy podatkowego (Q6). T2 Decyzje właściciela Q4, Q5, Q7, Q9–Q12 i Q-B1–Q-B6 wpisane w „Decyzje i zmiany” spec stacku i briefu. T3 Aktualizacja Now/Later w briefie.

@@ -114,14 +114,14 @@ Benchmark: Preply.com (mechanizmy marketplace'u lekcji 1:1). Stan rynku i przepi
 | A5 | Wideo, płatności, KYC, e-mail u zewnętrznych dostawców za portami (LiveKit, Stripe Connect, SES; ADR 0005) | przyjęte |
 | A6 | Rynek startowy PL, mentorzy z PL; UI po polsku, mobile-first, WCAG 2.2 AA | przyjęte (mentorzy spoza PL — Q-B5) |
 | A7 | Mały zespół + agenci AI; praca fazami, PR ≤ ~400 linii, bramka QA na preview | przyjęte |
-| A8 | Rezerwacja w Now działa bez płatności (dane testowe/seed) — płatność dochodzi w F4 bez zmiany modelu rezerwacji (`pending_payment` w maszynie stanów §4.3) | założenie tego briefu |
+| A8 | Rezerwacja w Now działa bez płatności (dane testowe/seed) — płatność dochodzi w F4 bez zmiany modelu rezerwacji (`pending_payment` w maszynie stanów §4.3) | przyjęte (Q-B2, 2026-11-11) |
 
 ## 9. Otwarte pytania
 
 Produktowe (ten brief):
 
 - **Q-B1.** Docelowe wartości miar C1–C5 (np. konwersja próbna → plan) — kto i kiedy je ustala?
-- **Q-B2.** Czy Now ma kończyć się rezerwacją bez płatności (A8), czy pierwszym pilotażem z prawdziwymi płatnościami (wtedy F4 wchodzi do Now i zależy od Q3–Q7)?
+- ~~**Q-B2.**~~ Czy Now kończy się rezerwacją bez płatności (A8), czy pilotażem z płatnościami? — **Rozstrzygnięte 2026-11-11:** F1–F3 bez płatności. Sposób potwierdzania rezerwacji do czasu F4 ustala spec F3 (E3-S1).
 - **Q-B3.** Pakiety jednorazowe obok subskrypcji (np. „przegląd CV”) — KONCEPCJA §6 p. 1.
 - **Q-B4.** Model i progi prowizji — KONCEPCJA §6 p. 2, A4.
 - **Q-B5.** Mentorzy spoza Polski (waluty, podatki, KYC) — KONCEPCJA §6 p. 5.
@@ -132,3 +132,4 @@ Techniczne, prawne i finansowe — otwarte w spec stacku i blokujące Later: **Q
 ## Decyzje i zmiany
 
 - 2026-11-11 — Pierwsza wersja na podstawie KONCEPCJA, spec stacku i stanu repozytorium po F1. Now = E1–E4 (domknięcie F1, F2, F3, preview i decyzje); Later = F4–F8 i pomysły po MVP. Plik ma stałą nazwę `product-brief.md` (dokument żyjący, na życzenie właściciela) — wyjątek od konwencji `YYYY-MM-DD-slug.md` opisany w `AGENTS.md`.
+- 2026-11-11 — Właściciel: Now = F1–F3 bez płatności (Q-B2, A8 przyjęte). Zgłoszenia Now utworzone w GitHub Issues: epiki #22–#25, historie #26–#47 (numery w backlogu).
