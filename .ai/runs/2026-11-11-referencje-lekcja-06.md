@@ -29,7 +29,7 @@ Przełożyć karty referencji na plik decyzji `lekcja-06/referencje.md`: obserwa
 Dokument, bez kodu. `lekcja-06/` jest wykluczony z lintu (biome, ESLint), więc nie było czego uruchamiać.
 
 ## Problemy i otwarte kwestie
-- Karty R03–R06 nie mają zrzutów, a ich obserwacje pochodzą z pamięci agenta. Barwa akcentu i konkretny krój zostają na krok tokenów.
+- Karty R03–R06 nie mają zrzutów, a ich obserwacje pochodzą z pamięci agenta. Barwa akcentu (rdza) i kroje (systemowe) rozstrzygnięte w kroku tokenów.
 - Brak referencji dla ruchu, pokoju U6 i e-maili transakcyjnych.
 - Tokeny nie są wdrożone w `packages/ui/src/styles/globals.css`; reguła szeryfu dla wszystkich h1–h3 jest tam sprzeczna z K6.
 
