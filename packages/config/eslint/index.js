@@ -78,6 +78,7 @@ export function kompasEslintConfig({ tsconfigRootDir }) {
         '**/next-env.d.ts',
         'packages/config/**/*.d.ts',
         'kompas-mentoring/**',
+        'lekcja-06/**',
         '.ai/**',
       ],
     },

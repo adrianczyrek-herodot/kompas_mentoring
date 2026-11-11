@@ -18,6 +18,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-11** — PR ze stosu (base = gałąź innego PR) scalony po scaleniu PR bazowego trafia na gałąź stosu, nie na `main` — tak krok 7 F1 (PR #19, #20) ominął `main`. Przed scaleniem PR-a ze stosu ustaw `gh pr edit <nr> --base main`; po scaleniu stosu sprawdź `git log origin/main..origin/<gałąź>` (puste = wszystko na `main`).
 - **2026-11-11** — Etykiety `priority-*` nadajemy wg tabeli w `SDLC.md` §2a; zgłoszenie z etykietami wymaga konta `gh` z uprawnieniem co najmniej triage (bez niego `gh issue create --label` się nie powiedzie).
 - **2026-11-11** — E2E w CI padało w `playwright install --with-deps` (`Temporary failure resolving 'azure.archive.ubuntu.com'`, `apt` kod 100) — testy w ogóle nie startowały, a kod nie był winny. Przeglądarkę instalujemy z CDN Playwrighta (`playwright install chromium`), a `install-deps` przez `apt` jest osobnym krokiem z `continue-on-error` (obraz runnera ma biblioteki Chromium). Czerwony job e2e → najpierw sprawdź, który krok padł.
+- **2026-11-11** — Biome (`biome ci .`) lintuje też HTML/CSS/JS spoza pakietów — materiały zewnętrzne dodane do repo (np. `lekcja-06/`) muszą być wykluczone w `files.includes` w `biome.json` (i w `ignores` ESLint), inaczej `pnpm lint` w CI pada. Nie poprawiaj takich materiałów pod lint — mają zostać w oryginale.
 
 ## Domena i produkt
 
