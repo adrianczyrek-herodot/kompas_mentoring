@@ -7,6 +7,13 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!kompas-mentoring", "!.ai", "!**/next-env.d.ts", "!pnpm-lock.yaml"]
+    "includes": [
+      "**",
+      "!kompas-mentoring",
+      "!lekcja-06",
+      "!.ai",
+      "!**/next-env.d.ts",
+      "!pnpm-lock.yaml"
+    ]
   }
 }
