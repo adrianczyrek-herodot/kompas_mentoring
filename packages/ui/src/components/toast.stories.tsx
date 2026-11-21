@@ -23,7 +23,15 @@ function Trigger({
 function AutoToast({ toast }: { toast: { title: string; description?: string; type?: string } }) {
   const manager = useToast();
   return (
-    <Button variant="outline" ref={(node) => { if (node && !node.dataset['shown']) { node.dataset['shown'] = '1'; manager.add({ ...toast, timeout: 0 }); } }}>
+    <Button
+      variant="outline"
+      ref={(node) => {
+        if (node && !node.dataset['shown']) {
+          node.dataset['shown'] = '1';
+          manager.add({ ...toast, timeout: 0 });
+        }
+      }}
+    >
       Pokaż ponownie
     </Button>
   );
@@ -33,7 +41,14 @@ const meta = {
   title: 'Komponenty bazowe/Komunikaty/Toast',
   render: () => (
     <ToastProvider closeLabel="Zamknij powiadomienie" regionLabel="Powiadomienia">
-      <Trigger label="Zapisz dostępność" toast={{ title: 'Zapisano', description: 'Dostępność na ten tydzień jest aktualna.', type: 'success' }} />
+      <Trigger
+        label="Zapisz dostępność"
+        toast={{
+          title: 'Zapisano',
+          description: 'Dostępność na ten tydzień jest aktualna.',
+          type: 'success',
+        }}
+      />
     </ToastProvider>
   ),
 } satisfies Meta;
@@ -49,8 +64,19 @@ export const Variants: Story = {
   render: () => (
     <ToastProvider closeLabel="Zamknij powiadomienie" regionLabel="Powiadomienia">
       <div className="flex flex-wrap gap-inline">
-        <AutoToast toast={{ title: 'Zapisano', description: 'Dostępność na ten tydzień jest aktualna.', type: 'success' }} />
-        <AutoToast toast={{ title: 'Ten termin został właśnie zajęty', description: 'Wybierz inną godzinę — siatka jest już odświeżona.' }} />
+        <AutoToast
+          toast={{
+            title: 'Zapisano',
+            description: 'Dostępność na ten tydzień jest aktualna.',
+            type: 'success',
+          }}
+        />
+        <AutoToast
+          toast={{
+            title: 'Ten termin został właśnie zajęty',
+            description: 'Wybierz inną godzinę — siatka jest już odświeżona.',
+          }}
+        />
       </div>
     </ToastProvider>
   ),
@@ -63,13 +89,20 @@ export const States: Story = {
     docs: {
       ...framed.docs,
       description: {
-        story: 'Pojawia się na dole (na telefonie na całą szerokość), znika po 6 s albo po zamknięciu; najechanie lub fokus wstrzymuje odliczanie.',
+        story:
+          'Pojawia się na dole (na telefonie na całą szerokość), znika po 6 s albo po zamknięciu; najechanie lub fokus wstrzymuje odliczanie.',
       },
     },
   },
   render: () => (
     <ToastProvider closeLabel="Zamknij powiadomienie" regionLabel="Powiadomienia">
-      <AutoToast toast={{ title: 'Sesja przełożona', description: 'Nowy termin: czwartek, 27 listopada, 18:00.', type: 'success' }} />
+      <AutoToast
+        toast={{
+          title: 'Sesja przełożona',
+          description: 'Nowy termin: czwartek, 27 listopada, 18:00.',
+          type: 'success',
+        }}
+      />
     </ToastProvider>
   ),
 };
@@ -83,7 +116,8 @@ export const LongContent: Story = {
       <AutoToast
         toast={{
           title: 'Przyjęliśmy prośbę o eksport danych',
-          description: 'Link do pobrania wyślemy na adres katarzyna.wisniewska@example.com, zwykle w ciągu doby.',
+          description:
+            'Link do pobrania wyślemy na adres katarzyna.wisniewska@example.com, zwykle w ciągu doby.',
           type: 'success',
         }}
       />

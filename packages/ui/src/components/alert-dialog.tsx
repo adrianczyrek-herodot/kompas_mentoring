@@ -38,7 +38,11 @@ function AlertDialogContent({ className, children, ...props }: AlertDialogPrimit
 
 function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="alert-dialog-header" className={cn('flex flex-col gap-tight', className)} {...props} />
+    <div
+      data-slot="alert-dialog-header"
+      className={cn('flex flex-col gap-tight', className)}
+      {...props}
+    />
   );
 }
 

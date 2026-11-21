@@ -1,7 +1,12 @@
 'use client';
 
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
-import { groupLabelClasses, listItemClasses, popupClasses, positionerClasses } from '../lib/overlay';
+import {
+  groupLabelClasses,
+  listItemClasses,
+  popupClasses,
+  positionerClasses,
+} from '../lib/overlay';
 import { cn } from '../lib/utils';
 
 // List of actions (account menu, row actions in A1). Items 44 px (K1), highlight surface-hover (D4).

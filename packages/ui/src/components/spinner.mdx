@@ -1,0 +1,120 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import { Spinner } from './spinner';
+import * as SpinnerStories from './spinner.stories';
+
+<Meta of={SpinnerStories} />
+
+# Spinner
+
+## 1. Do czego służy
+
+Wskazuje trwające, asynchroniczne przetwarzanie operacji (np. zapis formularza, wysyłanie wniosku lub weryfikację logowania) wewnątrz przycisków lub zwartych kontrolek.
+
+<Canvas of={SpinnerStories.Playground} />
+<Controls of={SpinnerStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Stan ładowania przycisku logowania lub rejestracji (P4) | KONCEPCJA §P4 |
+| Zapisywanie pojedynczego kroku w kreatorze mentora (M1) | KONCEPCJA §M1 |
+| Wskaźnik przetwarzania transakcji rezerwacji (U1) | KONCEPCJA §U1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast spinnera | Użyj | Źródło |
+|---|---|---|
+| Ładowanie całego widoku lub sekcji strony | `Skeleton` | prompt |
+| Długie procesy w tle trwające powyżej kilku sekund | wskaźnik postępu (Progress bar) | propozycja |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Spinner` | tak | Okrągły animowany wskaźnik SVG z otwartym łukiem i ukrytym tekstem dostępnym |
+
+## 5. Warianty
+
+<Canvas of={SpinnerStories.Variants} />
+
+Dostępny w rozmiarach: `sm` (16 px, do przycisków i etykiet), `md` (20 px, domyślny) oraz `lg` (24 px).
+
+## 6. Stany
+
+<Canvas of={SpinnerStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Animacja | Płynny obrót wokół własnej osi; przy `prefers-reduced-motion` animacja zwalnia lub przyjmuje subtelny puls | WCAG 2.3.3 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Posiada `role="status"` oraz ukryty tekst `aria-label="Ładowanie..."` (lub tekst przekazany jako prop). | WAI-ARIA APG |
+| Kolor dostosowuje się do kontekstu (`currentColor`), dziedzicząc kolor tekstu kontrolki. | propozycja |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Dostępny opis stanu ładowania jest krótki i rzeczowy. | „Zapisywanie...”, „Przetwarzanie...” | R05.2 |
+
+## 9. Responsywność
+
+<Canvas of={SpinnerStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 / 768 / 1440 px | Niezależny od szerokości ekranu; zachowuje stałe proporcje w pikselach | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Spinner` | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Rozmiar wskaźnika |
+| `Spinner` | `label` | `string` | `'Ładowanie...'` | Dostępna etykieta odczytywana przez czytniki |
+| `Spinner` | `className` | `string` | — | Dodatkowe klasy CSS |
+
+## 11. Kod
+
+```tsx
+<Button disabled>
+  <Spinner size="sm" />
+  Zapisywanie profilu...
+</Button>
+```
+
+Typowy przykład z produktu (M1): wskaźnik zapisu w przycisku formularza.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel flex items-center gap-inline">
+          <Button size="sm" disabled>
+            <Spinner size="sm" />
+            Wysyłam zgłoszenie...
+          </Button>
+        </div>
+      }
+      goodNote="Spinner wewnątrz przycisku z zablokowaną możliwością ponownego kliknięcia."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel flex justify-center py-section">
+          <Spinner size="lg" />
+        </div>
+      }
+      badNote="Nie umieszczaj samotnego spinnera na środku pustego ekranu zamiast strukturalnego szkieletu strony."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Skeleton` (struktura ładowania ekranu).
+- **Wzorce:** `Button` w stanie `loading` (P4, M1).

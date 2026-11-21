@@ -16,7 +16,13 @@ import {
 
 const framed = { docs: { story: { inline: false, height: '560px' } } };
 
-function FiltersSheet({ side = 'bottom', defaultOpen = false }: { side?: 'right' | 'bottom'; defaultOpen?: boolean }) {
+function FiltersSheet({
+  side = 'bottom',
+  defaultOpen = false,
+}: {
+  side?: 'right' | 'bottom';
+  defaultOpen?: boolean;
+}) {
   return (
     <Sheet defaultOpen={defaultOpen}>
       <SheetTrigger render={<Button variant="outline" />}>Filtry</SheetTrigger>
@@ -70,9 +76,12 @@ export const LongContent: Story = {
       <SheetTrigger render={<Button variant="outline" />}>Przełóż sesję</SheetTrigger>
       <SheetContent side="bottom" closeLabel="Zamknij">
         <SheetHeader>
-          <SheetTitle>Przełóż sesję z Katarzyną Wiśniewską-Zalewską na inny termin w tym tygodniu</SheetTitle>
+          <SheetTitle>
+            Przełóż sesję z Katarzyną Wiśniewską-Zalewską na inny termin w tym tygodniu
+          </SheetTitle>
           <SheetDescription>
-            Bezpłatnie do 12 godzin przed startem. Mentor dostanie powiadomienie i może zaproponować inną godzinę.
+            Bezpłatnie do 12 godzin przed startem. Mentor dostanie powiadomienie i może zaproponować
+            inną godzinę.
           </SheetDescription>
         </SheetHeader>
         <SheetFooter>

@@ -1,0 +1,140 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverTitle,
+  PopoverTrigger,
+} from './popover';
+import * as PopoverStories from './popover.stories';
+
+<Meta of={PopoverStories} />
+
+# Popover
+
+## 1. Do czego służy
+
+Wyświetla bogatą treść pomocniczą lub podręczny panel kontrolny (np. minikalendarz wyboru tygodnia lub selektor pory dnia) bezpośrednio przy elemencie wyzwalającym bez blokowania tła.
+
+<Canvas of={PopoverStories.Playground} />
+<Controls of={PopoverStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Podręczny kalendarz do szybkiego skoku do tygodnia w rezerwacji sesji (U1) | KONCEPCJA §U1 |
+| Wielokrotny filtr pory dnia (rano, popołudnie, wieczór) na desktopie (P2) | KONCEPCJA §P2 |
+| Podgląd szczegółów polityki odwołań z wyliczeniem godzin | A04 |
+
+## 3. Kiedy nie używać
+
+| Zamiast wyskakującego okienka | Użyj | Źródło |
+|---|---|---|
+| Prosta, jednolinijkowa podpowiedź tekstowa do ikony | `Tooltip` | WAI-ARIA APG |
+| Lista opcji akcji do kliknięcia | `Menu` | WAI-ARIA APG |
+| Zadanie wymagające pełnego skupienia lub formularz wielopolowy | `Dialog` | WAI-ARIA APG |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Popover` | tak | Główny kontener stanu otwarcia |
+| `PopoverTrigger` | tak | Element aktywujący (przycisk lub łącze) |
+| `PopoverContent` | tak | Pływający kontener z tłem `surface-panel`, ramką `border-divider` i cieniem `shadow-overlay` |
+| `PopoverTitle` | opcjonalnie | Tytuł okienka (`text-label` font-medium) |
+| `PopoverDescription` | opcjonalnie | Tekst opisowy |
+| `PopoverClose` | opcjonalnie | Przycisk zamykający okienko |
+
+## 5. Warianty
+
+<Canvas of={PopoverStories.Variants} />
+
+Popover dostosowuje swój rozmiar do zawartej treści (maksymalnie 320 px dla informacji tekstowych, szerszy dla kalendarzy i siatek wyboru).
+
+## 6. Stany
+
+<Canvas of={PopoverStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Otwarty | Płynne pojawienie się w pobliżu wyzwalacza z automatycznym pozycjonowaniem (flip/shift) | Base UI |
+| Interaktywny | Wnętrze w pełni obsługuje fokus formularzy, przycisków i linków | WAI-ARIA APG |
+| Zamykanie | Kliknięcie poza okienko lub Escape natychmiast ukrywa popover | WCAG 2.1.2 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Atrybuty `aria-expanded` i `aria-haspopup` na wyzwalaczu; `aria-labelledby` na kontenerze. | WAI-ARIA APG |
+| Fokus nie jest uwięziony, ale klawisz Escape zamyka okienko i przywraca fokus. | WCAG 2.1.2 |
+| Kliknięcie w dowolne miejsce poza popoverem (click-outside) powoduje jego zamknięcie. | Base UI |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Zwięzła i bezpośrednia treść pomocnicza. | „Wybierz tydzień sesji” | KONCEPCJA §U1 |
+| Jasne przyciski zatwierdzenia lub zamknięcia. | „Zastosuj”, „Zamknij” | prompt |
+
+## 9. Responsywność
+
+<Canvas of={PopoverStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Popover dopasowuje się do szerokości ekranu, na urządzeniach mobilnych zaleca się zastąpienie przez `Sheet` | propozycja |
+| 768 / 1440 px | Pływające okienko zakotwiczone do wyzwalacza z odstępem 8 px | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Popover` | `open` / `defaultOpen` | `boolean` | — | Stan otwarcia |
+| `PopoverContent` | `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'bottom'` | Preferowana strona pozycjonowania |
+| `PopoverContent` | `align` | `'start' \| 'center' \| 'end'` | `'center'` | Wyrównanie względem punktu odniesienia |
+
+## 11. Kod
+
+```tsx
+<Popover>
+  <PopoverTrigger render={<Button variant="outline">Wybierz tydzień</Button>} />
+  <PopoverContent>
+    <PopoverTitle>Skocz do tygodnia</PopoverTitle>
+    <div className="py-tight">{/* minikalendarz */}</div>
+  </PopoverContent>
+</Popover>
+```
+
+Typowy przykład z produktu (U1): szybki przeskok tygodni w grafiku rezerwacji sesji próbnej.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel max-w-sm">
+          <p className="text-label font-medium">Szybki filtr pory dnia</p>
+          <p className="text-muted text-body-dense mt-tight">Podręczny panel z checkboxami pod przyciskiem filtra na desktopie.</p>
+        </div>
+      }
+      goodNote="Popover idealnie sprawdza się dla małych, kontekstowych kontrolek."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel max-w-sm">
+          <p className="text-label font-medium">Zapisz sesję mentoringową</p>
+          <p className="text-muted text-body-dense mt-tight">Trzystopniowy formularz rezerwacji z płatnością wciśnięty w popover.</p>
+        </div>
+      }
+      badNote="Złożone procesy rezerwacji i płatności wymagają pełnego widoku strony lub modalnego Dialogu."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Tooltip` (wyłącznie krótki tekst pomocniczy), `Dialog` (okno modalne blokujące tło).
+- **Wzorce:** wybór terminu z blokadą (U1), filtry desktopowe (P2).

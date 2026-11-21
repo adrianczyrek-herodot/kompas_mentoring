@@ -1,0 +1,131 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import { ErrorState } from './error-state';
+import * as ErrorStateStories from './error-state.stories';
+
+<Meta of={ErrorStateStories} />
+
+# ErrorState
+
+## 1. Do czego służy
+
+Obsługuje błędy poziomu ekranu lub sekcji (np. brak połączenia sieciowego lub błąd serwera przy wczytywaniu danych), informując użytkownika w prostym języku i dając możliwość ponowienia próby.
+
+<Canvas of={ErrorStateStories.Playground} />
+<Controls of={ErrorStateStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Niepowodzenie wczytania listy mentorów w katalogu (P2) | KONCEPCJA §P2 |
+| Błąd pobrania profilu mentora lub dostępnych terminów (P3, U1) | KONCEPCJA §P3 |
+| Awaria pobierania kolejki weryfikacji w panelu zaufania (A1) | KONCEPCJA §A1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast stanu błędu ekranu | Użyj | Źródło |
+|---|---|---|
+| Błąd walidacji pojedynczego pola w formularzu | `FieldError` pod polem | prompt, D5 |
+| Błąd w trakcie wypełniania formularza nieblokujący całego widoku | `Alert` na górze formularza | prompt |
+| Brak elementów na liście z powodu braku wpisów (nie z powodu awarii) | `EmptyState` | prompt |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Ikona błędu | opcjonalnie | Dyskretna ikona ostrzegawcza w kolorze `text-danger` |
+| Tytuł błędu | tak | Zrozumiały nagłówek (`text-section-title` font-medium) |
+| Opis | opcjonalnie | Proste wyjaśnienie sytuacji bez żargonu programistycznego (`text-body` text-muted) |
+| Przycisk akcji | tak | Przycisk ponowienia operacji („Spróbuj ponownie” / „Ponów”) |
+
+## 5. Warianty
+
+<Canvas of={ErrorStateStories.Variants} />
+
+Domyślny układ to wycentrowany panel błędu z czerwoną ikoną statusową i widocznym przyciskiem ponowienia.
+
+## 6. Stany
+
+<Canvas of={ErrorStateStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Błąd zgłoszony | Posiada `role="alert"`, natychmiast anonsując błąd w czytniku ekranu | WCAG 4.1.3 |
+| Ponawianie | Po kliknięciu „Ponów” przycisk wchodzi w stan ładowania lub widok przechodzi w stan `Skeleton` | prompt |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `alert` lub nagłówek powiązany z czytnikiem ekranu, aby poinformować o niepowodzeniu ładowania. | WCAG 4.1.3 |
+| Przycisk ponowienia jest dostępny z klawiatury i posiada czytelną etykietę. | WCAG 2.1.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Prosty, bezpośredni język. Błąd wyjaśnia, co się stało, bez technicznego żargonu. | „Nie udało się załadować listy mentorów. Sprawdź połączenie i spróbuj ponownie.” | R05.2 |
+| Żadnych surowych kodów błędów HTTP (np. „Error 500: Internal Server Error”) jako jedynej treści. | — | R05.2 |
+| Przycisk opisany czasownikiem zachęcającym do ponowienia. | „Spróbuj ponownie”, „Ponów” | prompt |
+
+## 9. Responsywność
+
+<Canvas of={ErrorStateStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Treść wyśrodkowana, przycisk „Ponów” na pełną szerokość lub z marginesami bocznymi | propozycja |
+| 768 / 1440 px | Wyśrodkowany blok o maks. szerokości `max-w-form` (640 px) | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `ErrorState` | `title` | `ReactNode` | — | Tytuł błędu |
+| `ErrorState` | `description` | `ReactNode` | — | Opis i wskazówka naprawcza |
+| `ErrorState` | `action` | `ReactNode` | — | Przycisk ponowienia (np. `<Button>Ponów</Button>`) |
+| `ErrorState` | `icon` | `ReactNode` | — | Opcjonalna ikona błędu |
+
+## 11. Kod
+
+```tsx
+<ErrorState
+  title="Nie udało się załadować grafiku mentora"
+  description="Wystąpił problem z połączeniem. Sprawdź sieć i spróbuj ponownie za chwilę."
+  action={<Button onClick={() => refetch()}>Spróbuj ponownie</Button>}
+/>
+```
+
+Typowy przykład z produktu (P3): błąd wczytania dostępnych slotów mentora.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel text-center">
+          <h4 className="text-section-title font-medium">Nie udało się pobrać danych</h4>
+          <p className="text-muted text-body-dense mt-tight">Sprawdź połączenie internetowe i spróbuj ponownie.</p>
+          <div className="mt-panel">
+            <Button variant="outline" size="sm">Spróbuj ponownie</Button>
+          </div>
+        </div>
+      }
+      goodNote="Wyjaśnienie w ludzkim języku i przycisk ponowienia próby."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel text-center">
+          <h4 className="text-section-title font-medium text-text-danger">Error: ECONNREFUSED 127.0.0.1:5432</h4>
+        </div>
+      }
+      badNote="Nigdy nie pokazuj użytkownikowi surowych błędów bazy danych ani żargonu sieciowego bez możliwości ponowienia."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `EmptyState` (brak danych z normalnego powodu, a nie błędu), `Alert` (komunikat w formularzu).
+- **Wzorce:** stan Er każdego ekranu i widoku danych.

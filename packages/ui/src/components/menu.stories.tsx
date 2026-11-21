@@ -16,7 +16,13 @@ import {
 
 const framed = { docs: { story: { inline: false, height: '360px' } } };
 
-function AccountMenu({ defaultOpen = false, onSignOut }: { defaultOpen?: boolean; onSignOut?: () => void }) {
+function AccountMenu({
+  defaultOpen = false,
+  onSignOut,
+}: {
+  defaultOpen?: boolean;
+  onSignOut?: () => void;
+}) {
   return (
     <div className="flex justify-end">
       <Menu defaultOpen={defaultOpen}>
@@ -91,7 +97,8 @@ export const States: Story = {
     docs: {
       ...framed.docs,
       description: {
-        story: 'Podświetlona pozycja (strzałki, najechanie) — `surface-hover`; zablokowana — `text-disabled` z powodem w nazwie.',
+        story:
+          'Podświetlona pozycja (strzałki, najechanie) — `surface-hover`; zablokowana — `text-disabled` z powodem w nazwie.',
       },
     },
   },

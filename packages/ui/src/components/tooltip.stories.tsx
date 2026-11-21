@@ -11,13 +11,17 @@ function WeekNav({ defaultOpen = false }: { defaultOpen?: boolean }) {
     <TooltipProvider>
       <div className="flex gap-inline pt-section">
         <Tooltip defaultOpen={defaultOpen}>
-          <TooltipTrigger render={<Button variant="outline" size="icon" aria-label="Poprzedni tydzień" />}>
+          <TooltipTrigger
+            render={<Button variant="outline" size="icon" aria-label="Poprzedni tydzień" />}
+          >
             <ChevronLeft aria-hidden="true" />
           </TooltipTrigger>
           <TooltipContent>Poprzedni tydzień</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger render={<Button variant="outline" size="icon" aria-label="Następny tydzień" />}>
+          <TooltipTrigger
+            render={<Button variant="outline" size="icon" aria-label="Następny tydzień" />}
+          >
             <ChevronRight aria-hidden="true" />
           </TooltipTrigger>
           <TooltipContent>Następny tydzień</TooltipContent>
@@ -50,7 +54,8 @@ export const States: Story = {
     docs: {
       ...framed.docs,
       description: {
-        story: 'Pokazuje się po najechaniu lub fokusie, znika po Escape, opuszczeniu kursora albo fokusu.',
+        story:
+          'Pokazuje się po najechaniu lub fokusie, znika po Escape, opuszczeniu kursora albo fokusu.',
       },
     },
   },
@@ -65,7 +70,9 @@ export const LongContent: Story = {
     <TooltipProvider>
       <div className="pt-section">
         <Tooltip defaultOpen>
-          <TooltipTrigger render={<Button variant="outline" size="icon" aria-label="Synchronizuj teraz" />}>
+          <TooltipTrigger
+            render={<Button variant="outline" size="icon" aria-label="Synchronizuj teraz" />}
+          >
             <ChevronRight aria-hidden="true" />
           </TooltipTrigger>
           <TooltipContent>Synchronizuj teraz z Kalendarzem Google</TooltipContent>
@@ -81,10 +88,16 @@ export const ShowsOnFocus: Story = {
     const trigger = within(canvasElement).getByRole('button', { name: 'Poprzedni tydzień' });
     await userEvent.tab();
     await expect(trigger).toHaveFocus();
-    await waitFor(() => expect(screen.getByText('Poprzedni tydzień', { selector: '[data-slot=tooltip-content]' })).toBeVisible());
+    await waitFor(() =>
+      expect(
+        screen.getByText('Poprzedni tydzień', { selector: '[data-slot=tooltip-content]' }),
+      ).toBeVisible(),
+    );
     await userEvent.keyboard('{Escape}');
     await waitFor(() =>
-      expect(screen.queryByText('Poprzedni tydzień', { selector: '[data-slot=tooltip-content]' })).not.toBeInTheDocument(),
+      expect(
+        screen.queryByText('Poprzedni tydzień', { selector: '[data-slot=tooltip-content]' }),
+      ).not.toBeInTheDocument(),
     );
   },
 };

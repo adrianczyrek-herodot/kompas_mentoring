@@ -1,0 +1,164 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './alert-dialog';
+import { Button } from './button';
+import * as AlertDialogStories from './alert-dialog.stories';
+
+<Meta of={AlertDialogStories} />
+
+# AlertDialog
+
+## 1. Do czego służy
+
+Wymusza świadome potwierdzenie krytycznej lub nieodwracalnej akcji (np. anulowanie sesji na mniej niż 12 godzin przed terminem albo trwałe usunięcie konta), minimalizując ryzyko przypadkowych błędów.
+
+<Canvas of={AlertDialogStories.Playground} />
+<Controls of={AlertDialogStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Anulowanie sesji mentoringowej na mniej niż 12 h przed terminem (utrata kredytu) | KONCEPCJA §U5, A04 |
+| Trwałe usunięcie konta ucznia lub profilu mentora (S3) | KONCEPCJA §S3 |
+| Usunięcie mentora z listy ulubionych (E2-S8) | backlog §E2-S8 |
+| Odrzucenie zgłoszenia mentora z konsekwencją zablokowania ponownej aplikacji | KONCEPCJA §A1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast okna potwierdzenia | Użyj | Źródło |
+|---|---|---|
+| Zwykła edycja lub formularz z możliwością anulowania zmian | `Dialog` | WAI-ARIA APG |
+| Akcje odwracalne (np. archiwizacja notatki) ze wzorcem „Cofnij” w powiadomieniu | `Toast` | R05.3 |
+| Prosta informacja o statusie lub ostrzeżenie w treści strony | `Alert` | WCAG 1.4.1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `AlertDialog` | tak | Główny kontener stanu otwarcia |
+| `AlertDialogTrigger` | opcjonalnie | Element wyzwalający (zwykle `Button` w wariancie destrukcyjnym) |
+| `AlertDialogContent` | tak | Panel okna o podwyższonej roli `alertdialog` |
+| `AlertDialogHeader` | tak | Nagłówek zawierający tytuł z nazwą obiektu i opis konsekwencji |
+| `AlertDialogTitle` | tak | Pytanie z dokładną nazwą obiektu (`text-section-title`) |
+| `AlertDialogDescription` | tak | Pełne wyjaśnienie konsekwencji (np. utrata kredytu sesji) |
+| `AlertDialogFooter` | tak | Belka akcji: bezpieczna rezygnacja (outline) i destrukcyjne zatwierdzenie (danger) |
+| `AlertDialogClose` | opcjonalnie | Komponent zamykający okno |
+
+## 5. Warianty
+
+<Canvas of={AlertDialogStories.Variants} />
+
+Domyślna szerokość to `max-w-dialog` (480 px). Zawsze zawiera wyraźnie odróżnialny przycisk bezpieczny (Anuluj / Wróć) oraz przycisk wykonujący akcję.
+
+## 6. Stany
+
+<Canvas of={AlertDialogStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Otwarty | Płynne wejście, fokus automatycznie ustawiany na przycisku rezygnacji (bezpieczny domyślny) | WAI-ARIA APG |
+| Tło (Backdrop) | Ciemne tło blokujące interakcję z resztą strony | P-T10 |
+| Zablokowany | W trakcie wykonywania żądania przycisk destrukcyjny pokazuje stan ładowania | D2 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `alertdialog`, atrybuty `aria-modal="true"`, `aria-labelledby` i `aria-describedby`. | WAI-ARIA APG |
+| Czytnik ekranu natychmiast ogłasza tytuł i opis ostrzeżenia. | WCAG 4.1.3 |
+| Fokus początkowy ląduje na przycisku bezpiecznym (Anuluj), nie na destrukcyjnym. | WAI-ARIA APG, A02 |
+| Klawisz Escape zamyka okno i przerywa operację. | WCAG 2.1.2 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| W pytaniu zawsze pada nazwa obiektu, nie abstrakcyjne „ten element”. | „Czy na pewno chcesz anulować sesję z Anną Kowalską?” | KONCEPCJA §U5 |
+| Pełny tekst reguły 12 godzin, bez ukrywania w drobnym druku. | „Do sesji zostało mniej niż 12 godzin. Kredyt nie zostanie zwrócony.” | A04 |
+| Przycisk potwierdzenia opisany czasownikiem, nigdy „OK”. | „Anuluj sesję”, „Usuń konto” | prompt, R05.3 |
+| Przycisk rezygnacji jasny i łatwy do znalezienia. | „Nie, zachowaj termin”, „Wróć” | prompt |
+
+## 9. Responsywność
+
+<Canvas of={AlertDialogStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Pełna szerokość z marginesami 16 px, przyciski akcji ułożone pionowo (destrukcyjny na górze lub dole) | propozycja |
+| 768 / 1440 px | Okno o szerokości maks. 480 px, przyciski wyrównane do prawej w jednym rzędzie | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `AlertDialog` | `open` / `defaultOpen` | `boolean` | — | Kontrolowany lub niekontrolowany stan otwarcia |
+| `AlertDialog` | `onOpenChange` | `(open: boolean) => void` | — | Callback informujący o zmianie stanu |
+| `AlertDialogContent` | `className` | `string` | — | Opcjonalne dodatkowe klasy CSS |
+
+## 11. Kod
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger render={<Button variant="danger">Anuluj sesję</Button>} />
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Czy na pewno chcesz anulować sesję z Anną Kowalską?</AlertDialogTitle>
+      <AlertDialogDescription>
+        Do sesji zostało 8 godzin. Zgodnie z zasadą 12 godzin kredyt za tę sesję nie zostanie zwrócony na Twoje konto.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogClose render={<Button variant="outline">Wróć, zachowaj termin</Button>} />
+      <Button variant="danger">Tak, anuluj sesję</Button>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+Typowy przykład z produktu (U5): odwołanie sesji mentoringowej w oknie krótszym niż 12 godzin.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <h4 className="text-section-title font-medium">Usunąć profil mentora Piotra Nowaka?</h4>
+          <p className="text-muted text-body-dense mt-tight">Wszystkie zaplanowane sesje zostaną odwołane, a środki zwrócone uczniom.</p>
+          <div className="mt-panel flex justify-end gap-inline">
+            <Button variant="outline" size="sm">Nie usuwaj</Button>
+            <Button variant="danger" size="sm">Usuń profil</Button>
+          </div>
+        </div>
+      }
+      goodNote="Pytanie z nazwą obiektu, pełne konsekwencje, przycisk rezygnacji i destrukcja z konkretnym czasownikiem."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <h4 className="text-section-title font-medium">Czy jesteś pewien?</h4>
+          <p className="text-muted text-body-dense mt-tight">Operacja usunie dane.</p>
+          <div className="mt-panel flex justify-end gap-inline">
+            <Button variant="outline" size="sm">Anuluj</Button>
+            <Button size="sm">OK</Button>
+          </div>
+        </div>
+      }
+      badNote="Nigdy nie pytaj abstrakcyjnie i nie używaj etykiety „OK” przy operacjach destrukcyjnych."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Dialog` (zwykłe modalne okno edycji/zadania).
+- **Wzorce:** potwierdzenie usunięcia (wzorzec z promptu), anulowanie sesji < 12 h (U5).

@@ -53,7 +53,11 @@ function SheetContent({ className, children, side, closeLabel, ...props }: Sheet
 
 function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="sheet-header" className={cn('flex flex-col gap-tight pr-control', className)} {...props} />
+    <div
+      data-slot="sheet-header"
+      className={cn('flex flex-col gap-tight pr-control', className)}
+      {...props}
+    />
   );
 }
 

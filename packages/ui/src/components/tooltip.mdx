@@ -1,0 +1,136 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './tooltip';
+import * as TooltipStories from './tooltip.stories';
+
+<Meta of={TooltipStories} />
+
+# Tooltip
+
+## 1. Do czego służy
+
+Wyświetla krótką etykietę lub podpowiedź tekstową po najechaniu kursorem lub przeniesieniu fokusu na element interaktywny (zwłaszcza przycisk zawierający wyłącznie ikonę).
+
+<Canvas of={TooltipStories.Playground} />
+<Controls of={TooltipStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Przyciski z samą ikoną: nawigacja poprzedni/następny tydzień w grafiku (U1) | KONCEPCJA §U1 |
+| Ikona kalendarza w grafiku mentora (M3) | KONCEPCJA §M3 |
+| Skrótowe ikony akcji tabeli (podgląd, edycja) | propozycja |
+
+## 3. Kiedy nie używać
+
+| Zamiast podpowiedzi | Użyj | Źródło |
+|---|---|---|
+| Informacja niezbędna do podjęcia decyzji (np. reguła 12 h, cena) | widoczny tekst na ekranie | A04, prompt |
+| Wyjaśnienie, dlaczego przycisk jest zablokowany | widoczny tekst obok kontrolki | D2, prompt |
+| Interaktywna treść z linkami lub przyciskami | `Popover` | WAI-ARIA APG |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `TooltipProvider` | tak | Kontekst zarządzający czasem opóźnienia podpowiedzi |
+| `Tooltip` | tak | Kontener pojedynczej podpowiedzi |
+| `TooltipTrigger` | tak | Element wyzwalający (zwykle przycisk ikony) |
+| `TooltipContent` | tak | Pływająca etykieta o odwróconej kolorystyce (`bg-night-900 text-sand-50`) i promieniu `radius-control` |
+
+## 5. Warianty
+
+<Canvas of={TooltipStories.Variants} />
+
+Domyślny wygląd to zwarty dymek tekstowy z ciemnym tłem w motywie jasnym i jasnym w ciemnym. Może pojawiać się nad (`top`), pod (`bottom`), z prawej (`right`) lub z lewej (`left`) strony kontrolki.
+
+## 6. Stany
+
+<Canvas of={TooltipStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Ukryty | Domyślny stan; brak w drzewie dostępności lub niewidoczny | WAI-ARIA |
+| Widoczny | Pojawia się po krótkim opóźnieniu (150 ms) przy hover lub natychmiast przy fokusie klawiaturą | Base UI |
+| Zniknięcie | Klawisz Escape natychmiast ukrywa podpowiedź bez utraty fokusu | WCAG 2.1.2 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `tooltip`, powiązana z wyzwalaczem przez `aria-describedby` (lub `aria-labelledby` dla przycisków bez tekstu). | WAI-ARIA APG |
+| Dostępny z klawiatury: pojawia się po wejściu klawiszem Tab na element. | WCAG 2.1.1 |
+| Podpowiedź nie znika, gdy kursor przesuwa się nad jej treść (hoverable). | WCAG 1.4.13 |
+| Klawisz Escape natychmiast zamyka tooltip. | WCAG 1.4.13 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Krótka etykieta nazywająca akcję (1–3 słowa). | „Następny tydzień”, „Poprzedni tydzień” | KONCEPCJA §U1 |
+| Nigdy nie umieszczaj w tooltipie jedynego wyjaśnienia blokady działania. | — | D2 |
+
+## 9. Responsywność
+
+<Canvas of={TooltipStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Na ekranach dotykowych tooltipy nie powinny być jedynym źródłem informacji; przyciski dotykowe powinny mieć etykietę tekstową lub dostępną nazwę | WCAG 2.5.3 |
+| 768 / 1440 px | Podpowiedź wyświetla się w pobliżu kursora lub elementu z fokusem | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Tooltip` | `open` / `defaultOpen` | `boolean` | — | Stan widoczności |
+| `TooltipContent` | `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'top'` | Kierunek wyskakiwania |
+| `TooltipContent` | `sideOffset` | `number` | `4` | Odstęp od wyzwalacza w pikselach |
+
+## 11. Kod
+
+```tsx
+<Tooltip>
+  <TooltipTrigger render={<Button variant="ghost" size="icon-sm" aria-label="Następny tydzień" />}>
+    <ChevronRight className="size-icon-sm" />
+  </TooltipTrigger>
+  <TooltipContent>Następny tydzień</TooltipContent>
+</Tooltip>
+```
+
+Typowy przykład z produktu (U1): przycisk nawigacji kalendarza z samą ikoną.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel flex items-center gap-group">
+          <Button variant="outline" size="sm">Poprzedni tydzień</Button>
+          <span className="text-body-dense text-muted">Przycisk ikony z pomocniczym tooltipem dla użytkowników myszy.</span>
+        </div>
+      }
+      goodNote="Tooltip uzupełnia dostępną nazwę elementu interaktywnego bez ukrywania krytycznej treści."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel flex items-center gap-group">
+          <Button size="sm" disabled>Zarezerwuj sesję</Button>
+          <span className="text-meta text-muted">Tooltip: „Musisz najpierw doładować portfel”.</span>
+        </div>
+      }
+      badNote="Nigdy nie ukrywaj w tooltipie powodu, dla którego akcja jest zablokowana. Wyjaśnij to jawnym tekstem na ekranie."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Popover` (bogata treść interaktywna).
+- **Wzorce:** kontrolki kalendarza (U1), akcje tabeli (A1).

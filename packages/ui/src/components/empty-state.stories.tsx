@@ -78,7 +78,11 @@ export const LongContent: Story = {
         icon={<SearchX aria-hidden="true" />}
         title="Brak mentorów dla tematu „Negocjacje wynagrodzenia w startupie”"
         description="Spróbuj szerszego tematu, np. „Negocjacje”, albo wyłącz filtr „tylko zweryfikowani”."
-        action={<Button variant="outline" className="w-full">Wyczyść filtry</Button>}
+        action={
+          <Button variant="outline" className="w-full">
+            Wyczyść filtry
+          </Button>
+        }
       />
     </ViewportFrame>
   ),
@@ -88,7 +92,9 @@ export const HeadingAndAction: Story = {
   name: 'Test: tytuł jest nagłówkiem, jest następny krok',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('heading', { level: 2, name: 'Brak sesji dzisiaj' })).toBeVisible();
+    await expect(
+      canvas.getByRole('heading', { level: 2, name: 'Brak sesji dzisiaj' }),
+    ).toBeVisible();
     await expect(canvas.getByRole('button', { name: 'Dodaj dostępność' })).toBeEnabled();
   },
 };

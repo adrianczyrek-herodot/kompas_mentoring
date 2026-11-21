@@ -281,7 +281,9 @@
   --text-disabled: var(--text-subtle); /* D2: 4.93 : 1 light / 7.01 : 1 dark on surface-disabled */
   --border-disabled: var(--border-divider); /* D2 */
   --border-invalid: var(--status-danger-fg); /* D5: field error border, no glow */
-  --surface-inverse: var(--text-default); /* P-T16: tooltip background (16.21 : 1 / 13.65 : 1 with text-inverse) */
+  --surface-inverse: var(
+    --text-default
+  ); /* P-T16: tooltip background (16.21 : 1 / 13.65 : 1 with text-inverse) */
   --text-inverse: var(--surface-panel);
 }
 
@@ -346,7 +348,9 @@
   --avatar-sm: 2rem; /* P-T15 (approved 2026-11-21): 32 px — lists, rows (M2 requests, A1 queue) */
   --avatar-md: 2.5rem; /* P-T15 (approved): 40 px — mentor card (P2), header */
   --avatar-lg: 4rem; /* P-T15 (approved): 64 px — profile hero (P3) */
-  --tab-indicator: var(--focus-ring-width); /* P-T15 (approved): 2 px bar under the active tab, in track-on */
+  --tab-indicator: var(
+    --focus-ring-width
+  ); /* P-T15 (approved): 2 px bar under the active tab, in track-on */
   --card-header-columns: 1fr auto; /* title and description | action */
   --icon-content-columns: auto 1fr; /* icon | text (Alert) */
   --sheet-width: 25rem; /* P-T16: 400 px side panel (U5 reschedule, P2 filters on desktop) */

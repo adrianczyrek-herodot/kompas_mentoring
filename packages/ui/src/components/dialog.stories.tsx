@@ -17,17 +17,26 @@ import { Textarea } from './textarea';
 // Open dialogs cover the page, so on the docs page they render in their own frame.
 const framed = { docs: { story: { inline: false, height: '520px' } } };
 
-function ExceptionDialog({ defaultOpen = false, long = false }: { defaultOpen?: boolean; long?: boolean }) {
+function ExceptionDialog({
+  defaultOpen = false,
+  long = false,
+}: {
+  defaultOpen?: boolean;
+  long?: boolean;
+}) {
   return (
     <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger render={<Button variant="outline" />}>Dodaj wyjątek</DialogTrigger>
       <DialogContent closeLabel="Zamknij">
         <DialogHeader>
           <DialogTitle>
-            {long ? 'Dodaj wyjątek w dostępności na okres urlopu od 22 grudnia do 6 stycznia' : 'Dodaj wyjątek'}
+            {long
+              ? 'Dodaj wyjątek w dostępności na okres urlopu od 22 grudnia do 6 stycznia'
+              : 'Dodaj wyjątek'}
           </DialogTitle>
           <DialogDescription>
-            Uczniowie nie zarezerwują sesji w tym czasie. Umówione sesje zostają — przełóż je osobno.
+            Uczniowie nie zarezerwują sesji w tym czasie. Umówione sesje zostają — przełóż je
+            osobno.
           </DialogDescription>
         </DialogHeader>
         <Field>

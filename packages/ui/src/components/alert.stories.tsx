@@ -24,7 +24,9 @@ const meta = {
     title: 'Uczniowie nie mogą cię zarezerwować',
     description: 'Nie masz dostępności w najbliższych 14 dniach. Dodaj godziny w kalendarzu.',
   },
-  argTypes: { variant: { control: 'inline-radio', options: ['neutral', 'success', 'warning', 'danger'] } },
+  argTypes: {
+    variant: { control: 'inline-radio', options: ['neutral', 'success', 'warning', 'danger'] },
+  },
   render: ({ variant, title, description }) => (
     <Alert variant={variant} className="max-w-form">
       {icons[variant]}
@@ -117,9 +119,12 @@ export const LongContent: Story = {
     <ViewportFrame width={320}>
       <Alert variant="warning">
         {icons.warning}
-        <AlertTitle>Do sesji z Katarzyną Wiśniewską-Zalewską zostało mniej niż 12 godzin</AlertTitle>
+        <AlertTitle>
+          Do sesji z Katarzyną Wiśniewską-Zalewską zostało mniej niż 12 godzin
+        </AlertTitle>
         <AlertDescription>
-          Anulowanie teraz oznacza, że kredyt za sesję nie wróci na saldo. Przełożenie jest już niedostępne.
+          Anulowanie teraz oznacza, że kredyt za sesję nie wróci na saldo. Przełożenie jest już
+          niedostępne.
         </AlertDescription>
       </Alert>
     </ViewportFrame>
@@ -136,7 +141,12 @@ function SubmitErrorDemo() {
           <AlertTitle>Coś poszło nie tak. Spróbuj ponownie.</AlertTitle>
         </Alert>
       ) : null}
-      <Button className="self-start" onClick={() => setFailed(true)}>
+      <Button
+        className="self-start"
+        onClick={() => {
+          setFailed(true);
+        }}
+      >
         Zapisz
       </Button>
     </div>

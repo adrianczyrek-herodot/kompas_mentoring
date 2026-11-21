@@ -31,7 +31,9 @@ function ErrorState({
     >
       <CircleAlert aria-hidden="true" className="size-icon-lg text-status-danger-fg" />
       <Title className="text-section-title font-semibold text-text-default">{title}</Title>
-      {description ? <p className="max-w-measure text-body text-text-muted">{description}</p> : null}
+      {description ? (
+        <p className="max-w-measure text-body text-text-muted">{description}</p>
+      ) : null}
       {action ? <div className="pt-inline">{action}</div> : null}
     </div>
   );

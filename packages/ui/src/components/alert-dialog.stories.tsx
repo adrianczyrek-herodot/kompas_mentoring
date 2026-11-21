@@ -28,7 +28,9 @@ function CancelSession({
       <AlertDialogTrigger render={<Button variant="outline" />}>Anuluj sesję</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Anulować sesję z Anną Kowalczyk we wtorek, 25 listopada, 18:00?</AlertDialogTitle>
+          <AlertDialogTitle>
+            Anulować sesję z Anną Kowalczyk we wtorek, 25 listopada, 18:00?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             {late
               ? 'Do sesji zostało mniej niż 12 godzin. Kredyt za sesję nie wróci na Twoje saldo.'
@@ -72,7 +74,8 @@ export const States: Story = {
     docs: {
       ...framed.docs,
       description: {
-        story: 'Otwarty: fokus na „Zostaw sesję” (bezpieczna odpowiedź). Kliknięcie tła nie zamyka.',
+        story:
+          'Otwarty: fokus na „Zostaw sesję” (bezpieczna odpowiedź). Kliknięcie tła nie zamyka.',
       },
     },
   },

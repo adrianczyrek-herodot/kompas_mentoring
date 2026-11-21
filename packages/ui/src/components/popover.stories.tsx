@@ -26,7 +26,12 @@ function DaytimeFilter({ defaultOpen = false }: { defaultOpen?: boolean }) {
           <FieldTitle id="daytime" className="sr-only">
             Pora dnia
           </FieldTitle>
-          <ToggleGroup aria-labelledby="daytime" multiple defaultValue={['evening']} className="w-full">
+          <ToggleGroup
+            aria-labelledby="daytime"
+            multiple
+            defaultValue={['evening']}
+            className="w-full"
+          >
             <ToggleGroupItem value="morning">Rano</ToggleGroupItem>
             <ToggleGroupItem value="afternoon">Po południu</ToggleGroupItem>
             <ToggleGroupItem value="evening">Wieczorem</ToggleGroupItem>

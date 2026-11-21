@@ -18,7 +18,11 @@ function MentorRowSkeleton() {
 
 function MentorListLoading({ rows = 3 }: { rows?: number }) {
   return (
-    <section aria-busy="true" aria-labelledby="mentors-loading" className="flex max-w-form flex-col">
+    <section
+      aria-busy="true"
+      aria-labelledby="mentors-loading"
+      className="flex max-w-form flex-col"
+    >
       <p id="mentors-loading" className="sr-only">
         Wczytujemy listę mentorów…
       </p>

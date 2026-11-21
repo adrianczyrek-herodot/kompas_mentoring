@@ -48,7 +48,11 @@ export const Variants: Story = {
         className="py-group"
         title="Nie udało się wczytać próśb o sesję"
         description="Pozostałe sekcje panelu działają."
-        action={<Button size="sm" variant="outline">Ponów</Button>}
+        action={
+          <Button size="sm" variant="outline">
+            Ponów
+          </Button>
+        }
       />
     </div>
   ),
@@ -81,7 +85,11 @@ export const LongContent: Story = {
         titleAs="h3"
         title="Nie udało się połączyć z Kalendarzem Google dla adresu katarzyna.wisniewska@example.com"
         description="Połącz kalendarz ponownie. Do tego czasu terminy z Google nie blokują Twojej dostępności."
-        action={<Button variant="outline" className="w-full">Połącz ponownie</Button>}
+        action={
+          <Button variant="outline" className="w-full">
+            Połącz ponownie
+          </Button>
+        }
       />
     </ViewportFrame>
   ),
@@ -93,7 +101,12 @@ function RetryDemo() {
     <ErrorState
       title="Nie udało się wczytać listy"
       action={
-        <Button variant="outline" onClick={() => setState('ready')}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setState('ready');
+          }}
+        >
           Ponów
         </Button>
       }

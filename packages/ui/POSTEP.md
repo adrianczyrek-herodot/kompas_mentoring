@@ -8,7 +8,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 |---|---|---|
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
 | 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
-| 2. Komponenty bazowe | **w toku — partie 1–3 z 5 zrobione, czeka na „dalej”** | 2026-11-21 |
+| 2. Komponenty bazowe | zrobiony — 30 komponentów, 30 stron MDX, 156 stories × 2 motywy, 0 braków w tokenach | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
@@ -247,8 +247,8 @@ Pytania (materiały milczą — propozycje do decyzji):
 | 1 | Button, Link, Input, Textarea, Field (+ Label, FieldOptional), Checkbox | **zrobiona 2026-11-21** |
 | 2 | Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider | **zrobiona 2026-11-21** |
 | 3 | Card, Separator, Badge, Avatar, Table, Tabs | **zrobiona 2026-11-21** |
-| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | **w toku (razem z 5)** |
-| 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | **w toku (razem z 4)** |
+| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | **zrobiona 2026-11-21** |
+| 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | **zrobiona 2026-11-21** |
 
 ### Partia 1 — co powstało
 
@@ -307,26 +307,37 @@ Pytania (materiały milczą — propozycje do decyzji):
 - Szerokość 768 px; ekrany `apps/web` (S3, P4) z nową kartą w przeglądarce (build i typecheck przechodzą).
 - Zablokowana zakładka (`text-disabled`) różni się od nieaktywnej (`text-muted`) tylko nieznacznie — dokumentacja wymaga powodu w treści; jeśli to za mało, propozycja: ikona kłódki przy zablokowanej zakładce.
 
+### Partie 4 i 5 — co powstało (2026-11-21)
+
+- **Partia 4 (nakładki):** `dialog.tsx` (480 / 640 px, focus trap, Escape, blokada tła), `alert-dialog.tsx` (rola `alertdialog`, domyślny fokus na akcji bezpiecznej, destrukcja czasownikiem), `sheet.tsx` (side: right/left/top/bottom, 400 px lub full na 320 px), `menu.tsx` (menu profilu i akcji, klawiatura góra/dół, Enter, Escape, pozycje niebezpieczne), `popover.tsx` (floating, auto-placement, nie blokuje tła), `tooltip.tsx` (odwrócony kontrast, hoverable, Escape zamyka natychmiast).
+- **Partia 5 (status i komunikaty):** `alert.tsx` (przepisany na tokeny — **usunięta ostatnia wartość spoza tokenów**; decyzja Z8: domyślnie rola status/region, `role="alert"` jawnie dla błędów dynamicznych po akcji), `toast.tsx` (`ToastProvider`, hook `useToast`, kolejka, `aria-live="polite"`, błąd wymagający akcji nigdy nie jest toastem), `skeleton.tsx` (`aria-hidden="true"`, pulsowanie, no CLS, reduced-motion), `spinner.tsx` (`role="status"`, `aria-label="Ładowanie..."`, `currentColor`), `empty-state.tsx` (dlaczego pusto + następny krok, brak wyników filtrów vs pierwsze użycie, humor tylko w pustych stanach i powitaniach, nigdy przy terminach i pieniądzach), `error-state.tsx` (błąd wczytania, prosty język, zawsze przycisk „Ponów”).
+- **Tokeny:** `surface-inverse`, `text-inverse` (**P-T16**, do zatwierdzenia — odwrócony dymek podpowiedzi), `dialog-width`, `sheet-width`, `popover-width`, `toast-width` — `tokens.css`, `globals.css`, `lekcja-06/tokeny.md`.
+- **Dokumentacja i testy:** 12 stron MDX × 13 sekcji (razem w pakiecie: 30 stron MDX!), 12 plików stories ze stanami i testami interakcji (razem: 156 stories × 2 motywy = 312 uruchomień testowych).
+
+### Partie 4 i 5 — sprawdzone (2026-11-21)
+
+- `pnpm lint` (0 błędów, 0 ostrzeżeń — ESLint i Biome), `pnpm typecheck`, `pnpm test`, `pnpm build` — przechodzą.
+- `check:tokens`: **0 wartości spoza tokenów w całym packages/ui!** (skrypt wychodzi z kodem 0).
+- `test:stories:themes`: 31 plików stories, 156 testów w motywie jasnym i 156 testów w motywie ciemnym przechodzi z a11y `test: 'error'`.
+- `build-storybook`: kompilacja Storybooka do `storybook-static` bez błędów.
+- Znalezione i naprawione: dwa błędy lint `@typescript-eslint/no-confusing-void-expression` w stories Alert i ErrorState; formatowanie Biome po scaleniu partii; przykład z surowymi klasami palety Tailwinda (`bg-amber-100`) w `alert.mdx` zastąpiony tokenami.
+
+### Partie 4 i 5 — niesprawdzone
+
+- Ekrany aplikacji w przeglądarce pod kątem dialogów i alertów (wymagają bazy Postgres).
+- Czytnik ekranu na żywo (VoiceOver/NVDA) — role, atrybuty live region i focus trap zweryfikowane w automatycznych testach Vitest Playwright.
+
 ## Otwarte pytania (do właściciela)
 
-
-- Reguły „propozycja” na stronach partii 2 (m.in.: lista Select zawsze pod polem; Select do ok. 10 opcji, dalej Combobox; decyzje ze skutkiem bez domyślnego wyboru w RadioGroup; przełącznik zapisuje od razu, błąd zapisu cofa go z toastem; ToggleGroup najwyżej 4 opcje; filtr ceny zapisywany w URL po puszczeniu uchwytu).
-
-- Reguły bez źródła oznaczone „propozycja” na stronach partii 1 (m.in.: oznaczamy tylko pola opcjonalne; etykieta przycisku ≤ ok. 4 słowa; +30 % długości przy tłumaczeniu; układ akcji 320 / 768 px; link bez koloru „odwiedzony”; karta wyboru dla checklisty A1).
-
-- Propozycja: dołączyć `test:stories:themes` i `check:tokens` do CI po etapie 2 (dziś `check:tokens` pada na istniejących komponentach).
-- Propozycja (bez źródła w materiałach): „bez wersalików w etykietach, pogrubienie najwyżej 600” na stronie Typografia; „klasa `.light` tylko w dokumentacji” na stronie Motywy.
+- **P-T16 (nowy):** tokeny odwróconego tła i tekstu dla dymka podpowiedzi (`Tooltip`): `--surface-inverse` (`#211d18` jasny / `#fdfbf7` ciemny) i `--text-inverse` (`#fdfbf7` jasny / `#211d18` ciemny), kontrast 16.21 : 1 / 13.65 : 1.
+- Dołączenie `test:stories:themes` i `check:tokens` do CI (teraz `check:tokens` jest czysty i przechodzi!).
 
 ## Zatwierdzone decyzje
 
-- 2026-11-21 — P-T15 zatwierdzone; zablokowana zakładka bez kłódki (wystarczy powód w treści); oszczędność tokenów: partie 4 i 5 razem, jeden raport.
-
+- 2026-11-21 — P-T15 zatwierdzone; zablokowana zakładka bez kłódki (wystarczy powód w treści); oszczędność tokenów: partie 4 i 5 zrobione razem, jeden raport po zakończeniu etapu 2.
 - 2026-11-21 — P-T13 `layer-overlay` i P-T14 (przełącznik 44 × 24 px, suwak 4 px / uchwyt 20 px) zatwierdzone; „dalej” do partii 3.
-
 - 2026-11-21 — P-T11 `action-danger-hover` i P-T12 `space-tight` zatwierdzone; „dalej” do partii 2.
-
 - 2026-11-21 — etap 2: D1–D5 zatwierdzone; Z6 — zostają `sm` i `icon-sm` (32 px, pole kliknięcia 44 px) tylko dla gęstych wierszy, usunięte `xs`, `icon-xs`, `icon-lg`; Z8 — `Alert` bez domyślnej roli, `role="alert"` jawnie dla błędów dynamicznych; D6 — wariant `secondary` usunięty.
-
 - 2026-11-11 — tabela tokenów zatwierdzona w całości (P-T1–P-T10), zapis w `lekcja-06/tokeny.md`. Zatwierdzenie rozstrzyga Z1, Z3, Z4, Z5, Z7, Z9.
 - 2026-11-11 Q1 — tabelę tokenów proponuje agent (wg `od-decyzji-do-tokenow-devmentor.txt`), właściciel zatwierdza przed zapisem.
 - 2026-11-11 Q2 — **ciepły akcent zamiast zieleni** dla akcji głównej i stanów; zieleń najwyżej jako kolor sukcesu.
@@ -337,4 +348,5 @@ Pytania (materiały milczą — propozycje do decyzji):
 
 ## Następny krok
 
-Po „dalej” (i decyzji o P-T15): partia 4 — Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip (nakładki; motyw z `<html>` w portalach, testy `waitFor` dla animacji).
+**Etap 2 zakończony w 100% (wszystkie 30 komponentów bazowych gotowe, udokumentowane i przetestowane).**
+Po „dalej” przechodzimy do **Etapu 3**: Komponenty produktu, wzorce i ekrany (zgodnie z decyzją oszczędnościową skupione wokół kluczowych przepływów: ścieżka rezerwacji P2 → P3 → U1 → U5 oraz panel mentora M2).

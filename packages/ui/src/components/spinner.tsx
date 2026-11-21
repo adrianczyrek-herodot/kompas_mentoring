@@ -29,7 +29,10 @@ function Spinner({ className, size, label, ...props }: SpinnerProps) {
     return icon;
   }
   return (
-    <span role="status" className="inline-flex items-center gap-inline text-body-dense text-text-muted">
+    <span
+      role="status"
+      className="inline-flex items-center gap-inline text-body-dense text-text-muted"
+    >
       {icon}
       {label}
     </span>

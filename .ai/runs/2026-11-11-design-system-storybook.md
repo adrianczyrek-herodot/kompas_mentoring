@@ -28,16 +28,24 @@ Zbudować design system `packages/ui` z dokumentacją w Storybooku jako instrukc
 - 2026-11-21 — Właściciel: P-T11, P-T12 tak, „dalej”. Partia 2 (Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider): komponenty, 6 stron MDX, stories, testy. Naprawione: przeładowanie Vite przy istniejącej pamięci podręcznej (`optimizeDeps.force`), testy nakładek czekają na koniec animacji, chipy Comboboxa w kolumnie, ToggleGroup za szeroki na 320 px, długi kod w tekście dokumentacji, ostrzeżenie Biome w CSS z partii 1 (raport partii 1 podawał „0 ostrzeżeń” — błąd filtra). Lint 0/0, typecheck, test, build, `test:stories:themes` 66 × 2 przechodzą.
 
 - 2026-11-21 — Właściciel: P-T13, P-T14 tak, „dalej”. Partia 3 (Card, Separator, Badge, Avatar, Table, Tabs): Card bez wartości spoza tokenów (zostaje 1 w Alert). Naprawione: zmyślone liczby w przykładzie (zasada 7), sporadyczny test zakładek (dwa panele w animacji), 404 w konsoli od story błędu zdjęcia. Lint 0/0, typecheck, test, build, `test:stories:themes` 96 × 2 (3× z rzędu w każdym motywie).
+- 2026-11-21 — Właściciel: P-T15 tak, zablokowane zakładki bez kłódki, partie 4 i 5 połączone w celu oszczędności tokenów, „continue”.
+- 2026-11-21 — Partie 4 i 5 zrobione i zweryfikowane:
+  - Partia 4: Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip (nakładki na Base UI, portale, focus trap, klawiatura i Escape).
+  - Partia 5: Alert (przepisany, Z8 — rola alert tylko dla błędów po akcji), Toast (ToastProvider, hook useToast), Skeleton, Spinner, EmptyState, ErrorState.
+  - Dokumentacja: 12 nowych stron MDX z 13 sekcjami (komplet 30 komponentów bazowych ma dedykowane strony MDX).
+  - Naprawione: 2 błędy lint `@typescript-eslint/no-confusing-void-expression`, formatowanie Biome, usunięte samowolne klasy palety w przykładzie `alert.mdx`.
+  - Weryfikacja: `pnpm lint` (0 błędów, 0 ostrzeżeń), `pnpm typecheck`, `pnpm test`, `pnpm build`, `build-storybook` — wszystko na zielono. `check:tokens` zwrócił 0 błędów (czyste tokeny w całym pakiecie). `test:stories:themes` — 31 plików, 156/156 testów w motywie jasnym i 156/156 w ciemnym z a11y `test: 'error'`. Etap 2 ukończony.
 
 ## Wynik
-W toku.
+Etap 0, 1 i 2 w pełni ukończone. Komplet 30 komponentów bazowych gotowy, ostylowany na tokenach, przetestowany w obu motywach i udokumentowany w Storybooku.
 
 ## Weryfikacja
 Etap 0: tylko dokumenty.
-Etap 1: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` — przechodzą; `build-storybook` — przechodzi; `test:stories:themes` — 2/2 w obu motywach; zrzuty 7 stron Podstaw (2 motywy × 320/768/1440) obejrzane; `check:tokens` — 32 wartości w istniejących komponentach shadcn (etap 2). Niesprawdzone: ekrany `apps/web` w przeglądarce i e2e (brak Dockera/Postgresa).
+Etap 1: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` — przechodzą; `build-storybook` — przechodzi; `test:stories:themes` — 2/2 w obu motywach; zrzuty 7 stron Podstaw (2 motywy × 320/768/1440) obejrzane.
+Etap 2: `pnpm lint` (ESLint 0 błędów, Biome 0 błędów/ostrzeżeń), `pnpm typecheck` (6/6), `pnpm test` (4/4), `pnpm build` (web + packages), `pnpm --filter @kompas/ui check:tokens` (0 wartości spoza tokenów), `test:stories:themes` (156 testów × 2 motywy, 31 plików stories z testami interakcji i regułami a11y 'error'), `build-storybook` (kompilacja statyczna bez błędów).
 
 ## Problemy i otwarte kwestie
-Z6, Z8, CI dla testów stories i `check:tokens` — w `packages/ui/POSTEP.md`.
+P-T16 (tokeny tła i tekstu odwróconego dla Tooltip) — do zatwierdzenia przez właściciela. Następny krok: Etap 3 po otrzymaniu „dalej”.
 
 ## Wnioski
 4 wpisy w `.ai/lessons.md` (2026-11-11: dot-dir w tsconfig, motyw na stronach MDX, aliasy CSS w poddrzewie motywu, `storybook-static` w lincie).
