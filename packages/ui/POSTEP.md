@@ -247,8 +247,8 @@ Pytania (materiały milczą — propozycje do decyzji):
 | 1 | Button, Link, Input, Textarea, Field (+ Label, FieldOptional), Checkbox | **zrobiona 2026-11-21** |
 | 2 | Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider | **zrobiona 2026-11-21** |
 | 3 | Card, Separator, Badge, Avatar, Table, Tabs | **zrobiona 2026-11-21** |
-| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | następna |
-| 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | — |
+| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | **w toku (razem z 5)** |
+| 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | **w toku (razem z 4)** |
 
 ### Partia 1 — co powstało
 
@@ -309,7 +309,6 @@ Pytania (materiały milczą — propozycje do decyzji):
 
 ## Otwarte pytania (do właściciela)
 
-- **P-T15** rozmiary awatara 32 / 40 / 64 px i pasek aktywnej zakładki 2 px — do zatwierdzenia.
 
 - Reguły „propozycja” na stronach partii 2 (m.in.: lista Select zawsze pod polem; Select do ok. 10 opcji, dalej Combobox; decyzje ze skutkiem bez domyślnego wyboru w RadioGroup; przełącznik zapisuje od razu, błąd zapisu cofa go z toastem; ToggleGroup najwyżej 4 opcje; filtr ceny zapisywany w URL po puszczeniu uchwytu).
 
@@ -319,6 +318,8 @@ Pytania (materiały milczą — propozycje do decyzji):
 - Propozycja (bez źródła w materiałach): „bez wersalików w etykietach, pogrubienie najwyżej 600” na stronie Typografia; „klasa `.light` tylko w dokumentacji” na stronie Motywy.
 
 ## Zatwierdzone decyzje
+
+- 2026-11-21 — P-T15 zatwierdzone; zablokowana zakładka bez kłódki (wystarczy powód w treści); oszczędność tokenów: partie 4 i 5 razem, jeden raport.
 
 - 2026-11-21 — P-T13 `layer-overlay` i P-T14 (przełącznik 44 × 24 px, suwak 4 px / uchwyt 20 px) zatwierdzone; „dalej” do partii 3.
 

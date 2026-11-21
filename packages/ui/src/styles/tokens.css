@@ -60,6 +60,8 @@
   --raw-yellow-dark-900: #3a2f16;
   --raw-shadow-light: rgb(33 29 24 / 0.12);
   --raw-shadow-dark: rgb(0 0 0 / 0.5);
+  --raw-scrim-light: rgb(33 29 24 / 0.4);
+  --raw-scrim-dark: rgb(0 0 0 / 0.6);
 
   /* spacing scale (4-based) */
   --raw-space-0: 0px;
@@ -159,6 +161,7 @@
 
   /* depth. Class: shadow-overlay */
   --depth-overlay: 0 4px 16px var(--raw-shadow-light); /* R01.4, A01, P-T4: overlays only, never panels */
+  --surface-scrim: var(--raw-scrim-light); /* P-T16: backdrop under dialogs and sheets */
 
   /* shape (A01: no large radii; values P-T5). Classes: rounded-tag / -control / -panel / -round */
   --shape-tag: var(--raw-radius-4); /* badge, checkbox */
@@ -264,6 +267,7 @@
   --status-danger-bg: var(--raw-red-dark-900);
 
   --depth-overlay: 0 4px 16px var(--raw-shadow-dark);
+  --surface-scrim: var(--raw-scrim-dark);
 }
 
 /* State aliases of other semantic tokens — declared on every theme scope so they follow `.dark`. */
@@ -277,6 +281,8 @@
   --text-disabled: var(--text-subtle); /* D2: 4.93 : 1 light / 7.01 : 1 dark on surface-disabled */
   --border-disabled: var(--border-divider); /* D2 */
   --border-invalid: var(--status-danger-fg); /* D5: field error border, no glow */
+  --surface-inverse: var(--text-default); /* P-T16: tooltip background (16.21 : 1 / 13.65 : 1 with text-inverse) */
+  --text-inverse: var(--surface-panel);
 }
 
 /* Wider screens: roomier panels, sections and titles (KONCEPCJA §3.2 breakpoint 768 px). */
@@ -337,9 +343,14 @@
   --track-off: var(--border-control); /* WCAG 1.4.11: switch off, empty slider track (3.65 : 1) */
   --track-on: var(--selected-border); /* R04.2, K4: on / filled part = selection accent */
   --layer-overlay: 50; /* P-T13 (approved 2026-11-21): popups (select, combobox) above page content */
-  --avatar-sm: 2rem; /* P-T15: 32 px — lists, rows (M2 requests, A1 queue) */
-  --avatar-md: 2.5rem; /* P-T15: 40 px — mentor card (P2), header */
-  --avatar-lg: 4rem; /* P-T15: 64 px — profile hero (P3) */
-  --tab-indicator: var(--focus-ring-width); /* P-T15: 2 px bar under the active tab, in track-on */
+  --avatar-sm: 2rem; /* P-T15 (approved 2026-11-21): 32 px — lists, rows (M2 requests, A1 queue) */
+  --avatar-md: 2.5rem; /* P-T15 (approved): 40 px — mentor card (P2), header */
+  --avatar-lg: 4rem; /* P-T15 (approved): 64 px — profile hero (P3) */
+  --tab-indicator: var(--focus-ring-width); /* P-T15 (approved): 2 px bar under the active tab, in track-on */
   --card-header-columns: 1fr auto; /* title and description | action */
+  --icon-content-columns: auto 1fr; /* icon | text (Alert) */
+  --sheet-width: 25rem; /* P-T16: 400 px side panel (U5 reschedule, P2 filters on desktop) */
+  --popover-width: 20rem; /* P-T16: 320 px */
+  --tooltip-max: 15rem; /* P-T16: 240 px, short labels only */
+  --toast-width: 22.5rem; /* P-T16: 360 px */
 }

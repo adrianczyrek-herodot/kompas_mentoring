@@ -98,13 +98,22 @@ Decyzje właściciela D1–D5, Z6 (lista różnic w `packages/ui/POSTEP.md`) i d
 | `slider-track`, `slider-thumb` | 4 px, 20 px | **P-T14** (zatwierdzone) | suwak ceny P2; pole kliknięcia uchwytu 44 px |
 | `layer-overlay` | 50 | **P-T13** (zatwierdzone, techniczne) | warstwa list rozwijanych nad treścią |
 
-### Partia 3 (propozycja P-T15 — do zatwierdzenia)
+### Partia 3 (P-T15 — zatwierdzone 2026-11-21)
 
 | Token | Wartość | Źródło | Do czego |
 |---|---|---|---|
-| `avatar-sm` / `-md` / `-lg` | 32 / 40 / 64 px | **P-T15** (propozycja) | wiersze list (M2, A1) / karta mentora (P2), nagłówek / profil (P3) |
-| `tab-indicator` | 2 px (= `focus-ring-width`), kolor `track-on` | **P-T15** (propozycja), R04.2 | pasek pod aktywną zakładką |
+| `avatar-sm` / `-md` / `-lg` | 32 / 40 / 64 px | **P-T15** (zatwierdzone) | wiersze list (M2, A1) / karta mentora (P2), nagłówek / profil (P3) |
+| `tab-indicator` | 2 px (= `focus-ring-width`), kolor `track-on` | **P-T15** (zatwierdzone), R04.2 | pasek pod aktywną zakładką |
 | `card-header-columns` | `1fr auto` | techniczny | układ tytułu i akcji w nagłówku karty |
+
+### Partie 4–5 (propozycja P-T16 — do zatwierdzenia)
+
+| Token | Wartość | Źródło | Do czego |
+|---|---|---|---|
+| `surface-scrim` | atrament 40 % / czerń 60 % | **P-T16** (propozycja) | tło pod dialogiem i panelem bocznym |
+| `surface-inverse` / `text-inverse` | = `text-default` / `surface-panel` | **P-T16** (propozycja), WCAG 1.4.3 | podpowiedź (16,21 : 1 / 13,65 : 1) |
+| `sheet-width`, `popover-width`, `tooltip-max`, `toast-width` | 400 / 320 / 240 / 360 px | **P-T16** (propozycja) | szerokości nakładek |
+| `icon-content-columns` | `auto 1fr` | techniczny | ikona i tekst w `Alert` |
 
 ## Kontrast (policzony dla wartości z tabeli)
 

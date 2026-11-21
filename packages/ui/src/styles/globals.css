@@ -87,6 +87,9 @@
   --color-checkbox-check: var(--checkbox-check);
   --color-track-off: var(--track-off);
   --color-track-on: var(--track-on);
+  --color-surface-scrim: var(--surface-scrim);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-text-inverse: var(--text-inverse);
   --color-selected-bg: var(--selected-bg);
   --color-selected-border: var(--selected-border);
   --color-focus-ring: var(--focus-ring);
@@ -208,6 +211,10 @@
   --container-form: var(--form-max);
   --container-measure: var(--measure-text);
   --container-dialog: var(--dialog-width);
+  --container-sheet: var(--sheet-width);
+  --container-popover: var(--popover-width);
+  --container-tooltip: var(--tooltip-max);
+  --container-toast: var(--toast-width);
 
   /* motion */
   --default-transition-duration: var(--duration-base);
