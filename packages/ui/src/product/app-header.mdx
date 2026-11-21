@@ -1,0 +1,172 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { Badge } from '../components/badge';
+import { AppHeader } from './app-header';
+import * as AppHeaderStories from './app-header.stories';
+
+<Meta of={AppHeaderStories} />
+
+# AppHeader
+
+## 1. Do czego służy
+
+Rama aplikacji po zalogowaniu: logo, pięć sekcji roli (uczeń albo mentor) i miejsce na menu konta —
+żeby użytkownik zawsze wiedział, gdzie jest, i jednym kliknięciem przeszedł do innej sekcji.
+
+<Canvas of={AppHeaderStories.Playground} />
+<Controls of={AppHeaderStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Każdy ekran ucznia (U*) i wspólny (S1–S3): Szukaj · Sesje · Wiadomości · Postępy · Konto | KONCEPCJA §3.1 |
+| Każdy ekran mentora M2–M5: Panel · Kalendarz · Uczniowie · Wiadomości · Zarobki | KONCEPCJA §3.1, §3.2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast nagłówka aplikacji | Użyj | Źródło |
+|---|---|---|
+| Strony publiczne P1–P4 (gość) | osobny nagłówek z przełącznikiem waluty i strefy | KONCEPCJA §3.2 |
+| Pokój sesji U6 (pełny ekran wideo) | bez nawigacji — skupienie na sesji | **Propozycja:** U6 bez paska nawigacji |
+| Onboarding M1 przed zatwierdzeniem | bez sekcji M2–M5 (strażnik trasy przekierowuje do M1) | KONCEPCJA §3.2 |
+| Admin A1–A2 | nawigacja admina (poza tym komponentem) | KONCEPCJA §3.1 |
+| Tytuł bieżącego ekranu | `PageHeader` z `h1` | WCAG 2.4.6 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Logo „Kompas” | tak | link do `/` | KONCEPCJA §3.2 |
+| Nawigacja główna | tak | `nav aria-label="Główna"`, 5 pozycji roli, ikona + słowo | KONCEPCJA §3.1, R02.6 |
+| Bieżąca sekcja | gdy `current` | `aria-current="page"`, tło `selected-bg` i kolor linku (desktop) / pogrubienie (dolny pasek) | WCAG 1.4.1, WAI-ARIA (`aria-current`) |
+| Akcje | nie | slot `actions`: dzwonek powiadomień, awatar z menu (Konto, Zmień rolę, Wyloguj) | KONCEPCJA §3.2 |
+| Dolny pasek | tak, poniżej 768 px | druga `nav` „Główna (dolny pasek)”, przyklejona do dołu | KONCEPCJA §3.2 |
+
+## 5. Warianty
+
+<Canvas of={AppHeaderStories.Mentor} />
+
+| `role` | Pozycje | Źródło |
+|---|---|---|
+| `student` | Szukaj, Sesje, Wiadomości, Postępy, Konto | KONCEPCJA §3.1 |
+| `mentor` | Panel, Kalendarz, Uczniowie, Wiadomości, Zarobki | KONCEPCJA §3.1 |
+
+Pozycje są stałe w komponencie — nie dodawaj szóstej i nie dopisuj liczników (R02.4, R02.6).
+
+## 6. Stany
+
+Nagłówek nie ładuje danych — ładowanie, pusto i błąd należą do treści ekranu (sekcje stanów w
+`TodayAgenda`, `SessionListItem`). Stany pozycji nawigacji:
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Zwykła | `text-muted` | K4 |
+| Najechanie | tło `surface-hover`, `text-default` | D4 |
+| Fokus | obrys `focus-ring` | WCAG 2.4.7, P-T2 |
+| Bieżąca | `aria-current="page"` + tło / pogrubienie, nie sam kolor | WCAG 1.4.1 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Landmark `header` (banner) i `nav` z nazwą „Główna”; czytnik ogłasza „nawigacja Główna, lista, 5 elementów”. | WAI-ARIA (landmarks), WCAG 1.3.1 |
+| Bieżąca pozycja: czytnik dodaje „bieżąca strona” (`aria-current="page"`). | WAI-ARIA 1.2 (`aria-current`) |
+| Kolejność fokusu: logo, 5 pozycji, `actions`. Tab przechodzi po linkach, Enter otwiera sekcję. | WCAG 2.4.3, 2.1.1 |
+| Ikony `aria-hidden` — nazwą linku jest słowo. | WCAG 4.1.2 |
+| Dolny pasek: pozycje `min-h-target` / `min-w-target` (44 px); desktop — `min-h-control` (44 px). Minimum 24 × 24 px. | WCAG 2.5.8, K1 |
+| Na wąskim ekranie widoczna jest tylko jedna `nav` (druga ma `display: none`, więc znika też dla czytnika). | WAI-ARIA |
+| Dolny pasek jest `fixed` — treść strony potrzebuje dolnego odstępu o jego wysokości, żeby nie zasłaniał fokusu. Ograniczenie: nie ma jeszcze tokenu wysokości paska. | WCAG 2.4.11 |
+| Ekran zaczyna się od linku „Przejdź do treści” przed nagłówkiem (składa układ `apps/web`). | WCAG 2.4.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Pozycje to jedno słowo, rzeczownik. | „Sesje”, „Zarobki” | KONCEPCJA §3.1 |
+| Bez liczników nieprzeczytanych przy pozycjach. | — | R02.4 |
+| Bez emoji, tylko ikony funkcyjne lucide. | — | R02.5 |
+| Ograniczenie: etykiety i adresy pozycji są dziś na stałe w `navItems`; docelowo etykiety z `messages/pl.json`. | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+<Canvas of={AppHeaderStories.Mobile} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px (poniżej 768 px) | w nagłówku logo i `actions`; 5 pozycji w dolnym pasku (ikona nad słowem) | KONCEPCJA §3.2 |
+| od 768 px | pozycje w nagłówku między logo a `actions`; dolny pasek ukryty | KONCEPCJA §3.2 |
+| 1440 px | jak 768 px | KONCEPCJA §3.2 |
+
+Przełączenie zależy od szerokości okna, nie kontenera — sprawdzaj w story z wąskim viewportem.
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `role` | `'student' \| 'mentor'` (`NavRole`) | — | zestaw pięciu pozycji |
+| `current` | `string` | — | id bieżącej pozycji: `search`, `sessions`, `messages`, `progress`, `account` (uczeń) / `dashboard`, `calendar`, `students`, `messages`, `earnings` (mentor) |
+| `actions` | `ReactNode` | — | prawa strona nagłówka |
+| `className` | `string` | — | tylko układ, dotyczy `header` |
+| pozostałe | atrybuty `header` | — | bez `children` |
+
+Ograniczenie: linki to zwykłe `a href` — komponent nie przyjmuje linku routera (`next/link`).
+
+## 11. Kod
+
+```tsx
+import { AppHeader } from '@kompas/ui';
+
+<AppHeader role="student" current="sessions" />
+```
+
+Typowy przykład z produktu (układ `apps/web`, U4):
+
+```tsx
+import { AppHeader, Avatar, AvatarFallback, Button, Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@kompas/ui';
+
+<AppHeader
+  role="student"
+  current="sessions"
+  actions={
+    <Menu>
+      <MenuTrigger render={<Button variant="ghost" size="icon" />}>
+        <Avatar size="sm" aria-hidden="true"><AvatarFallback>AC</AvatarFallback></Avatar>
+        <span className="sr-only">{t('accountMenu')}</span>
+      </MenuTrigger>
+      <MenuContent align="end">
+        <MenuItem>{t('accountSettings')}</MenuItem>
+        <MenuSeparator />
+        <MenuItem>{t('signOut')}</MenuItem>
+      </MenuContent>
+    </Menu>
+  }
+/>
+{/* poniżej 768 px: dolny odstęp treści ≥ wysokości dolnego paska (WCAG 2.4.11) */}
+<main id="main">{children}</main>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<AppHeader role="student" current="sessions" className="w-full" />}
+      goodNote="Bieżąca sekcja oznaczona atrybutem aria-current i tłem, nie samym kolorem."
+      bad={<AppHeader role="student" className="w-full" />}
+      badNote="Bez current użytkownik i czytnik nie wiedzą, gdzie są (WAI-ARIA aria-current)."
+    />
+    <DoDont
+      good={<AppHeader role="mentor" current="dashboard" className="w-full" />}
+      goodNote="Pięć stałych pozycji bez liczników."
+      bad={<AppHeader role="mentor" current="dashboard" actions={<Badge variant="danger">Nowe</Badge>} className="w-full" />}
+      badNote="Licznik w nagłówku zachęca do sprawdzania wszystkiego, a nie tego, co wymaga działania (R02.4)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Współpracuje z:** `PageHeader` (tytuł ekranu pod nagłówkiem), `Menu` (menu konta), `Avatar`.
+- **Mylony z:** `Tabs` (przełączanie widoków w obrębie ekranu, np. Nadchodzące / Minione w U4).
+- **Wzorce:** rama aplikacji, strażnicy tras (KONCEPCJA §3.2).

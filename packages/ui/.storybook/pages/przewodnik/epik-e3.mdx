@@ -1,0 +1,76 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Epik E3 Dostępność i rezerwacje" />
+
+# Epik E3: Dostępność i rezerwacje
+
+Wybór terminu, sesje, przełożenie/anulowanie, panel mentora, powiadomienia.
+
+## Przepływ
+
+1. **U1 Wybór terminu** — tydzień, siatka slotów, długość, strefa, blokada (hold), countdown
+2. **U4 Moje sesje** — lista nadchodzących/minionych, status, akcja „Dołącz”
+3. **U5 Szczegóły sesji** — najważniejsze info + akcja, reguła 12 h, przełożenie/anulowanie
+4. **M2 Panel mentora** — prośby o sesję próbną (akceptuj/odrzuć z powodem), agenda dnia
+5. **M3 Kalendarz** — szablon tygodnia, wyjątki, ustawienia (Later)
+6. **S2 Powiadomienia** — lista z akcjami (Later)
+
+## Komponenty
+
+| Komponent | Ekrany | Stan dokumentacji |
+|---|---|---|
+| `WeekPicker` | U1, U5 | Pełna |
+| `SlotGrid` | U1, U5 | Pełna |
+| `DurationToggle` | U1 | Pełna |
+| `TimezoneSelect` | U1, S3 | Pełna |
+| `HoldCountdown` | U1 | Pełna |
+| `MentorSummaryBar` | U1 | Pełna |
+| `NextSessionCard` | U4, M2 | Pełna |
+| `SessionListItem` | U4, M2 | Pełna |
+| `BookingStatusBadge` | U4, U5 | Pełna |
+| `PolicyNotice` | U5 | Pełna |
+| `CancelDialog` | U5 | Pełna |
+| `RescheduleSheet` | U5 | Pełna |
+| `TrialRequestCard` | M2 | Pełna |
+| `TodayAgenda` | M2 | Pełna |
+| `AvailabilityWeek` | M3 | Brak (Later) |
+| `ExceptionForm` | M3 | Brak (Later) |
+| `CalendarSettingsForm` | M3 | Brak (Later) |
+| `NotificationItem` | S2 | Brak (Later) |
+
+## Ekrany jako stories
+
+| Story | Plik | Stany (mapa) |
+|---|---|---|
+| U1 Wybór terminu | `u1-booking.stories.tsx` | free, hold, held, expired, conflict, narrow |
+| U4 Moje sesje | `u4-sessions.stories.tsx` | loading, empty, error, upcoming, past, narrow |
+| U5 Szczegóły sesji | `u5-session.stories.tsx` | loading, upcoming, room-opens, in-progress, late-cancel, past, narrow |
+| M2 Panel mentora | `m2-dashboard.stories.tsx` | loading, empty, error, requests, agenda, narrow |
+
+## Wzorce używane
+
+- **Wybór terminu z blokadą** (U1) — `SlotGrid` + `HoldCountdown` + `SlotHold` pattern
+- **Zmiana z regułą 12 h** (U5) — `PolicyNotice` + `CancelDialog` + `RescheduleSheet` + `Change12h` pattern
+- **Decyzja z powodem** (M2) — `TrialRequestCard` + `DeclineDialog` + `DecisionReason` pattern
+- **Lista z filtrami** (U4) — `SessionListItem` + `BookingStatusBadge` + filtry statusu
+- **Widok szczegółów** (U5) — `NextSessionCard` + `PolicyNotice` + akce
+
+## Pliki źródłowe
+
+- `packages/ui/src/product/slot-grid.tsx`
+- `packages/ui/src/product/hold-countdown.tsx`
+- `packages/ui/src/product/booking-status-badge.tsx`
+- `packages/ui/src/product/policy-notice.tsx`
+- `packages/ui/src/product/trial-request-card.tsx`
+- `packages/ui/src/product/today-agenda.tsx`
+- `packages/ui/src/screens/u1-booking.stories.tsx`
+- `packages/ui/src/screens/u5-session.stories.tsx`
+- `packages/ui/src/screens/m2-dashboard.stories.tsx`
+- `packages/ui/.storybook/pages/przewodnik/epik-e3.mdx` (ten plik)
+
+## Praca, która zostaje w produkcie
+
+- Implementacja `AvailabilityWeek`, `ExceptionForm`, `CalendarSettingsForm` (M3)
+- Implementacja `NotificationItem` (S2)
+- Logika hold/409 po stronie serwera (pg-boss job wygasania)
+- E2E testy ścieżki U1 → U5 → M2

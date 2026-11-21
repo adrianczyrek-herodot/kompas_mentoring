@@ -1,0 +1,136 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Separator } from './separator';
+import * as CardStories from './card.stories';
+
+<Meta of={CardStories} />
+
+# Card
+
+## 1. Do czego służy
+
+Wyodrębnia jedną sekcję ekranu (profil, prywatność, status profilu), żeby użytkownik widział, co
+do siebie należy.
+
+<Canvas of={CardStories.Playground} />
+<Controls of={CardStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Sekcje konta: Profil, Hasło, Zgody, Prywatność (S3) | F1 Q7, `apps/web/app/konto` |
+| Formularz logowania i rejestracji na tle strony (P4) | `apps/web` (auth-page) |
+| Sekcje panelu mentora: dzisiaj, prośby, status profilu (M2) | KONCEPCJA §M2 |
+| Sekcje profilu mentora: opis, doświadczenie (P3) | KONCEPCJA §P3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast karty | Użyj | Źródło |
+|---|---|---|
+| Elementy listy (mentorzy w P2, sesje w U4) | wiersze oddzielone `Separator` / `border-divider` | R01.4 |
+| Karta w karcie | odstęp `space-group` i `Separator` w jednej karcie | A01, prompt („karta w karcie”) |
+| Trzy identyczne karty z ikoną jako „zalety” | zwykły tekst lub lista | A01 |
+| Komunikat (błąd, ostrzeżenie) | `Alert` (partia 5) | WCAG 1.4.1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Card` | tak | `rounded-panel`, ramka `border-divider`, tło `surface-panel`, odstęp `space-panel` (16 → 24 px od 768 px), bez cienia |
+| `CardHeader` | nie | tytuł, opis i opcjonalna akcja po prawej |
+| `CardTitle` | zalecany | dziecko to nagłówek (`<h2>` / `<h3>`) |
+| `CardDescription` | nie | `text-body-dense`, `text-text-muted` |
+| `CardAction` | nie | znacznik statusu lub przycisk w nagłówku |
+| `CardContent` | tak | treść |
+| `CardFooter` | nie | akcje nad linią `border-divider` |
+
+## 5. Warianty
+
+<Canvas of={CardStories.Variants} />
+
+| Wariant (`size`) | Kiedy wybrać | Źródło |
+|---|---|---|
+| `default` | sekcje formularzy i profilu | R01.1 |
+| `sm` | gęste podsumowania w panelu (M2) | K1 |
+
+## 6. Stany
+
+<Canvas of={CardStories.States} />
+
+Karta nie jest interaktywna: najechanie, fokus, wciśnięcie, wybór, zablokowanie i błąd nie dotyczą.
+Klikalną całą kartę robi komponent produktu z linkiem w tytule (etap 3), nie `Card`. Stany danych
+(ładowanie, pusto, błąd) mają komponenty produktu i wzorce w etapie 3.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Tytuł karty to nagłówek (`<h2>` w sekcji strony z `<h1>`), więc czytnik pozwala skakać między sekcjami. | WCAG 1.3.1, 2.4.6 |
+| Karta to zwykły `div` — bez roli `region`, chyba że sekcja jest punktem orientacyjnym strony. | WAI-ARIA |
+| Kolejność w DOM = kolejność wizualna (nagłówek, treść, stopka). | WCAG 1.3.2 |
+| Granica karty jest dekoracyjna (`border-divider`); znaczenie niesie nagłówek. | WCAG 1.4.11 (nie dotyczy dekoracji) |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tytuł: rzeczownik, 1–3 słowa. | „Prywatność” | teksty S3 |
+| Opis: jedno zdanie, po co ta sekcja. | „Tak zobaczą Cię mentorzy i uczniowie.” | R05.2 |
+| Długi tytuł zawija się; nie ucinaj imion i nazwisk. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={CardStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | odstęp wewnętrzny 16 px, akcje w stopce zawijają się, przycisk główny na całą szerokość | P-T7 |
+| 768 / 1440 px | odstęp 24 px; karty sekcji formularza najwyżej `form-max` | P-T7, makieta |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Card><CardHeader><CardTitle>Hasło</CardTitle></CardHeader><CardContent><p className="text-body-dense">Zmień hasło.</p></CardContent></Card>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Card` | `size` | `'default' \| 'sm'` | `'default'` | odstępy |
+| wszystkie | `className` | `string` | — | tylko układ |
+| wszystkie | atrybuty `div` | — | — | — |
+
+## 11. Kod
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle><h2>Profil</h2></CardTitle>
+  </CardHeader>
+  <CardContent>{/* pola */}</CardContent>
+</Card>
+```
+
+Typowy przykład z produktu (S3, `apps/web/app/konto/page.tsx`): funkcja `Section` z `title`
+i `children` składająca `Card`, `CardHeader`, `CardTitle` i `CardContent`.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Card className="w-full"><CardHeader><CardTitle>Zgody</CardTitle></CardHeader><CardContent className="flex flex-col gap-group"><p className="text-body-dense">Regulamin</p><Separator /><p className="text-body-dense">Marketing</p></CardContent></Card>}
+      goodNote="Grupy w karcie oddziela linia."
+      bad={<Card className="w-full"><CardHeader><CardTitle>Zgody</CardTitle></CardHeader><CardContent className="flex flex-col gap-group"><Card size="sm"><p className="text-body-dense">Regulamin</p></Card><Card size="sm"><p className="text-body-dense">Marketing</p></Card></CardContent></Card>}
+      badNote="Karta w karcie podwaja ramki i odstępy (A01)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Alert` (komunikat), wiersz listy (komponenty produktu, R01.4).
+- **Wzorce:** widok szczegółów (sekcje P3, U5), formularz (sekcje S3).

@@ -1,0 +1,182 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { requestPawel, TZ } from '../../.storybook/fixtures/kompas';
+import { Badge } from '../components/badge';
+import { Button } from '../components/button';
+import { TrialRequestCard } from './trial-request-card';
+import * as TrialRequestCardStories from './trial-request-card.stories';
+
+<Meta of={TrialRequestCardStories} />
+
+# TrialRequestCard
+
+## 1. Do czego służy
+
+Prośba ucznia o sesję próbną w panelu mentora (M2): kto, kiedy, z czym przychodzi i do kiedy
+odpowiedzieć — żeby mentor przyjął albo odrzucił ją z powodem bez otwierania kolejnego ekranu.
+
+<Canvas of={TrialRequestCardStories.Playground} />
+<Controls of={TrialRequestCardStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Sekcja „Prośby o sesję próbną” w M2 (akceptuj / odrzuć, SLA 24 h) | KONCEPCJA §M2, E3-S7 |
+| Głęboki link z e-maila „nowa prośba” prowadzący do M2 | KONCEPCJA §3.2 (głębokie linki) |
+
+## 3. Kiedy nie używać
+
+| Zamiast karty | Użyj | Źródło |
+|---|---|---|
+| Sesja już potwierdzona | `SessionListItem` / `TodayAgenda` | KONCEPCJA §M2, §U4 |
+| Status prośby widziany przez ucznia | `BookingStatusBadge` `requested` w `SessionListItem` | KONCEPCJA §U4 |
+| Odrzucenie bez powodu jednym kliknięciem | `onDecline` otwiera dialog „Decyzja z powodem” | KONCEPCJA §M2 (Walidacje), E3-S7 |
+| Odliczanie do końca SLA | zdanie „Odpowiedz do … Bez odpowiedzi …” (wbudowane) | A02, E3-S7 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Awatar | tak | inicjały ucznia, `sm` | — |
+| Uczeń i termin | tak | imię, „Sesja próbna 30 min”, `DateTime` terminu | KONCEPCJA §M2, brief reguła 10 |
+| Cel ucznia | tak | `blockquote` — słowa ucznia, do `max-w-measure` | KONCEPCJA §U2 (20–500 znaków) |
+| Termin odpowiedzi | tak | „Odpowiedz do (termin). Bez odpowiedzi prośba zostanie przyjęta automatycznie, jeśli termin będzie wolny.” — tekst `meta`, bez koloru ostrzegawczego | E3-S7, A02 |
+| „Przyjmij” | tak | `Button` `outline` `sm` | R01.6, Z6 |
+| „Odrzuć…” | tak | `Button` `ghost` `sm`; wielokropek = otworzy dialog | E3-S7, R05.3 |
+| Linia podziału | tak | `border-border-divider`, wiersz listy, bez cienia | R01.4 |
+
+## 5. Warianty
+
+Brak propu wariantu. Obie akcje są drugorzędne, bo w M2 akcją główną jest „Dołącz” w
+`TodayAgenda`, a próśb bywa kilka (R01.6).
+
+<Canvas of={TrialRequestCardStories.Accepting} />
+
+| Przypadek | Wygląd | Źródło |
+|---|---|---|
+| `accepting: false` | obie akcje aktywne | E3-S7 |
+| `accepting: true` | „Przyjmij” ze wskaźnikiem i `aria-busy`, „Odrzuć…” zablokowane | KONCEPCJA §P4 (blokada podwójnego wysłania) |
+
+## 6. Stany
+
+<Canvas of={TrialRequestCardStories.Loading} />
+<Canvas of={TrialRequestCardStories.Empty} />
+<Canvas of={TrialRequestCardStories.ErrorLoading} />
+<Canvas of={TrialRequestCardStories.ManyRequests} />
+<Canvas of={TrialRequestCardStories.LongContent} />
+
+| Stan | Jak pokazać | Źródło |
+|---|---|---|
+| Ładowanie | szkielety wierszy w `ul aria-busy="true"` („Wczytujemy prośby”) — składa ekran | KONCEPCJA §M2 (L) |
+| Pusto | `EmptyState` „Brak nowych próśb” + zdanie, że prośba przyjdzie też e-mailem | KONCEPCJA §M2 (E) |
+| Błąd | `ErrorState` per sekcja: „Pozostałe sekcje panelu działają.” + „Ponów” | KONCEPCJA §M2 (Er — Ponów per sekcja) |
+| Dużo danych | wiersze jeden pod drugim w `ul aria-label="Prośby o sesję próbną"` | R01.1, K1 |
+| Wysyłanie akceptacji | sekcja 5 | KONCEPCJA §P4 |
+| Po decyzji | prośba znika z listy, potwierdzenie toastem — robi ekran | **Propozycja:** toast po akcji jak w U5 (KONCEPCJA §U5 S) |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Renderuje `li` — zawsze w `ul` z `aria-label`. | WCAG 1.3.1 |
+| Fokus: „Przyjmij”, potem „Odrzuć…”. Enter i Spacja uruchamiają akcję. | WCAG 2.4.3, WAI-ARIA APG (Button) |
+| Oba przyciski mają `aria-describedby` na wiersz z imieniem i terminem — czytnik czyta „Przyjmij, przycisk, Paweł R. · Sesja próbna 30 min · …”, więc wiadomo, której prośby dotyczy. | WCAG 2.4.6, 4.1.2 |
+| Podczas `accepting` przycisk ma `aria-busy`, fokus zostaje; drugie kliknięcie nic nie wysyła. | WAI-ARIA 1.2 (`aria-busy`), KONCEPCJA §P4 |
+| Po „Odrzuć…” fokus wchodzi do dialogu z powodem i wraca na listę po zamknięciu. | WAI-ARIA APG (Dialog) |
+| Przyciski `sm`: 32 px wizualnie, pole kliknięcia 44 px (≥ 24 × 24 px). | WCAG 2.5.8, K1, Z6 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| SLA jako fakt i skutek, bez odliczania, wykrzyknika i czerwieni. | „Odpowiedz do śr., 21 paź, 10:30. Bez odpowiedzi prośba zostanie przyjęta automatycznie, jeśli termin będzie wolny.” | A02, E3-S7 |
+| Cel ucznia bez redakcji, w cytacie. | „Mam rozmowę techniczną za 2 tygodnie w scale-upie…” | KONCEPCJA §U2 |
+| Wielokropek w etykiecie, gdy akcja otwiera dialog. | „Odrzuć…” | **Propozycja:** konwencja etykiet otwierających dialog |
+| Odrzucenie wymaga powodu z listy albo „inne” 10–300 znaków (w dialogu, nie w karcie). | — | KONCEPCJA §M2, E3-S7 |
+| Ograniczenie: teksty karty są dziś na stałe w komponencie; docelowo z `messages/pl.json`. | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | cel i termin odpowiedzi się zawijają; przyciski w rzędzie, zawijają się, gdy brak miejsca | K1 |
+| 768 / 1440 px | układ bez zmian; listę ogranicz do `max-w-form` | tokeny.md (`form-max`) |
+
+Story „Długie teksty i 320 px” — sekcja 6.
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `request` | `TrialRequest` | — | `id`, `student`, `startsAt` (ISO), `goal`, `respondBy` (ISO, prośba + 24 h) |
+| `timeZone` | `string` (IANA) | — | strefa mentora-oglądającego |
+| `onAccept` | `() => void` | — | komenda akceptacji |
+| `onDecline` | `() => void` | — | otwiera dialog z powodem — nie odrzuca od razu |
+| `accepting` | `boolean` | `false` | akceptacja w toku: wskaźnik, blokada drugiego kliknięcia i „Odrzuć…” |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `li` | — | bez `children` |
+
+## 11. Kod
+
+```tsx
+import { TrialRequestCard } from '@kompas/ui';
+
+<ul aria-label="Prośby o sesję próbną">
+  <TrialRequestCard request={request} timeZone={viewerTimeZone} onAccept={accept} onDecline={openDecline} />
+</ul>
+```
+
+Typowy przykład z produktu (M2, sekcja próśb):
+
+```tsx
+import { TrialRequestCard } from '@kompas/ui';
+
+<section aria-labelledby="requests-heading" className="flex flex-col gap-inline">
+  <h2 id="requests-heading" className="text-section-title font-semibold">{t('trialRequests')}</h2>
+  <ul aria-label={t('trialRequests')}>
+    {requests.map((request) => (
+      <TrialRequestCard
+        key={request.id}
+        request={request}
+        timeZone={viewerTimeZone}
+        accepting={pendingId === request.id}
+        onAccept={() => accept(request.id)}
+        onDecline={() => setDeclining(request)}
+      />
+    ))}
+  </ul>
+  {/* Dialog „Decyzja z powodem”: lista powodów + „inne” 10–300 znaków */}
+</section>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<ul className="w-full"><TrialRequestCard request={requestPawel} timeZone={TZ} /></ul>}
+      goodNote="Termin odpowiedzi i skutek podane spokojnie, zwykłym tekstem."
+      bad={<Badge variant="danger">Pilne! Odpowiedz teraz</Badge>}
+      badNote="Czerwona presja i wykrzyknik zamiast faktu (A02)."
+    />
+    <DoDont
+      good={<Button variant="ghost" size="sm">Odrzuć…</Button>}
+      goodNote="Odrzucenie otwiera dialog z powodem."
+      bad={<Button variant="destructive" size="sm">Odrzuć</Button>}
+      badNote="Odrzucenie jednym kliknięciem pomija wymagany powód (KONCEPCJA §M2)."
+    />
+    <DoDont
+      good={<><Button variant="outline" size="sm">Przyjmij</Button><Button variant="ghost" size="sm">Odrzuć…</Button></>}
+      goodNote="Obie akcje drugorzędne — akcją główną M2 jest „Dołącz”."
+      bad={<><Button size="sm">Przyjmij</Button><Button size="sm">Odrzuć…</Button></>}
+      badNote="Dwie akcje główne w każdej prośbie spłaszczają hierarchię ekranu (R01.6)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Składa się z:** `Avatar`, `DateTime`, `Button`.
+- **Mylony z:** `SessionListItem` (sesja już umówiona), `TodayAgenda` (dzisiejsze sesje).
+- **Wzorce:** „Decyzja z powodem” (`Dialog` + `RadioGroup` + `Textarea`), stany danych sekcji z ponowieniem per sekcja (M2), blokada podwójnego wysłania (`Button` `loading`).

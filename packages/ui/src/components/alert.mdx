@@ -1,0 +1,144 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Alert, AlertAction, AlertDescription, AlertTitle } from './alert';
+import { Button } from './button';
+import * as AlertStories from './alert.stories';
+
+<Meta of={AlertStories} />
+
+# Alert
+
+## 1. Do czego służy
+
+Komunikuje ważną informację systemową, ostrzeżenie lub błąd w kontekście całego ekranu lub sekcji, pomagając użytkownikowi zrozumieć stan aplikacji i podjąć odpowiednie działanie.
+
+<Canvas of={AlertStories.Playground} />
+<Controls of={AlertStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Informacja w panelu mentora: „Przyjmowanie nowych uczniów jest wstrzymane” (M3) | KONCEPCJA §M3 |
+| Przypomnienie o regule 12 godzin przy próbie zmiany terminu sesji (U5) | KONCEPCJA §U5, A04 |
+| Podsumowanie błędów formularza na samej górze strony po nieudanej walidacji | WAI-ARIA APG |
+| Komunikat weryfikacyjny: „Twój profil oczekuje na weryfikację przez zespół zaufania” (M1) | KONCEPCJA §M1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast alertu sekcji | Użyj | Źródło |
+|---|---|---|
+| Błąd walidacji pojedynczego pola wejściowego | `FieldError` pod polem | prompt, D5 |
+| Krótkie potwierdzenie wykonania akcji (np. „Zapisano zmiany”) | `Toast` | R05.3 |
+| Błąd wczytywania całego widoku uniemożliwiający pracę | `ErrorState` z przyciskiem „Ponów” | prompt |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Alert` | tak | Kontener z obramowaniem, tłem stanu i odpowiednim wcięciem |
+| Ikona statusu | tak | Zawsze obecna ikona dopasowana do wariantu (kolor nie jest jedynym nośnikiem) |
+| `AlertTitle` | tak | Zwięzły tytuł komunikatu (`text-label` font-medium) |
+| `AlertDescription` | opcjonalnie | Rozwinięcie wyjaśniające szczegóły lub kroki naprawcze |
+| `AlertAction` | opcjonalnie | Przycisk lub łącze umożliwiające natychmiastowe rozwiązanie problemu |
+
+## 5. Warianty
+
+<Canvas of={AlertStories.Variants} />
+
+| Wariant | Przeznaczenie | Kolorystyka | Źródło |
+|---|---|---|---|
+| `neutral` | Informacje organizacyjne, statusy w toku | Tło `surface-sunken`, ikona neutralna | P-T3 |
+| `warning` | Ostrzeżenia, zasada 12 h, wstrzymane przyjmowanie | Tło `status-warning-bg`, ikona ostrzeżenia | KONCEPCJA §U5 |
+| `danger` | Krytyczne błędy blokujące wykonanie zadania | Tło `status-danger-bg`, ikona błędu | WCAG 1.4.1 |
+| `success` | Potwierdzenie statusu weryfikacji lub zakończenia etapu | Tło `status-success-bg`, ikona sukcesu | KONCEPCJA §M1 |
+
+## 6. Stany
+
+<Canvas of={AlertStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Statyczny | Wyświetlany na stałe w strukturze dokumentu, rola informacyjna | Z8 |
+| Dynamiczny (po akcji) | Pojawia się w odpowiedzi na błąd formularza; posiada `role="alert"` i natychmiast ogłasza błąd czytnikowi | Z8, WCAG 4.1.3 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| `role="alert"` jest używana WYŁĄCZNIE dla błędów pojawiających się dynamicznie po akcji użytkownika (Z8). Statyczne banery informacyjne nie mają tej roli, aby nie zakłócać czytania strony. | Z8, WAI-ARIA |
+| Kolor nigdy nie jest jedynym nośnikiem informacji: każdy alert zawiera dedykowaną ikonę oraz tekst. | WCAG 1.4.1 |
+| Wyraźny kontrast tekstu i ikon względem tła alertu (co najmniej 4.5:1). | WCAG 1.4.3 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tytuł jasno komunikuje sytuację bez żargonu technicznego. | „Wstrzymano przyjmowanie nowych uczniów” | KONCEPCJA §M3 |
+| Opis precyzuje, co użytkownik może zrobić, a czego nie. | „Twój profil jest ukryty w wynikach wyszukiwania. Zaplanowane wcześniej sesje odbędą się normalnie.” | R05.2 |
+
+## 9. Responsywność
+
+<Canvas of={AlertStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Ikona i treść układają się elastycznie; akcja przenosi się pod treść komunikatu | propozycja |
+| 768 / 1440 px | Układ poziomy z akcją po prawej stronie lub pod opisem | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Alert` | `variant` | `'neutral' \| 'warning' \| 'danger' \| 'success'` | `'neutral'` | Wariant semantyczny alertu |
+| `Alert` | `role` | `'alert' \| 'status' \| 'region'` | zależnie od wariantu | Dostępna rola ARIA (Z8) |
+| `AlertTitle` | `className` | `string` | — | Dodatkowe klasy CSS |
+| `AlertDescription` | `className` | `string` | — | Dodatkowe klasy CSS |
+
+## 11. Kod
+
+```tsx
+<Alert variant="warning">
+  <AlertTriangle className="size-icon-sm" />
+  <AlertTitle>Do sesji zostało mniej niż 12 godzin</AlertTitle>
+  <AlertDescription>
+    Przełożenie terminu w tym oknie czasowym wymaga zgody mentora. Jeśli odwołasz sesję teraz, kredyt nie zostanie zwrócony.
+  </AlertDescription>
+  <AlertAction>
+    <Button variant="outline" size="sm">Regulamin odwołań</Button>
+  </AlertAction>
+</Alert>
+```
+
+Typowy przykład z produktu (U5): przypomnienie o regule 12 godzin przy próbie zmiany rezerwacji.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <Alert variant="warning">
+            <AlertTitle>Przyjmowanie nowych uczniów wstrzymane</AlertTitle>
+            <AlertDescription>Profil nie pojawia się w katalogu mentorów.</AlertDescription>
+          </Alert>
+        </div>
+      }
+      goodNote="Wyraźna ikona, czytelny tekst stanu i odpowiedni wariant ostrzegawczy."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <div className="p-panel border border-border-divider rounded-panel">
+            <span className="text-body-dense font-medium">Błąd! Coś poszło nie tak.</span>
+          </div>
+        </div>
+      }
+      badNote="Nigdy nie twórz alertów bez ikony oraz konkretnego wyjaśnienia problemu i kroków naprawczych."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Toast` (chwilowe powiadomienie po akcji), `FieldError` (komunikat pod polem).
+- **Wzorce:** reguła 12 godzin (U5), statusy wniosku i profilu (M1, M3).

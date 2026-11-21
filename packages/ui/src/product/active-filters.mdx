@@ -1,0 +1,165 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { X } from 'lucide-react';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { Button } from '../components/button';
+import { ActiveFilters } from './active-filters';
+import * as ActiveFiltersStories from './active-filters.stories';
+
+<Meta of={ActiveFiltersStories} />
+
+# ActiveFilters
+
+## 1. Do czego służy
+
+Pokazuje nad listą wyników, ile jest wyników i które filtry działają, i pozwala usunąć każdy
+filtr jednym kliknięciem — żeby gość wiedział, dlaczego widzi taką listę, i mógł ją szybko
+poszerzyć (KONCEPCJA §P2: ResultCount, ActiveFilterChips).
+
+<Canvas of={ActiveFiltersStories.Playground} />
+<Controls of={ActiveFiltersStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Nad listą mentorów P2, pod paskiem filtrów (desktop) lub pod przyciskiem otwierającym filtry w bottom sheet (mobile) | KONCEPCJA §P2, E2-S5 |
+| Każda lista z filtrami zapisanymi w URL, gdzie użytkownik ma widzieć liczbę wyników | KONCEPCJA §P2 „Walidacje” (filtry w URL) |
+
+## 3. Kiedy nie używać
+
+| Zamiast `ActiveFilters` | Użyj | Źródło |
+|---|---|---|
+| Ustawianie filtrów (temat, cena, język) | pola w pasku filtrów: `Select`, `Combobox`, `Slider`, `Checkbox` | KONCEPCJA §P2 (FilterBar) |
+| Tagi kompetencji mentora (nie da się ich usunąć) | `Badge` w `MentorCard` | KONCEPCJA §P2 |
+| Kategorie do wyboru na stronie głównej | `CategoryChips` (jeszcze nie ma w systemie) | KONCEPCJA §P1 |
+| Status obiektu | `Badge`, `BookingStatusBadge` | WCAG 1.4.1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Liczba wyników | tak | `text-label`, cyfry tabelaryczne, odmiana przez `countForms`; region `aria-live="polite"` | KONCEPCJA §P2 (ResultCount), WCAG 4.1.3 |
+| Lista filtrów | gdy `filters.length > 0` | `<ul aria-label="Aktywne filtry">` | WCAG 1.3.1 |
+| Filtr | tak, w liście | `Button variant="outline" size="sm"` z etykietą i ikoną X; nazwa „etykieta — usuń filtr” | WCAG 2.5.3, 4.1.2 |
+| „Wyczyść wszystkie” | gdy filtry są co najmniej dwa | `Button variant="link" size="sm"` | **Propozycja:** jeden filtr usuwa się jego własnym przyciskiem, więc drugi przycisk byłby zbędny |
+
+## 5. Warianty
+
+Komponent nie ma wariantów wyglądu. Zmienia się liczba filtrów (zero, jeden, kilka) — zob. sekcja 6.
+
+## 6. Stany
+
+| Stan danych | Co pokazać | Story | Źródło |
+|---|---|---|---|
+| Ładowanie | liczba wyników zostaje z poprzedniego wyniku; stan ładowania pokazuje lista pod spodem (szkielety `MentorCard`) | — (nie dotyczy komponentu) | KONCEPCJA §P2 (L) |
+| Pusto — bez filtrów | sama liczba wyników | `NoFilters` | KONCEPCJA §P2 |
+| Zero wyników | „0 mentorów” + filtry do usunięcia; pod spodem `EmptyState` z „Wyczyść filtr X” | `ZeroResults` | KONCEPCJA §P2 (E), E2-S5 |
+| Błąd | komponent się nie zmienia (filtry zostają, KONCEPCJA §P2 Er); błąd pokazuje `ErrorState` listy | — (nie dotyczy komponentu) | KONCEPCJA §P2 (Er) |
+| Częściowe dane | jeden filtr — bez „Wyczyść wszystkie”; odmiana „1 mentor” | `OneResult` | — |
+| Dużo danych / długie teksty | filtry się zawijają, długa etykieta zostaje w całości | `Narrow` | WCAG 1.4.10 |
+
+<Canvas of={ActiveFiltersStories.NoFilters} />
+<Canvas of={ActiveFiltersStories.ZeroResults} />
+<Canvas of={ActiveFiltersStories.OneResult} />
+
+Stany przycisków (najechanie, fokus, wciśnięcie) — zob. strona `Button`. Filtr nie ma stanu
+zablokowanego ani wybranego: jest albo aktywny (widoczny), albo usunięty.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Każdy filtr to prawdziwy `<button>`; Tab przechodzi po filtrach w kolejności, potem do „Wyczyść wszystkie”; Enter i Spacja usuwają filtr. | WAI-ARIA APG (Button), WCAG 2.1.1, story `RemoveTest` |
+| Nazwa filtra zaczyna się od widocznej etykiety: czytnik ogłasza „Frontend — usuń filtr, przycisk”; sterowanie głosem działa po słowie „Frontend”. | WCAG 2.5.3, 4.1.2 |
+| Ikona X jest dekoracyjna (`aria-hidden`). | WCAG 1.1.1 |
+| Zmiana liczby wyników jest ogłaszana uprzejmie („6 mentorów”), bez przenoszenia fokusu. | WCAG 4.1.3 |
+| **Propozycja:** po usunięciu filtra ekran przenosi fokus na następny filtr, a gdy go nie ma — na liczbę wyników; komponent tego nie robi sam (przycisk znika z DOM). | — |
+| Przyciski `sm` mają 32 px wysokości i pole kliknięcia 44 × 44 px; minimum WCAG to 24 × 24 px. | Z6, K1, WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykieta filtra = wartość, tak jak w pasku filtrów, bez nazwy pola, gdy wartość mówi sama za siebie. | „Frontend”, „0–200 zł”, „angielski” | **Propozycja** |
+| Liczba z poprawną odmianą przez `countForms`. | „1 mentor”, „4 mentorów” | R05.2 |
+| Ceny w etykiecie w złotych, bez groszy, jak w suwaku ceny. | „0–200 zł” | KONCEPCJA §P2 (cena 0–1000 zł) |
+
+## 9. Responsywność
+
+<Canvas of={ActiveFiltersStories.Narrow} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | liczba wyników nad filtrami, filtry zawijają się w wiele wierszy | KONCEPCJA Z9, WCAG 1.4.10 |
+| od 768 px | liczba wyników i filtry w jednym rzędzie | **Propozycja** |
+| 1440 px | jak 768 px | — |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `resultCount` | `number` | — | liczba wyników dla bieżących filtrów; zmiana jest ogłaszana |
+| `countForms` | `CountForms` (`{ one, few, many }`) | — | formy rzeczownika, np. mentor / mentorów / mentorów |
+| `filters` | `ActiveFilter[]` (`{ id, label }`) | — | aktywne filtry w kolejności paska filtrów |
+| `onRemove` | `(id: string) => void` | — | usunięcie jednego filtra |
+| `onClearAll` | `() => void` | — | „Wyczyść wszystkie” |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `<div>` | — | bez `children` |
+
+## 11. Kod
+
+```tsx
+import { ActiveFilters } from '@kompas/ui';
+
+<ActiveFilters
+  resultCount={6}
+  countForms={{ one: 'mentor', few: 'mentorów', many: 'mentorów' }}
+  filters={[]}
+/>
+```
+
+Typowy przykład z produktu (P2, filtry w URL):
+
+```tsx
+<ActiveFilters
+  resultCount={data.total}
+  countForms={{ one: 'mentor', few: 'mentorów', many: 'mentorów' }}
+  filters={[
+    { id: 'topic', label: 'Frontend' },
+    { id: 'price', label: '0–200 zł' },
+  ]}
+  onRemove={(id) => router.replace(withoutParam(searchParams, id))}
+  onClearAll={() => router.replace(pathname)}
+/>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<ActiveFilters resultCount={4} countForms={{ one: 'mentor', few: 'mentorów', many: 'mentorów' }} filters={[{ id: 'topic', label: 'Frontend' }, { id: 'price', label: '0–200 zł' }]} />}
+      goodNote="Każdy filtr to przycisk z nazwą „… — usuń filtr”."
+      bad={<span className="inline-flex items-center gap-tight text-meta text-text-muted">Frontend<X aria-hidden="true" className="size-icon-sm" /></span>}
+      badNote="Tekst z ikoną bez przycisku nie działa z klawiatury i nie ma nazwy (WCAG 2.1.1, 4.1.2)."
+    />
+    <DoDont
+      good={<ActiveFilters resultCount={0} countForms={{ one: 'mentor', few: 'mentorów', many: 'mentorów' }} filters={[{ id: 'price', label: '0–200 zł' }]} />}
+      goodNote="Przy zerze wyników filtry zostają widoczne, żeby dało się je usunąć (KONCEPCJA §P2 E)."
+      bad={<p className="text-label font-medium text-text-default">Brak wyników</p>}
+      badNote="Bez filtrów gość nie wie, co zawęziło listę."
+    />
+    <DoDont
+      good={<Button variant="link" size="sm">Wyczyść wszystkie</Button>}
+      goodNote="Usunięcie wszystkich filtrów jako cicha akcja tekstowa."
+      bad={<Button>Wyczyść wszystkie</Button>}
+      badNote="Akcja główna nad listą konkuruje z rezerwacją (R01.6)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `MentorCard` (lista pod spodem), `EmptyState` („Wyczyść filtr X”), `Button`.
+- **Mylony z:** `Badge` (status, nieusuwalny), tagi kompetencji.
+- **Wzorce:** lista z filtrami (P2).

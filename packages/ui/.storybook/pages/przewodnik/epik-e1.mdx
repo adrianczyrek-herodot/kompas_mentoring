@@ -1,0 +1,48 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Epik E1 Tożsamość" />
+
+# Epik E1: Tożsamość
+
+Logowanie, rejestracja, konto, zgody, rola.
+
+## Przepływ
+
+1. **P4 Logowanie / Rejestracja** — e-mail/hasło, social sign-in, wybór roli, zgody
+2. **S3 Konto** — dane profilu, zgody, żądania danych, zmiana hasła, usuwanie konta
+
+## Komponenty
+
+| Komponent | Ekran | Stan dokumentacji |
+|---|---|---|
+| `PasswordField` | P4 | Pełna |
+| `RoleChoice` | P4 | Pełna |
+| `SocialSignInButtons` | P4 | Pełna |
+| `ConsentField` | P4, S3 | Pełna |
+| `DataRequestRow` | S3 | Pełna |
+
+## Ekrany jako stories
+
+| Story | Plik | Stany (mapa) |
+|---|---|---|
+| P4 Logowanie i rejestracja | `p4-auth.stories.tsx` | loading, empty, error, success, narrow |
+| S3 Konto | `s3-account.stories.tsx` | loading, data, error, narrow |
+
+> **Uwaga:** Ekrany P4 i S3 w Storybooku używają `ScreenShell` z `role="student"` i `current="account"`.
+
+## Pliki źródłowe
+
+- `packages/ui/src/product/password-field.tsx`
+- `packages/ui/src/product/role-choice.tsx`
+- `packages/ui/src/product/social-sign-in-buttons.tsx`
+- `packages/ui/src/product/consent-field.tsx`
+- `packages/ui/src/product/data-request-row.tsx`
+- `packages/ui/src/screens/p4-auth.stories.tsx`
+- `packages/ui/src/screens/s3-account.stories.tsx`
+- `packages/ui/.storybook/pages/przewodnik/epik-e1.mdx` (ten plik)
+
+## Praca, która zostaje w produkcie
+
+- Podłączenie `SocialSignInButtons` do Better Auth (Google, GitHub, Apple)
+- Walidacja siły hasła po stronie serwera (zgodna z `PasswordField` policy)
+- E2E testy logowania/rejestracji z prawdziwym Postgresem

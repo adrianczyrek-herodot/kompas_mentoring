@@ -1,0 +1,190 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { TZ, TZ_LABEL, WEEK_LABEL, week } from '../../.storybook/fixtures/kompas';
+import { Button } from '../components/button';
+import { SlotGrid } from './slot-grid';
+import * as SlotGridStories from './slot-grid.stories';
+
+<Meta of={SlotGridStories} />
+
+# SlotGrid
+
+## 1. Do czego służy
+
+Tydzień wolnych terminów mentora w strefie czasowej oglądającego: uczeń przewija tygodnie i
+wybiera jeden slot sesji (KONCEPCJA §U1, E3-S4). Strefa jest zawsze podpisana nad siatką, bo
+rezerwacje między strefami to częsty błąd (KONCEPCJA Z9, brief reguła 10).
+
+<Canvas of={SlotGridStories.Playground} />
+<Controls of={SlotGridStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Wybór terminu U1 (sesja próbna 30 min lub kolejna sesja z planu) | KONCEPCJA §U1 (SlotGrid), E3-S4 |
+| Arkusz przełożenia sesji w U5 (`RescheduleSheet`) | KONCEPCJA §U5, E3-S6 |
+| Tydzień dostępności na profilu P3 (tylko podgląd → prowadzi do U1) | KONCEPCJA §P3 (AvailabilityWeek), E2-S6 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `SlotGrid` | Użyj | Źródło |
+|---|---|---|
+| Ustawianie dostępności przez mentora (szablon tygodnia, wyjątki) | edytor dostępności M3 (jeszcze nie ma w systemie) | KONCEPCJA §M3, E3-S2 |
+| Lista umówionych sesji | `SessionListItem`, `TodayAgenda` | KONCEPCJA §U4, §M2 |
+| Wybór długości sesji (30 / 60 min) | `ToggleGroup` nad siatką (`DurationToggle`) | KONCEPCJA §U1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| `<section>` | tak | nazwana nagłówkiem tygodnia, `aria-busy` w trakcie ładowania | WAI-ARIA (region) |
+| Nawigacja tygodnia | tak | „Poprzedni tydzień” / „Następny tydzień” — `Button variant="outline" size="icon"` (44 px) | KONCEPCJA §U1 (WeekPicker), K1 |
+| Nagłówek tygodnia | tak | `weekLabel`, `h2` lub `h3`, cyfry tabelaryczne | WCAG 2.4.6, R01.3 |
+| Strefa czasowa | tak | „Godziny w Twojej strefie: Warszawa (GMT+2)” | brief reguła 10, KONCEPCJA Z9 |
+| Kolumna dnia | tak | `<fieldset>` z `<legend>` „czw., 22 paź”; pusty dzień — „Brak terminów” | WCAG 1.3.1 |
+| Slot | tak | `Button variant="outline"` z godziną, `aria-pressed`; wybrany — tokeny `selected-*` | R04.2, K4, R01.3 |
+
+## 5. Warianty
+
+Komponent nie ma wariantów wyglądu. Ten sam zestaw slotów wygląda inaczej w innej strefie
+oglądającego — godziny przelicza `timeZone`:
+
+<Canvas of={SlotGridStories.OtherTimeZone} />
+
+## 6. Stany
+
+| Stan danych | Co pokazać | Story | Źródło |
+|---|---|---|---|
+| Ładowanie | szkielet siatki 7 kolumn; nawigacja i strefa zostają | `Loading` | KONCEPCJA §U1 (L) |
+| Pusto — jest później wolny termin | „Brak wolnych terminów w tym tygodniu” + przycisk „Następny wolny termin: …” (skok do tygodnia) | `EmptyWithNext` | KONCEPCJA §U1 (E), E3-S4 |
+| Pusto — brak terminów w 14 dni | ten sam tytuł + „Napisz do mentora, by ustalić termin” | `EmptyNoSlots` | KONCEPCJA F3, §P3 (E), E3-S6 |
+| Błąd | `ErrorState` „Nie udało się wczytać terminów” + „Ponów”; mentor i tydzień zostają | `ErrorLoading` | KONCEPCJA §U1 (Er) |
+| Częściowe dane | dni bez slotów pokazują „Brak terminów”, reszta tygodnia normalnie | `Playground` | KONCEPCJA §U1 |
+| Dużo danych | 11 slotów dziennie przez cały tydzień | `ManySlots` | R03.3 |
+| Długie teksty / 320 px | jedna kolumna dni, sloty w rzędach | `Narrow` | WCAG 1.4.10 |
+| Wybrany slot | `aria-pressed="true"`, tło `selected-bg`, ramka `selected-border` | `Selected` | R04.2, K4 |
+
+<Canvas of={SlotGridStories.Loading} />
+<Canvas of={SlotGridStories.EmptyWithNext} />
+<Canvas of={SlotGridStories.EmptyNoSlots} />
+<Canvas of={SlotGridStories.ErrorLoading} />
+<Canvas of={SlotGridStories.ManySlots} />
+<Canvas of={SlotGridStories.Selected} />
+
+| Stan interakcji | Zachowanie | Źródło |
+|---|---|---|
+| Najechanie, fokus, wciśnięcie slotu | jak `Button outline` | zob. strona `Button`, D3, D4 |
+| Wybrany | tylko jeden slot naraz; ponowny wybór innego zdejmuje poprzedni | KONCEPCJA §U1 |
+| Bez „Poprzedni tydzień” | w bieżącym tygodniu (`canGoPrev={false}`) przycisku nie ma — rezerwacja wstecz jest niemożliwa, a zablokowany przycisk bez powodu łamałby D2 | KONCEPCJA §U1, D2 |
+| Slot zajęty w międzyczasie (409) | ekran pokazuje toast „Ten termin został właśnie zajęty” i odświeża sloty | KONCEPCJA §U1 (Er), F1 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Kolejność Tab: „Poprzedni tydzień” (jeśli jest) → „Następny tydzień” → sloty dzień po dniu, od góry. | WCAG 2.4.3 |
+| Slot to przycisk przełącznika: Enter lub Spacja wybiera; czytnik ogłasza grupę dnia i stan, np. „czw., 22 paź, grupa — 18:00, przycisk przełącznika, niewciśnięty”. | WAI-ARIA APG (Button, toggle), WCAG 4.1.2, story `SelectTest` |
+| Dzień jako `fieldset` + `legend` — godzina ma kontekst dnia bez powtarzania daty w każdym przycisku. | WCAG 1.3.1 |
+| Przyciski tygodnia z samą ikoną mają `aria-label` („Poprzedni tydzień”, „Następny tydzień”); ikony `aria-hidden`. | WCAG 4.1.2, 1.1.1 |
+| Wybrany slot różni się nie tylko kolorem: ma `aria-pressed` dla czytnika i ramkę `selected-border`. | WCAG 1.4.1, 1.4.11 |
+| W trakcie ładowania sekcja ma `aria-busy="true"`; szkielet jest `aria-hidden`. | WAI-ARIA 1.2 (`aria-busy`) |
+| Każdy slot i przycisk tygodnia ma 44 px wysokości (minimum WCAG 24 × 24 px). | K1, WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Godziny zawsze w strefie oglądającego, nazwa strefy nad siatką. | „Godziny w Twojej strefie: Warszawa (GMT+2)” | brief reguła 10, KONCEPCJA Z9 |
+| Godzina w formacie 24 h, cyfry tabelaryczne. | „18:00” | R01.3, R03.3 |
+| Daty dnia skrótem z dniem tygodnia. | „czw., 22 paź” | KONCEPCJA Z9 (UI po polsku) |
+| Pusty tydzień zawsze z następnym krokiem. | „Następny wolny termin: …” | KONCEPCJA §U1 (E) |
+| Czas tylko jako ISO w danych (`startsAt`), formatuje komponent — nie przeliczaj w ekranie. | `2026-10-22T18:00:00+02:00` | brief reguła 10, KONCEPCJA §4 („daty w UTC ISO 8601”) |
+| Pokazuj tylko sloty co najmniej 6 h od teraz — filtruje serwer. | — | KONCEPCJA §U1 „Walidacje” |
+
+## 9. Responsywność
+
+<Canvas of={SlotGridStories.Narrow} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | dni jeden pod drugim (oddzielone linią), sloty w rzędach z zawijaniem; strefa pod nawigacją | KONCEPCJA Z9, R01.4, WCAG 1.4.10 |
+| od 768 px | siatka 7 kolumn, sloty w kolumnie dnia | R03.3 |
+| 1440 px | jak 768 px | — |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `status` | `'ready' \| 'loading' \| 'error'` | `'ready'` | `loading` → szkielet, `error` → `ErrorState` z „Ponów” |
+| `days` | `DaySlots[]` (`{ date, slots: Slot[] }`, `Slot` = `{ id, startsAt }`) | — | 7 dni tygodnia; czasy ISO |
+| `timeZone` | `string` (IANA) | — | strefa oglądającego, np. `Europe/Warsaw` |
+| `timeZoneLabel` | `string` | nazwa IANA | podpis strefy, np. „Warszawa (GMT+2)” |
+| `weekLabel` | `string` | — | zakres tygodnia, np. „19–25 października 2026” |
+| `selectedSlotId` | `string` | — | id wybranego slotu |
+| `onSelect` | `(slot: Slot) => void` | — | wybór slotu |
+| `onPrevWeek` / `onNextWeek` | `() => void` | — | przewijanie tygodni |
+| `canGoPrev` | `boolean` | `true` | `false` w bieżącym tygodniu — ukrywa „Poprzedni tydzień” |
+| `layout` | `'week' \| 'stacked'` | `'week'` | `week` — 7 kolumn od 768 px; `stacked` — dni jeden pod drugim (wąskie panele, `Sheet` przełożenia w U5) |
+| `nextAvailable` | `string` (ISO) | — | pierwszy wolny termin po tym tygodniu (stan pusty) |
+| `onJumpToNext` | `() => void` | — | skok do tygodnia z `nextAvailable` |
+| `onRetry` | `() => void` | — | „Ponów” w stanie błędu |
+| `headingAs` | `'h2' \| 'h3'` | `'h2'` | poziom nagłówka tygodnia |
+| `className` | `string` | — | tylko układ |
+
+`SlotGridSkeleton` — sam szkielet siatki (używany wewnętrznie przy `status="loading"`).
+
+## 11. Kod
+
+```tsx
+import { SlotGrid } from '@kompas/ui';
+
+<SlotGrid days={days} timeZone={viewerTimeZone} weekLabel={weekLabel} />
+```
+
+Typowy przykład z produktu (U1, wybór terminu sesji próbnej):
+
+```tsx
+const [selected, setSelected] = useState<string>();
+
+<SlotGrid
+  status={query.isPending ? 'loading' : query.isError ? 'error' : 'ready'}
+  days={query.data?.days ?? []}
+  timeZone={viewer.timeZone}
+  timeZoneLabel={viewer.timeZoneLabel}
+  weekLabel={weekLabel}
+  canGoPrev={!isCurrentWeek}
+  selectedSlotId={selected}
+  onSelect={(slot) => setSelected(slot.id)}
+  onPrevWeek={prevWeek}
+  onNextWeek={nextWeek}
+  nextAvailable={query.data?.nextAvailable}
+  onJumpToNext={jumpToNext}
+  onRetry={() => query.refetch()}
+/>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<SlotGrid days={week.slice(2, 4)} timeZone={TZ} timeZoneLabel={TZ_LABEL} weekLabel={WEEK_LABEL} canGoPrev={false} headingAs="h3" />}
+      goodNote="Strefa czasowa podpisana nad siatką (brief reguła 10)."
+      bad={<div className="flex gap-inline"><Button variant="outline">16:00</Button><Button variant="outline">17:00</Button></div>}
+      badNote="Godziny bez strefy — uczeń w innej strefie zarezerwuje zły termin (KONCEPCJA Z9)."
+    />
+    <DoDont
+      good={<SlotGrid days={week.slice(3, 4)} timeZone={TZ} timeZoneLabel={TZ_LABEL} weekLabel={WEEK_LABEL} selectedSlotId="2026-10-22-18" canGoPrev={false} headingAs="h3" />}
+      goodNote="Wybrany slot ma tło, ramkę i stan aria-pressed dla czytnika (WCAG 1.4.1)."
+      bad={<div className="flex gap-inline"><Button variant="outline">18:00</Button><Button variant="outline">19:00</Button><span className="text-meta text-text-muted">Zostały 2 terminy!</span></div>}
+      badNote="Licznik „zostały 2 terminy” to sztuczna presja (A02)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `HoldCountdown` (po wybraniu slotu, w U2), `PolicyNotice` (zasada 12 h w U1 i U5), `DateTime`, `EmptyState`, `ErrorState`, `Toast` (konflikt 409).
+- **Mylony z:** edytorem dostępności M3, `ToggleGroup` (wybór jednej z kilku stałych opcji).
+- **Wzorce:** wybór terminu z blokadą (U1 → U2), przełożenie sesji (U5).

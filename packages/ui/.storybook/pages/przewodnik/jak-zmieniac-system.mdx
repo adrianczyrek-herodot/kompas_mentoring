@@ -1,0 +1,126 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Jak zmieniać system" />
+
+# Jak zmieniać system
+
+Proces zmiany design systemu. Dla developerów, agentów AI i designerów.
+
+## Kiedy dodać nowy komponent
+
+**Tak:** ta sama potrzeba pojawia się w **co najmniej dwóch miejscach** (ekranach/wzorcach) i nie da się złożyć z istniejących komponentów.
+
+**Nie:** potrzeba jest w jednym miejscu → zrób to lokalnie w ekranie / jako komponukę produktu (nie bazową).
+
+Przykłady:
+- `Combobox` — potrzebny w P1 (tematy), P2 (filtr tematu), M1 (tagi) → **tak, komponent bazowy**
+- `PhotoUpload` — tylko M1 krok 2 → **nie, komponent produktu w E2**
+- `ProgressStepper` — jeśli M1 i inny kreator (np. A1) będą miały te same kroki → **tak**
+
+## Kiedy dodać wariant do istniejącego komponentu
+
+**Tak:** nowy wariant rozwiązuje problem w ≥ 2 miejscach i nie da się uzyskać kompozycją (propsami).
+
+**Nie:** „przy okazji” dodajesz `size="xl"` bo „może się przyda” → wpisz na stronę „Czego brakuje”.
+
+Proces:
+1. Zidentyfikuj ≥ 2 miejsca w produkcie
+2. Otwórz issue / dodaj do `POSTEP.md` sekcji „Otwarte pytania”
+3. Zespół (developer + designer) decyduje
+4. Jeśli tak: dodaj wariant, zaktualizuj tokeny (jeśli nowe wartości), stronę dokumentacji (13 sekcji), stories (wariant + stan), testy
+
+## Co musi mieć dokumentacja nowego komponentu
+
+Każdy komponent (bazowy i produktowy) dostaje stronę `.mdx` z **13 sekcjami** (taką samą budowę co `button.mdx`):
+
+1. **Do czego służy** — jedno zdanie o problemie użytkownika
+2. **Kiedy używać** — konkretne sytuacje z produktu
+3. **Kiedy nie używać i czego użyć zamiast** — antywzorce
+4. **Anatomia** — części i które są opcjonalne
+5. **Warianty** — każdy z opisem, kiedy wybrać
+6. **Stany** — domyślny, najechanie, fokus, wciśnięty, zablokowany, ładowanie, wybrany, błąd (jeśli dotyczą); przy zablokowanym: jak użytkownik dowie się dlaczego
+7. **Zachowanie i dostępność** — klawiatura, kolejność fokusu, role/ARIA, co ogłasza czytnik, cel kliknięcia ≥ 24×24 px
+8. **Treść** — jak pisać etykiety, max długość, długi tekst, tłumaczenie na dłuższy język
+9. **Responsywność** — 320, 768, 1440 px
+10. **API** — propsy z typami, wartościami domyślnymi, opisem
+11. **Kod** — minimalny przykład + typowy z produktu (fixtures)
+12. **Dobrze i źle** — pary obok siebie, każda z 1 zdaniem
+13. **Powiązane** — z czym się myli, w jakich wzorcach występuje
+
+Stories (plik `*.stories.tsx`):
+- Playground z kontrolkami
+- Każdy wariant i rozmiar
+- Macierz stanów: hover/focus/pressed jako zamrożony podgląd (`data-preview-state`)
+- Długa treść i wąski ekran (320 px)
+- Test interakcji w `play` function (kliknięcie, klawiatura, walidacja)
+
+Każda story przechodzi a11y (`test: 'error'`) albo ma opisany wyjątek.
+
+## Co sprawdzić przy zmianie tokena
+
+| Token | Co sprawdzić | Narzędzie |
+|---|---|---|
+| Kolor (`--action-primary`, `--text-*`, `--surface-*`, `--border-*`, `--status-*`) | Kontrast **w obu motywach** ≥ 4.5:1 (tekst) / 3:1 (UI) | `check:tokens` + ręczny podgląd w Storybooku (strona Kolor) |
+| Odstęp (`--space-*`, `--control-height`, `--target-min`) | 44 px cele dotyku, 65 ch szerokość tekstu, relacje (w grupie / między grupami) | `ViewportFrame` 320/768/1440 w stories |
+| Promień (`--radius-*`) | Spójność: `control` 6, `panel` 8, `tag` 4, `round` full | Strona Kształt i głębia |
+| Typografia (`--text-*`, `--font-*`) | Rozmiary, line-height, `numeric` dla kwot/godzin | Strona Typografia |
+| Czas (`--duration-*`) | `prefers-reduced-motion` → 0 ms / ≤ 100 ms | Strona Ruch |
+
+Jeśli zmiana tokenu **psuje kontrast lub układ** — cofnij lub zmień tokenDependent komponenty.
+
+## Kto zatwierdza
+
+| Zmiana | Zatwierdza |
+|---|---|
+| Nowy komponent bazowy | Developer + Designer (issue z design review) |
+| Nowy wariant bazowy | Developer (jeśli ≤ 2 miejsca) / Developer + Designer (jeśli > 2) |
+| Nowy komponent produktu | Developer (własny epik) |
+| Zmiana tokena (kolor, odstęp, promień, czas) | Developer + Designer (kontrast + brand) |
+| Zmiana tokena (typografia) | Developer (techniczne) |
+| Usunięcie komponentu/wariantu | Developer + Designer (migracja `apps/web`) |
+
+## Komendy
+
+```bash
+# Rozwój
+pnpm --filter @kompas/ui storybook          # dev na porcie 6006
+pnpm --filter @kompas/ui test:stories       # testy stories (motyw z STORYBOOK_THEME)
+pnpm --filter @kompas/ui test:stories:themes # oba motywy (CI)
+
+# Weryfikacja
+pnpm --filter @kompas/ui check:tokens       # wartości spoza tokenów (kod ≠ 0 = błąd)
+pnpm --filter @kompas/ui build-storybook    # produkcja do storybook-static
+pnpm lint                                   # całe repo (ESLint + Biome + deps + dead code)
+pnpm typecheck                              # TypeScript całe repo
+pnpm test                                   # testy jednostkowe
+pnpm build                                  # build całe monorepo (w tym apps/web)
+
+# Przed commitem / PR
+pnpm lint && pnpm typecheck && pnpm --filter @kompas/ui check:tokens && pnpm --filter @kompas/ui test:stories:themes
+```
+
+## Przydatne pliki
+
+| Plik | Co zawiera |
+|---|---|
+| `packages/ui/src/styles/tokens.css` | Jedyny plik z surowymi wartościami (3 warstwy, jasny/ciemny) |
+| `packages/ui/src/styles/globals.css` | Fonty, Tailwind bez palety, klasy z tokenów, aliasy shadcn |
+| `packages/ui/.storybook/preview.tsx` | Dekoratory, motyw na `<html>`, a11y, widoki |
+| `packages/ui/.storybook/blocks/component-docs.tsx` | `StateMatrix`, `DoDont`, `ViewportFrame`, `ComponentTable` |
+| `packages/ui/.storybook/blocks/component-index.ts` | Indeks komponentów do tabel |
+| `packages/ui/POSTEP.md` | Historia decyzji, otwarte pytania, stan etapów |
+| `lekcja-06/tokeny.md` | Zatwierdzona tabela tokenów z kontrastem |
+| `lekcja-06/referencje.md` | R01–R06, A01–A04, K1–K6 |
+| `kompas-mentoring/KONCEPCJA.md` | Ekrany, przepływy, reguły domenowe |
+
+## Referencje do źródeł w dokumentacji
+
+Każda reguła na stronach komponentów i przewodnika ma przy sobie numer:
+- **R01–R06** — `lekcja-06/referencje.md` (kolumna „Bierzemy”)
+- **A01–A04** — antyreferencje (kolumna „Odrzucamy”)
+- **K1–K6** — rozstrzygnięte konflikty
+- **P-T1…P-T17** — propozycje agenta (nie z materiałów, do decyzji)
+- **Brief / KONCEPCJA / Spec** — reguły produktu
+- **WCAG / WAI-ARIA** — standardy dostępności
+
+Reguła bez źródła = **propozycja** (oznaczona w dokumentacji).

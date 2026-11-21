@@ -26,7 +26,9 @@
 .sbdocs.sbdocs-content :is(table) :is(td, th) {
   background: var(--surface-page);
   border-color: var(--border-divider);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  /* Narrow screens: the table scrolls instead of breaking words letter by letter. */
+  min-width: 7.5rem;
 }
 
 /* Markdown tables stay inside the page at 320 px: long code wraps, wide tables scroll. */
@@ -50,4 +52,66 @@
 
 .toc-wrapper a.toc-link.is-active-link.is-active-link {
   color: var(--text-link);
+}
+
+/*
+ * Storybook's own docs blocks (props table, code samples) ship light-only styles; follow the theme.
+ * Syntax colours are flattened to text tokens so code stays readable in both themes.
+ */
+.sbdocs .docblock-argstable.docblock-argstable :is(th, td) {
+  min-width: 6rem;
+  background: var(--surface-panel);
+  color: var(--text-default);
+  border-color: var(--border-divider);
+}
+
+.sbdocs .docblock-argstable.docblock-argstable thead :is(th, td) {
+  background: var(--surface-page);
+  color: var(--text-muted);
+}
+
+.sbdocs .docblock-argstable.docblock-argstable :is(input, textarea, select) {
+  background: var(--surface-panel);
+  color: var(--text-default);
+  border-color: var(--border-control);
+}
+
+.sbdocs .docblock-source.docblock-source,
+.sbdocs .docblock-source.docblock-source pre {
+  background: var(--surface-sunken);
+  color: var(--text-default);
+}
+
+.sbdocs .docblock-source.docblock-source :is(code, span) {
+  color: var(--text-default);
+}
+
+.sbdocs .docblock-source.docblock-source .token:is(.keyword, .tag, .attr-name) {
+  color: var(--text-link);
+}
+
+.sbdocs .docblock-source.docblock-source .token:is(.comment, .punctuation) {
+  color: var(--text-muted);
+}
+
+/* Type summaries ("boolean", union values) are spans with a hard-coded dark colour. */
+.sbdocs .docblock-argstable.docblock-argstable td span:not([class*="toc"]) {
+  color: var(--text-default);
+}
+
+.sbdocs .docblock-argstable.docblock-argstable {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Long component names as page titles (e.g. BookingStatusBadge) wrap at 320 px. */
+.sbdocs.sbdocs-content :is(h1, h2, h3) {
+  overflow-wrap: anywhere;
+}
+
+/* Long inline code in prose wraps instead of widening the page at 320 px. */
+.sbdocs.sbdocs-content :not(pre) > code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }

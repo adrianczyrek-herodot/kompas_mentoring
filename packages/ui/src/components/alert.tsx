@@ -2,19 +2,26 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 import { cn } from '../lib/utils';
 
+// Message about a whole screen or form (M3 "Uczniowie nie mogą cię zarezerwować", U5 12 h rule,
+// form server error). Status colour + icon + text, never colour alone (WCAG 1.4.1). No role by
+// default (Z8): a static banner must not interrupt the screen reader; pass role="alert" for errors
+// that appear after an action, role="status" for confirmations.
 const alertVariants = cva(
-  "group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
+  "group/alert relative grid w-full gap-x-inline gap-y-tight rounded-panel px-group py-row-y text-left text-body-dense has-data-[slot=alert-action]:pr-control has-[>svg]:grid-cols-(--icon-content-columns) *:[svg]:row-span-2 *:[svg]:h-lh *:[svg]:text-current *:[svg:not([class*='size-'])]:w-icon-sm",
   {
     variants: {
       variant: {
-        default: 'bg-card text-card-foreground',
-        destructive:
-          'bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current',
+        neutral: 'bg-status-neutral-bg text-text-default',
+        success: 'bg-status-success-bg text-text-default *:[svg]:text-status-success-fg',
+        warning: 'bg-status-warning-bg text-text-default *:[svg]:text-status-warning-fg',
+        danger: 'bg-status-danger-bg text-text-default *:[svg]:text-status-danger-fg',
+        /** @deprecated use `neutral` (kept for apps/web, BACKWARD_COMPATIBILITY.md). */
+        default: 'bg-status-neutral-bg text-text-default',
+        /** @deprecated use `danger` (kept for apps/web, BACKWARD_COMPATIBILITY.md). */
+        destructive: 'bg-status-danger-bg text-text-default *:[svg]:text-status-danger-fg',
       },
     },
-    defaultVariants: {
-      variant: 'default',
-    },
+    defaultVariants: { variant: 'neutral' },
   },
 );
 
@@ -23,24 +30,14 @@ function Alert({
   variant,
   ...props
 }: React.ComponentProps<'div'> & VariantProps<typeof alertVariants>) {
-  return (
-    <div
-      data-slot="alert"
-      role="alert"
-      className={cn(alertVariants({ variant }), className)}
-      {...props}
-    />
-  );
+  return <div data-slot="alert" className={cn(alertVariants({ variant }), className)} {...props} />;
 }
 
 function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="alert-title"
-      className={cn(
-        'font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground',
-        className,
-      )}
+      className={cn('font-semibold group-has-[>svg]/alert:col-start-2', className)}
       {...props}
     />
   );
@@ -51,7 +48,7 @@ function AlertDescription({ className, ...props }: React.ComponentProps<'div'>) 
     <div
       data-slot="alert-description"
       className={cn(
-        'text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
+        'max-w-measure text-text-default group-has-[>svg]/alert:col-start-2 [&_a]:text-text-link [&_a]:underline [&_a]:underline-offset-4 [&_p:not(:last-child)]:mb-inline',
         className,
       )}
       {...props}
@@ -61,8 +58,12 @@ function AlertDescription({ className, ...props }: React.ComponentProps<'div'>) 
 
 function AlertAction({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="alert-action" className={cn('absolute top-2 right-2', className)} {...props} />
+    <div
+      data-slot="alert-action"
+      className={cn('absolute top-tight right-tight', className)}
+      {...props}
+    />
   );
 }
 
-export { Alert, AlertAction, AlertDescription, AlertTitle };
+export { Alert, AlertAction, AlertDescription, AlertTitle, alertVariants };

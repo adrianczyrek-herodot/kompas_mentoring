@@ -1,0 +1,114 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import * as DetailViewStories from './detail-view.stories';
+
+<Meta of={DetailViewStories} />
+
+# Widok szczegółów
+
+Pokazuje jeden obiekt tak, żeby bez przewijania było widać, co to jest, kiedy, w jakim stanie i jaki
+jest następny krok. W Kompasie: szczegóły sesji U5 (E3-S5).
+
+<Canvas of={DetailViewStories.Ready} />
+<Controls of={DetailViewStories.Ready} />
+
+## Kiedy używać
+
+| Sytuacja | Źródło |
+|---|---|
+| Zarządzanie jednym obiektem z akcjami zależnymi od jego stanu (sesja: dołącz, przełóż, anuluj) | KONCEPCJA §U5, E3-S5 T2 |
+| Cel głębokiego linku z e-maila lub powiadomienia | KONCEPCJA §3.2 („Głębokie linki … do U5”) |
+
+## Kiedy nie używać
+
+| Zamiast widoku szczegółów | Użyj | Źródło |
+|---|---|---|
+| Porównanie wielu obiektów | wzorzec **Lista z filtrami** | KONCEPCJA §P2 |
+| Szybka decyzja o pozycji listy (prośba o sesję próbną) | karta w liście + wzorzec **Decyzja z powodem** | KONCEPCJA §M2, E3-S7 |
+| Edycja danych obiektu | wzorzec **Formularz** | KONCEPCJA §M1 |
+
+## Zasady
+
+| Zasada | Jak to zrobić w kodzie | Źródło |
+|---|---|---|
+| Nagłówek strony (h1) mówi, czego dotyczy widok; status obok jako znacznik z tekstem. | `PageHeader title="Sesja — Kasia Nowicka" actions={<BookingStatusBadge status />}` | KONCEPCJA §U5 (SessionHeader), WCAG 2.4.6, 1.4.1 |
+| Najważniejsze fakty bez przewijania: termin w strefie oglądającego, rodzaj i długość, cel. | `dl` z parami `dt`/`dd`; `DateTime value timeZone` | KONCEPCJA §U5, brief reguła 10, Z9, WCAG 1.3.1 |
+| Jedna akcja główna nad zgięciem ekranu. | `Button` `default` „Dołącz do sesji” zaraz pod faktami; test `AboveTheFoldTest` | R01.6, R05.3 |
+| Akcja zablokowana ma widoczny powód obok i zostaje w kolejności fokusu. | `disabled focusableWhenDisabled aria-describedby={reasonId}`; „Pokój otworzy się 10 minut przed startem — …” | D2, KONCEPCJA F2 (wejście od T-10 min), E3-S5 T1 |
+| Akcje zależą od stanu obiektu; zakończona sesja nie pokazuje akcji zmiany. | akcje tylko dla `scheduled` i `in_progress` (zmienna `active`) | KONCEPCJA §U5 (statusy), E3-S5 T2 |
+| Stan akcji (np. czy „Dołącz” jest aktywne) przychodzi z domeny, nie z zegara przeglądarki. | props `joinOpen`, `policy` z serwera | E3-S6 T1 |
+| Jeden komunikat dla „nie istnieje” i „brak dostępu” — nie zdradzamy, czy cudzy obiekt istnieje. Wyjście do listy. | 404 i 403 → `ErrorState titleAs="h1"` „Nie znaleźliśmy tej sesji” + `Link href="/sesje"` „Przejdź do moich sesji” | E3-S5 T2, KONCEPCJA §U5 Er, §P4 Er („bez ujawniania, który”) |
+| Ładowanie: szkielet nagłówka, faktów i akcji w miejscu docelowym; tekst dla czytnika. | `Skeleton` × 3 w `div aria-busy="true"` + `sr-only` „Wczytujemy sesję…” | KONCEPCJA §U5 L, WAI-ARIA 1.2 (`aria-busy`) |
+| Błąd wczytania: co się stało + Ponów. | `ErrorState` „Nie udało się wczytać sesji” + `Button variant="outline"` „Ponów” | KONCEPCJA §U4 Er, R05.2 |
+| Po akcji: toast i odświeżony status na tej samej stronie. | `useToast().add(...)`, nowy `status` w `BookingStatusBadge` | KONCEPCJA §U5 S |
+| 320 px: fakty w jednej kolumnie, długie imię i cel się zawijają; od 768 px trzy kolumny. | `grid grid-cols-1 md:grid-cols-3`, cel `md:col-span-3 max-w-measure` | K1, Z9, WCAG 1.4.10 |
+
+## Mapa stanów
+
+| Stan | Story |
+|---|---|
+| Załadowany | `Ready` |
+| Pokój otwarty (główna akcja aktywna) | `RoomOpen` |
+| Sesja zakończona | `Completed` |
+| Ładowanie | `Loading` |
+| Nie istnieje albo brak dostępu | `NotFound` |
+| Błąd | `ErrorLoading` |
+| Długie teksty i 320 px | `Narrow` |
+| Test: h1, termin i główna akcja na górze | `AboveTheFoldTest` |
+| Test: brak dostępu prowadzi do listy | `NotFoundTest` |
+| Test: błąd z ponowieniem | `RetryTest` |
+
+### Pokój otwarty (główna akcja aktywna)
+
+<Canvas of={DetailViewStories.RoomOpen} />
+
+### Sesja zakończona
+
+<Canvas of={DetailViewStories.Completed} />
+
+### Ładowanie
+
+<Canvas of={DetailViewStories.Loading} />
+
+### Nie istnieje albo brak dostępu
+
+<Canvas of={DetailViewStories.NotFound} />
+
+### Błąd
+
+<Canvas of={DetailViewStories.ErrorLoading} />
+
+### Długie teksty i 320 px
+
+<Canvas of={DetailViewStories.Narrow} />
+
+## Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<p className="text-body-dense">„Nie znaleźliśmy tej sesji” — „Sesja nie istnieje albo nie masz do niej dostępu.” + „Przejdź do moich sesji”.</p>}
+      goodNote="Ten sam komunikat dla 404 i 403 nie zdradza, czy cudza sesja istnieje."
+      bad={<p className="text-body-dense">Osobny komunikat „Nie masz dostępu do tej sesji” dla 403.</p>}
+      badNote="Potwierdza, że obiekt o tym identyfikatorze istnieje (E3-S5 T2)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Zablokowane „Dołącz do sesji”, obok: „Pokój otworzy się 10 minut przed startem — pt., 23 paź, 17:50.”</p>}
+      goodNote="Użytkownik wie, kiedy akcja będzie dostępna."
+      bad={<p className="text-body-dense">Zablokowane „Dołącz do sesji” bez zdania obok, powód tylko w podpowiedzi.</p>}
+      badNote="Zablokowany przycisk bez fokusu nie pokaże podpowiedzi (D2)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Termin, rodzaj, cel i „Dołącz do sesji” na górze; zasady zmiany i akcje drugorzędne niżej.</p>}
+      goodNote="Następny krok widać od razu po wejściu z powiadomienia."
+      bad={<p className="text-body-dense">Notatki i historia na górze, „Dołącz” na dole strony.</p>}
+      badNote="Główna akcja ginie pod treścią drugorzędną (R01.6)."
+    />
+  </div>
+</Unstyled>
+
+## Powiązane
+
+- **Komponenty:** `PageHeader`, `BookingStatusBadge`, `DateTime`, `Button`, `Skeleton`, `ErrorState`, `Link`, `Toast`.
+- **Wzorce:** [Zmiana z regułą 12 h](?path=/docs/wzorce-zmiana-z-regułą-12-h--docs) (sekcja „Zmiana terminu” na tym samym widoku), [Lista z filtrami](?path=/docs/wzorce-lista-z-filtrami--docs) (skąd użytkownik przychodzi).
+- **Ekrany:** U5 Szczegóły sesji (E3-S5), U4 Moje sesje (powrót z „Przejdź do moich sesji”).

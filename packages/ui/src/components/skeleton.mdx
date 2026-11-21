@@ -1,0 +1,125 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Skeleton } from './skeleton';
+import * as SkeletonStories from './skeleton.stories';
+
+<Meta of={SkeletonStories} />
+
+# Skeleton
+
+## 1. Do czego służy
+
+Odzwierciedla zarys i proporcje ładującej się zawartości (karty mentora, wiersza tabeli, profilu), redukując skoki układu (CLS) i dając poczucie szybkiego działania aplikacji.
+
+<Canvas of={SkeletonStories.Playground} />
+<Controls of={SkeletonStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Stan ładowania (L) siatki mentorów w katalogu (P2) | prompt §Etap 3, KONCEPCJA §P2 |
+| Stan ładowania profilu mentora i terminów sesji (P3) | KONCEPCJA §P3 |
+| Stan ładowania wierszy w tabeli weryfikacji wniosków (A1) | KONCEPCJA §A1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast szkieletu | Użyj | Źródło |
+|---|---|---|
+| Ładowanie wewnątrz pojedynczego przycisku po kliknięciu | `Button` ze stanem `loading` (`Spinner`) | prompt |
+| Krótkie opóźnienia poniżej 150 ms | brak wskaźnika (aby uniknąć migotania) | propozycja |
+| Treść, której struktura nie jest z góry znana | ogólny kontener ładowania | WAI-ARIA APG |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Skeleton` | tak | Blok o określonym kształcie z tłem `surface-sunken` i subtelną animacją pulsowania |
+
+## 5. Warianty
+
+<Canvas of={SkeletonStories.Variants} />
+
+Szkielet komponuje się za pomocą klas wymiarów i zaokrągleń: koło dla awatara (`rounded-round`), linie dla tekstu (`h-4 rounded-control`), bloki dla przycisków i kart (`rounded-panel`).
+
+## 6. Stany
+
+<Canvas of={SkeletonStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Pulsowanie | Subtelna zmiana jasności tła `surface-sunken`; przy `prefers-reduced-motion` animacja jest wstrzymana | WCAG 2.3.3 |
+| Ukryty dla czytników | Posiada `aria-hidden="true"`, aby nie generować szumu w czytniku ekranu | WAI-ARIA |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Element szkieletu ma `aria-hidden="true"`. | WAI-ARIA |
+| Kontener nadrzędny posiada `aria-busy="true"` oraz dostępny komunikat o ładowaniu danych. | WCAG 4.1.3 |
+| Animacja respektuje ustawienie `prefers-reduced-motion`. | WCAG 2.3.3 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Szkielet nie zawiera żadnego widocznego tekstu ani lorem ipsum. | — | prompt, zasada 7 |
+
+## 9. Responsywność
+
+<Canvas of={SkeletonStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Szkielet dopasowuje się do wąskiego układu kolumnowego | propozycja |
+| 768 / 1440 px | Odzwierciedla układ siatki wielokolumnowej | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Skeleton` | `className` | `string` | — | Klasy określające szerokość, wysokość i promień |
+
+## 11. Kod
+
+```tsx
+<div className="flex items-center gap-group p-panel border border-border-divider rounded-panel" aria-busy="true">
+  <Skeleton className="size-avatar-md rounded-round" />
+  <div className="space-y-tight flex-1">
+    <Skeleton className="h-4 w-1/3" />
+    <Skeleton className="h-3 w-1/2" />
+  </div>
+</div>
+```
+
+Typowy przykład z produktu (P2): wczytywanie wiersza mentora.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel flex items-center gap-group">
+          <Skeleton className="size-10 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-48" />
+          </div>
+        </div>
+      }
+      goodNote="Szkielet dokładnie odwzorowuje układ docelowej karty (awatar + nagłówek + opis)."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel flex justify-center py-section">
+          <p className="text-muted text-body">Wczytywanie...</p>
+        </div>
+      }
+      badNote="Samotny napis „Wczytywanie...” na pustej stronie powoduje gwałtowny skok układu po załadowaniu treści."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Spinner` (wskaźnik kręcący się).
+- **Wzorce:** stan L (ładowanie) każdego ekranu (P2, P3, U4).

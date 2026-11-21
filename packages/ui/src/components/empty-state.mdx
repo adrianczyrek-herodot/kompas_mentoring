@@ -1,0 +1,133 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import { EmptyState } from './empty-state';
+import * as EmptyStateStories from './empty-state.stories';
+
+<Meta of={EmptyStateStories} />
+
+# EmptyState
+
+## 1. Do czego służy
+
+Informuje o braku danych na liście lub ekranie (stan pusty) — wyjaśnia przyczynę i wskazuje konkretny następny krok, aby użytkownik nie czuł się zagubiony.
+
+<Canvas of={EmptyStateStories.Playground} />
+<Controls of={EmptyStateStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Uczeń nie ma jeszcze żadnych zaplanowanych sesji w zakładce Nadchodzące (U4) | KONCEPCJA §U4 |
+| Brak wyników po zastosowaniu zbyt wąskich filtrów w katalogu mentorów (P2) | prompt §Etap 3, KONCEPCJA §P2 |
+| Pusta lista zapisanych ulubionych mentorów (E2-S8) | backlog §E2-S8 |
+| Mentor nie otrzymał jeszcze żadnych nowych próśb o sesję (M2) | KONCEPCJA §M2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast pustego stanu | Użyj | Źródło |
+|---|---|---|
+| Wystąpił błąd pobierania danych z serwera lub brak sieci | `ErrorState` z przyciskiem „Ponów” | prompt |
+| Dane są w trakcie pobierania | `Skeleton` | prompt |
+| Puste pole tekstowe w formularzu | `FieldDescription` lub placeholder | prompt |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Ikona / Ilustracja | opcjonalnie | Tematyczna, prosta ikona funkcyjna w kolorze `text-muted` (bez pstrokacizny) |
+| Tytuł stanu | tak | Zwięzły nagłówek informujący, co się stało (`text-section-title` font-medium) |
+| Opis | opcjonalnie | Wyjaśnienie przyczyny i podpowiedź kolejnego kroku (`text-body` text-muted) |
+| Akcja główna | opcjonalnie | Przycisk prowadzący do rozwiązania (np. „Znajdź mentora”, „Wyczyść filtry”) |
+
+## 5. Warianty
+
+<Canvas of={EmptyStateStories.Variants} />
+
+Dwa fundamentalne warianty logiczne:
+1. **Pierwsze użycie („Jeszcze nic tu nie ma”):** zachęta do rozpoczęcia korzystania z produktu (np. rezerwacja pierwszej sesji).
+2. **Brak wyników wyszukiwania:** informacja o braku dopasowania filtrów z przyciskiem resetującym kryteria.
+
+## 6. Stany
+
+<Canvas of={EmptyStateStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Prezentacyjny | Wycentrowana treść w panelu o optymalnym odstępie pionowym `py-section` | R01.1 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Struktura nagłówków: tytuł stanu to poprawny nagłówek (h2 lub h3) w hierarchii strony. | WCAG 1.3.1 |
+| Akcja jest dostępna z klawiatury i posiada czytelny fokus. | WCAG 2.1.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Wyjaśnia DLACZEGO jest pusto i JEST KOLEJNY KROK. | „Nie masz jeszcze zaplanowanych sesji. Wybierz mentora i zarezerwuj 30-minutową sesję próbną.” | prompt, R06.1 |
+| Lekki humor jest dozwolony WYŁĄCZNIE w pustych stanach i powitaniach — NIGDY przy pieniądzach, terminach ani sporach. | „Twój kalendarz ma dziś wolne.” (w kalendarzu, ale nie w płatnościach!) | R05.2, R06.1, K5 |
+
+## 9. Responsywność
+
+<Canvas of={EmptyStateStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Treść wyśrodkowana, marginesy boczne 16 px, przyciski na pełną szerokość kontenera | propozycja |
+| 768 / 1440 px | Wyśrodkowany blok o maksymalnej szerokości treści `max-w-form` (640 px) | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `EmptyState` | `title` | `ReactNode` | — | Tytuł stanu |
+| `EmptyState` | `description` | `ReactNode` | — | Opis i wskazówka |
+| `EmptyState` | `icon` | `ReactNode` | — | Opcjonalna ikona |
+| `EmptyState` | `action` | `ReactNode` | — | Przycisk lub link akcji |
+
+## 11. Kod
+
+```tsx
+<EmptyState
+  icon={<Calendar className="size-icon-lg text-muted" />}
+  title="Brak nadchodzących sesji"
+  description="Nie masz jeszcze zaplanowanych spotkań. Przejrzyj profil mentora i umów sesję próbną."
+  action={<Button>Znajdź mentora</Button>}
+/>
+```
+
+Typowy przykład z produktu (U4): zakładka Moje sesje u nowego ucznia.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel text-center">
+          <h4 className="text-section-title font-medium">Brak wyników dla wybranych filtrów</h4>
+          <p className="text-muted text-body-dense mt-tight">Spróbuj zmienić stawkę godzinową lub zakres dostępności.</p>
+          <div className="mt-panel">
+            <Button variant="outline" size="sm">Wyczyść filtry</Button>
+          </div>
+        </div>
+      }
+      goodNote="Pusty stan filtra podaje powód i oferuje natychmiastowe zresetowanie kryteriów."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel text-center">
+          <h4 className="text-section-title font-medium">Pusto :(</h4>
+        </div>
+      }
+      badNote="Nigdy nie zostawiaj samego komunikatu „Pusto” bez wyjaśnienia i bez akcji wskazującej kolejny krok."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `ErrorState` (błąd pobierania danych).
+- **Wzorce:** lista z filtrami (P2), moje sesje (U4).

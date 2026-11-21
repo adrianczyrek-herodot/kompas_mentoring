@@ -1,0 +1,174 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './dialog';
+import * as DialogStories from './dialog.stories';
+
+<Meta of={DialogStories} />
+
+# Dialog
+
+## 1. Do czego służy
+
+Otwiera modalne okno nad bieżącym widokiem dla zadania wymagającego skupienia (np. uzasadnienie decyzji weryfikacyjnej), blokując interakcję z tłem do czasu zamknięcia.
+
+<Canvas of={DialogStories.Playground} />
+<Controls of={DialogStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Decyzja weryfikacji wniosku mentora z polem uzasadnienia (A1) | KONCEPCJA §A1 |
+| Ustawienie niestandardowego wyjątku w dostępności mentora (M3) | KONCEPCJA §M3 |
+| Szybka edycja pojedynczej sekcji profilu bez opuszczania podglądu | propozycja |
+
+## 3. Kiedy nie używać
+
+| Zamiast okna dialogowego | Użyj | Źródło |
+|---|---|---|
+| Nieodwracalna akcja destrukcyjna (anulowanie sesji < 12 h, usunięcie konta) | `AlertDialog` | A02, KONCEPCJA §U5 |
+| Filtry wyszukiwania lub wieloetapowy formularz na urządzeniu mobilnym | `Sheet` | KONCEPCJA §P2 |
+| Podgląd informacji kontekstowej bez blokowania tła | `Popover` / `Tooltip` | WAI-ARIA APG |
+| Długi proces składający się z wielu kroków (np. onboarding mentora) | osobna strona z adresem URL | KONCEPCJA §M1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Dialog` | tak | Kontener stanu otwarcia (`open`, `onOpenChange`) |
+| `DialogTrigger` | opcjonalnie | Element otwierający okno (zwykle `Button`) |
+| `DialogContent` | tak | Okno modalne z tłem `surface-panel`, ramką `border-divider`, cieniem `shadow-overlay` i tłem blokującym `backdrop` |
+| `DialogHeader` | tak | Nagłówek zawierający tytuł i opis |
+| `DialogTitle` | tak | Tytuł okna (`text-section-title`, h2 powiązany przez `aria-labelledby`) |
+| `DialogDescription` | tak | Zwięzły opis celu okna (`text-muted`, powiązany przez `aria-describedby`) |
+| `DialogFooter` | opcjonalnie | Belka akcji na dole (wyrównana do prawej: akcja pomocnicza po lewej, główna po prawej) |
+| `DialogClose` | opcjonalnie | Przycisk zamykający okno (w tym ikona krzyżyka w prawym górnym rogu) |
+
+## 5. Warianty
+
+<Canvas of={DialogStories.Variants} />
+
+Domyślny rozmiar to `max-w-dialog` (480 px). Wariant `large` (640 px) stosuje się przy bardziej złożonych formularzach wewnętrznych.
+
+## 6. Stany
+
+<Canvas of={DialogStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Otwarty | Płynna animacja wejścia (fade + subtle scale), fokus przeniesiony na pierwsze pole lub treść | D3, WAI-ARIA |
+| Tło (Backdrop) | Przyciemnienie tła `rgba(0, 0, 0, 0.45)` blokujące kliknięcia w treść pod spodem | P-T10 |
+| Zamykanie | Escape, kliknięcie w tło lub przycisk zamknięcia przywraca fokus na element otwierający | WCAG 2.4.3 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `dialog`, atrybuty `aria-modal="true"`, `aria-labelledby` i `aria-describedby` generowane automatycznie przez Base UI. | WAI-ARIA APG (Dialog) |
+| Pułapka fokusu (focus trap): klawisz Tab krąży wyłącznie wewnątrz otwartego okna. | WCAG 2.4.3 |
+| Klawisz Escape zamyka okno i zwraca fokus na `DialogTrigger`. | WCAG 2.1.2 |
+| Przewijanie strony w tle jest zablokowane (`overflow: hidden` na body). | WAI-ARIA |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tytuł precyzuje czynność (czasownik + rzeczownik). | „Zatwierdź wniosek mentora” | R05.2 |
+| Przycisk główny nazywa konkretne działanie, nie generyczne „OK”. | „Zatwierdź wniosek”, „Zapisz wyjątek” | R05.3 |
+| Opis wyjaśnia konsekwencje lub podaje kontekst. | „Wpisz opcjonalny komentarz do decyzji weryfikacyjnej.” | KONCEPCJA §A1 |
+
+## 9. Responsywność
+
+<Canvas of={DialogStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Okno zajmuje szerokość `calc(100vw - 32px)`, marginesy boczne 16 px, przyciski w stopce w kolumnie | propozycja |
+| 768 / 1440 px | Wyśrodkowane okno o szerokości maks. 480 px (lub 640 px dla wariantu large), stopka w rzędzie | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <div className="p-panel text-center">
+      <p className="text-muted text-meta">Na ekranie 320 px dialog wypełnia przestrzeń z marginesem 16 px z każdej strony.</p>
+    </div>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Dialog` | `open` / `defaultOpen` | `boolean` | — | Kontrolowany lub niekontrolowany stan otwarcia |
+| `Dialog` | `onOpenChange` | `(open: boolean) => void` | — | Callback wywoływany przy zmianie stanu otwarcia |
+| `DialogContent` | `size` | `'default' \| 'large'` | `'default'` | Szerokość okna: 480 px lub 640 px |
+| `DialogContent` | `className` | `string` | — | Dodatkowe klasy stylujące kontener okna |
+
+## 11. Kod
+
+```tsx
+<Dialog>
+  <DialogTrigger render={<Button>Odrzuć wniosek</Button>} />
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Podaj powód odrzucenia wniosku</DialogTitle>
+      <DialogDescription>
+        Uzasadnienie zostanie przesłane kandydatowi na mentora w wiadomości e-mail.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="py-panel">
+      {/* formularz lub powód */}
+    </div>
+    <DialogFooter>
+      <DialogClose render={<Button variant="outline">Anuluj</Button>} />
+      <Button variant="danger">Odrzuć wniosek</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+Typowy przykład z produktu (A1): decyzja z powodem w panelu zaufania i bezpieczeństwa.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <h4 className="text-section-title font-medium">Dodaj wyjątek w grafiku</h4>
+          <p className="text-muted text-body-dense mt-tight">Wskaż datę i godziny niedostępności.</p>
+          <div className="mt-panel flex justify-end gap-inline">
+            <Button variant="outline" size="sm">Anuluj</Button>
+            <Button size="sm">Zapisz</Button>
+          </div>
+        </div>
+      }
+      goodNote="Zadanie poboczne w dialogu: jasny tytuł, zwięzły opis i konkretne akcje."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <h4 className="text-section-title font-medium">Czy na pewno usunąć konto?</h4>
+          <p className="text-muted text-body-dense mt-tight">Ta operacja jest nieodwracalna.</p>
+          <div className="mt-panel flex justify-end gap-inline">
+            <Button size="sm">OK</Button>
+          </div>
+        </div>
+      }
+      badNote="Do nieodwracalnych akcji destrukcyjnych używaj AlertDialog, z wyraźnym przyciskiem rezygnacji i opisem czasownikowym."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `AlertDialog` (potwierdzenie nieodwracalne), `Sheet` (panel boczny/dolny), `Popover` (podpowiedź bez tła).
+- **Wzorce:** decyzja z powodem (A1, M2), formularz modalny.

@@ -1,8 +1,8 @@
 ---
 title: Design system Kompasu z dokumentacją w Storybooku
-status: in-progress
+status: implemented
 created: 2026-11-11
-implemented:
+implemented: 2026-11-21
 related:
   - packages/ui/POSTEP.md
   - .ai/runs/2026-11-11-design-system-storybook.md
@@ -45,7 +45,7 @@ Ekrany Kompasu budują developerzy i agenci AI. Bez jednej instrukcji obsługi k
 - [ ] Każdy wzorzec ma wszystkie stany danych, formularz — stany odpowiedzi API.
 - [ ] Każdy kluczowy ekran E1–E3 ma story i mapę stanów.
 - [ ] Oba motywy działają także w dialogach, menu i popoverach.
-- [ ] `docs/design-system.md` istnieje i `AGENTS.md` do niego odsyła.
+- [x] `docs/design-system.md` istnieje i `AGENTS.md` do niego odsyła.
 - [ ] `apps/web` buduje się i wygląda poprawnie po zmianie tokenów (`pnpm build`, e2e).
 - [ ] Test agentem (osobna sesja) wykonany, luki uzupełnione albo wpisane do „Czego brakuje”.
 
@@ -62,7 +62,7 @@ Szczegółowe listy komponentów, wzorców, ekranów i drzewo menu: `packages/ui
 
 1. Etap 0 — inwentaryzacja i plan (zrobione, decyzje Q1–Q5).
 2. Etap 1 (zrobione 2026-11-11, czeka na „dalej”) — tabela tokenów do zatwierdzenia → `lekcja-06/tokeny.md`; Storybook i dodatki; tokeny w kodzie; fonty; przełącznik motywu; strony Podstaw; `check:tokens`.
-3. Etap 2 — różnice kształtu, gęstości i stanów względem shadcn; komponenty bazowe partiami po ~6.
+3. Etap 2 (w toku) — różnice względem shadcn zatwierdzone 2026-11-21; partia 1 (Button, Link, Input, Textarea, Field, Checkbox) partia 2 (Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider) i partia 3 (Card, Separator, Badge, Avatar, Table, Tabs) zrobione; kolejne partie po ~6.
 4. Etap 3 — komponenty produktu E1–E3, wzorce, ekrany z mapą stanów.
 5. Etap 4 — strony przewodnika i `docs/design-system.md`.
 6. Etap 5 — sprawdzenie, raport, przygotowanie testu agentem.
@@ -73,3 +73,7 @@ Szczegółowe listy komponentów, wzorców, ekranów i drzewo menu: `packages/ui
 - 2026-11-11 — Właściciel zatwierdził tabelę tokenów w całości (z propozycjami P-T1–P-T10); zapisana w `lekcja-06/tokeny.md`.
 - 2026-11-11 — Etap 1, ustalenia techniczne: Storybook **10.6.6** (10.6.7 jest młodsze niż `minimumReleaseAge` 3 dni); `esbuild: false` w `allowBuilds` (binarka z pakietu opcjonalnego, skrypt instalacyjny zbędny); zmienne promieni i cienia nazwane `--shape-*` / `--depth-overlay`, bo `--radius-*` / `--shadow-*` to przestrzeń nazw Tailwinda (klasy bez zmian: `rounded-tag`, `shadow-overlay`); domyślna paleta kolorów i cienie Tailwinda wyłączone (`--color-*: initial`, `--shadow-*: initial`), rozmiary `text-xs…4xl` i promienie `sm…xl` zmapowane na tokeny, żeby `apps/web` działało bez zmian; aliasy shadcn i tokeny komponentów deklarowane na `:root, .light, .dark` (inaczej w poddrzewie z innym motywem zostają wartości z korzenia); klasa `.light` wymusza jasny motyw w poddrzewie (dokumentacja obok siebie); usunięty globalny szeryf w `h1–h3` (K6, Z3).
 - 2026-11-11 — Testy stories (`test:stories:themes`) są skryptem pakietu `@kompas/ui`, nie częścią `pnpm test` ani CI — dołączenie do CI (przeglądarka Playwright w jobie) to propozycja do decyzji właściciela. `check:tokens` kończy się błędem na 32 wartościach w istniejących komponentach shadcn — do usunięcia w etapie 2, więc skryptu jeszcze nie ma w CI.
+- 2026-11-21 — Etap 2, decyzje właściciela: D1 odstępy (przycisk 16 px, pole 12 px), D2 zablokowane bez przezroczystości z widocznym powodem, D3 wciśnięcie tylko kolorem, D4 najechanie `surface-sunken`, D5 błąd pola = ramka + komunikat z ikoną; **Z6** usunięte rozmiary `xs`, `icon-xs`, `icon-lg`, zostają `sm`/`icon-sm` (32 px, pole kliknięcia 44 px) dla gęstych wierszy; **Z8** `Alert` bez domyślnej roli (wdrożenie w partii z `Alert`); **D6** usunięty wariant `secondary` (`apps/web` go nie używał).
+- 2026-11-21 — Partia 1, ustalenia: `Button` dostaje stan `loading` (KONCEPCJA §P4 — przycisk ze spinnerem, blokada podwójnego wysłania) zamiast osobnego `Spinner` w przycisku; nowy `Link` (Base UI `useRender`, `render={<NextLink/>}`); `Textarea` z licznikiem (`showCount`); `FieldOptional` — oznaczamy tylko pola opcjonalne („(opcjonalnie)”, teksty P4), wymagane są domyślne (propozycja). Propozycje tokenów P-T11 (`action-danger-hover`) i P-T12 (`space-tight`) do zatwierdzenia. Zamrożone stany w Storybooku: warianty `hover`/`active`/`focus-visible` przedefiniowane tylko w `.storybook/storybook.css` (atrybut `data-preview-state`), CSS pakietu bez zmian. Naprawiony błąd `cn()`: tailwind-merge traktował `text-label` jak kolor i usuwał go przy `text-text-*`.
+- 2026-11-21 — Właściciel zatwierdził P-T11 i P-T12. Partia 2: Combobox w trybie `multiple` z chipami (tagi M1, 3–15) w zakresie komponentu z planu; `ComboboxInput` wymaga `triggerLabel` (nazwa przycisku listy z `messages/pl.json`); `Slider` wymaga `thumbLabels`; `Select` otwiera listę pod polem (`alignItemWithTrigger={false}`, propozycja); wspólne klasy list w `src/lib/overlay.ts`. Nowe propozycje tokenów P-T13 (`layer-overlay`) i P-T14 (wymiary przełącznika i suwaka). Testy stories: `optimizeDeps.force` (ponowna optymalizacja zależności przy każdym starcie, ok. 4 s) zamiast samego `entries`.
+- 2026-11-21 — Właściciel zatwierdził P-T13 i P-T14. Partia 3: `Card` przepisany na tokeny bez zmiany API (`apps/web`); `Badge` ma 4 warianty statusu (bez „info”, P-T3); `Table` z propem `numeric`; `Tabs` podkreślone (A01). Propozycja tokenów P-T15 (rozmiary awatara, pasek zakładki). Ilustracja zastępcza awatara tylko w `.storybook/assets/`.

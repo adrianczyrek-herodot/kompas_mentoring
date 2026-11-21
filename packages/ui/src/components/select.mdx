@@ -1,0 +1,167 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Field, FieldLabel } from './field';
+import { RadioGroup, RadioGroupItem } from './radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import * as SelectStories from './select.stories';
+
+<Meta of={SelectStories} />
+
+# Select
+
+## 1. Do czego służy
+
+Pozwala wybrać jedną wartość z krótkiej, znanej listy, gdy opcji jest za dużo, żeby pokazać je
+wszystkie naraz.
+
+<Canvas of={SelectStories.Playground} />
+<Controls of={SelectStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Sortowanie wyników wyszukiwarki: trafność, cena, ocena, liczba sesji (P2) | KONCEPCJA §P2 |
+| Strefa czasowa ucznia i mentora (U1, S3) | KONCEPCJA §U1, §S3, brief reguła 10 |
+| Minimalne wyprzedzenie rezerwacji 2–48 h i bufor 0–30 min (M3) | KONCEPCJA §M3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast listy rozwijanej | Użyj | Źródło |
+|---|---|---|
+| 2–4 opcje, które warto widzieć od razu („uczyć się / mentorować”) | `RadioGroup` | KONCEPCJA §P4, WAI-ARIA APG |
+| 2–3 opcje przełączane często (30 / 60 min) | `ToggleGroup` | KONCEPCJA §U1 |
+| Długa lista, w której szukasz po nazwie (tematy, tagi) | `Combobox` | Base UI (Select nie filtruje) |
+| Wybór kilku opcji | `Combobox multiple` albo `Checkbox` w grupie | — (propozycja) |
+| Akcje („Edytuj”, „Usuń”) | `Menu` (partia 4) | WAI-ARIA APG (Menu) |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Etykieta | tak | `FieldLabel htmlFor` = `id` pola |
+| Pole (`SelectTrigger`) | tak | wygląd `Input`: 44 px, `border-control`, strzałka |
+| Wartość (`SelectValue`) | tak | wybrana opcja albo `placeholder` (przykład, nie nazwa) |
+| Lista (`SelectContent`) | tak | panel `surface-panel`, `rounded-panel`, `shadow-overlay`, pod polem |
+| Opcja (`SelectItem`) | tak | 44 px, znacznik ✓ przy wybranej |
+| Grupa i separator | nie | `SelectGroup` + `SelectGroupLabel`, `SelectSeparator` |
+
+## 5. Warianty
+
+<Canvas of={SelectStories.Variants} />
+
+Jeden wygląd. Odmiany treści: z grupami (strefy według kontynentu), z podpowiedzią, z placeholderem,
+gdy nie ma sensownej wartości domyślnej. Lista otwiera się zawsze pod polem
+(`alignItemWithTrigger={false}`), żeby nie zasłaniać etykiety (propozycja).
+
+## 6. Stany
+
+<Canvas of={SelectStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | bez zmiany pola | propozycja (jak `Input`) |
+| Fokus | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Otwarta lista | podświetlona opcja `surface-hover`, wybrana — ✓ i `font-medium` | D4, WCAG 1.4.1 |
+| Błąd | ramka `border-invalid` + `FieldError` | D5 |
+| Zablokowany | `surface-disabled`, `text-disabled`; powód w `FieldDescription` | D2 |
+| Wciśnięty, ładowanie | nie dotyczy; listy ładowanej z serwera nie robimy w `Select` — użyj `Combobox` | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Pole ma rolę `combobox`, lista `listbox`, opcje `option` z `aria-selected`. | WAI-ARIA APG (Select-Only Combobox) |
+| Enter, Spacja lub strzałka w dół otwiera listę; strzałki przesuwają podświetlenie; Enter wybiera; Escape zamyka bez zmiany; litery przeskakują do opcji. | WAI-ARIA APG |
+| Po wyborze fokus wraca na pole. | WAI-ARIA APG |
+| Lista renderuje się w portalu, a motyw z `<html>` działa także w niej. | zasada 9 promptu |
+| Opcje mają 44 px wysokości. | K1, WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Opcje to krótkie rzeczowniki lub wartości, bez kropki. | „Cena: od najniższej” | propozycja |
+| Strefę czasową pokazuj z miastem i przesunięciem. | „Warszawa (UTC+1)” | brief reguła 10 |
+| Placeholder mówi, co wybrać, gdy brak wartości. | „Wybierz wyprzedzenie” | prompt (wzorzec formularza) |
+| Długa opcja ucina się w polu (`truncate`), na liście się zawija. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={SelectStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | pole na całą szerokość; lista ma szerokość pola i najwyżej dostępną wysokość ekranu | propozycja |
+| 768 / 1440 px | pole najwyżej `form-max`; sortowanie P2 według treści | makieta |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Field>
+      <FieldLabel htmlFor="r-sort">Sortowanie</FieldLabel>
+      <Select defaultValue="Trafność">
+        <SelectTrigger id="r-sort"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Trafność">Trafność</SelectItem>
+          <SelectItem value="Ocena">Ocena</SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Select` | `value` / `defaultValue` | `string \| null` | — | wybrana wartość |
+| `Select` | `onValueChange` | `(value) => void` | — | zmiana wyboru |
+| `Select` | `items` | `{ value, label }[]` | — | etykieta wartości w polu przed otwarciem listy |
+| `Select` | `disabled`, `required`, `name` | `boolean`, `boolean`, `string` | — | formularz |
+| `SelectTrigger` | `id`, `aria-invalid`, `aria-describedby` | — | — | etykieta, błąd, podpowiedź |
+| `SelectValue` | `placeholder` | `ReactNode` | — | tekst bez wyboru |
+| `SelectContent` | `sideOffset` | `number` | `4` | odstęp listy od pola (px) |
+| `SelectItem` | `value`, `disabled` | `string`, `boolean` | — | opcja |
+
+## 11. Kod
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="sort">Sortowanie</FieldLabel>
+  <Select items={options} defaultValue="relevance">
+    <SelectTrigger id="sort"><SelectValue /></SelectTrigger>
+    <SelectContent>
+      {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+    </SelectContent>
+  </Select>
+</Field>
+```
+
+Typowy przykład z produktu (P2, sortowanie w URL):
+
+```tsx
+<Select items={sortOptions} value={params.sort} onValueChange={(sort) => setParam('sort', sort)}>
+  <SelectTrigger id="sort"><SelectValue /></SelectTrigger>
+  <SelectContent>
+    {sortOptions.map((o) => <SelectItem key={o.value} value={o.value}>{t(o.labelKey)}</SelectItem>)}
+  </SelectContent>
+</Select>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<RadioGroup aria-label="Chcę" defaultValue="s"><Field orientation="horizontal"><RadioGroupItem id="dd-s1" value="s" /><FieldLabel htmlFor="dd-s1">się uczyć</FieldLabel></Field><Field orientation="horizontal"><RadioGroupItem id="dd-s2" value="m" /><FieldLabel htmlFor="dd-s2">mentorować</FieldLabel></Field></RadioGroup>}
+      goodNote="Dwie opcje widać od razu, bez otwierania listy."
+      bad={<Field><FieldLabel htmlFor="dd-s3">Chcę</FieldLabel><Select defaultValue="s"><SelectTrigger id="dd-s3"><SelectValue>się uczyć</SelectValue></SelectTrigger><SelectContent><SelectItem value="s">się uczyć</SelectItem><SelectItem value="m">mentorować</SelectItem></SelectContent></Select></Field>}
+      badNote="Lista ukrywa jedyną alternatywę i wymaga dodatkowego kliknięcia."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Combobox` (filtrowanie), `RadioGroup` (opcje widoczne), `Menu` (akcje, nie wartości).
+- **Wzorce:** lista z filtrami (sortowanie P2), formularz (ustawienia M3, S3), wybór terminu (strefa czasowa U1).

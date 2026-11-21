@@ -1,0 +1,169 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Field, FieldError, FieldLabel } from './field';
+import { Input } from './input';
+import * as InputStories from './input.stories';
+
+<Meta of={InputStories} />
+
+# Input
+
+## 1. Do czego służy
+
+Pozwala wpisać krótką, jednowierszową wartość (imię, e-mail, hasło, link, kwotę), żeby formularz
+dostał dokładnie to, czego potrzebuje.
+
+<Canvas of={InputStories.Playground} />
+<Controls of={InputStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Logowanie i rejestracja: imię, e-mail, hasło (P4) | KONCEPCJA §P4 |
+| Konto: imię, zmiana hasła (S3) | F1 Q7 |
+| Onboarding mentora: nagłówek 20–80 znaków, link do wideo, stawka 40–1000 zł (M1) | backlog E2-S2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast pola | Użyj | Źródło |
+|---|---|---|
+| Tekst dłuższy niż jedno zdanie (opis, powód) | `Textarea` | KONCEPCJA §M1, §M2 |
+| Wybór z listy znanych wartości (strefa czasowa) | `Select` (partia 2) | — (propozycja) |
+| Wyszukiwanie z podpowiedziami (temat) | `Combobox` (partia 2) | KONCEPCJA §P1 |
+| Zakres ceny | `Slider` (partia 2) | KONCEPCJA §P2 |
+| Pole bez widocznej etykiety | zawsze `Field` + `FieldLabel` | WCAG 3.3.2 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Etykieta (`FieldLabel`) | tak | zawsze widoczna, nad polem |
+| Pole | tak | 44 px, ramka `border-control`, tło `surface-panel`, tekst 16 px |
+| Placeholder | nie | przykład wartości („np. anna@example.com”), nigdy nazwa pola |
+| Podpowiedź (`FieldDescription`) | nie | reguła wartości: „Min. 10 znaków” |
+| Błąd (`FieldError`) | gdy błąd | ikona + tekst pod polem |
+
+## 5. Warianty
+
+<Canvas of={InputStories.Variants} />
+
+Input nie ma wariantów wyglądu. Wybierasz `type` (`text`, `email`, `password`, `url`, `number`)
+i `autoComplete`, bo od nich zależy klawiatura telefonu i autouzupełnianie (WCAG 1.3.5).
+
+## 6. Stany
+
+<Canvas of={InputStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | bez zmiany (kursor tekstowy) | propozycja |
+| Fokus | obrys 2 px `focus-ring`, ramka bez zmian | WCAG 2.4.7, P-T2, R4 |
+| Błąd | ramka `border-invalid` + `FieldError`, bez czerwonej poświaty | D5 |
+| Zablokowany | `text-disabled` na `surface-disabled`, bez przezroczystości | D2 |
+| Wciśnięty, wybrany, ładowanie | nie dotyczy pola; ładowanie pokazuje przycisk wysyłania | — |
+
+**Zablokowane pole:** zawsze z `FieldDescription`, która mówi dlaczego i kiedy będzie dostępne
+(„Zmiana e-maila wymaga weryfikacji — będzie dostępna wkrótce”). Jeśli wartości nie da się zmienić
+nigdy, pokaż ją jako tekst, nie jako pole (propozycja).
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Etykieta powiązana przez `htmlFor` / `id`; czytnik ogłasza „E-mail, pole edycji”. | WCAG 1.3.1, 4.1.2 |
+| Podpowiedź i błąd w `aria-describedby`; czytnik czyta je po etykiecie. | WCAG 3.3.1 |
+| Błąd: `aria-invalid="true"` na polu i `FieldError` (rola `alert`). | WAI-ARIA, WCAG 3.3.1 |
+| Pole wymagane: atrybut `required`; opcjonalne oznacz tekstem „(opcjonalnie)”. | KONCEPCJA §P4, propozycja |
+| Tekst 16 px także na komputerze — iOS nie powiększa strony przy fokusie. | R05.1 |
+| `autoComplete` przy danych osobowych (`email`, `given-name`, `new-password`). | WCAG 1.3.5 |
+| Pole 44 px — cel większy niż minimum 24 × 24 px. | K1, WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykieta to rzeczownik, 1–3 słowa. | „E-mail”, „Nowe hasło” | KONCEPCJA §P4 (teksty P4) |
+| Placeholder to przykład, nie instrukcja. | „np. anna@example.com” | prompt (wzorzec formularza) |
+| Reguła wartości w podpowiedzi, nie w placeholderze. | „Min. 10 znaków” | WCAG 3.3.2 |
+| Liczby i kwoty z cyframi tabelarycznymi, waluta poza polem. | „1200” + „zł” | R01.3 |
+| Długa wartość przewija się w polu; długa etykieta zawija się nad polem. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={InputStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | pole na całą szerokość | propozycja |
+| 768 / 1440 px | formularz najwyżej `form-max` (640 px); pole nie rośnie z ekranem | makieta (`.narrow`) |
+
+<Unstyled>
+  <ViewportFrame width={768}>
+    <Field className="max-w-form">
+      <FieldLabel htmlFor="r-email">E-mail</FieldLabel>
+      <Input id="r-email" type="email" />
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `type` | `string` | `'text'` | rodzaj danych |
+| `aria-invalid` | `boolean` | — | stan błędu (razem z `FieldError`) |
+| `disabled` | `boolean` | `false` | blokada; dodaj powód w `FieldDescription` |
+| `className` | `string` | — | tylko szerokość; nie zmieniaj wysokości ani kolorów |
+| pozostałe | atrybuty `<input>` | — | `id`, `name`, `required`, `autoComplete`, `inputMode` |
+
+## 11. Kod
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="email">E-mail</FieldLabel>
+  <Input id="email" type="email" autoComplete="email" />
+</Field>
+```
+
+Typowy przykład z produktu (P4, hasło z podpowiedzią i błędem):
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="password">{t('password')}</FieldLabel>
+  <Input
+    id="password"
+    type="password"
+    autoComplete="new-password"
+    required
+    aria-invalid={Boolean(error) || undefined}
+    aria-describedby={error ? 'password-hint password-error' : 'password-hint'}
+  />
+  <FieldDescription id="password-hint">{t('passwordHint')}</FieldDescription>
+  {error ? <FieldError id="password-error">{error}</FieldError> : null}
+</Field>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Field><FieldLabel htmlFor="dd-e1">E-mail</FieldLabel><Input id="dd-e1" placeholder="np. anna@example.com" /></Field>}
+      goodNote="Etykieta zawsze widoczna, placeholder to tylko przykład."
+      bad={<Input aria-label="E-mail" placeholder="E-mail" />}
+      badNote="Placeholder znika po wpisaniu i nie jest etykietą."
+    />
+    <DoDont
+      good={<Field><FieldLabel htmlFor="dd-e2">E-mail</FieldLabel><Input id="dd-e2" defaultValue="anna@" aria-invalid aria-describedby="dd-e2-err" /><FieldError id="dd-e2-err">Podaj poprawny adres e-mail.</FieldError></Field>}
+      goodNote="Błąd mówi, co poprawić, i ma ikonę, nie tylko kolor."
+      bad={<Field><FieldLabel htmlFor="dd-e3">E-mail</FieldLabel><Input id="dd-e3" defaultValue="anna@" aria-invalid /></Field>}
+      badNote="Sama czerwona ramka nie mówi, co jest źle (WCAG 1.4.1, 3.3.1)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Textarea` (tekst wielowierszowy), `Combobox` (wartość z listy z wyszukiwaniem).
+- **Wzorce:** formularz (walidacja po opuszczeniu pola i przy wysłaniu), kreator ze szkicem (M1).

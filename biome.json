@@ -12,6 +12,8 @@
       "!kompas-mentoring",
       "!lekcja-06",
       "!.ai",
+      "!.ai/cezar",
+      "!packages/config/eslint/**",
       "!**/next-env.d.ts",
       "!pnpm-lock.yaml"
     ]

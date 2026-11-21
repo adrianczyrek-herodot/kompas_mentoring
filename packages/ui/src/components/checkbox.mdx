@@ -1,0 +1,163 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Checkbox } from './checkbox';
+import { Field, FieldLabel } from './field';
+import * as CheckboxStories from './checkbox.stories';
+
+<Meta of={CheckboxStories} />
+
+# Checkbox
+
+## 1. Do czego służy
+
+Pozwala zaznaczyć zgodę albo wybrać kilka niezależnych opcji, z których każda może być włączona
+lub nie.
+
+<Canvas of={CheckboxStories.Playground} />
+<Controls of={CheckboxStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Zgody w rejestracji: regulamin (wymagany), marketing (opcjonalny, niezaznaczony) | KONCEPCJA §P4 |
+| Filtr „tylko zweryfikowani” w wyszukiwarce (P2) | KONCEPCJA §P2 |
+| Checklista weryfikacji wniosku (A1) | KONCEPCJA §A1 |
+| Wybór kilku dni tygodnia w filtrze dostępności (P2) | backlog E2-S5 T4 |
+
+## 3. Kiedy nie używać
+
+| Zamiast checkboxa | Użyj | Źródło |
+|---|---|---|
+| Ustawienie działające od razu, bez wysyłania formularza (wstrzymanie przyjmowania M3) | `Switch` (partia 2) | WAI-ARIA APG (Switch) |
+| Wybór dokładnie jednej opcji („uczyć się / mentorować”) | `RadioGroup` (partia 2) | KONCEPCJA §P4 |
+| Akcja („Dodaj do ulubionych”) | `Button` / `FavoriteToggle` (etap 3) | WAI-ARIA APG (Button) |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Pole | tak | 20 px (`--checkbox-size`), `rounded-tag`, ramka `border-control` |
+| Znacznik | gdy zaznaczony | ✓ lub — (częściowo), kolor `--checkbox-check` na `--checkbox-checked-bg` |
+| Etykieta | tak | po prawej, klikalna (`FieldLabel htmlFor`) |
+| Opis | nie | `FieldDescription` w `FieldContent` |
+| Obszar kliknięcia | — | ≥ 44 × 44 px (warstwa `::after`) plus cała etykieta |
+
+## 5. Warianty
+
+<Canvas of={CheckboxStories.Variants} />
+
+| Odmiana | Kiedy wybrać | Źródło |
+|---|---|---|
+| Pojedynczy z etykietą | zgoda, filtr | KONCEPCJA §P4, §P2 |
+| Z opisem | opcja wymaga zdania wyjaśnienia (skutek, częstotliwość) | WCAG 3.3.2 |
+| Karta wyboru (`FieldLabel` wokół `Field`) | punkty checklisty A1, gdzie cała karta jest celem | propozycja |
+
+## 6. Stany
+
+<Canvas of={CheckboxStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | tło `surface-hover` (tylko niezaznaczony) | D4 |
+| Fokus | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Zaznaczony / częściowo | wypełnienie akcentem wyboru `selected-border`, znacznik ✓ lub — | R04.2, K4 |
+| Błąd | ramka `border-invalid` + `FieldError` pod etykietą | D5 |
+| Zablokowany | `surface-disabled`, ramka `border-disabled`; powód w opisie | D2 |
+| Wciśnięty, ładowanie | nie dotyczy | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `checkbox`, `aria-checked` = `true` / `false` / `mixed`; Spacja przełącza. | WAI-ARIA APG (Checkbox) |
+| Kliknięcie etykiety przełącza i ustawia fokus na polu. | WCAG 1.3.1 |
+| Grupa checkboxów w `FieldSet` z `FieldLegend` („Dni tygodnia”). | WCAG 1.3.1 |
+| Wymagana zgoda: `required` + błąd „Akceptacja regulaminu jest wymagana.” przy wysłaniu. Nie blokuj przycisku wysyłania zamiast błędu. | teksty P4, D2 |
+| Cel kliknięcia ≥ 44 × 44 px mimo pola 20 px. | K1, WCAG 2.5.8 |
+| Zaznaczenie widać kształtem znacznika, nie tylko kolorem. | WCAG 1.4.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykieta w pierwszej osobie dla zgód. | „Akceptuję regulamin i politykę prywatności” | teksty P4 |
+| Opcja jako stan, nie polecenie. | „Tylko zweryfikowani mentorzy” | KONCEPCJA §P2 |
+| Bez podwójnego przeczenia. | „Chcę dostawać wskazówki”, nie „Nie chcę nie dostawać” | propozycja |
+| Zgody marketingowe nigdy domyślnie zaznaczone. | — | KONCEPCJA §P4, A02 |
+
+## 9. Responsywność
+
+<Canvas of={CheckboxStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | etykieta zawija się obok pola; pole wyrównane do pierwszej linii | propozycja |
+| 768 / 1440 px | bez zmian; grupa w jednej kolumnie (bez kolumn obok siebie) | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Field orientation="horizontal">
+      <Checkbox id="r-verified" defaultChecked />
+      <FieldLabel htmlFor="r-verified">Tylko zweryfikowani mentorzy</FieldLabel>
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `checked` / `defaultChecked` | `boolean` | — / `false` | stan kontrolowany / początkowy |
+| `onCheckedChange` | `(checked: boolean) => void` | — | zmiana stanu |
+| `indeterminate` | `boolean` | `false` | „częściowo” (np. zaznacz wszystkie w A1) |
+| `disabled` | `boolean` | `false` | blokada; powód w opisie |
+| `required` | `boolean` | `false` | wymagany w formularzu |
+| `name`, `value` | `string` | — | wartość w wysłanym formularzu |
+| `aria-invalid` | `boolean` | — | stan błędu |
+
+## 11. Kod
+
+```tsx
+<Field orientation="horizontal">
+  <Checkbox id="verified" />
+  <FieldLabel htmlFor="verified">Tylko zweryfikowani mentorzy</FieldLabel>
+</Field>
+```
+
+Typowy przykład z produktu (P2, filtr w URL):
+
+```tsx
+<Field orientation="horizontal">
+  <Checkbox
+    id="verified"
+    checked={filters.verifiedOnly}
+    onCheckedChange={(checked) => setFilter('verifiedOnly', checked)}
+  />
+  <FieldLabel htmlFor="verified">{t('filters.verifiedOnly')}</FieldLabel>
+</Field>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Field orientation="horizontal"><Checkbox id="dd-c1" /><FieldLabel htmlFor="dd-c1">Chcę dostawać wskazówki i oferty</FieldLabel></Field>}
+      goodNote="Zgoda marketingowa domyślnie niezaznaczona."
+      bad={<Field orientation="horizontal"><Checkbox id="dd-c2" defaultChecked /><FieldLabel htmlFor="dd-c2">Chcę dostawać wskazówki i oferty</FieldLabel></Field>}
+      badNote="Zaznaczona z góry zgoda to presja (A02)."
+    />
+    <DoDont
+      good={<Field orientation="horizontal"><Checkbox id="dd-c3" /><FieldLabel htmlFor="dd-c3">Tylko zweryfikowani mentorzy</FieldLabel></Field>}
+      goodNote="Etykieta jest klikalna i powiązana z polem."
+      bad={<div className="flex items-center gap-inline"><Checkbox aria-label="Tylko zweryfikowani" /><span className="text-label">Tylko zweryfikowani mentorzy</span></div>}
+      badNote="Tekst obok bez powiązania — klik w etykietę nic nie robi."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Switch` (działa od razu), `RadioGroup` (jedna z wielu), `ToggleGroup`.
+- **Wzorce:** formularz (zgody), lista z filtrami (P2), decyzja z powodem (checklista A1).

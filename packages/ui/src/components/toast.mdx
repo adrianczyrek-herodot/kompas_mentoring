@@ -1,0 +1,136 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import { ToastProvider, useToast } from './toast';
+import * as ToastStories from './toast.stories';
+
+<Meta of={ToastStories} />
+
+# Toast
+
+## 1. Do czego służy
+
+Wyświetla krótkie, nieinwazyjne powiadomienie po udanej akcji lub pobocznym zdarzeniu systemowym, potwierdzając zmianę stanu bez przerywania pracy użytkownika.
+
+<Canvas of={ToastStories.Playground} />
+<Controls of={ToastStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Zapisanie zmian w grafiku dostępności: „Zapisano dostępność” (M3) | KONCEPCJA §M3 |
+| Pomyślne wysłanie prośby o przełożenie sesji (U5) | KONCEPCJA §U5 |
+| Konflikt 409 podczas wyboru terminu: „Ten termin został właśnie zajęty przez innego ucznia” (U1) | KONCEPCJA §U1 |
+| Skopiowanie linku do profilu mentora lub pokoju sesji do schowka | propozycja |
+
+## 3. Kiedy nie używać
+
+| Zamiast toastu | Użyj | Źródło |
+|---|---|---|
+| Błąd formularza lub operacji wymagający naprawienia przez użytkownika | `Alert` lub `FieldError` | prompt, R02.4 |
+| Potwierdzenie usunięcia lub odwołania sesji przed wykonaniem | `AlertDialog` | A02 |
+| Stała informacja o stanie konta lub weryfikacji | `Alert` w treści strony | KONCEPCJA §M1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `ToastProvider` | tak | Kontekst zarządzający kolejką i pozycją toastów (dolny prawy róg) |
+| `useToast` | tak | Hook udostępniający funkcję `toast({ title, description, variant, action })` |
+| Toast Title | tak | Krótkie podsumowanie operacji (`text-label` font-medium) |
+| Toast Description | opcjonalnie | Szczegóły lub wyjaśnienie |
+| Toast Close | tak | Dyskretny przycisk zamykający z etykietą dostępną |
+
+## 5. Warianty
+
+<Canvas of={ToastStories.Variants} />
+
+Obsługiwane warianty: `neutral` (domyślny), `success` (sukces operacji) oraz `danger` (wyłącznie dla natychmiastowych komunikatów o braku możliwości wykonania akcji, np. utrata połączenia).
+
+## 6. Stany
+
+<Canvas of={ToastStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Wejście | Płynne wysunięcie od dołu z fade-in | Base UI |
+| Widoczny | Widoczny przez 5000 ms; najechanie myszą wstrzymuje odliczanie czasu | WAI-ARIA |
+| Zamknięcie | Fade-out i zwolnienie miejsca w kolejce | Base UI |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Region powiadomień posiada `role="region"`, `aria-label="Powiadomienia"` i `aria-live="polite"`. | WAI-ARIA APG |
+| Toast nie kradnie fokusu klawiatury podczas pojawienia się. | WCAG 2.4.3 |
+| Błędy krytyczne wymagające interwencji nigdy nie są toastem, ponieważ toast znika. | prompt, R02.4 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Zwięzłe potwierdzenie w czasie przeszłym dokonanym. | „Zapisano zmiany w dostępności” | KONCEPCJA §M3 |
+| Unikaj niejasnych zwrotów typu „Sukces!”. | — | R05.2 |
+
+## 9. Responsywność
+
+<Canvas of={ToastStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Toast zajmuje pełną szerokość u dołu ekranu z marginesem 16 px | propozycja |
+| 768 / 1440 px | Toast przypięty do prawego dolnego rogu ekranu, maks. szerokość 380 px | propozycja |
+
+## 10. API
+
+| Prop / Metoda | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `toast({ ... })` | `(options) => string` | — | Wywołanie nowego toastu |
+| `title` | `ReactNode` | — | Tytuł powiadomienia |
+| `description` | `ReactNode` | — | Opcjonalny opis |
+| `variant` | `'neutral' \| 'success' \| 'danger'` | `'neutral'` | Wariant wizualny |
+| `duration` | `number` | `5000` | Czas wyświetlania w milisekundach |
+
+## 11. Kod
+
+```tsx
+const { toast } = useToast();
+
+// po udanym zapisie:
+toast({
+  title: 'Zapisano grafik dostępności',
+  description: 'Twoje nowe godziny są już widoczne w kalendarzu rezerwacji.',
+  variant: 'success',
+});
+```
+
+Typowy przykład z produktu (M3): potwierdzenie zapisu grafiku dostępności mentora.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel max-w-sm shadow-overlay">
+          <p className="text-label font-medium">Link do pokoju sesji skopiowany</p>
+          <p className="text-muted text-body-dense mt-tight">Możesz przesłać go uczestnikowi spotkania.</p>
+        </div>
+      }
+      goodNote="Krótka, jednoznaczna informacja potwierdzająca wykonanie pobocznej akcji."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel max-w-sm shadow-overlay border-status-danger-fg">
+          <p className="text-label font-medium text-text-danger">Nie udało się zapisać zmian</p>
+          <p className="text-muted text-body-dense mt-tight">Sprawdź błędy w polach formularza i wyślij ponownie.</p>
+        </div>
+      }
+      badNote="Błąd wymagający działania nigdy nie może być toastem — użytkownik może go przeoczyć, gdy powiadomienie zniknie."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Alert` (trwały komunikat na stronie).
+- **Wzorce:** potwierdzenie akcji (U5, M3), informacja o konflikcie (U1).

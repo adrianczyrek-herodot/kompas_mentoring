@@ -1,0 +1,169 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { sessionFriday, TZ } from '../../.storybook/fixtures/kompas';
+import { Button } from '../components/button';
+import { Link } from '../components/link';
+import { NextSessionCard } from './next-session-card';
+import * as NextSessionCardStories from './next-session-card.stories';
+
+<Meta of={NextSessionCardStories} />
+
+# NextSessionCard
+
+## 1. Do czego służy
+
+Panel z najbliższą sesją na górze Moich sesji (U4): kiedy, z kim, po co — i jedyna akcja główna
+ekranu, „Dołącz do sesji”, żeby uczeń wszedł do pokoju bez szukania.
+
+<Canvas of={NextSessionCardStories.Playground} />
+<Controls of={NextSessionCardStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Góra U4: najbliższa nadchodząca sesja z „Dołącz” (aktywny od T-10 min) | KONCEPCJA §U4, E3-S5 |
+| Ekran, na którym następnym krokiem jest wejście do pokoju | R01.6, KONCEPCJA §U6 |
+
+## 3. Kiedy nie używać
+
+| Zamiast karty | Użyj | Źródło |
+|---|---|---|
+| Kolejne sesje pod kartą | `SessionListItem` w `ul` | KONCEPCJA §U4, R01.4 |
+| Dzień mentora z kilkoma sesjami | `TodayAgenda` | KONCEPCJA §M2 |
+| Brak nadchodzącej sesji | nie renderuj karty; lista pokazuje `EmptyState` „Nie masz jeszcze sesji” | KONCEPCJA §U4 (E) |
+| Druga karta z akcją główną na tym samym ekranie | jedna karta, reszta jako wiersze | R01.6 |
+| Szczegóły jednej sesji (U5) | `PageHeader` + `BookingStatusBadge` + `PolicyNotice` | KONCEPCJA §U5 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Nagłówek „Najbliższa sesja” | tak | `h2` (lub `h3` przez `headingAs`), nazywa sekcję | WCAG 1.3.1, 2.4.6 |
+| Termin | tak | `DateTime` `datetime` · czas trwania, rola `section-title` | brief reguła 10, R01.3 |
+| Osoba, typ, cel | tak | awatar `md` z inicjałami, imię, „Sesja próbna” / „Plan”, cel do `max-w-measure` | KONCEPCJA §U4 |
+| „Dołącz do sesji” | tak | `Button` `default` z ikoną wideo — akcja główna ekranu | R01.6, K4 |
+| Powód blokady | gdy `joinOpen: false` | „Pokój otworzy się o 17:50, 10 minut przed startem.” obok przycisku | D2, KONCEPCJA §U6 |
+| Akcje drugorzędne | nie | slot `secondary`, np. `Link` „Szczegóły sesji” | R05.3 |
+| Panel | tak | `rounded-panel`, ramka `border-divider`, `surface-panel`, bez cienia | R01.4, P-T5 |
+
+## 5. Warianty
+
+Brak propu wariantu. Dwa przypadki wynikają z `joinOpen` (liczy domena, nie UI):
+
+<Canvas of={NextSessionCardStories.BeforeRoomOpens} />
+
+| `joinOpen` | Wygląd | Źródło |
+|---|---|---|
+| `true` | „Dołącz do sesji” aktywny | KONCEPCJA §U4, §U6 |
+| `false` | przycisk zablokowany, ale osiągalny klawiaturą; obok godzina otwarcia pokoju z `joinFrom` | D2, KONCEPCJA §U6 (wejście od T-10 min) |
+
+## 6. Stany
+
+Ładowanie, pusto i błąd należą do ekranu U4 (skeleton listy, „Nie masz jeszcze sesji”, „Ponów”) —
+karta dostaje gotowe dane albo nie jest renderowana (KONCEPCJA §U4). Komponent ma stany przycisku:
+
+<Canvas of={NextSessionCardStories.Narrow} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Pokój otwarty | przycisk główny aktywny, `onJoin` | KONCEPCJA §U6 |
+| Pokój zamknięty | `aria-disabled`, powód tekstem obok, kliknięcie nic nie robi | D2 |
+| Fokus | obrys `focus-ring` na przycisku i linku | WCAG 2.4.7, P-T2 |
+| Długie teksty / 320 px | cel się zawija, przycisk i powód jeden pod drugim | K1 |
+| Wejście do pokoju w toku | nie dotyczy — przejście do U6 obsługuje ekran | KONCEPCJA §U6 (L — łączenie) |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| `section` z `aria-labelledby` na nagłówek — czytnik ogłasza region „Najbliższa sesja”. | WAI-ARIA (region), WCAG 1.3.1 |
+| Fokus: „Dołącz do sesji”, potem `secondary`. Enter i Spacja uruchamiają `onJoin`. | WCAG 2.4.3, WAI-ARIA APG (Button) |
+| Zamknięty pokój: `focusableWhenDisabled` + `aria-disabled="true"` + `aria-describedby` na powód — czytnik czyta „Dołącz do sesji, przycisk, niedostępny, Pokój otworzy się o 17:50, 10 minut przed startem.” | D2, WAI-ARIA 1.2 (`aria-disabled`) |
+| Ikona wideo `aria-hidden`; nazwa przycisku to tekst. | WCAG 4.1.2 |
+| Cel kliknięcia ≥ 24 × 24 px; przycisk ma 44 px. | WCAG 2.5.8, K1 |
+| Odblokowanie o T-10 min przychodzi z nowymi danymi (`joinOpen`), bez zegara w komponencie. | KONCEPCJA §U6, AGENTS.md (czas przez `Clock`) |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Powód blokady mówi, kiedy będzie można, a nie tylko „niedostępne”. | „Pokój otworzy się o 17:50, 10 minut przed startem.” | D2, R05.2 |
+| Godziny w strefie oglądającego. | „pt., 23 paź, 18:00 · 60 min” | brief reguła 10 |
+| Etykieta akcji: czasownik + obiekt. | „Dołącz do sesji” | R05.2 |
+| Ograniczenie: „Najbliższa sesja”, „Dołącz do sesji” i zdanie o pokoju są dziś na stałe w komponencie; docelowo z `messages/pl.json`. | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | przycisk, powód i link jeden pod drugim; cel się zawija | K1 |
+| od 768 px (`md`) | przycisk, powód i link w jednym rzędzie | KONCEPCJA §3.2 (próg 768 px) |
+| 1440 px | karta nie rośnie ponad szerokość kolumny treści (w stories `max-w-form`) | tokeny.md (`form-max`) |
+
+Story „Długie teksty i 320 px” — sekcja 6.
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `session` | `SessionSummary` | — | jak w `SessionListItem` |
+| `timeZone` | `string` (IANA) | — | strefa oglądającego |
+| `joinOpen` | `boolean` | — | pokój otwarty (od T-10 min do końca) — decyduje domena |
+| `joinFrom` | `string` (ISO) | — | chwila otwarcia pokoju, pokazana w powodzie blokady |
+| `onJoin` | `() => void` | — | przejście do U6 |
+| `secondary` | `ReactNode` | — | akcje drugorzędne (`Link`) |
+| `headingAs` | `'h2' \| 'h3'` | `'h2'` | poziom nagłówka w hierarchii strony |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `section` | — | bez `children` |
+
+## 11. Kod
+
+```tsx
+import { NextSessionCard } from '@kompas/ui';
+
+<NextSessionCard session={next} timeZone={viewerTimeZone} joinOpen={joinOpen} joinFrom={joinFrom} onJoin={join} />
+```
+
+Typowy przykład z produktu (U4):
+
+```tsx
+import { Link, NextSessionCard, PageHeader } from '@kompas/ui';
+
+<PageHeader title={t('mySessions')} />
+{next ? (
+  <NextSessionCard
+    session={next}
+    timeZone={viewerTimeZone}
+    joinOpen={next.joinOpen}
+    joinFrom={next.joinFrom}
+    onJoin={() => router.push(`/sesje/${next.id}/pokoj`)}
+    secondary={<Link href={`/sesje/${next.id}`}>{t('sessionDetails')}</Link>}
+  />
+) : null}
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<NextSessionCard session={sessionFriday} timeZone={TZ} joinOpen={false} joinFrom="2026-10-23T17:50:00+02:00" />}
+      goodNote="Zablokowany przycisk ma obok godzinę, o której pokój się otworzy."
+      bad={<Button disabled>Dołącz do sesji</Button>}
+      badNote="Szary przycisk bez powodu nie mówi, kiedy będzie można wejść (D2)."
+    />
+    <DoDont
+      good={<NextSessionCard session={sessionFriday} timeZone={TZ} joinOpen joinFrom="2026-10-23T17:50:00+02:00" secondary={<Link href="/sesje/s2">Szczegóły sesji</Link>} />}
+      goodNote="Obok akcji głównej tylko link drugorzędny."
+      bad={<NextSessionCard session={sessionFriday} timeZone={TZ} joinOpen joinFrom="2026-10-23T17:50:00+02:00" secondary={<Button>Przełóż</Button>} />}
+      badNote="Dwie akcje główne obok siebie — nie wiadomo, co jest następnym krokiem (R01.6)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Składa się z:** `DateTime`, `Avatar`, `Button`.
+- **Mylony z:** `SessionListItem` (wiersz bez akcji głównej), `TodayAgenda` (dzień mentora), `HoldCountdown` (blokada terminu w U1, nie pokój).
+- **Wzorce:** zablokowana akcja z powodem (D2), jedna akcja główna na ekran (R01.6), stany danych listy w U4.

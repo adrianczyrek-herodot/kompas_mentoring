@@ -1,0 +1,67 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as U5Stories from './u5-session.stories';
+
+<Meta of={U5Stories} />
+
+# U5 · Szczegóły sesji
+
+**Cel:** Zarządzać pojedynczą sesją: dołączyć, przełożyć, anulować z regułą 12 h (KONCEPCJA §U5, E3-S5, E3-S6).
+**Kto i gdzie:** Uczeń · `/sesje/:id`. Ekran składa się wyłącznie z komponentów pakietu; dane z mockupów.
+
+## Mapa stanów
+
+Każdy stan ekranu ma swoją story. Oznaczenia L / E / Er / S jak w KONCEPCJI (ładowanie, pusto, błąd, sukces).
+
+| Stan | Co widzi użytkownik | Story |
+|---|---|---|
+| scheduled, ≥ 12 h | Dane sesji, „Dołącz” zablokowane do T-10 min, zmiana bez kosztów do podanej godziny | `Scheduled` |
+| scheduled, < 12 h | „Dołącz” aktywne, przełożenie zablokowane, anulowanie z ostrzeżeniem „sesja przepadnie” | `Late` |
+| in_progress | Zmiana zablokowana z powodem | `InProgress` |
+| completed | Status „Zakończona”, bez akcji zmiany | `Completed` |
+| cancelled | Status „Anulowana” | `Cancelled` |
+| L — ładowanie | Szkielet nagłówka i akcji | `Loading` |
+| Er — 404/403 | Jeden komunikat dla „nie istnieje” i „nie Twoja” | `NotFound` |
+| Er — błąd | „Nie udało się wczytać sesji” + Ponów | `ErrorLoading` |
+
+## Z czego jest zbudowany
+
+- `PageHeader`, `BookingStatusBadge`, `DateTime`, `PolicyNotice`, `AlertDialog`, `Sheet`, `SlotGrid`, `Toast`
+- Wzorce: [Widok szczegółów](?path=/docs/wzorce-widok-szczegółów--docs), [Zmiana z regułą 12 h](?path=/docs/wzorce-zmiana-z-regułą-12-h--docs)
+
+## Co zostaje w produkcie
+
+- Notatka mentora i zadania po sesji, „Zgłoś problem” (do 72 h), statusy `no_show` i `disputed` z akcjami — w „Czego brakuje”.
+
+## Stany
+
+### scheduled, ≥ 12 h
+
+<Canvas of={U5Stories.Scheduled} layout="fullscreen" />
+
+### scheduled, < 12 h
+
+<Canvas of={U5Stories.Late} layout="fullscreen" />
+
+### in_progress
+
+<Canvas of={U5Stories.InProgress} layout="fullscreen" />
+
+### completed
+
+<Canvas of={U5Stories.Completed} layout="fullscreen" />
+
+### cancelled
+
+<Canvas of={U5Stories.Cancelled} layout="fullscreen" />
+
+### L — ładowanie
+
+<Canvas of={U5Stories.Loading} layout="fullscreen" />
+
+### Er — 404/403
+
+<Canvas of={U5Stories.NotFound} layout="fullscreen" />
+
+### Er — błąd
+
+<Canvas of={U5Stories.ErrorLoading} layout="fullscreen" />

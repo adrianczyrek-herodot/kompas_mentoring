@@ -4,3 +4,37 @@
  */
 @import "../src/styles/globals.css";
 @source "./";
+
+/*
+ * Frozen state previews (docs only, prompt stage 2): `data-preview-state="hover|focus|pressed"`
+ * applies the same declarations as the component's :hover, :focus-visible and :active.
+ * The variants are redefined only in this Storybook stylesheet, so the package CSS that apps
+ * import is unchanged.
+ */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &[data-preview-state~="hover"] {
+    @slot;
+  }
+}
+@custom-variant active (&:active, &[data-preview-state~="pressed"]);
+@custom-variant focus-visible (&:focus-visible, &[data-preview-state~="focus"]);
+
+/* Same declaration as `:focus-visible` in globals.css (base layer). */
+[data-preview-state~="focus"] {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Combobox: the outline sits on the input group (same as its has-[input:focus-visible] rule). */
+[data-slot="combobox-input-group"]:has([data-preview-state~="focus"]) {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+[data-slot="combobox-input"][data-preview-state~="focus"] {
+  outline: none;
+}

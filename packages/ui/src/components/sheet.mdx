@@ -1,0 +1,150 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from './sheet';
+import * as SheetStories from './sheet.stories';
+
+<Meta of={SheetStories} />
+
+# Sheet
+
+## 1. Do czego służy
+
+Wysuwa boczny lub dolny panel roboczy nad treścią strony, pozwalając na wykonywanie zadań kontekstowych (takich jak filtrowanie listy mentorów) bez opuszczania bieżącego widoku.
+
+<Canvas of={SheetStories.Playground} />
+<Controls of={SheetStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Filtry wyszukiwania mentorów na urządzeniach mobilnych (P2) | KONCEPCJA §P2 |
+| Szybkie przełożenie terminu sesji z podglądem kalendarza (U5) | KONCEPCJA §U5 |
+| Podgląd szczegółów zgłoszenia w panelu zaufania (A1) | KONCEPCJA §A1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast panelu bocznego | Użyj | Źródło |
+|---|---|---|
+| Proste potwierdzenie decyzji lub usunięcia | `AlertDialog` | A02 |
+| Krótki formularz skupiony na jednym pytaniu | `Dialog` | WAI-ARIA APG |
+| Menu nawigacji lub akcji profilu | `Menu` | R02.6 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Sheet` | tak | Główny kontener stanu otwarcia |
+| `SheetTrigger` | opcjonalnie | Element otwierający panel (np. przycisk „Filtry”) |
+| `SheetContent` | tak | Panel boczny wysuwany z prawej, lewej, góry lub dołu |
+| `SheetHeader` | tak | Nagłówek z tytułem i zwięzłym opisem |
+| `SheetTitle` | tak | Tytuł panelu (`text-section-title`) |
+| `SheetDescription` | tak | Opis zawartości panelu |
+| `SheetFooter` | opcjonalnie | Belka z przyciskami akcji na dole panelu |
+| `SheetClose` | opcjonalnie | Przycisk zamykający panel |
+
+## 5. Warianty
+
+<Canvas of={SheetStories.Variants} />
+
+Domyślny kierunek wysunięcia to prawa strona (`side="right"`, szerokość 400 px lub pełny ekran na wąskim widoku). Obsługiwane kierunki to także `left`, `bottom` (wygodny dla arkuszy mobilnych) oraz `top`.
+
+## 6. Stany
+
+<Canvas of={SheetStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Otwarty | Płynne wysunięcie z krawędzi ekranu z tłem przyciemniającym | D3 |
+| Przewijanie | Wewnętrzna treść przewija się niezależnie od zablokowanego tła | WAI-ARIA |
+| Zamykanie | Kliknięcie w tło, Escape lub krzyżyk zamyka panel i zwraca fokus | WCAG 2.4.3 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `dialog`, `aria-modal="true"`, tytuł i opis powiązane identyfikatorami. | WAI-ARIA APG |
+| Blokada przewijania tła strony podczas gdy arkusz jest otwarty. | WAI-ARIA |
+| Fokus jest uwięziony wewnątrz otwartego panelu do momentu jego zamknięcia. | WCAG 2.4.3 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tytuł jasno precyzuje zawartość panelu. | „Filtruj mentorów”, „Przełóż termin sesji” | KONCEPCJA §P2 |
+| Przyciski w stopce jednoznacznie zatwierdzają lub resetują stan. | „Zastosuj filtry (3)”, „Wyczyść filtry” | prompt |
+
+## 9. Responsywność
+
+<Canvas of={SheetStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Panel zajmuje 100% szerokości ekranu; przyciski akcji przypięte na dole | propozycja |
+| 768 / 1440 px | Panel boczny o stałej szerokości 400 px wyrównany do krawędzi | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Sheet` | `open` / `defaultOpen` | `boolean` | — | Kontrolowany lub niekontrolowany stan otwarcia |
+| `Sheet` | `onOpenChange` | `(open: boolean) => void` | — | Callback zmiany stanu |
+| `SheetContent` | `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'right'` | Krawędź ekranu, z której wysuwa się arkusz |
+
+## 11. Kod
+
+```tsx
+<Sheet>
+  <SheetTrigger render={<Button variant="outline">Filtry</Button>} />
+  <SheetContent side="right">
+    <SheetHeader>
+      <SheetTitle>Filtruj mentorów</SheetTitle>
+      <SheetDescription>Dopasuj wyniki wyszukiwania do swoich potrzeb.</SheetDescription>
+    </SheetHeader>
+    <div className="py-panel">{/* lista filtrów */}</div>
+    <SheetFooter>
+      <Button className="w-full">Pokaż wyniki (12)</Button>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>
+```
+
+Typowy przykład z produktu (P2): mobilny panel filtrów w katalogu mentorów.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <h4 className="text-section-title font-medium">Filtry wyszukiwania</h4>
+          <p className="text-muted text-body-dense mt-tight">Panel wysuwany z prawej strony na żądanie użytkownika.</p>
+        </div>
+      }
+      goodNote="Wykorzystanie bocznego panelu do filtrów na ekranach mobilnych i tabletach."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel">
+          <h4 className="text-section-title font-medium">Kreator profilu mentora (krok 1 z 4)</h4>
+          <p className="text-muted text-body-dense mt-tight">Cały proces rejestracji wciśnięty w wąski panel boczny.</p>
+        </div>
+      }
+      badNote="Złożone procesy wieloetapowe powinny mieć dedykowaną podstronę z własnym adresem URL, nie wąski arkusz boczny."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Dialog` (wyśrodkowane okno), `Menu` (lista rozwijana akcji).
+- **Wzorce:** lista z filtrami (P2), formularz boczny.

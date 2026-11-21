@@ -1,0 +1,139 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { TZ } from '../../.storybook/fixtures/kompas';
+import { DateTime } from './date-time';
+import * as DateTimeStories from './date-time.stories';
+
+<Meta of={DateTimeStories} />
+
+# DateTime
+
+## 1. Do czego służy
+
+Wyświetla chwilę (ISO) w strefie czasowej oglądającego, po polsku i z cyframi tabelarycznymi — żeby
+uczeń i mentor w różnych strefach widzieli każdy swoją godzinę tej samej sesji.
+
+<Canvas of={DateTimeStories.Playground} />
+<Controls of={DateTimeStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Każda data i godzina w UI: sloty (U1), sesje (U4, U5, M2), prośby i terminy odpowiedzi (M2), powiadomienia (S2) | brief reguła 10 |
+| Kolumny godzin do porównania (siatka slotów U1) | R01.3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `DateTime` | Użyj | Źródło |
+|---|---|---|
+| Odliczanie blokady terminu w U1 | `HoldCountdown` | E3-S4 |
+| Czas trwania („60 min”) | zwykły tekst z `tabular-nums` | R01.3 |
+| Reguły dostępności mentora (szablon tygodnia w M3) | godzina lokalna mentora bez chwili ISO | brief reguła 10 („reguły dostępności w czasie lokalnym mentora”) |
+| Liczenie „czy pokój już otwarty”, „czy minęło 12 h” | domena przez `Clock` i Temporal; UI dostaje wynik (`joinOpen`) | AGENTS.md (czas), KONCEPCJA §U6 |
+| Odliczanie do terminu odpowiedzi na prośbę | termin jako `DateTime`, bez licznika | A02, E3-S7 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Element `time` | tak | `dateTime` = wartość ISO z `value` | HTML (`time`) |
+| Tekst | tak | `Intl.DateTimeFormat('pl-PL')` w strefie `timeZone` | brief reguła 10 |
+| Cyfry tabelaryczne, bez łamania | tak | `tabular-nums`, `whitespace-nowrap` | R01.3 |
+
+## 5. Warianty
+
+<Canvas of={DateTimeStories.Formats} />
+
+| `format` | Wynik dla 2026-10-22 09:00 (Warszawa) | Gdzie | Źródło |
+|---|---|---|---|
+| `datetime` (domyślny) | „czw., 22 paź, 09:00” | listy, karty, powiadomienia | brief reguła 10 |
+| `weekday` | „czw., 22 paź” | nagłówki dni w `SlotGrid`, wiersze U4 | KONCEPCJA §U1, §U4 |
+| `time` | „09:00” | sloty, agenda dnia, gdy dzień jest w nagłówku | R01.3 |
+| `date` | „22 października 2026” | daty bez godziny (wnioski, faktury) | KONCEPCJA §M5 |
+
+<Canvas of={DateTimeStories.TimeZones} />
+
+## 6. Stany
+
+`DateTime` jest nieinteraktywny i nie ładuje danych — stany ładowania, pustki i błędu należą do
+komponentu nadrzędnego (`SessionListItem`, `TodayAgenda`, `SlotGrid`).
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Czytnik czyta widoczny tekst („czw., 22 paź, 09:00”); `datetime` zawiera ISO dla maszyn. | WCAG 1.3.1 |
+| Nie dostaje fokusu; brak celu kliknięcia (WCAG 2.5.8 nie dotyczy). | WCAG 2.5.8 |
+| Gdy na ekranie jest godzina innej strefy niż przeglądarki, nazwij strefę obok (np. „Warszawa (GMT+2)”). | KONCEPCJA §3.2 (przełącznik strefy), brief reguła 10 |
+| Formatowanie używa `Intl` w przeglądarce; w `domain/**` czas tylko przez `Clock` i Temporal. | AGENTS.md (czas) |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Zawsze strefa oglądającego (`timeZone` z profilu lub przeglądarki), nigdy serwera ani mentora. | ta sama sesja: 09:00 w Warszawie, 08:00 w Londynie | brief reguła 10 |
+| Format 24-godzinny, polskie skróty dni i miesięcy (locale `pl-PL`). | „09:00”, „czw., 22 paź” | **Propozycja:** zapis godzin wg `pl-PL` |
+| Komponent nie ma własnych tekstów; format daje `Intl`. | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+Tekst ma szerokość treści i się nie zawija (`whitespace-nowrap`); na 320 px zawija się zdanie
+wokół niego. Na wąskim ekranie wybierz krótszy `format` (`time` pod nagłówkiem dnia) zamiast
+skracać ręcznie (K1).
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `value` | `string` (ISO) | — | chwila, np. `2026-10-22T09:00:00+02:00` |
+| `timeZone` | `string` (IANA) | — | strefa oglądającego, np. `Europe/Warsaw` |
+| `format` | `'datetime' \| 'date' \| 'time' \| 'weekday'` | `'datetime'` | sekcja 5 |
+| `className` | `string` | — | tylko układ i typografia |
+| pozostałe | atrybuty `time` | — | bez `dateTime` i `children` |
+
+## 11. Kod
+
+```tsx
+import { DateTime } from '@kompas/ui';
+
+<DateTime value={booking.startsAt} timeZone={viewerTimeZone} />
+```
+
+Typowy przykład z produktu (U1, nagłówek dnia i sloty):
+
+```tsx
+import { DateTime } from '@kompas/ui';
+
+<h3 className="text-label font-medium">
+  <DateTime value={day.date} timeZone={viewerTimeZone} format="weekday" />
+</h3>
+{day.slots.map((slot) => (
+  <DateTime key={slot.id} value={slot.startsAt} timeZone={viewerTimeZone} format="time" />
+))}
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<DateTime value="2026-10-22T09:00:00+02:00" timeZone={TZ} />}
+      goodNote="Godzina w strefie oglądającego, po polsku."
+      bad={<span>2026-10-22T07:00:00Z</span>}
+      badNote="Surowy zapis w UTC — uczeń sam musi przeliczać strefę (brief reguła 10)."
+    />
+    <DoDont
+      good={<DateTime value="2026-10-22T09:00:00+02:00" timeZone={TZ} format="time" />}
+      goodNote="Pod nagłówkiem dnia wystarczy sama godzina."
+      bad={<DateTime value="2026-10-22T09:00:00+02:00" timeZone="UTC" format="time" />}
+      badNote="Strefa serwera pokazuje 07:00 zamiast 09:00 (brief reguła 10)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Funkcja:** `formatDateTime(iso, timeZone, format)` z `@kompas/ui` — ten sam format jako tekst (np. w zdaniu z powodem w `NextSessionCard`).
+- **Używany w:** `SessionListItem`, `NextSessionCard`, `TrialRequestCard`, `TodayAgenda`, `SlotGrid`, `PolicyNotice`, `HoldCountdown`.
+- **Mylony z:** `HoldCountdown` (odliczanie), `Money` (ten sam wzorzec dla kwot).

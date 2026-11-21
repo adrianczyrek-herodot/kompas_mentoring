@@ -1,0 +1,31 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+import { ComponentTable } from '../../blocks/component-docs';
+import { componentIndex } from '../../blocks/component-index';
+
+<Meta title="Przewodnik/Zacznij tutaj" />
+
+# Zacznij tutaj
+
+**Kompas** to marketplace mentoringu 1:1 online (IT, kariera, biznes, design). Uczeń szuka i porównuje mentorów, rezerwuje sesję próbną i plan, mentor prowadzi dostępność, sesje i notatki, zespół zaufania weryfikuje mentorów.
+
+## Słowa charakteru
+
+| Cecha | Co to oznacza w interfejsie |
+|---|---|
+| **Czytelny** | Jedna główna akcja na ekranie, gęste tabele liczb, etykiety zawsze widoczne (placeholder to przykład, nie nazwa pola) |
+| **Gęsty** | Wiersze dzielone cienkimi liniami, nie kartami z cieniem; 16 px tekst, 44 px cele dotyku |
+| **Ciepły** | Złamane tło (`surface-page`), ciepłe szarości (`ink`, `stone`), jeden nasycony akcent (`action-primary` = bursztyn) tylko dla akcji głównej i stanów |
+| **Uporządkowany** | Szeryf tylko w nagłówkach P1 i P3, reszta bezszeryfowa (IBM Plex Sans); mono tylko dla kodu; cyfry tabelaryczne dla kwot i godzin |
+| **Rzeczowy** | Błąd mówi co się stało i co poprawić; humor tylko w pustych stanach i powitaniach, nigdy przy pieniądzach, terminach i sporach; bez emoji, gradientów, szkła, iskierek |
+
+## 5 kroków budowy ekranu
+
+1. **Znajdź wzorzec** — czy ekran to forma, lista, szczegóły, potwierdzenie usunięcia, kreator, wybór terminu, zmiana 12 h, decyzja? → [Wzorce](/przewodnik/wzorce)
+2. **Wybierz komponenty** — użyj tabeli „Jeśli… to użyj…” → [Jak wybrać](/przewodnik/jak-wybrac)
+3. **Użyj tokenów znaczeniowych** — nigdy `bg-zinc-900`, `text-white`, `p-[13px]`; zawsze `bg-surface-panel`, `text-text-default`, `gap-group` → [Podstawy](/podstawy)
+4. **Zaprojektuj stany danych** — każdy komponent produktu ma: ładowanie, pusto, błąd, częściowe dane, dużo danych, długie teksty, 320 px
+5. **Sprawdź „Czego unikać”** — antywzorce produktu, generyczny wygląd AI, błędy implementacji → [Czego unikać](/przewodnik/czego-unikac)
+
+## Tabela wszystkich komponentów
+
+<ComponentTable components={componentIndex} />

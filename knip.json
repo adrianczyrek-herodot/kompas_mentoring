@@ -1,9 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignore": ["kompas-mentoring/**"],
+  "ignore": ["kompas-mentoring/**", "packages/ui/.storybook/**"],
   "workspaces": {
     ".": {
-      "entry": ["scripts/*.mjs"]
+      "entry": ["scripts/*.mjs"],
+      "ignoreDependencies": ["playwright"]
     },
     "apps/web": {},
     "apps/worker": {},
@@ -12,6 +13,7 @@
     },
     "packages/config": {
       "ignoreDependencies": ["eslint-import-resolver-typescript"]
-    }
+    },
+    "packages/ui": {}
   }
 }

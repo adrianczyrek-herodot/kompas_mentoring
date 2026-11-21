@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Przykładowa ilustracja zamiast zdjęcia">
+  <!-- Docs-only stand-in for a profile photo (no real person). -->
+  <rect width="128" height="128" fill="#e3ddd1"/>
+  <circle cx="64" cy="50" r="24" fill="#8c8275"/>
+  <path d="M20 128c4-26 22-40 44-40s40 14 44 40z" fill="#5a5249"/>
+</svg>

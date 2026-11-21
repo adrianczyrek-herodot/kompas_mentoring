@@ -1,0 +1,156 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { TZ } from '../../.storybook/fixtures/kompas';
+import { HoldCountdown } from './hold-countdown';
+import * as HoldCountdownStories from './hold-countdown.stories';
+
+<Meta of={HoldCountdownStories} />
+
+# HoldCountdown
+
+## 1. Do czego służy
+
+Mówi uczniowi, do której godziny trzymamy dla niego wybrany termin i ile czasu zostało, a po
+wygaśnięciu blokady — co zrobić dalej. Blokada trwa 10 minut od wejścia do checkoutu (brief
+reguła 5, KONCEPCJA F1, §U2, E3-S4).
+
+To **jedyne odliczanie czasu dozwolone w Kompasie**: pokazuje rzeczywistą blokadę, a nie sztuczną
+presję sprzedażową (A02, wyjątek HoldCountdown).
+
+<Canvas of={HoldCountdownStories.Playground} />
+<Controls of={HoldCountdownStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Checkout U2, nad podsumowaniem zamówienia, przez cały czas trwania blokady `hold` | KONCEPCJA §U2 (HoldCountdown), brief reguła 5 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `HoldCountdown` | Użyj | Źródło |
+|---|---|---|
+| Promocja, rabat, „oferta ważna jeszcze…” | nic — liczniki promocyjne są zakazane | A02 |
+| Czas do rozpoczęcia sesji („za 2 h”) | `DateTime` / `NextSessionCard` z godziną | A02, brief reguła 10 |
+| Termin bezpłatnej zmiany (12 h) | `PolicyNotice` z godziną, bez odliczania | A04, KONCEPCJA Z4 |
+| Czas na odpowiedź mentora na prośbę (SLA 24 h) | tekst z godziną w `TrialRequestCard` | E3-S7, A02 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Panel | tak | `rounded-panel`, ramka `border-divider`; w ostatnich 2 min — tło i ramka `status-warning-*` | R01.4, K4 |
+| Ikona zegara | tak | dekoracyjna (`aria-hidden`), w ostatnich 2 min w kolorze ostrzeżenia | WCAG 1.4.1 |
+| Zdanie z godziną | tak | „Trzymamy ten termin dla Ciebie do 14:10.” — godzina w strefie oglądającego | brief reguła 10 |
+| Licznik | tak | `mm:ss`, `role="timer"`, cyfry tabelaryczne, `text-section-title` | R01.3, WAI-ARIA (timer) |
+| Ogłoszenie dla czytnika | tak | ukryty region `aria-live="polite"`, mówi tylko przy 2 min i 1 min | WCAG 4.1.3 |
+| Komunikat po wygaśnięciu | po czasie | `Alert variant="warning"` z `role="alert"` i przyciskiem „Wybierz termin ponownie” | KONCEPCJA §U2 (Er), Z8 |
+
+## 5. Warianty
+
+Komponent nie ma wariantów wyglądu; wygląd zależy od pozostałego czasu (sekcja 6).
+
+## 6. Stany
+
+<Canvas of={HoldCountdownStories.States} />
+
+| Stan | Wygląd i treść | Źródło |
+|---|---|---|
+| Trwa (ponad 2 min) | spokojny panel, bez koloru statusu | A02 (bez presji) |
+| Ostatnie 2 min | tło i ramka ostrzeżenia, ikona w kolorze; czytnik słyszy „Zostały 2 minuty blokady terminu.”, potem „Została minuta…” | K4, WCAG 4.1.3 |
+| Wygasła (`secondsLeft` 0) | „Blokada terminu wygasła” + „Termin mógł zająć ktoś inny. Wybierz go ponownie — wybrany mentor zostaje.” + przycisk | KONCEPCJA §U2 (Er), F1 |
+
+| Stan danych | Zachowanie | Źródło |
+|---|---|---|
+| Ładowanie | nie renderuj licznika przed odpowiedzią `POST /bookings/holds` (`{ holdId, expiresAt }`) — bez `expiresAt` nie ma czego liczyć | KONCEPCJA §U1 (API) |
+| Pusto | nie dotyczy — bez blokady nie ma checkoutu | KONCEPCJA §U2 |
+| Błąd | 409 przy tworzeniu blokady → ekran U1 pokazuje toast „Ten termin został właśnie zajęty” i nie przechodzi do U2 | KONCEPCJA §U1 (Er) |
+| Częściowe dane, dużo danych | nie dotyczy — komponent ma dwie wartości (`secondsLeft`, `expiresAt`) | — |
+| Długie teksty / 320 px | zdanie się zawija, licznik zostaje obok | sekcja 9 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Licznik ma `role="timer"` z `aria-live="off"` i nazwą „Pozostały czas blokady” — czytnik nie czyta każdej sekundy, a użytkownik może go odczytać sam. | WAI-ARIA 1.2 (timer), WCAG 2.2.2 |
+| Dwa ogłoszenia uprzejme: przy 2 min i przy 1 min. Fokus się nie przesuwa. | WCAG 4.1.3, story `ExpiryTest` |
+| Po wygaśnięciu komunikat ma `role="alert"` (pojawia się dynamicznie) — czytnik przerywa i czyta „Blokada terminu wygasła…”. | Z8, WAI-ARIA (alert) |
+| Przycisk „Wybierz termin ponownie” wraca do U1 z tym samym mentorem; Enter i Spacja działają, cel 44 px (minimum WCAG 24 × 24 px). | KONCEPCJA §U2 (Er), K1, WCAG 2.5.8 |
+| Blokady nie da się przedłużyć (reguła produktu); ostrzeżenia przed końcem i ponowny wybór z zachowanym mentorem ograniczają skutki limitu czasu. | brief reguła 5, WCAG 2.2.1 |
+| Ostatnie 2 minuty widać po samej liczbie, kolor tylko wzmacnia. | WCAG 1.4.1 |
+| Licznik nie ma elementów z fokusem; w kolejności Tab jest tylko przycisk po wygaśnięciu. | WCAG 2.4.3 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| **Propozycja:** obok licznika zawsze godzina końca blokady — można ją zapamiętać i nie trzeba patrzeć na licznik. Godzina w strefie oglądającego. | „…do 14:10.” | strefa: brief reguła 10; reszta: propozycja |
+| Ton spokojny, bez wykrzykników i „Pospiesz się!”. | „Trzymamy ten termin dla Ciebie” | A02, K5 |
+| Po wygaśnięciu: co się stało + co zrobić + co zostaje zachowane. | „…wybrany mentor zostaje.” | R05.2, KONCEPCJA §U2 (Er) |
+
+## 9. Responsywność
+
+<Canvas of={HoldCountdownStories.Narrow} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | zdanie zawija się w kilka linii, licznik po prawej | KONCEPCJA Z9, WCAG 1.4.10 |
+| 768 / 1440 px | jedna linia: zdanie po lewej, licznik po prawej | — |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `secondsLeft` | `number` | — | sekundy do końca blokady; ekran liczy je z `expiresAt` i `Clock`, nie z `Date.now()` w domenie |
+| `expiresAt` | `string` (ISO) | — | koniec blokady z API (`POST /bookings/holds`) |
+| `timeZone` | `string` (IANA) | — | strefa oglądającego |
+| `onChooseAgain` | `() => void` | — | po wygaśnięciu: powrót do U1 z tym samym mentorem; bez niego komunikat nie ma przycisku |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `<div>` | — | bez `children` |
+
+## 11. Kod
+
+```tsx
+import { HoldCountdown } from '@kompas/ui';
+
+<HoldCountdown secondsLeft={512} expiresAt={hold.expiresAt} timeZone={viewer.timeZone} />
+```
+
+Typowy przykład z produktu (U2, checkout):
+
+```tsx
+// useSecondsUntil — hook ekranu (nie ma go w @kompas/ui): tyka co sekundę od expiresAt
+const secondsLeft = useSecondsUntil(hold.expiresAt);
+
+<HoldCountdown
+  secondsLeft={secondsLeft}
+  expiresAt={hold.expiresAt}
+  timeZone={viewer.timeZone}
+  onChooseAgain={() => router.push(`/rezerwacja/${hold.mentorId}`)}
+/>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<HoldCountdown secondsLeft={512} expiresAt="2026-10-20T14:10:00+02:00" timeZone={TZ} className="w-full" />}
+      goodNote="Spokojnie przez większość czasu, z godziną końca blokady (A02)."
+      bad={<p className="text-section-title font-semibold text-status-danger-fg tabular-nums">Pospiesz się! 08:32</p>}
+      badNote="Czerwień i ponaglanie od początku to presja, której zakazuje A02."
+    />
+    <DoDont
+      good={<HoldCountdown secondsLeft={0} expiresAt="2026-10-20T14:10:00+02:00" timeZone={TZ} onChooseAgain={() => {}} className="w-full" />}
+      goodNote="Po wygaśnięciu: co się stało i jeden następny krok (KONCEPCJA §U2 Er)."
+      bad={<p className="text-section-title font-semibold tabular-nums">00:00</p>}
+      badNote="Licznik na zerze bez komunikatu zostawia ucznia bez wyjścia."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `SlotGrid` (wybór terminu przed blokadą), `Alert`, `Toast` (409), `DateTime`.
+- **Mylony z:** liczniki promocyjne (zakazane, A02), `PolicyNotice` (termin bezpłatnej zmiany).
+- **Wzorce:** wybór terminu z blokadą (U1 → U2).

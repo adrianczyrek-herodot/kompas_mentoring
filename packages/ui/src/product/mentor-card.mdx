@@ -1,0 +1,206 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { adam, kasia } from '../../.storybook/fixtures/kompas';
+import { Button } from '../components/button';
+import { MentorCard } from './mentor-card';
+import * as MentorCardStories from './mentor-card.stories';
+
+<Meta of={MentorCardStories} />
+
+# MentorCard
+
+## 1. Do czego służy
+
+Jeden wiersz listy wyników wyszukiwarki P2: kim jest mentor, ile kosztuje i czy przyjmuje nowych
+uczniów — tak, żeby gość mógł porównać kilku mentorów na jednym ekranie i wybrać 1–3 do
+obejrzenia (KONCEPCJA §P2 „Cel”).
+
+<Canvas of={MentorCardStories.Playground} />
+<Controls of={MentorCardStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Lista wyników wyszukiwarki mentorów P2 (każdy wynik = jeden `MentorCard` w `<li>`) | KONCEPCJA §P2 (MentorCard), E2-S5 |
+| Lista „Podobni mentorzy” pod profilem P3 i po błędzie 404 profilu | KONCEPCJA §P3 (SimilarMentors, stan Er) |
+
+## 3. Kiedy nie używać
+
+| Zamiast `MentorCard` | Użyj | Źródło |
+|---|---|---|
+| Górna część profilu mentora (P3) | `ProfileHero` | KONCEPCJA §P3 |
+| Wyróżnieni mentorzy na stronie głównej P1 (×4) | `MentorCardMini` (jeszcze nie ma w systemie) | KONCEPCJA §P1 |
+| Pojedyncza karta z cieniem w siatce kafelków | lista wierszy oddzielonych linią | R01.4, A01 |
+| Wiersz ucznia w panelu mentora M2 | `TrialRequestCard`, `SessionListItem` | KONCEPCJA §M2 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Kontener `<article>` | tak | nazwany imieniem mentora (`aria-labelledby`); dolna linia `border-divider`, bez cienia | R01.4, WAI-ARIA (article) |
+| Awatar | tak | zdjęcie lub inicjały, rozmiar `avatar-md` (40 px); zdjęcie z pustym `alt` (imię jest obok) | P-T15, WCAG 1.1.1 |
+| Imię | tak | nagłówek `h3` (lub `h2`) z linkiem do profilu P3 | WCAG 2.4.6, KONCEPCJA §P2 |
+| „Zweryfikowany” | gdy `verified` | ikona + tekst, nigdy sama ikona | WCAG 1.4.1 |
+| Headline | tak | jedna linia o specjalizacji | KONCEPCJA §P2 |
+| Metadane | tak | ocena (liczba opinii) albo „Nowy mentor”, liczba sesji, „Odpowiada zwykle w X h”, języki | KONCEPCJA §P2, §P3 (stan E) |
+| Tagi | gdy są | najwyżej `maxTags` (domyślnie 5), reszta jako „+N” | KONCEPCJA §P2 |
+| Cena | tak | stawka za 60 min i cena sesji próbnej 30 min (`Money`, cyfry tabelaryczne) | R01.3, Z2 |
+| Akcja | gdy `acceptingNew` | slot `action` — zwykle `Button variant="outline" size="sm"` | R01.6 |
+| Powód braku akcji | gdy `!acceptingNew` | „Nie przyjmuje teraz nowych uczniów” zamiast przycisku | D2, KONCEPCJA §P3 „Walidacje” |
+
+## 5. Warianty
+
+Komponent nie ma wariantów wyglądu. Zmienia się tylko treść zależnie od danych (sekcja 6) oraz
+poziom nagłówka (`headingAs`) — `h2`, gdy lista nie ma nadrzędnego `h2`, inaczej `h3`
+(WCAG 1.3.1).
+
+<Canvas of={MentorCardStories.ManyResults} />
+
+## 6. Stany
+
+| Stan danych | Co pokazać | Źródło |
+|---|---|---|
+| Ładowanie | 6 szkieletów `MentorCardSkeleton` w miejscu listy, kontener z `aria-busy` | KONCEPCJA §P2 (L) |
+| Pusto | `EmptyState` „Brak mentorów dla tych filtrów” + „Wyczyść filtr X” dla filtra, który najbardziej zawęża | KONCEPCJA §P2 (E), F1, E2-S5 |
+| Błąd | `ErrorState` „Nie udało się wczytać listy” + „Ponów”; filtry zostają | KONCEPCJA §P2 (Er) |
+| Częściowe dane | brak opinii → „Nowy mentor” zamiast oceny; brak zdjęcia → inicjały; brak tagów → bez listy tagów; wstrzymane przyjmowanie → powód tekstem | KONCEPCJA §P3 (stan E), D2 |
+| Dużo danych | lista wierszy, gęsto, bez kart | R01.1, K1 |
+| Długie teksty / 320 px | długie imię i headline się zawijają; tagi ponad `maxTags` → „+N” | WCAG 1.4.10 |
+
+Ładowanie:
+
+<Canvas of={MentorCardStories.Loading} />
+
+Pusto (stan należy do wzorca listy z filtrami, tu dla kompletu):
+
+<Canvas of={MentorCardStories.Empty} />
+
+Błąd:
+
+<Canvas of={MentorCardStories.ErrorLoading} />
+
+Częściowe dane:
+
+<Canvas of={MentorCardStories.PartialData} />
+
+Dużo danych: zob. sekcja 5 (`ManyResults`). Długie teksty i 320 px: sekcja 9.
+
+Stany interakcji (najechanie, fokus) mają link i przycisk w środku — zob. strony `Link` i `Button`.
+Sam wiersz nie jest klikalny w całości, więc nie ma własnego stanu najechania.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Kolejność fokusu: imię (link do profilu) → akcja „Zarezerwuj sesję próbną”. Cały wiersz nie jest jednym linkiem, bo zawiera drugi element interaktywny. | WCAG 2.4.3, story `KeyboardTest` |
+| Enter na imieniu otwiera profil P3; Enter i Spacja na przycisku uruchamiają `action`. | WAI-ARIA APG (Link, Button) |
+| `<article>` z nazwą = imię mentora; czytnik ogłasza „Kasia Nowicka, artykuł”, potem nagłówek, headline i metadane w kolejności wizualnej. | WAI-ARIA (article), WCAG 1.3.2 |
+| Przycisk w wierszu ma nazwę z imieniem dla czytnika: „Zarezerwuj sesję próbną — Kasia Nowicka” (tekst `sr-only`), bo na liście jest kilka takich samych przycisków. | WCAG 2.4.4 |
+| Tagi jako lista `aria-label="Kompetencje"`. | WCAG 1.3.1 |
+| Przycisk `sm` ma wysokość 32 px, ale pole kliknięcia 44 × 44 px; minimum WCAG to 24 × 24 px. | Z6, K1, WCAG 2.5.8 |
+| „Zweryfikowany” i „Nowy mentor” są tekstem, kolor tylko wzmacnia. | WCAG 1.4.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tylko prawdziwe dane: bez opinii nie pokazuj oceny ani „0,0”, tylko „Nowy mentor”. | „Nowy mentor” (Adam Górski) | KONCEPCJA §P3 (stan E), A01 |
+| Liczby z odmianą (`formatCount`) i cyframi tabelarycznymi. | „87 opinii”, „642 sesje” | R01.3 |
+| Kwoty tylko przez `Money` z `bigint` w groszach, nigdy `number`. | `rate60: 18000n` → „180 zł / 60 min” | AGENTS.md (Pieniądze) |
+| Cena próbnej zawsze obok stawki — gość porównuje koszt wejścia. | „Sesja próbna 30 min: 49 zł” | Z2, KONCEPCJA §P2 |
+| Brak przycisku zawsze z powodem tekstem. | „Nie przyjmuje teraz nowych uczniów” | D2 |
+| Headline do 80 znaków, 3–15 tagów (limity z onboardingu). | `longMentor` | E2-S2 |
+
+## 9. Responsywność
+
+<Canvas of={MentorCardStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | jedna kolumna: dane mentora, pod nimi cena i akcja | KONCEPCJA Z9, WCAG 1.4.10 |
+| od 768 px (`md`) | dwie kolumny: dane po lewej, cena i akcja wyrównane do prawej | R01.1, R03.3 |
+| 1440 px | jak 768 px; lista ograniczona do `max-w-content` | K1 |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `mentor` | `MentorSummary` | — | `id`, `name`, `headline`, `photoUrl?`, `tags`, `languages`, `rate60` i `trialPrice` (`bigint`, grosze), `rating`, `reviewsCount`, `sessions`, `responseHours`, `verified`, `acceptingNew` |
+| `profileHref` | `string` | — | adres profilu P3 |
+| `linkRender` | `ReactElement` | — | element linku routera, np. `<NextLink href={profileHref} />` |
+| `action` | `ReactNode` | — | akcja rezerwacji; pokazywana tylko, gdy `acceptingNew` |
+| `headingAs` | `'h2' \| 'h3'` | `'h3'` | poziom nagłówka z imieniem |
+| `maxTags` | `number` | `5` | liczba tagów przed „+N” |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `<article>` | — | bez `children` |
+
+`MentorCardSkeleton` — szkielet jednego wiersza (bez propsów, `aria-hidden`).
+
+## 11. Kod
+
+```tsx
+import { MentorCard } from '@kompas/ui';
+
+<MentorCard mentor={mentor} profileHref={`/mentorzy/${mentor.id}`} />
+```
+
+Typowy przykład z produktu (P2, lista wyników):
+
+```tsx
+import { Button, MentorCard, MentorCardSkeleton } from '@kompas/ui';
+
+{isLoading ? (
+  <section aria-busy="true" aria-label="Wczytujemy mentorów">
+    {[0, 1, 2, 3, 4, 5].map((row) => <MentorCardSkeleton key={row} />)}
+  </section>
+) : (
+  <ul aria-label="Mentorzy" className="max-w-content">
+    {mentors.map((mentor) => (
+      <li key={mentor.id}>
+        <MentorCard
+          mentor={mentor}
+          profileHref={`/mentorzy/${mentor.id}`}
+          linkRender={<NextLink href={`/mentorzy/${mentor.id}`} />}
+          action={
+            <Button variant="outline" size="sm" onClick={() => book(mentor.id)}>
+              Zarezerwuj sesję próbną<span className="sr-only"> — {mentor.name}</span>
+            </Button>
+          }
+        />
+      </li>
+    ))}
+  </ul>
+)}
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<ul className="w-full"><li><MentorCard mentor={kasia} profileHref="/mentorzy/m1" action={<Button variant="outline" size="sm">Zarezerwuj sesję próbną</Button>} /></li></ul>}
+      goodNote="Akcja w wierszu jest drugorzędna — akcja główna to rezerwacja na profilu P3 (R01.6)."
+      bad={<ul className="w-full"><li><MentorCard mentor={kasia} profileHref="/mentorzy/m1" action={<Button size="sm">Zarezerwuj sesję próbną</Button>} /></li></ul>}
+      badNote="Akcja główna w każdym wierszu daje kilka równorzędnych przycisków na ekranie (R01.6)."
+    />
+    <DoDont
+      good={<ul className="w-full"><li><MentorCard mentor={adam} profileHref="/mentorzy/m6" /></li></ul>}
+      goodNote="Bez opinii pokazujemy „Nowy mentor”, a nie zmyśloną ocenę (KONCEPCJA §P3)."
+      bad={<p className="text-body-dense text-text-muted">Adam Górski · 0,0 (0 opinii) · 0 sesji</p>}
+      badNote="Zera wyglądają jak zła ocena, a nie jak brak danych."
+    />
+    <DoDont
+      good={<p className="text-meta text-text-muted">Nie przyjmuje teraz nowych uczniów</p>}
+      goodNote="Zamiast przycisku powód tekstem (D2)."
+      bad={<Button variant="outline" size="sm" disabled>Zarezerwuj sesję próbną</Button>}
+      badNote="Zablokowany przycisk bez powodu — gość nie wie, co się stało (D2)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `ActiveFilters` (nad listą), `Avatar`, `Badge`, `Money`, `Link`, `EmptyState`, `ErrorState`, `Skeleton`.
+- **Mylony z:** `ProfileHero` (profil P3), `TrialRequestCard` (wiersz prośby w M2).
+- **Wzorce:** lista z filtrami (P2: `ActiveFilters` + lista `MentorCard` + stany L/E/Er).

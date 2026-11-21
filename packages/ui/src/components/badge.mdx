@@ -1,0 +1,131 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Badge } from './badge';
+import * as BadgeStories from './badge.stories';
+
+<Meta of={BadgeStories} />
+
+# Badge
+
+## 1. Do czego służy
+
+Pokazuje status obiektu (sesji, wniosku) jednym-dwoma słowami, żeby użytkownik od razu wiedział,
+na jakim jest etapie.
+
+<Canvas of={BadgeStories.Playground} />
+<Controls of={BadgeStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Status sesji w U4 i U5: oczekuje, potwierdzona, anulowana, zakończona | brief (statusy U4/U5), KONCEPCJA §U4 |
+| Status wniosku mentora w M1 i A1: szkic, w weryfikacji, poproszono o zmiany, zatwierdzony, odrzucony | KONCEPCJA §M1 |
+| „Nowy mentor” zamiast oceny, gdy brak opinii (P3) | KONCEPCJA §P3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast znacznika | Użyj | Źródło |
+|---|---|---|
+| Licznik powiadomień przy każdej pozycji | nic — liczniki tylko przy tym, co wymaga działania | R02.4, prompt |
+| Punkty, odznaki, poziomy | nic | A03 |
+| Komunikat, który wymaga działania | `Alert` | WCAG 3.3.1 |
+| Filtr do usunięcia | przycisk z ikoną „Usuń filtr” (wzorzec listy, etap 3) | WAI-ARIA APG |
+| Tagi kompetencji | `SkillTags` (etap 3) | KONCEPCJA §P3 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Tekst | tak | `text-meta`, `font-medium` |
+| Ikona | nie | 16 px, przed tekstem, `aria-hidden` |
+| Tło i kolor | tak | para `status-*-bg` / `status-*-fg`; `rounded-tag` (nie pigułka) |
+
+## 5. Warianty
+
+<Canvas of={BadgeStories.Variants} />
+
+| Wariant | Kiedy wybrać | Źródło |
+|---|---|---|
+| `neutral` | informacja bez oceny: szkic, zakończona, nowy | P-T3, K4 |
+| `success` | gotowe, potwierdzone (zieleń tylko dla sukcesu) | Q2 |
+| `warning` | czeka na czyjąś akcję | brief |
+| `danger` | anulowane, odrzucone, po terminie | brief |
+
+## 6. Stany
+
+<Canvas of={BadgeStories.States} />
+
+Znacznik nie jest interaktywny: najechanie, fokus, wciśnięcie, zablokowanie i błąd nie dotyczą.
+Macierz pokazuje mapowanie statusów z backlogu na warianty.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Status zawsze tekstem; kolor tylko wzmacnia. | WCAG 1.4.1 |
+| Kontrast tekstu do tła ≥ 4,5 : 1 w obu motywach (najniższy: `success` jasny 4,52 : 1). | WCAG 1.4.3 |
+| Zwykły `span` — czytnik czyta tekst w miejscu; zmiana statusu na żywo ogłasza komponent nadrzędny (`role="status"`). | WAI-ARIA |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| 1–3 słowa, imiesłów lub przymiotnik. | „Potwierdzona”, „Oczekuje na mentora” | propozycja |
+| Bez wersalików i wykrzykników. | — | propozycja (Typografia) |
+| Termin w znaczniku tylko w strefie użytkownika. | „do jutra, 14:30” | brief reguła 10 |
+
+## 9. Responsywność
+
+<Canvas of={BadgeStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | znacznik nie zawija się; długi tekst — `whitespace-normal` albo skrócenie treści | propozycja |
+| 768 / 1440 px | bez zmian | — |
+
+<Unstyled>
+  <ViewportFrame width={320}><Badge variant="success">Potwierdzona</Badge></ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `variant` | `'neutral' \| 'success' \| 'warning' \| 'danger'` | `'neutral'` | znaczenie statusu |
+| `className` | `string` | — | tylko układ |
+
+`badgeVariants({ variant })` zwraca klasy, np. dla linku wyglądającego jak status.
+
+## 11. Kod
+
+```tsx
+<Badge variant="success">Potwierdzona</Badge>
+```
+
+Typowy przykład z produktu (U4): mapowanie statusu rezerwacji na wariant w komponencie
+`BookingStatusBadge` (etap 3), tekst z `messages/pl.json`.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Badge>Nowy mentor</Badge>}
+      goodNote="Brak opinii mówimy wprost, bez zmyślonej oceny."
+      bad={<Badge variant="success">4,9 ★ (128)</Badge>}
+      badNote="Zmyślona ocena i liczby, których nie ma w danych (A01)."
+    />
+    <DoDont
+      good={<Badge variant="warning">Oczekuje na mentora</Badge>}
+      goodNote="Status tekstem, kolor go wzmacnia."
+      bad={<span className="inline-block size-icon-sm rounded-round bg-status-warning-fg" title="Oczekuje" />}
+      badNote="Sama kropka koloru nic nie mówi (WCAG 1.4.1)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Alert` (komunikat), tagi kompetencji, przyciski filtra.
+- **Wzorce:** widok szczegółów (status sesji U5), lista z filtrami (status w wierszu), decyzja z powodem (status wniosku A1).

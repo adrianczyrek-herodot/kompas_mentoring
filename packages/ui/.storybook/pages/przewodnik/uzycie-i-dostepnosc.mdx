@@ -1,0 +1,89 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Użycie i dostępność" />
+
+# Użycie i dostępność
+
+Zasady, które pilnuje interfejs. Każda z numerem referencji, decyzji lub standardu.
+
+## Klawiatura i fokus
+
+| Reguła | Źródło |
+|---|---|
+| Wszystkie elementy interaktywne osiągalne Tabem, widoczny fokus (`focus-ring` 2 px + 2 px offset) | WCAG 2.4.7, 2.4.11, P-T2 |
+| Kolejność fokusowania = kolejność wizualna (góra→dół, lewo→prawo) | WCAG 2.4.3 |
+| Focus trap w `Dialog`, `AlertDialog`, `Sheet`; Escape zamyka | WAI-ARIA Dialog Pattern |
+| Po zamknięciu nakładki fokus wraca na element otwierający | WCAG 2.4.3 |
+| `Menu`, `Select`, `Combobox`, `RadioGroup`, `ToggleGroup` — nawigacja strzałkami, Home/End, Enter/Space, Escape | WAI-ARIA Authoring Practices |
+| Przycisk zablokowany (`disabled`) **nie** jest usuwany z porządku Tab; powód zawsze widoczny obok (D2) | WCAG 2.1.1, D2 |
+| Cel kliknięcia ≥ 44 × 44 px (przyciski, pola, checkbox, radio, switch, toggle, slider) | K1, WCAG 2.5.5, R01.1 |
+
+## Formularze i komunikaty
+
+| Reguła | Źródło |
+|---|---|
+| Etykieta zawsze widoczna (`FieldLabel`), placeholder = przykład, nie nazwa pola | Wzorzec formularza, R05.1, WCAG 3.3.2 |
+| Walidacja po opuszczeniu pola (on blur) i przy wysłaniu (on submit) | Wzorzec formularza, WCAG 3.3.1 |
+| Po nieudanym wysłaniu: fokus na pierwszym błędzie, wpisane dane zostają, blokada podwójnego wysłania | Wzorzec formularza, KONCEPCJA §P4 L |
+| Błąd przy polu: ramka `status-danger-fg` + `FieldError` z ikoną i tekstem (bez poświaty) | D5, WCAG 1.4.1 |
+| Status w treści: zawsze ikona + tekst, nigdy sam kolor | WCAG 1.4.1, Z5 |
+| `Alert` domyślnie `role="status"`/`region`; `role="alert"` **tylko** dla błędów pojawiających się dynamicznie po akcji (Z8) | WAI-ARIA Live Regions |
+| `Toast` (`aria-live="polite"`) tylko dla potwierdzeń; błąd wymagający działania **nigdy** nie jest toastem | R02.4, Z8 |
+| Pusty stan: dlaczego pusto + konkretny następny krok (dwa warianty: brak wyników filtrów vs pierwsze użycie) | `EmptyState`, K5 |
+
+## Kolor
+
+| Reguła | Źródło |
+|---|---|
+| Kontrast tekstu ≥ 4.5:1, elementów interfejsu ≥ 3:1 w obu motywach | WCAG 1.4.3, 1.4.11 |
+| Kolor nigdy nie jest jedynym nośnikiem znaczenia (status zawsze z ikoną/tekstem) | WCAG 1.4.1 |
+| Jeden nasycony akcent (`action-primary`) tylko dla akcji głównej i stanów (hover/pressed/focus/selected) | K4, R01.6, R04.2, R06.2 |
+| Akcja destrukcyjna: `action-danger` + `text-on-danger` (6.03:1), tylko nieodwracalne | A02 (brak fałszywej pilności) |
+| Tło podpowiedzi (`Tooltip`): odwrócony kontrast (`surface-inverse`/`text-inverse` 16.21:1 / 13.65:1) | P-T16 |
+
+## Ruch
+
+| Reguła | Źródło |
+|---|---|
+| `prefers-reduced-motion`: ruch → 0 ms, zanikania ≤ 100 ms | WCAG 2.3.3 |
+| Czas trwania: `duration-fast` 100 ms (hover), `duration-base` 160 ms (stany), `duration-overlay` 200 ms (nakładki) | P-T8 |
+| Żadnej animacji przesunięcia (translate) przy wciśnięciu — tylko zmiana koloru | D3, K4 |
+
+## Treść
+
+| Reguła | Źródło |
+|---|---|
+| Ton: bezpośredni, ludzki, prosty język; błąd mówi co się stało i co poprawić | R05.2, R06.1 |
+| Humor tylko w pustych stanach i powitaniach, nigdy przy pieniądzach, terminach, sporach | K5 |
+| Przyciski: czasownik + obiekt („Zarezerwuj sesję”, „Usuń profil”), nie „OK”/„Anuluj” | R05.3, wzorzec potwierdzenia usunięcia |
+| Liczby/kwaluty: `Money` (bigint grosze, waluta), cyfry tabelaryczne (`numeric`), nigdy `number`/`float` | Spec §6.3, R01.3 |
+| Daty/godziny: `DateTime` w strefie użytkownika, format PL (`pl-PL`), 24 h | Brief reguła 10, R01.3 |
+| Maksymalna szerokość treści ciągłej: 65 znaków (`measure-text`) | R05.1 |
+
+## Układ na szerokościach
+
+| Szerokość | Zasada | Źródło |
+|---|---|---|
+| 320 px | Wszystkie komponenty mieszczą się bez przewijania poziomej strony; tabele przewijają się w sobie; etykiety zawijają się | Mockupy, R01.1 |
+| 768 px | `AppHeader` → nawigacja w nagłówku, dolny pasek znika; `Sheet` = panel boczny; `StickyBookingBar` = static | KONCEPCJA §3.2, P8 |
+| 1440 px | Maksymalna szerokość treści `content-max` 1160 px, formularze `form-max` 640 px | Mockupy `.main`, `.narrow` |
+
+## Reguły produktu (pilnuje interfejs)
+
+| Reguła | Źródło |
+|---|---|
+| Jedna główna akcja na ekranie (`Button default`), reszta `outline`/`ghost`/`link` | R01.6, R05.3, P2 |
+| Wiersze dzielone cienkimi liniami (`Separator`), nie karty z cieniem | R01.4 |
+| Szeryf tylko w nagłówkach P1 i P3 (rola `display`/`page-title`), reszta Sans | K6, R01.2 |
+| Mono tylko dla kodu; nazwy plików — zwykły tekst | P4 (propozycja) |
+| Powiadomienia tylko o czym wymaga działania lub zmienia termin; bez liczników | R02.4 |
+| Rozmowa w centrum tylko w S1 i U6 | K2 |
+| Odliczanie blokady (HoldCountdown) — jedyny dozwolony timer | A02 |
+| Brak gamifikacji (punkty, odznaki, streaki) | A03 |
+| Reguła 12 h: pełny tekst przy akcji anulowania/przełożenia, nie w drobnym druku | A04 |
+| Żadnych gradientów, szkła, poświat, iskierek, emoji zamiast ikon | A01 |
+
+## Skrypty CI (dodaj do pipeline)
+
+- `pnpm --filter @kompas/ui check:tokens` — kod wyjścia ≠ 0 przy wartościach spoza tokenów
+- `pnpm --filter @kompas/ui test:stories:themes` — 352 testy × 2 motywy, a11y `error`

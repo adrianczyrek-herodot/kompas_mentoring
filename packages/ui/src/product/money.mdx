@@ -1,0 +1,133 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { Money } from './money';
+import * as MoneyStories from './money.stories';
+
+<Meta of={MoneyStories} />
+
+# Money
+
+## 1. Do czego służy
+
+Wyświetla kwotę podaną w groszach (`bigint`) w walucie i formacie polskim, z cyframi tabelarycznymi
+— żeby ceny, salda i zarobki były dokładne i dało się je porównywać w kolumnach.
+
+<Canvas of={MoneyStories.Playground} />
+<Controls of={MoneyStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Każda kwota w UI: cena sesji próbnej i godziny (P2, P3), checkout (U2), saldo (U8), zarobki i prowizja (M5) | AGENTS.md (Pieniądze), R01.3 |
+| Kwota w etykiecie przycisku („Zapłać 180 zł”) | R01.3, brief reguła 10 |
+| Kolumny kwot w tabelach (M5) — wyrównanie do prawej | R01.3, R03.3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `Money` | Użyj | Źródło |
+|---|---|---|
+| Liczba bez waluty (godziny, liczba sesji) | `formatCount` / zwykły tekst z `tabular-nums` | R01.3 |
+| Procent prowizji | zwykły tekst ze znakiem `%` — to nie kwota | KONCEPCJA §M5 (próg prowizji) |
+| Kwota w `number` / `float` z API | najpierw zamień na `bigint` groszy w warstwie danych; komponent przyjmuje tylko `bigint` | AGENTS.md (Pieniądze) |
+| Obliczenia (suma, prowizja) | domena (`Money` w `packages/core`), nie komponent UI | AGENTS.md (Pieniądze, ledger) |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Element `data` | tak | `value` = grosze jako tekst (`"4950"`) — wartość maszynowa | HTML (`data`) |
+| Tekst | tak | `Intl.NumberFormat('pl-PL')`, bez groszy dla pełnych złotych, z groszami gdy są | R01.3 |
+| Cyfry tabelaryczne, bez łamania | tak | `tabular-nums`, `whitespace-nowrap` | R01.3 |
+
+## 5. Warianty
+
+<Canvas of={MoneyStories.Formats} />
+
+| Przypadek | Grosze | Wyświetlane | Źródło |
+|---|---|---|---|
+| Pełne złote | `4900n` | „49 zł” | R01.3 |
+| Z groszami | `4950n` | „49,50 zł” | R01.3 |
+| Kwota ujemna (zwrot, korekta) | `-3600n` | „-36 zł” — znak minus przed kwotą | AGENTS.md (ledger) |
+| Waluta | `currency` | dziś tylko `'PLN'` | KONCEPCJA §3.2 (przełącznik waluty — później) |
+
+## 6. Stany
+
+`Money` jest nieinteraktywny i nie ładuje danych — stany ładowania, pustki i błędu należą do
+komponentu nadrzędnego (np. tabela zarobków M5, `StickyBookingBar`). **Propozycja:** nie pokazuj „0 zł” w
+miejsce brakujących danych.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Czytnik czyta widoczny tekst („49,50 zł”); `value` służy maszynom i testom. | WCAG 1.3.1 |
+| Nie dostaje fokusu; brak celu kliknięcia (WCAG 2.5.8 nie dotyczy). | WCAG 2.5.8 |
+| Kwota ujemna jest oznaczona znakiem, nie tylko kolorem. | WCAG 1.4.1 |
+| Kwota nie łamie się między liczbą a walutą. | R01.3 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Kwoty zawsze w groszach (`bigint`), nigdy `number` ani `float`. | `18000n` → „180 zł” | AGENTS.md (Pieniądze) |
+| Cena widoczna tym samym tekstem co reszta, bez drobnego druku. | „Sesja próbna 49 zł” | A04 |
+| Bez przekreślonych „promocyjnych” cen bez podstawy. | — | A02 |
+| Komponent nie ma własnych tekstów; format daje `Intl`. | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+Kwota ma szerokość treści i się nie zawija (`whitespace-nowrap`); na 320 px zawija się zdanie
+wokół niej, nie kwota. Najdłuższy przykład („1 234 567 zł”) jest w macierzy w sekcji 5 (K1).
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `amount` | `bigint` | — | kwota w groszach |
+| `currency` | `'PLN'` (`Currency`) | `'PLN'` | waluta |
+| `className` | `string` | — | tylko układ i typografia (np. `font-semibold`) |
+| pozostałe | atrybuty `data` | — | bez `value` i `children` |
+
+## 11. Kod
+
+```tsx
+import { Money } from '@kompas/ui';
+
+<Money amount={4900n} />
+```
+
+Typowy przykład z produktu (P3, cena sesji próbnej w przycisku):
+
+```tsx
+import { Button, Money } from '@kompas/ui';
+
+<Button size="lg">
+  {t('bookTrial')} <Money amount={mentor.trialPrice} />
+</Button>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Money amount={BigInt(4950)} />}
+      goodNote="Grosze jako bigint — „49,50 zł” bez błędów zaokrągleń."
+      bad={<span>49.5 zł</span>}
+      badNote="Liczba zmiennoprzecinkowa sformatowana ręcznie: kropka i zgubiony grosz (AGENTS.md)."
+    />
+    <DoDont
+      good={<p className="text-body text-text-default">Sesja próbna <Money amount={BigInt(4900)} /></p>}
+      goodNote="Cena tym samym tekstem co reszta zdania."
+      bad={<p className="text-meta text-text-subtle">Sesja próbna <Money amount={BigInt(4900)} /></p>}
+      badNote="Cena drobnym, jaśniejszym drukiem budzi nieufność (A04)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Funkcja:** `formatMoney(minor, currency)` z `@kompas/ui` — ten sam format w miejscach, gdzie potrzebny jest sam tekst (np. `aria-label`).
+- **Używany w:** `MentorCard`, `StickyBookingBar`.
+- **Mylony z:** `DateTime` (ten sam wzorzec dla czasu).

@@ -1,0 +1,117 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { Button } from '../components/button';
+import * as DeleteStories from './delete-confirmation.stories';
+
+<Meta of={DeleteStories} />
+
+# Potwierdzenie usunięcia
+
+Chroni przed przypadkowym usunięciem: przed nieodwracalną akcją mówi, co dokładnie zniknie i jaki
+będzie skutek. W Kompasie: usunięcie wyjątku w dostępności M3 (E3-S2); ten sam układ ma anulowanie
+sesji w U5 i usunięcie konta w S3.
+
+<Canvas of={DeleteStories.Closed} />
+<Controls of={DeleteStories.Closed} />
+
+Wiersze wyjątków w tych stories są przykładowe — mockupy nie mają listy wyjątków.
+
+## Kiedy używać
+
+| Sytuacja | Źródło |
+|---|---|
+| Akcja nieodwracalna albo zmieniająca dane innych osób (usunięty wyjątek otwiera godziny dla uczniów) | D6, E3-S2 |
+| Akcja z kosztem dla użytkownika (anulowanie sesji, usunięcie konta) | brief reguła 4, A04 |
+
+## Kiedy nie używać
+
+| Zamiast potwierdzenia | Użyj | Źródło |
+|---|---|---|
+| Akcja wymaga powodu (odrzucenie prośby, decyzja A1) | wzorzec **Decyzja z powodem** | E3-S7 T1, E2-S4 T1 |
+| Anulowanie lub przełożenie sesji | wzorzec **Zmiana z regułą 12 h** (to samo potwierdzenie + skutek wg reguły 12 h) | E3-S6 |
+| Akcja odwracalna jednym kliknięciem (usunięcie filtra) | akcja od razu, bez dialogu | **Propozycja:** dialog tylko dla akcji nieodwracalnych |
+
+## Zasady
+
+| Zasada | Jak to zrobić w kodzie | Źródło |
+|---|---|---|
+| Okno ostrzegawcze, a nie zwykły dialog: tytuł i opis ogłaszane od razu. | `AlertDialog` + `AlertDialogTitle` + `AlertDialogDescription` (rola `alertdialog`) | WAI-ARIA APG (Alert Dialog), WCAG 4.1.3 |
+| Nazwa obiektu w pytaniu. | `AlertDialogTitle`: „Usunąć wyjątek „pt., 24 paź · cały dzień”?” | WCAG 2.4.6, R05.2 |
+| Skutek w opisie, pełnym zdaniem. | `AlertDialogDescription`: „Te godziny wrócą do Twojej dostępności i uczniowie będą mogli je zarezerwować.” | A04, R05.2 |
+| Bezpieczna akcja pierwsza w DOM i z fokusem po otwarciu. | `AlertDialogFooter`: najpierw `Button variant="outline"` „Zostaw wyjątek”, potem destrukcyjny | WAI-ARIA APG (Alert Dialog), WCAG 2.4.3 |
+| Przycisk destrukcyjny: czasownik + obiekt, nigdy „OK” ani samo „Tak”. Bezpieczny też nazywa obiekt. | `Button variant="destructive"` „Usuń wyjątek”; „Zostaw wyjątek” zamiast „Anuluj” | R05.2, D6 |
+| Przycisk w wierszu listy ma w nazwie obiekt, a widoczna etykieta jest jej początkiem. | „Usuń” + `<span className="sr-only"> wyjątek {item.label}</span>` | WCAG 2.4.6, 2.5.3 |
+| Escape rezygnuje bez zmian. | `onOpenChange(false)` czyści `target` i błąd | WAI-ARIA APG (Alert Dialog), WCAG 2.1.2 |
+| W trakcie wysyłania: wskaźnik na przycisku destrukcyjnym, bezpieczny zablokowany, okna nie da się zamknąć. | `loading={pending}` / `disabled={pending}`, `onOpenChange` ignoruje zamknięcie przy `pending` | KONCEPCJA §P4 L |
+| Sukces dopiero po odpowiedzi serwera: okno się zamyka, pozycja znika, toast mówi co i z jakim skutkiem. | `toast.add({ title: 'Usunięto wyjątek', description: '… — znów dostępny do rezerwacji.' })` | KONCEPCJA §U5 S, §M3 S |
+| Przy błędzie okno zostaje otwarte: alert w oknie — co się stało, że obiekt nadal istnieje, co zrobić. | `Alert variant="danger" role="alert"` „Wyjątek nie został usunięty” w `AlertDialogContent` | Z8, R05.2, WCAG 4.1.3 |
+| Po usunięciu ostatniej pozycji pusty stan, który mówi, co zrobić dalej. | `EmptyState` „Brak wyjątków” + „Dodaj wyjątek, gdy w danym dniu nie możesz prowadzić sesji.” | **Propozycja:** pusty stan po usunięciu ostatniej pozycji (wzór: KONCEPCJA §U4 E) |
+
+## Odpowiedzi API
+
+| Odpowiedź | Co widzi użytkownik | Story |
+|---|---|---|
+| `success` | Okno się zamyka, wiersz znika, toast „Usunięto wyjątek” — „pt., 24 paź · cały dzień — znów dostępny do rezerwacji.” | `ConfirmTest` |
+| `pending` | „Usuń wyjątek” z wskaźnikiem i `aria-busy`, „Zostaw wyjątek” zablokowane | `PendingTest` |
+| `server-error` | W oknie: „Wyjątek nie został usunięty” — „Nie udało się usunąć. Wyjątek nadal obowiązuje — spróbuj ponownie za chwilę.” | `ServerErrorTest` |
+| `offline` | W oknie: „Wyjątek nie został usunięty” — „Brak połączenia z internetem. Wyjątek nadal obowiązuje — spróbuj ponownie.” | `OfflineTest` |
+| `field-error` | Nie dotyczy — potwierdzenie nie ma pól | — |
+
+## Mapa stanów
+
+| Stan | Story |
+|---|---|
+| Lista (dialog zamknięty) | `Closed` |
+| Dialog otwarty | `Open` |
+| Test: nazwa w pytaniu, fokus na rezygnacji, usunięcie | `ConfirmTest` |
+| Test: Escape rezygnuje bez usuwania | `EscapeTest` |
+| Usuwanie (oczekiwanie) | `PendingTest` |
+| Błąd serwera | `ServerErrorTest` |
+| Brak sieci | `OfflineTest` |
+
+### Dialog otwarty
+
+<Canvas of={DeleteStories.Open} />
+
+### Usuwanie (oczekiwanie)
+
+<Canvas of={DeleteStories.PendingTest} />
+
+### Błąd serwera
+
+<Canvas of={DeleteStories.ServerErrorTest} />
+
+### Brak sieci
+
+<Canvas of={DeleteStories.OfflineTest} />
+
+## Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<><Button variant="outline">Zostaw wyjątek</Button><Button variant="destructive">Usuń wyjątek</Button></>}
+      goodNote="Obie akcje mówią, co się stanie; bezpieczna jest pierwsza i dostaje fokus."
+      bad={<><Button variant="destructive">OK</Button><Button variant="outline">Anuluj</Button></>}
+      badNote="„OK” nie mówi, co zniknie, a „Anuluj” myli się z anulowaniem obiektu (R05.2)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">„Usunąć wyjątek „pt., 24 paź · cały dzień”?” + „Te godziny wrócą do Twojej dostępności i uczniowie będą mogli je zarezerwować.”</p>}
+      goodNote="Nazwa obiektu i skutek są w samym oknie."
+      bad={<p className="text-body-dense">„Czy na pewno?” bez nazwy i bez skutku.</p>}
+      badNote="Użytkownik nie wie, który wiersz usuwa ani co się zmieni (A04)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Błąd: okno zostaje, w nim „Wyjątek nie został usunięty” i „Wyjątek nadal obowiązuje — spróbuj ponownie”.</p>}
+      goodNote="Można ponowić jednym kliknięciem i wiadomo, że nic się nie zmieniło."
+      bad={<p className="text-body-dense">Okno się zamyka, toast „Błąd”.</p>}
+      badNote="Toast znika, a stan obiektu jest niejasny (Z8)."
+    />
+  </div>
+</Unstyled>
+
+## Powiązane
+
+- **Komponenty:** `AlertDialog`, `Button` (`destructive` + `outline`), `Alert`, `Toast`, `EmptyState`.
+- **Wzorce:** [Zmiana z regułą 12 h](?path=/docs/wzorce-zmiana-z-regułą-12-h--docs) (potwierdzenie anulowania sesji), [Decyzja z powodem](?path=/docs/wzorce-decyzja-z-powodem--docs) (gdy trzeba podać powód).
+- **Ekrany:** M3 Kalendarz i dostępność (E3-S2), U5 Szczegóły sesji, S3 Konto (usunięcie konta).

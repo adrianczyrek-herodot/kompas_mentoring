@@ -1,0 +1,57 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as P3Stories from './p3-profile.stories';
+
+<Meta of={P3Stories} />
+
+# P3 · Profil mentora
+
+**Cel:** Zbudować zaufanie i doprowadzić do rezerwacji sesji próbnej (KONCEPCJA §P3, E2-S6).
+**Kto i gdzie:** Uczeń / gość · `/mentorzy/:id`. Ekran składa się wyłącznie z komponentów pakietu; dane z mockupów.
+
+## Mapa stanów
+
+Każdy stan ekranu ma swoją story. Oznaczenia L / E / Er / S jak w KONCEPCJI (ładowanie, pusto, błąd, sukces).
+
+| Stan | Co widzi użytkownik | Story |
+|---|---|---|
+| S — pełny profil | Hero ze statystykami, pasek rezerwacji, opis, kompetencje, tydzień dostępności, opinie | `Full` |
+| E — nowy mentor | „Nowy mentor” zamiast oceny i statystyk, brak opinii z wyjaśnieniem | `NewMentor` |
+| E — brak terminów w 14 dni | Przycisk rezerwacji zablokowany z powodem, pusty tydzień | `NoSlots` |
+| Wstrzymane przyjmowanie | Przycisk zablokowany z powodem (KONCEPCJA §P3 „Walidacje”) | `Paused` |
+| L — ładowanie | Szkielet hero i kalendarza | `Loading` |
+| Er — 404 | „Profil niedostępny” + podobni mentorzy | `NotFound` |
+
+## Z czego jest zbudowany
+
+- `ProfileHero`, `StickyBookingBar`, `SlotGrid`, `Badge`, `Separator`, `DateTime`, `ErrorState`
+- Wzorzec: [Widok szczegółów](?path=/docs/wzorce-widok-szczegółów--docs)
+
+## Co zostaje w produkcie
+
+- Wideo-wprowadzenie, doświadczenie (firmy i role jako lista), filtrowanie opinii i rozkład ocen, podobni mentorzy, „Napisz wiadomość” — w „Czego brakuje”.
+
+## Stany
+
+### S — pełny profil
+
+<Canvas of={P3Stories.Full} layout="fullscreen" />
+
+### E — nowy mentor
+
+<Canvas of={P3Stories.NewMentor} layout="fullscreen" />
+
+### E — brak terminów w 14 dni
+
+<Canvas of={P3Stories.NoSlots} layout="fullscreen" />
+
+### Wstrzymane przyjmowanie
+
+<Canvas of={P3Stories.Paused} layout="fullscreen" />
+
+### L — ładowanie
+
+<Canvas of={P3Stories.Loading} layout="fullscreen" />
+
+### Er — 404
+
+<Canvas of={P3Stories.NotFound} layout="fullscreen" />

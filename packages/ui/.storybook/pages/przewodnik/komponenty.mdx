@@ -1,0 +1,15 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+import { ComponentTable } from '../../blocks/component-docs';
+import { componentIndex } from '../../blocks/component-index';
+
+<Meta title="Przewodnik/Komponenty" />
+
+# Katalog komponentów
+
+Poniżej wszystkie komponenty systemu z małym podglądem, grupą, jednym zdaniem opisu i linkiem do dokumentacji.
+
+<ComponentTable components={componentIndex} />
+
+---
+
+> **Uwaga:** Komponenty produktu (E1–E3) wymagają danych z briefu/KONCEPCJI. Ich przykłady używają fixture'ów z `.storybook/fixtures/kompas.ts`.

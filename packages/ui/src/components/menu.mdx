@@ -1,0 +1,155 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import {
+  Menu,
+  MenuContent,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuLinkItem,
+  MenuSeparator,
+  MenuTrigger,
+} from './menu';
+import * as MenuStories from './menu.stories';
+
+<Meta of={MenuStories} />
+
+# Menu
+
+## 1. Do czego służy
+
+Prezentuje listę akcji lub opcji nawigacyjnych w rozwijanym panelu pod elementem wyzwalającym (np. menu profilu w nagłówku lub akcje wiersza tabeli).
+
+<Canvas of={MenuStories.Playground} />
+<Controls of={MenuStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Menu awatara w nagłówku: Konto, Zmień rolę, Wyloguj (S3) | KONCEPCJA §S3 |
+| Akcje wiersza w kolejce weryfikacji mentora (A1) | KONCEPCJA §A1 |
+| Menu dodatkowych opcji sesji (Zgłoś problem, Pobierz fakturę) | KONCEPCJA §U4 |
+
+## 3. Kiedy nie używać
+
+| Zamiast menu akcji | Użyj | Źródło |
+|---|---|---|
+| Wybór jednej opcji w formularzu | `Select` | WAI-ARIA APG |
+| Wyszukiwanie i filtrowanie z wpisywaniem | `Combobox` | KONCEPCJA §P1 |
+| Główna nawigacja między widokami aplikacji | dedykowany pasek nawigacyjny | R02.6 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `Menu` | tak | Kontener nadrzędny stanu otwarcia |
+| `MenuTrigger` | tak | Przycisk rozwijający menu |
+| `MenuContent` | tak | Panel menu z cienką ramką `border-divider` i cieniem `shadow-overlay` |
+| `MenuItem` | tak, min. 1 | Pozycja menu wykonująca akcję |
+| `MenuLinkItem` | opcjonalnie | Pozycja menu będąca łączem nawigacyjnym |
+| `MenuGroup` | opcjonalnie | Grupa powiązanych pozycji z etykietą `MenuGroupLabel` |
+| `MenuSeparator` | opcjonalnie | Separator oddzielający grupy akcji (np. przed Wyloguj) |
+
+## 5. Warianty
+
+<Canvas of={MenuStories.Variants} />
+
+Standardowe menu rozwija się pod przyciskiem wyrównane do prawej lub lewej krawędzi. Pozycje destrukcyjne (np. „Wyloguj” lub „Usuń”) oznaczone są kolorem `text-danger`.
+
+## 6. Stany
+
+<Canvas of={MenuStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie / Fokus klawiaturą | Tło `surface-sunken`, tekst `text-default` | D4 |
+| Aktywny (wciśnięty) | Tło nasycone bez przesunięcia pikselowego | D3 |
+| Zablokowany | Tekst `text-disabled`, kursor domyślny, brak reakcji na kliknięcie | D2 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Role `menu` i `menuitem`. | WAI-ARIA APG (Menu) |
+| Nawigacja strzałkami góra/dół przenosi fokus pomiędzy aktywnymi pozycjami. | WAI-ARIA APG |
+| Klawisz Enter lub Spacja wykonuje akcję i zamyka menu. | WAI-ARIA APG |
+| Klawisz Escape zamyka menu i zwraca fokus na `MenuTrigger`. | WCAG 2.1.2 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Zwięzłe etykiety akcji (1–3 słowa). | „Ustawienia konta”, „Zmień rolę”, „Wyloguj” | KONCEPCJA §S3 |
+| Bez ikon zamiast tekstu; ikona może towarzyszyć etykiecie z lewej strony. | — | R02.5 |
+
+## 9. Responsywność
+
+<Canvas of={MenuStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | Menu pozycjonowane względem wyzwalacza, ograniczone do szerokości ekranu z marginesem 8 px | propozycja |
+| 768 / 1440 px | Menu o minimalnej szerokości 200 px | propozycja |
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Menu` | `open` / `defaultOpen` | `boolean` | — | Stan otwarcia |
+| `MenuContent` | `align` | `'start' \| 'center' \| 'end'` | `'start'` | Wyrównanie względem przycisku |
+| `MenuItem` | `disabled` | `boolean` | `false` | Zablokowanie pozycji |
+| `MenuItem` | `variant` | `'default' \| 'danger'` | `'default'` | Wariant wizualny (standardowy lub destrukcyjny) |
+
+## 11. Kod
+
+```tsx
+<Menu>
+  <MenuTrigger render={<Button variant="outline">Opcje profilu</Button>} />
+  <MenuContent align="end">
+    <MenuItem onSelect={() => router.push('/konto')}>Ustawienia konta</MenuItem>
+    <MenuItem onSelect={() => switchRole()}>Zmień rolę na mentora</MenuItem>
+    <MenuSeparator />
+    <MenuItem variant="danger" onSelect={() => logout()}>Wyloguj się</MenuItem>
+  </MenuContent>
+</Menu>
+```
+
+Typowy przykład z produktu (S3): rozwijane menu profilu użytkownika w pasku nagłówka.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel max-w-sm">
+          <p className="text-label font-medium mb-tight">Menu profilu</p>
+          <div className="border border-border-divider rounded-control p-tight bg-surface-panel shadow-overlay">
+            <div className="px-inline py-tight text-body-dense">Ustawienia konta</div>
+            <div className="px-inline py-tight text-body-dense">Pomoc i wsparcie</div>
+            <div className="border-t border-border-divider my-tight" />
+            <div className="px-inline py-tight text-body-dense text-text-danger">Wyloguj</div>
+          </div>
+        </div>
+      }
+      goodNote="Akcje nawigacyjne i operacje na koncie logicznie pogrupowane, destrukcja wyraźnie oddzielona separatorem."
+      bad={
+        <div className="p-panel border border-border-divider rounded-panel bg-surface-panel max-w-sm">
+          <p className="text-label font-medium mb-tight">Wybór strefy czasowej</p>
+          <div className="border border-border-divider rounded-control p-tight bg-surface-panel shadow-overlay">
+            <div className="px-inline py-tight text-body-dense">Europe/Warsaw</div>
+            <div className="px-inline py-tight text-body-dense">Europe/London</div>
+          </div>
+        </div>
+      }
+      badNote="Do wyboru wartości w formularzu użyj Select, a nie Menu akcji."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Select` (wybór wartości w formularzu), `Popover` (kontener z dowolną treścią).
+- **Wzorce:** nagłówek aplikacji (S3), akcje tabeli (A1).

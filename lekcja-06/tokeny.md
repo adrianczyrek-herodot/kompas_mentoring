@@ -74,6 +74,47 @@ Oznaczenia: **P-T…** — wartość zaproponowana przez agenta (materiały jej 
 | `slot-selected-bg` / `-border` | `selected-bg` / `selected-border` | R04.2 |
 | `dialog-width` | 480 px | P-T10 |
 
+## Uzupełnienia etapu 2 (2026-11-21)
+
+Decyzje właściciela D1–D5, Z6 (lista różnic w `packages/ui/POSTEP.md`) i dwie propozycje agenta (**P-T11**, **P-T12** — zatwierdzone 2026-11-21).
+
+| Token | Jasny / ciemny | Źródło | Do czego |
+|---|---|---|---|
+| `surface-hover` | = `surface-sunken` | D4 | najechanie na akcje drugorzędne i ciche, karty wyboru |
+| `surface-disabled`, `text-disabled`, `border-disabled` | = `surface-sunken`, `text-subtle`, `border-divider` | D2 | zablokowane kontrolki zamiast przezroczystości (tekst 4,93 : 1 / 7,01 : 1) |
+| `border-invalid` | = `status-danger-fg` | D5 | ramka pola z błędem, bez poświaty |
+| `action-danger-hover` | `#962c22` / `#f4978c` | **P-T11** (zatwierdzone) | najechanie na akcję destrukcyjną (7,84 : 1 / 8,20 : 1 z `text-on-danger`) |
+| `space-tight` | 4 px | **P-T12** (zatwierdzone) | etykieta–opis, elementy jednego komunikatu |
+| `button-height-lg` / `-sm` | 48 / 32 px | R01.1 / Z6 | rezerwacja (P3, U1) / gęste wiersze (A1) z polem kliknięcia 44 px |
+| `button-padding-x`, `field-padding-x`, `field-padding-y` | 16 / 12 / 8 px | D1 | odstępy wewnętrzne kontrolek |
+| `checkbox-size`, `checkbox-checked-bg`, `checkbox-check` | 20 px, `selected-border`, `surface-panel` | K1, R04.2 | pole wyboru (znacznik 5,78 : 1 / 8,44 : 1) |
+
+### Partia 2 (P-T13, P-T14 — zatwierdzone 2026-11-21)
+
+| Token | Wartość | Źródło | Do czego |
+|---|---|---|---|
+| `track-off` / `track-on` | = `border-control` / `selected-border` | WCAG 1.4.11, R04.2 | tor przełącznika wyłączonego i suwaka (uchwyt na torze 3,65 : 1 / 3,85 : 1) / część włączona i wypełniona (5,40 : 1 / 9,30 : 1 do tła) |
+| `switch-width`, `switch-height`, `switch-thumb` | 44 × 24 px, uchwyt 20 px | **P-T14** (zatwierdzone), K1 | przełącznik; pole kliknięcia 44 px |
+| `slider-track`, `slider-thumb` | 4 px, 20 px | **P-T14** (zatwierdzone) | suwak ceny P2; pole kliknięcia uchwytu 44 px |
+| `layer-overlay` | 50 | **P-T13** (zatwierdzone, techniczne) | warstwa list rozwijanych nad treścią |
+
+### Partia 3 (P-T15 — zatwierdzone 2026-11-21)
+
+| Token | Wartość | Źródło | Do czego |
+|---|---|---|---|
+| `avatar-sm` / `-md` / `-lg` | 32 / 40 / 64 px | **P-T15** (zatwierdzone) | wiersze list (M2, A1) / karta mentora (P2), nagłówek / profil (P3) |
+| `tab-indicator` | 2 px (= `focus-ring-width`), kolor `track-on` | **P-T15** (zatwierdzone), R04.2 | pasek pod aktywną zakładką |
+| `card-header-columns` | `1fr auto` | techniczny | układ tytułu i akcji w nagłówku karty |
+
+### Partie 4–5 (propozycja P-T16 — do zatwierdzenia)
+
+| Token | Wartość | Źródło | Do czego |
+|---|---|---|---|
+| `surface-scrim` | atrament 40 % / czerń 60 % | **P-T16** (propozycja) | tło pod dialogiem i panelem bocznym |
+| `surface-inverse` / `text-inverse` | = `text-default` / `surface-panel` | **P-T16** (propozycja), WCAG 1.4.3 | podpowiedź (16,21 : 1 / 13,65 : 1) |
+| `sheet-width`, `popover-width`, `tooltip-max`, `toast-width` | 400 / 320 / 240 / 360 px | **P-T16** (propozycja) | szerokości nakładek |
+| `icon-content-columns` | `auto 1fr` | techniczny | ikona i tekst w `Alert` |
+
 ## Kontrast (policzony dla wartości z tabeli)
 
 | Para | Jasny | Ciemny | Próg |

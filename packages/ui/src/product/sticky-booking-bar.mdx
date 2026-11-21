@@ -1,0 +1,157 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { kasia, marek } from '../../.storybook/fixtures/kompas';
+import { Button } from '../components/button';
+import { StickyBookingBar } from './sticky-booking-bar';
+import * as StickyBookingBarStories from './sticky-booking-bar.stories';
+
+<Meta of={StickyBookingBarStories} />
+
+# StickyBookingBar
+
+## 1. Do czego służy
+
+Jedyna akcja główna profilu mentora P3 — „Zarezerwuj sesję próbną — X zł” — zawsze w zasięgu
+kciuka: na telefonie przypięta do dołu ekranu, na szerokim ekranie w treści strony. Gdy rezerwacja
+jest niemożliwa, pokazuje powód (KONCEPCJA §P3 „sticky CTA”, R01.6, E2-S6).
+
+<Canvas of={StickyBookingBarStories.Playground} />
+<Controls of={StickyBookingBarStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Profil mentora P3 — raz na stronie, jako akcja główna | KONCEPCJA §P3, E2-S6 (T3), R01.6 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `StickyBookingBar` | Użyj | Źródło |
+|---|---|---|
+| Rezerwacja z wiersza listy P2 | `Button variant="outline" size="sm"` w `MentorCard` | R01.6 |
+| „Dalej” po wybraniu terminu w U1 | `StickyContinueButton` (jeszcze nie ma w systemie) | KONCEPCJA §U1 |
+| Druga akcja przypięta do dołu na tym samym ekranie | nic — jedna akcja główna na ekran | R01.6, R05.3 |
+| Akcja płatności w U2 | `PayButton` (jeszcze nie ma w systemie) | KONCEPCJA §U2 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Pasek | tak | `bg-surface-panel`, górna linia `border-divider`; od `md` panel z ramką w treści | R01.4 |
+| Przycisk | tak | `Button size="lg"` (48 px), etykieta z ceną sesji próbnej | KONCEPCJA §P3, K1 |
+| Linia pod przyciskiem | tak | gdy można rezerwować — czas trwania i zasada 12 h; gdy nie — powód blokady | A04, D2, KONCEPCJA Z4 |
+| `secondary` | nie | treść dodatkowa, np. link do sekcji dostępności lub „Napisz wiadomość” | KONCEPCJA §P3 |
+
+## 5. Warianty
+
+Komponent nie ma wariantów wyglądu; ma trzy stany biznesowe sterowane propsami (sekcja 6).
+
+## 6. Stany
+
+<Canvas of={StickyBookingBarStories.States} />
+
+| Stan | Wygląd i treść | Źródło |
+|---|---|---|
+| Dostępny | aktywny przycisk; „30 minut · możesz przełożyć lub anulować bez kosztów do 12 h przed sesją” | KONCEPCJA §P3, Z4, A04 |
+| Wstrzymane przyjmowanie (`acceptingNew={false}`) | przycisk zablokowany, ale osiągalny klawiaturą; obok powód „Mentor wstrzymał przyjmowanie nowych uczniów…” | KONCEPCJA §P3 „Walidacje”, D2, E2-S6 |
+| Brak terminów w 14 dni (`noSlotsIn14Days`) | przycisk zablokowany; powód „Brak wolnych terminów w najbliższych 14 dniach. Napisz do mentora…” | KONCEPCJA §P3 (E), F3 |
+
+| Stan danych | Zachowanie | Źródło |
+|---|---|---|
+| Ładowanie | nie renderuj paska, dopóki profil się wczytuje (cena jest częścią etykiety); stan ładowania pokazuje `ProfileHeroSkeleton` | KONCEPCJA §P3 (L) |
+| Pusto | brak slotów → stan „Brak terminów w 14 dni” powyżej | KONCEPCJA §P3 (E) |
+| Błąd | profil niedostępny (404) → paska nie ma, jest `ErrorState` z podobnymi mentorami | KONCEPCJA §P3 (Er) |
+| Częściowe dane | nie dotyczy — pasek wymaga tylko ceny próbnej i flagi `acceptingNew` | — |
+| Dużo danych | nie dotyczy — jedna akcja | — |
+| Długie teksty / 320 px | etykieta przycisku i powód się zawijają | sekcja 9, WCAG 1.4.10 |
+
+Najechanie, fokus, wciśnięcie i ładowanie przycisku — zob. strona `Button`.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Przycisk `<button>`; Enter i Spacja wywołują `onBook`. Cena jest w nazwie: czytnik ogłasza „Zarezerwuj sesję próbną — 49 zł, przycisk”. | WAI-ARIA APG (Button), WCAG 2.5.3, story `BookTest` |
+| Zablokowany przycisk zostaje w kolejności Tab (`focusableWhenDisabled`, `aria-disabled="true"`), a powód jest jego opisem (`aria-describedby`) — czytnik czyta go po nazwie. Enter nic nie robi. | D2, WCAG 4.1.2, story `PausedTest` |
+| Umieść pasek w DOM po treści profilu — wtedy w kolejności fokusu jest po treści, choć na telefonie widać go cały czas. | WCAG 2.4.3 |
+| Przypięty pasek nie może zasłaniać elementu z fokusem — strona P3 rezerwuje pod nim miejsce (np. `scroll-padding-bottom` = wysokość paska). | WCAG 2.4.11 |
+| Przycisk 48 px, cel ≥ 44 × 44 px (minimum WCAG 24 × 24 px). | K1, WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykieta = czasownik + obiekt + cena; cena przez `formatMoney` z `bigint` w groszach. | „Zarezerwuj sesję próbną — 49 zł” | KONCEPCJA §P3, R01.6, AGENTS.md (Pieniądze) |
+| Zasada 12 h pełnym zdaniem obok akcji, nie w przypisie. | „…możesz przełożyć lub anulować bez kosztów do 12 h przed sesją” | A04, KONCEPCJA Z4, brief reguła 4 |
+| Powód blokady mówi, co zrobić dalej. | „Wróć później albo wybierz innego mentora.” | D2, R05.2 |
+| Bez presji czasu i liczników („zostało X miejsc”). | — | A02 |
+
+Linia z zasadą 12 h ma rozmiar i kolor tekstu głównego (`text-body text-text-default`) — nie
+zmniejszaj jej ani nie rozjaśniaj klasami (A04).
+
+## 9. Responsywność
+
+<Canvas of={StickyBookingBarStories.Narrow} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | przypięty do dołu ekranu (`sticky bottom-0`), przycisk nad linią tekstu | KONCEPCJA §P3 „sticky CTA”, KONCEPCJA Z9 |
+| od 768 px | w treści strony (`static`), panel z ramką, przycisk i tekst w jednym rzędzie | **Propozycja** |
+| 1440 px | jak 768 px; tekst ograniczony do `max-w-measure` | R05.1 |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `trialPrice` | `bigint` | — | cena sesji próbnej w groszach; część etykiety |
+| `acceptingNew` | `boolean` | — | `false` → przycisk zablokowany z powodem |
+| `noSlotsIn14Days` | `boolean` | `false` | brak wolnych terminów w 14 dni → przycisk zablokowany z powodem |
+| `onBook` | `() => void` | — | przejście do wyboru terminu U1 |
+| `secondary` | `ReactNode` | — | treść dodatkowa pod przyciskiem |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `<div>` | — | bez `children` |
+
+## 11. Kod
+
+```tsx
+import { StickyBookingBar } from '@kompas/ui';
+
+<StickyBookingBar trialPrice={4900n} acceptingNew onBook={goToBooking} />
+```
+
+Typowy przykład z produktu (P3, z linkiem do sekcji dostępności):
+
+```tsx
+<StickyBookingBar
+  trialPrice={profile.trialPrice}
+  acceptingNew={profile.acceptingNew}
+  noSlotsIn14Days={availability.days.every((day) => day.slots.length === 0)}
+  onBook={() => router.push(`/rezerwacja/${profile.id}`)}
+  secondary={<Link href="#dostepnosc">Zobacz tydzień dostępności</Link>}
+/>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<StickyBookingBar trialPrice={marek.trialPrice} acceptingNew={false} className="w-full" />}
+      goodNote="Zablokowany przycisk z powodem obok, osiągalny klawiaturą (D2)."
+      bad={<Button size="lg" disabled>Zarezerwuj sesję próbną</Button>}
+      badNote="Bez powodu i bez fokusu — gość nie wie, dlaczego nie może zarezerwować (D2)."
+    />
+    <DoDont
+      good={<StickyBookingBar trialPrice={kasia.trialPrice} acceptingNew className="w-full" />}
+      goodNote="Jedna akcja główna z ceną; zasada 12 h pełnym zdaniem obok (A04)."
+      bad={<><Button size="lg">Zarezerwuj sesję próbną</Button><Button size="lg">Napisz wiadomość</Button></>}
+      badNote="Dwie akcje główne konkurują ze sobą (R01.6)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `Button` (`lg`, `focusableWhenDisabled`), `ProfileHero` (góra tego samego ekranu), `Money`.
+- **Mylony z:** `PolicyNotice` (zasada 12 h przy przełożeniu w U5), przycisk rezerwacji w `MentorCard`.
+- **Wzorce:** widok szczegółów z akcją przypiętą do dołu (P3).

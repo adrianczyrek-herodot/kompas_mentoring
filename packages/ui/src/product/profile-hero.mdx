@@ -1,0 +1,171 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { adam, kasia } from '../../.storybook/fixtures/kompas';
+import { Badge } from '../components/badge';
+import { ProfileHero } from './profile-hero';
+import * as ProfileHeroStories from './profile-hero.stories';
+
+<Meta of={ProfileHeroStories} />
+
+# ProfileHero
+
+## 1. Do czego służy
+
+Górna część profilu mentora P3: kto to jest i dlaczego można mu zaufać — imię, specjalizacja,
+weryfikacja i statystyki widoczne bez przewijania. Profil ma zbudować zaufanie i doprowadzić do
+rezerwacji sesji próbnej (KONCEPCJA §P3 „Cel”).
+
+<Canvas of={ProfileHeroStories.Playground} />
+<Controls of={ProfileHeroStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Początek strony profilu mentora P3 (`/mentorzy/:id`), raz na stronie | KONCEPCJA §P3 (ProfileHero, StatsRow), E2-S6 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `ProfileHero` | Użyj | Źródło |
+|---|---|---|
+| Wiersz mentora na liście wyników P2 | `MentorCard` | KONCEPCJA §P2 |
+| Pasek z mentorem nad wyborem terminu U1 | `MentorSummaryBar` (jeszcze nie ma w systemie) | KONCEPCJA §U1 |
+| Nagłówek innego ekranu (U4, M2, S3) | `PageHeader` — szeryf tylko na P1 i P3 | K6 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| `<section>` | tak | nazwana imieniem (`aria-labelledby`) | WAI-ARIA (region) |
+| Awatar | tak | `avatar-lg` (64 px); zdjęcie z pustym `alt`, bez zdjęcia — inicjały | P-T15, WCAG 1.1.1 |
+| Imię | tak | jedyny `h1` strony, `font-serif text-display` | K6, R03.2, Q3, WCAG 2.4.6 |
+| Headline | tak | `text-body`, szerokość `max-w-measure` | R05.1 |
+| Znaczniki | gdy dotyczy | „Zweryfikowany” (`success` + ikona), „Nowy mentor”, „Nie przyjmuje teraz nowych uczniów” (`neutral`) | KONCEPCJA §P3, WCAG 1.4.1 |
+| Statystyki | tak | lista opisów `<dl>`: ocena (liczba opinii), sesje, wracający uczniowie, czas odpowiedzi, doświadczenie; podział pionową linią | KONCEPCJA §P3 (StatsRow), R01.4 |
+| Języki i firmy | tak | jedna linia `text-body-dense` | KONCEPCJA §P3 (doświadczenie) |
+
+## 5. Warianty
+
+Komponent nie ma wariantów wyglądu. Treść zależy od danych: mentor z opiniami pokazuje pełne
+statystyki, nowy — tylko czas odpowiedzi i doświadczenie (sekcja 6).
+
+<Canvas of={ProfileHeroStories.Paused} />
+
+## 6. Stany
+
+| Stan danych | Co pokazać | Story | Źródło |
+|---|---|---|---|
+| Ładowanie | `ProfileHeroSkeleton` (awatar, imię, headline, statystyki), kontener z `aria-busy` | `Loading` | KONCEPCJA §P3 (L) |
+| Pusto (brak opinii) | „Nowy mentor” zamiast oceny, liczby sesji i odsetka wracających | `NewMentor` | KONCEPCJA §P3 (E), E2-S6 |
+| Błąd | `ErrorState` „Profil niedostępny” jako `h1` + „Pokaż podobnych mentorów” | `NotFound` | KONCEPCJA §P3 (Er), E2-S6 |
+| Częściowe dane | bez weryfikacji — bez znacznika „Zweryfikowany”; bez zdjęcia — inicjały; bez firm — sama linia języków | `NewMentor` | KONCEPCJA §P3 |
+| Dużo danych | nie dotyczy — liczba statystyk jest stała (5) | — | KONCEPCJA §P3 (StatsRow) |
+| Długie teksty / 320 px | długie imię i headline się zawijają, statystyki przechodzą do kolejnych wierszy | `LongContent` | WCAG 1.4.10 |
+
+<Canvas of={ProfileHeroStories.Loading} />
+<Canvas of={ProfileHeroStories.NewMentor} />
+<Canvas of={ProfileHeroStories.NotFound} />
+
+Komponent nie jest interaktywny: najechanie, fokus, wciśnięcie i zablokowanie nie dotyczą.
+Wstrzymane przyjmowanie (`Paused`, sekcja 5) blokuje rezerwację w `StickyBookingBar`, a tu jest
+tylko znacznikiem.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Brak elementów z fokusem; klawiatura przechodzi dalej, do akcji strony (`StickyBookingBar`). | WCAG 2.4.3 |
+| Imię to jedyny `h1` na stronie — czytnik nawigujący nagłówkami trafia od razu na mentora. | WCAG 2.4.6, 1.3.1, story `HeadingTest` |
+| Statystyki jako `<dl>`: czytnik ogłasza parę „Ocena — 4,9 (87 opinii)”. | WCAG 1.3.1 |
+| Znaczniki są tekstem z ikoną dekoracyjną (`aria-hidden`); kolor tylko wzmacnia. | WCAG 1.4.1 |
+| Zdjęcie ma pusty `alt`, bo imię jest tuż obok; czytnik go pomija. | WCAG 1.1.1 |
+| Cel kliknięcia — nie dotyczy (brak kontrolek). | WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tylko prawdziwe statystyki z danych; bez opinii nie pokazujemy oceny ani zer. | „Nowy mentor” (Adam Górski) | KONCEPCJA §P3 (E), A01 |
+| Liczby z odmianą i cyframi tabelarycznymi. | „87 opinii”, „9 lat” | R01.3 |
+| Bez sztucznej presji: żadnych „zostały 2 miejsca”, „X osób ogląda”. | — | A02 |
+| Bez odznak i rankingów mentora poza weryfikacją. | „Zweryfikowany” | A03 |
+| Headline do 80 znaków. | `longMentor` | E2-S2 |
+
+## 9. Responsywność
+
+<Canvas of={ProfileHeroStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | awatar nad imieniem; `display` 28 px; statystyki zawijają się | KONCEPCJA Z9, tokeny (role tekstu), WCAG 1.4.10 |
+| od 768 px | awatar obok imienia, `display` 36 px | tokeny (role tekstu), P-T6 |
+| 1440 px | jak 768 px; headline ograniczony do `max-w-measure` (65 znaków) | R05.1 |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `mentor` | `MentorProfileSummary` | — | `name`, `headline`, `photoUrl?`, `languages`, `companies`, `yearsExp`, `verified`, `acceptingNew`, `rating`, `reviewsCount`, `sessions`, `returningPct` (0–100), `responseHours` |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `<section>` | — | bez `children` |
+
+`ProfileHeroSkeleton` — szkielet hero (bez propsów, `aria-hidden`).
+
+## 11. Kod
+
+```tsx
+import { ProfileHero } from '@kompas/ui';
+
+<ProfileHero mentor={mentor} />
+```
+
+Typowy przykład z produktu (P3, góra strony profilu):
+
+```tsx
+import { ProfileHero, ProfileHeroSkeleton, StickyBookingBar } from '@kompas/ui';
+
+if (isLoading) {
+  return (
+    <section aria-busy="true" aria-label="Wczytujemy profil">
+      <ProfileHeroSkeleton />
+    </section>
+  );
+}
+
+return (
+  <main className="flex flex-col gap-section">
+    <ProfileHero mentor={profile} />
+    {/* wideo, kompetencje, tydzień dostępności, opinie */}
+    <StickyBookingBar
+      trialPrice={profile.trialPrice}
+      acceptingNew={profile.acceptingNew}
+      onBook={() => router.push(`/rezerwacja/${profile.id}`)}
+    />
+  </main>
+);
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<ProfileHero mentor={adam} />}
+      goodNote="Nowy mentor bez opinii: pokazujemy to, co wiemy (czas odpowiedzi, doświadczenie)."
+      bad={<Badge variant="success">5,0 · 0 opinii</Badge>}
+      badNote="Ocena bez opinii wprowadza w błąd (KONCEPCJA §P3 E, A01)."
+    />
+    <DoDont
+      good={<h1 className="font-serif text-display text-text-default">{kasia.name}</h1>}
+      goodNote="Szeryf tylko w imieniu na profilu P3 (K6)."
+      bad={<h2 className="font-serif text-section-title text-text-default">Opinie</h2>}
+      badNote="Szeryf w zwykłym nagłówku sekcji rozmywa hierarchię (K6)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `StickyBookingBar` (akcja główna P3), `Avatar`, `Badge`, `Skeleton`, `ErrorState`.
+- **Mylony z:** `MentorCard` (wiersz listy P2), `PageHeader` (nagłówek innych ekranów).
+- **Wzorce:** widok szczegółów (P3: hero, sekcje, akcja przypięta do dołu).
