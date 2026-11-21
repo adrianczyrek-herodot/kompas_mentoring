@@ -12,6 +12,10 @@ dist/
 coverage/
 *.tsbuildinfo
 
+# Storybook build
+storybook-static/
+*.log
+
 # Playwright
 playwright-report/
 test-results/

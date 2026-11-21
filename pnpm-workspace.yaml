@@ -12,6 +12,7 @@ allowBuilds:
   '@parcel/watcher': false
   '@swc/core': false
   cpu-features: false
+  esbuild: false
   lefthook: false
   protobufjs: false
   ssh2: false

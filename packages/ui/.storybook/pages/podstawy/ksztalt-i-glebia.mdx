@@ -1,0 +1,31 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DepthSamples, ShapeSamples } from '../../blocks/foundations';
+
+<Meta title="Podstawy/Kształt i głębia" />
+
+# Kształt i głębia
+
+Małe zaokrąglenia, linie zamiast cieni. Duże zaokrąglenia i cienie na każdym elemencie to podpis
+generycznego wyglądu AI (A01).
+
+## Promienie
+
+<Unstyled>
+  <ShapeSamples />
+</Unstyled>
+
+## Obramowania i cienie
+
+<Unstyled>
+  <DepthSamples />
+</Unstyled>
+
+## Zasady
+
+| Zasada | Źródło |
+|---|---|
+| Promienie tylko z czterech tokenów: `rounded-tag` (4 px), `rounded-control` (6 px), `rounded-panel` (8 px), `rounded-round` (awatar, radio). Wartości: propozycja P-T5. | A01, Z7 |
+| Nie wszystko jest pigułką: znaczniki statusu mają `rounded-tag`, nie `rounded-round`. | A01, prompt („wszystko w pigułkach”) |
+| Panele i karty oddziela obramowanie `border-divider`. Cień tylko `shadow-overlay` i tylko dla warstw nad treścią: menu, popover, dialog, toast. | R01.4, propozycja P-T4 |
+| Nie zagnieżdżaj panelu w panelu (karta w karcie). Wewnątrz panelu grupuj odstępem i linią. | A01, prompt |
+| Granice pól i kontrolek: `border-control` (kontrast ≥ 3 : 1). Linie dekoracyjne: `border-divider`. | WCAG 1.4.11 |

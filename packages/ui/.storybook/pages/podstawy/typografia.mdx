@@ -1,0 +1,37 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { MeasureSample, TypeRoles } from '../../blocks/foundations';
+
+<Meta title="Podstawy/Typografia" />
+
+# Typografia
+
+Jedna rodzina **IBM Plex** z pełnymi polskimi znakami: Plex Sans dla tekstu i danych, Plex Mono tylko
+dla kodu, Plex Serif tylko w dużych nagłówkach strony głównej (P1) i profilu mentora (P3)
+(K6, R01.2, decyzja Q3). Fonty są w projekcie (`@fontsource/ibm-plex-*`), nie z CDN.
+
+## Role
+
+Wybieraj rolę, nie rozmiar. Klasy ról (`text-page-title`, `text-body-dense`…) niosą rozmiar i interlinię.
+
+<Unstyled>
+  <TypeRoles />
+</Unstyled>
+
+## Zasady
+
+| Zasada | Źródło |
+|---|---|
+| Tekst podstawowy ma 16 px; w listach i tabelach 14 px (`text-body-dense`). | R05.1, K1 |
+| Jeden nagłówek strony na ekran. Nagłówki sekcji porządkują panel, nie zastępują etykiet pól. | R05.1, WCAG 1.3.1 |
+| Szeryf (`font-serif`) tylko w nagłówku `text-display` na P1 i P3. Nigdzie indziej. | K6 |
+| Plex Mono tylko dla kodu (czat, notatki po sesji). Nie dla nazw plików, kwot ani godzin. | R01.2, P4 |
+| Godziny, kwoty i kolumny liczb zawsze z `tabular-nums`, wyrównane w kolumnach. | R01.3, R03.3 |
+| Zasada 12 h, cena i jej składniki nigdy w `text-meta` ani w kolorze `text-subtle`. | A04 |
+| Tekst ciągły ma najwyżej około 65 znaków w linii (`max-w-measure`). | R05.1, prompt |
+| Bez wersalików w etykietach i przyciskach; pogrubienie najwyżej 600. | propozycja (R05.1 — czytelność) |
+
+## Długość linii
+
+<Unstyled>
+  <MeasureSample />
+</Unstyled>

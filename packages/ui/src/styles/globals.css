@@ -1,81 +1,97 @@
 /*
- * Kompas design tokens on top of Tailwind CSS 4 + shadcn/ui (Base UI).
+ * Kompas styles: Tailwind CSS 4 wired to the design tokens in ./tokens.css.
  * Imported once by apps/web: `@import "@kompas/ui/styles.css";`
- * Palette and typography carried over from the clickable mockup (PR #7): deep green brand,
- * amber signal colour, warm paper background, serif headings.
+ * Tailwind's default colour palette and shadows are removed, so only token classes exist
+ * (bg-surface-page, text-muted, bg-action-primary…). shadcn names (--primary, --muted…) stay
+ * as aliases of the semantic tokens so existing components and apps/web keep working.
  */
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-ext-400.css";
+@import "@fontsource/ibm-plex-serif/latin-600.css";
+@import "@fontsource/ibm-plex-serif/latin-ext-600.css";
 @import "tailwindcss";
+@import "./tokens.css";
 
 /* Classes used by this package (it lives in node_modules from the app's point of view). */
 @source "../";
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --radius: 0.625rem;
-  --background: #f6f3ec; /* paper */
-  --foreground: #17201e; /* ink */
-  --card: #ffffff;
-  --card-foreground: #17201e;
-  --popover: #ffffff;
-  --popover-foreground: #17201e;
-  --primary: #13463d; /* brand */
-  --primary-foreground: #ffffff;
-  --secondary: #e3efe9; /* brand-soft */
-  --secondary-foreground: #13463d;
-  --muted: #efeae0;
-  --muted-foreground: #4a5552; /* ink-2 */
-  --accent: #efeae0;
-  --accent-foreground: #17201e;
-  --destructive: #b4352a;
-  --border: #e3ddd1;
-  --input: #e3ddd1;
-  --ring: #1d5f53; /* brand-2 */
-  --signal: #e07b2f; /* amber: highlights, ratings, the MOCKUP tag */
-  --signal-soft: #fbeadb;
-  --success: #2f7a4a;
-  --success-soft: #e2f2e7;
-  --warning: #9a6400;
-  --warning-soft: #fdf1d6;
+/*
+ * shadcn aliases → semantic tokens (kept for backward compatibility of components and apps/web).
+ * Declared on every theme scope so they re-resolve inside a `.light` / `.dark` subtree.
+ */
+:root,
+.light,
+.dark {
+  --background: var(--surface-page);
+  --foreground: var(--text-default);
+  --card: var(--surface-panel);
+  --card-foreground: var(--text-default);
+  --popover: var(--surface-panel);
+  --popover-foreground: var(--text-default);
+  --primary: var(--action-primary);
+  --primary-foreground: var(--text-on-action);
+  --secondary: var(--surface-sunken);
+  --secondary-foreground: var(--text-default);
+  --muted: var(--surface-sunken);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-sunken);
+  --accent-foreground: var(--text-default);
+  --destructive: var(--status-danger-fg);
+  --border: var(--border-divider);
+  --input: var(--border-control);
+  --ring: var(--focus-ring);
+  --signal: var(--action-primary);
+  --signal-soft: var(--selected-bg);
+  --success: var(--status-success-fg);
+  --success-soft: var(--status-success-bg);
+  --warning: var(--status-warning-fg);
+  --warning-soft: var(--status-warning-bg);
 }
 
-.dark {
-  --background: #0e1615;
-  --foreground: #e7efec;
-  --card: #152120;
-  --card-foreground: #e7efec;
-  --popover: #152120;
-  --popover-foreground: #e7efec;
-  --primary: #7cc4b0;
-  --primary-foreground: #0e1615;
-  --secondary: #1d332f;
-  --secondary-foreground: #cfe6dd;
-  --muted: #1c2826;
-  --muted-foreground: #a9b6b2;
-  --accent: #1f2d2a;
-  --accent-foreground: #e7efec;
-  --destructive: #f07b6f;
-  --border: #2a3532;
-  --input: #34413e;
-  --ring: #7cc4b0;
-  --signal: #f0a060;
-  --signal-soft: #3a2a1c;
-  --success: #6fcf8f;
-  --success-soft: #1b3324;
-  --warning: #e8b85a;
-  --warning-soft: #3a2f16;
+@theme {
+  /* No default palette or shadows: only tokens below generate classes. */
+  --color-*: initial;
+  --shadow-*: initial;
 }
 
 @theme inline {
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* semantic colours */
+  --color-surface-page: var(--surface-page);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-text-default: var(--text-default);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-link: var(--text-link);
+  --color-text-on-action: var(--text-on-action);
+  --color-text-on-danger: var(--text-on-danger);
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-primary-pressed: var(--action-primary-pressed);
+  --color-action-danger: var(--action-danger);
+  --color-selected-bg: var(--selected-bg);
+  --color-selected-border: var(--selected-border);
+  --color-focus-ring: var(--focus-ring);
+  --color-border-divider: var(--border-divider);
+  --color-border-control: var(--border-control);
+  --color-status-success-fg: var(--status-success-fg);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-warning-fg: var(--status-warning-fg);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-danger-fg: var(--status-danger-fg);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-neutral-fg: var(--status-neutral-fg);
+  --color-status-neutral-bg: var(--status-neutral-bg);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-
+  /* shadcn aliases as classes (bg-primary, text-muted-foreground…) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -100,18 +116,95 @@
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
+
+  /* typography */
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+  --font-serif: var(--font-family-serif);
+  --text-display: var(--type-display-size);
+  --text-display--line-height: var(--type-display-leading);
+  --text-page-title: var(--type-page-title-size);
+  --text-page-title--line-height: var(--type-page-title-leading);
+  --text-section-title: var(--type-section-title-size);
+  --text-section-title--line-height: var(--type-section-title-leading);
+  --text-body: var(--type-body-size);
+  --text-body--line-height: var(--type-body-leading);
+  --text-body-dense: var(--type-body-dense-size);
+  --text-body-dense--line-height: var(--type-body-dense-leading);
+  --text-label: var(--type-label-size);
+  --text-label--line-height: var(--type-label-leading);
+  --text-meta: var(--type-meta-size);
+  --text-meta--line-height: var(--type-meta-leading);
+  --text-code: var(--type-code-size);
+  --text-code--line-height: var(--type-code-leading);
+  /* Tailwind size names mapped onto the token scale (used by shadcn components and apps/web). */
+  --text-xs: var(--type-meta-size);
+  --text-xs--line-height: var(--type-meta-leading);
+  --text-sm: var(--type-body-dense-size);
+  --text-sm--line-height: var(--type-body-dense-leading);
+  --text-base: var(--type-body-size);
+  --text-base--line-height: var(--type-body-leading);
+  --text-lg: var(--type-section-title-size);
+  --text-lg--line-height: var(--type-section-title-leading);
+  --text-xl: var(--type-page-title-size);
+  --text-xl--line-height: var(--type-page-title-leading);
+  --text-2xl: var(--type-page-title-size-wide);
+  --text-2xl--line-height: var(--type-page-title-leading-wide);
+  --text-3xl: var(--type-display-size);
+  --text-3xl--line-height: var(--type-display-leading);
+  --text-4xl: var(--type-display-size-wide);
+  --text-4xl--line-height: var(--type-display-leading-wide);
+
+  /* shape and depth */
+  --radius-tag: var(--shape-tag);
+  --radius-control: var(--shape-control);
+  --radius-panel: var(--shape-panel);
+  --radius-round: var(--shape-round);
+  --radius-sm: var(--shape-tag);
+  --radius-md: var(--shape-control);
+  --radius-lg: var(--shape-control);
+  --radius-xl: var(--shape-panel);
+  --shadow-overlay: var(--depth-overlay);
+
+  /* spacing relations: gap-inline, p-panel, py-row-y, gap-section… */
+  --spacing-inline: var(--space-inline);
+  --spacing-group: var(--space-group);
+  --spacing-panel: var(--space-panel);
+  --spacing-section: var(--space-section);
+  --spacing-row-y: var(--space-row-y);
+  --spacing-control: var(--control-height);
+  --spacing-target: var(--target-min);
+  --spacing-icon-sm: var(--icon-sm);
+  --spacing-icon-md: var(--icon-md);
+  --spacing-icon-lg: var(--icon-lg);
+  --container-content: var(--content-max);
+  --container-form: var(--form-max);
+  --container-measure: var(--measure-text);
+  --container-dialog: var(--dialog-width);
+
+  /* motion */
+  --default-transition-duration: var(--duration-base);
+  --default-transition-timing-function: var(--easing-standard);
+  --ease-standard: var(--easing-standard);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+  html {
+    background-color: var(--surface-page);
   }
   body {
-    @apply bg-background font-sans text-foreground;
+    @apply bg-background font-sans text-body text-foreground;
   }
-  h1,
-  h2,
-  h3 {
-    @apply font-serif font-semibold tracking-tight;
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
+  code,
+  kbd,
+  pre {
+    @apply font-mono text-code;
   }
 }

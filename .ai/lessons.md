@@ -21,6 +21,11 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-11** — Biome (`biome ci .`) lintuje też HTML/CSS/JS spoza pakietów — materiały zewnętrzne dodane do repo (np. `lekcja-06/`) muszą być wykluczone w `files.includes` w `biome.json` (i w `ignores` ESLint), inaczej `pnpm lint` w CI pada. Nie poprawiaj takich materiałów pod lint — mają zostać w oryginale.
 - **2026-11-11** — Materiały kursu w `lekcja-06/` (prompty `*-devmentor.txt`, karty R01/R02/A01) opisują przykładową aplikację DevMentor. Nasz produkt to Kompas: prompt z kontekstem DevMentora wykonuj dla Kompasu (brief `.ai/specs/product-brief.md`, tokeny w `packages/ui/src/styles/globals.css`), nie twórz osobnych plików dla DevMentora.
 
+- **2026-11-11** — TypeScript pomija katalogi z kropką przy `include: [".storybook"]` — `tsc` po cichu nie sprawdzał `.storybook/`, a ESLint (project service) zgłaszał „not found by the project service”. Podawaj jawne wzorce: `".storybook/**/*.ts"`, `".storybook/**/*.tsx"`; sprawdzaj `tsc --listFilesOnly`.
+- **2026-11-11** — Storybook: strony MDX bez stories nie uruchamiają dekoratorów, więc przełącznik motywu oparty tylko na dekoratorze nie działa na stronach dokumentacji. Motyw na `<html>` ustawiaj też z kanału (`SET_GLOBALS`, `GLOBALS_UPDATED`) w `preview.tsx`.
+- **2026-11-11** — Zmienna CSS zdefiniowana jako `var(--inna)` na `:root` jest rozwiązywana raz, na korzeniu, i dziedziczona już jako wartość — w poddrzewie `.dark` / `.light` alias (np. `--card: var(--surface-panel)`) zostaje z motywu korzenia. Aliasy i tokeny komponentów deklaruj na `:root, .light, .dark`.
+- **2026-11-11** — Wynik `build-storybook` (`storybook-static/`) musi być wykluczony z ESLint (`packages/config/eslint`), dependency-cruiser (`.dependency-cruiser.cjs`) i `.gitignore`, inaczej `pnpm lint` zgłasza tysiące błędów w zbudowanych plikach.
+
 ## Domena i produkt
 
 ## Kod i mockupy
@@ -28,6 +33,7 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-10** — Lokalne e2e używają bazy z docker-compose, której testy nie migrują — po dodaniu migracji uruchom `pnpm db:migrate`, inaczej rejestracja kończy się 500 (hook zapisu zgód) i padają niezwiązane testy.
 - **2026-11-10** — W RSC wywołuj `await headers()`/`cookies()` **przed** `getContainer()`: inaczej `next build` próbuje prerenderować stronę, buduje kontener i pada na walidacji env (brak `DATABASE_URL`).
 
+- **2026-11-21** — Od etapu 1 design systemu alias shadcn `--primary` = `action-primary` (bursztynowe wypełnienie przycisku), więc `text-primary` / `border-primary` na tle strony nie spełnia kontrastu — e2e (axe `color-contrast`) padło w PR #54. Tekst-akcent i linki: `text-text-link`, zaznaczenie: `border-selected-border`; `primary` tylko jako tło z `primary-foreground`. Po zmianie tokenów uruchom e2e (wymaga Dockera albo CI).
 - **2026-10-21** — Playwright: nie używaj `reuseExistingServer` domyślnie — w worktree port bywa zajęty przez serwer innej sesji i testy po cichu sprawdzają obcą aplikację. U nas reuse tylko przy `E2E_REUSE_SERVER=1`, port przez `E2E_PORT`.
 - **2026-10-21** — `eslint-plugin-boundaries` 7: wzorce elementów dopasowują katalogi, nie pliki — `index.ts`/`di.ts` klasyfikuj przez `boundaries/files`; komunikat polityki pojawia się tylko, gdy decyduje jej `disallow`, więc per strefa: „disallow all z komunikatem, potem allow wyjątki”.
 - **2026-10-21** — CLI dependency-cruiser 18 odmawia działania na nieparzystych wydaniach Node (25) — uruchamiamy go przez API (`scripts/check-dependencies.mjs`).

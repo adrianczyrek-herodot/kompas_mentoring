@@ -11,6 +11,7 @@ ADR zapisuje **dlaczego** podjęto decyzję trudną do odwrócenia; specyfikacja
 | [0003](0003-stripe-connect-kredyty-zamiast-portfela.md) | Stripe Connect i kredyty na sesje zamiast portfela (PSD2, limit 90 dni) | accepted (czeka na Q3/Q4/Q7) | 2026-10-21 |
 | [0004](0004-ledger-podwojny-partie-kredytu.md) | Księga podwójna z partiami kredytu | accepted (czeka na Q4/Q7) | 2026-10-21 |
 | [0005](0005-porty-dostawcow-hosting-ue.md) | Dostawcy za portami, hosting Cloud Run + Neon w UE | accepted | 2026-10-21 |
+| [0006](0006-design-system-storybook.md) | Design system w `packages/ui` z dokumentacją w Storybooku | accepted | 2026-11-11 |
 
 Źródło pierwszych pięciu: `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md`.
 

@@ -1,0 +1,30 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { IconSizes } from '../../blocks/foundations';
+
+<Meta title="Podstawy/Ikony" />
+
+# Ikony
+
+Biblioteka: **lucide-react** (spec stacku, tabela technologii). Ikony są funkcyjne: pomagają rozpoznać
+akcję albo status, nie ozdabiają (R02.5, P7).
+
+<Unstyled>
+  <IconSizes />
+</Unstyled>
+
+Rozmiary 16 / 20 / 24 px to propozycja P-T9. Kolor ikony dziedziczy kolor tekstu (`currentColor`).
+
+## Kiedy ikona potrzebuje podpisu
+
+| Sytuacja | Co robić | Źródło |
+|---|---|---|
+| Ikona obok tekstu (przycisk „Przełóż” z ikoną kalendarza) | Ikona ma `aria-hidden`; tekst jest nazwą. | WAI-ARIA, WCAG 1.1.1 |
+| Przycisk z samą ikoną (zamknij, poprzedni tydzień) | Wymagana nazwa dostępna (`aria-label`, np. „Poprzedni tydzień”) i podpowiedź (Tooltip) z tą samą treścią. Cel ≥ 44 × 44 px. | WCAG 4.1.2, 2.5.8, K1 |
+| Status (potwierdzona, odwołana) | Ikona zawsze z tekstem statusu; sam kolor ani sama ikona nie wystarczą. | WCAG 1.4.1 |
+| Ikona dekoracyjna w pustym stanie | `aria-hidden`; treść niesie nagłówek i opis. | WCAG 1.1.1 |
+
+## Czego nie robić
+
+- Emoji zamiast ikon, także w treściach i reakcjach (R02.5).
+- Ikona iskierek (`Sparkles`, ✨) jako symbol czegokolwiek (A01).
+- Trzy identyczne karty z ikoną nad nagłówkiem (A01).

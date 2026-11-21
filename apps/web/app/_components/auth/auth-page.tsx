@@ -35,7 +35,7 @@ function AuthTabs({
           className={cn(
             '-mb-px flex min-h-11 items-center border-b-2 px-3.5 font-semibold',
             tab.mode === mode
-              ? 'border-primary text-primary'
+              ? 'border-selected-border text-text-link'
               : 'border-transparent text-muted-foreground',
           )}
         >
