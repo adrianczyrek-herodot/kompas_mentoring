@@ -22,6 +22,7 @@ Zbudować design system `packages/ui` z dokumentacją w Storybooku jako instrukc
 - Etap 1 — `lekcja-06/tokeny.md`; Storybook 10.6.6 + docs/a11y/vitest + remark-gfm; `tokens.css` (3 warstwy, 2 motywy), `globals.css` (Tailwind tylko z tokenów, fonty Plex z @fontsource), przełącznik motywu na `<html>`, 7 stron Podstaw z blokami czytającymi żywe zmienne, `check:tokens`, testy stories w obu motywach.
 - Etap 1 — błędy znalezione i naprawione w trakcie: motyw nie działał na stronach MDX (dekorator) → kanał globals; aliasy shadcn nie przełączały się w poddrzewie `.dark` → deklaracja na `:root, .light, .dark`; tabele 320 px; kod inline i spis treści nieczytelne w ciemnym motywie; `.storybook` poza typecheckiem (dot-dir w `include`); lint skanował `storybook-static`.
 - Etap 1 — jednorazowo `test:stories:themes` padł przy zbieraniu testów zaraz po podziale plików bloków; 3 kolejne przebiegi (w tym z wyczyszczoną pamięcią podręczną) przechodzą — prawdopodobnie przeładowanie optymalizacji zależności Vite.
+- 2026-11-21 — nowa sesja (poprzednie padły: wygasłe OAuth, błąd modelu). Etap 2 rozpoczęty: lista różnic R1–R10 względem shadcn ze źródłami i pytania D1–D6, Z6, Z8 w `POSTEP.md`. `apps/web` nie używa rozmiarów przycisku < 44 px ani `secondary`, a `role="alert"` przekazuje jawnie — Z6/Z8/D6 nie wymagają zmian w aplikacji. Czeka na decyzje właściciela.
 
 ## Wynik
 W toku.

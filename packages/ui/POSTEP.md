@@ -7,8 +7,8 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | Etap | Stan | Data |
 |---|---|---|
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
-| 1. Fundamenty | **zrobiony, czeka na „dalej”** | 2026-11-11 |
-| 2. Komponenty bazowe | nie zaczęty | — |
+| 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
+| 2. Komponenty bazowe | **w toku — lista różnic względem bazy czeka na decyzje D1–D6, Z6, Z8** | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
@@ -211,6 +211,35 @@ Szacunek: ok. 30 stron przewodnika i podstaw + 75 stron komponentów; ok. 220 st
 
 - Wygląd ekranów `apps/web` (P4, S3) po zmianie tokenów w przeglądarce i e2e — wymagają Postgresa, a Docker nie działał w tej sesji. Do sprawdzenia: `docker compose up -d && pnpm db:migrate && pnpm test:e2e`.
 
+## Etap 2 — różnice względem bazy (shadcn `base-nova`), przed pierwszą partią
+
+Stan: **czeka na decyzję właściciela** (D1–D6, Z6, Z8). Wartości bez źródła oznaczone „propozycja”.
+
+| # | Element | shadcn (dziś w pakiecie) | Kompas | Źródło |
+|---|---|---|---|---|
+| R1 | Wysokość kontrolek | przycisk 44 / 24 / 28 / 48, pole 44 | 44 px (`--control-height`) dla przycisku, pola, selecta; `lg` 48 tylko w P3/U1 (przestronnie) | K1, R01.1 |
+| R2 | Promienie | `rounded-lg` 10 px, karta `rounded-xl` 14 px, checkbox 4 px | przycisk i pole `rounded-control` 6, panel/dialog `rounded-panel` 8, znacznik i checkbox `rounded-tag` 4, radio i awatar `rounded-round` | A01, P-T5 |
+| R3 | Obramowania | pole `border-input` (1,35 : 1), karta `ring-foreground/10` | pole, checkbox, radio, przycisk drugorzędny: 1 px `border-control` (3,65 : 1); panel: 1 px `border-divider`, bez cienia | WCAG 1.4.11, R01.4, Z5 |
+| R4 | Fokus | `ring-3` w kolorze `ring/50` + zmiana ramki | obrys 2 px `focus-ring` z odsunięciem 2 px (`outline`, widoczny też w trybie wysokiego kontrastu) na każdym elemencie, bez zmiany ramki | WCAG 2.4.7, 2.4.11, P-T2 |
+| R5 | Najechanie (akcja główna) | `bg-primary/80` (przezroczystość) | `action-primary-hover`; czas `duration-fast` | K4, Z9, P-T8 |
+| R6 | Wciśnięcie | `translate-y-px` (przesunięcie) | `action-primary-pressed`, bez ruchu | K4 (token), D3 |
+| R7 | Cień | brak na przyciskach, `ring` na kartach | cień tylko na nakładkach (`shadow-overlay`) | R01.4, A01 |
+| R8 | Tekst w polach | 16 px na mobile, 14 px od `md` | zawsze 16 px (`body`), także desktop; placeholder `text-subtle` jako przykład, nie nazwa pola | R05.1, P-T6, prompt (wzorzec formularza) |
+| R9 | Akcja destrukcyjna | tło czerwone 10 % + czerwony tekst | wypełnienie `action-danger` + `text-on-danger` (6,03 : 1), tylko akcje nieodwracalne | tokeny (WCAG, A02) |
+| R10 | Alert | zawsze `role="alert"`, tło karty | tło i ikona statusu (`status-*-bg/fg`), status zawsze z ikoną i tekstem | WCAG 1.4.1, Z8 |
+
+Pytania (materiały milczą — propozycje do decyzji):
+
+- **D1 Odstęp wewnętrzny kontrolek** (propozycja): przycisk 16 px w poziomie (`space-group`), pole 12 px (`--raw-space-3` przez token komponentu `--control-padding-x`), ikona–tekst 8 px (`space-inline`).
+- **D2 Zablokowane** (propozycja): zamiast `opacity-50` — `text-subtle` na `surface-sunken`, ramka `border-divider`, kursor `not-allowed`; przy zablokowanej akcji zawsze widoczny powód obok (tekst `meta` albo `FieldDescription`), nie tylko w podpowiedzi.
+- **D3 Wciśnięcie bez ruchu** (propozycja): tylko kolor `*-pressed`, bez `translate-y` — spokojny, „rzeczowy” charakter.
+- **D4 Najechanie na akcje drugorzędne i ciche** (propozycja): tło `surface-sunken` (nowy alias `--surface-hover` = `surface-sunken`, kontrast tekstu 13,97 / 15,76 : 1).
+- **D5 Błąd pola** (propozycja): ramka 1 px `status-danger-fg` + komunikat pod polem z ikoną i tekstem; bez czerwonej poświaty `ring`.
+- **D6 Warianty przycisku**: plan ma 4 role (główna, drugorzędna, cicha, destrukcyjna) + ikona; shadcn ma 6 (`default`, `outline`, `secondary`, `ghost`, `destructive`, `link`). Propozycja: zachować nazwy (Z0, `apps/web`), `default` = główna, `outline` = drugorzędna, `ghost` = cicha, `destructive` = destrukcyjna, `link` = akcja tekstowa; `secondary` (wypełnione szare tło) wygląda jak `outline` i jest oznaczony jako przestarzały — usunięcie wymaga zgody (zasada 12), `apps/web` go nie używa.
+- **Z6 Rozmiary < 44 px** (`xs` 24, `sm` 28, `icon-xs` 24, `icon-sm` 28, `icon-lg` 36): `apps/web` żadnego nie używa. Propozycja: usunąć `xs`, `icon-xs`, `icon-lg`; `sm` i `icon-sm` zostają tylko dla gęstych wierszy (A1 tabela) z wysokością wizualną 32 px i polem kliknięcia 44 px.
+- **Z8 `role` w `Alert`**: `apps/web` już przekazuje `role="alert"` jawnie przy błędach (`auth-form.tsx`, `form-status.tsx`). Propozycja: domyślnie bez roli (baner statyczny), `role="alert"` tylko jawnie dla błędów pojawiających się dynamicznie — bez zmian w aplikacji.
+- **Checkbox i radio** (propozycja, zależy od D1): pole 20 px (`icon-md`) zamiast 16, cel kliknięcia 44 px przez etykietę / pseudo-element.
+
 ## Otwarte pytania (do właściciela)
 
 - Z6 (rozmiary przycisków < 44 px) i Z8 (`role` w `Alert`) — decyzja przy etapie 2.
@@ -229,4 +258,4 @@ Szacunek: ok. 30 stron przewodnika i podstaw + 75 stron komponentów; ok. 220 st
 
 ## Następny krok
 
-Etap 2, przed pierwszą partią: lista różnic kształtu, gęstości i stanów względem shadcn (wysokość kontrolek, promienie, obramowania, odstępy wewnętrzne, fokus) z decyzją przy każdej + pytania o Z6, Z8 i luki. Potem partie po ~6 komponentów (pierwsza: Button, Link, Input, Textarea, Field, Checkbox) ze stroną 13 sekcji, macierzą stanów (`data-preview-state`) i play functions.
+Etap 2: po decyzjach D1–D6, Z6, Z8 (sekcja „Etap 2 — różnice względem bazy”) wpisać je do „Zatwierdzone decyzje”, dopisać ewentualne tokeny komponentów (`--control-padding-x`, `--surface-hover`) do `tokens.css` i `lekcja-06/tokeny.md`. Potem partie po ~6 komponentów (pierwsza: Button, Link, Input, Textarea, Field, Checkbox) ze stroną 13 sekcji, macierzą stanów (`data-preview-state`) i play functions.
