@@ -1,15 +1,26 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import { ToastProvider, TooltipProvider } from '@kompas/ui';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { App } from './app';
+import { interceptAppLinks } from './lib/router';
+import { installEngineAdapter } from './review/engine-adapter';
+import { DemoProvider } from './state/demo-context';
+import './styles.css';
 
-// Initialize demo "now" time
-const DEMO_NOW = new Date('2026-10-20T14:00:00+02:00');
+installEngineAdapter();
 
-// Expose for debugging (components import DEMO_NOW from utils/types)
-(window as any).__DEMO_NOW__ = DEMO_NOW;
+const container = document.getElementById('root');
+if (!container) throw new Error('#root missing in index.html');
+interceptAppLinks(document.body);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+createRoot(container).render(
+  <StrictMode>
+    <DemoProvider>
+      <TooltipProvider>
+        <ToastProvider closeLabel="Zamknij powiadomienie" regionLabel="Powiadomienia">
+          <App />
+        </ToastProvider>
+      </TooltipProvider>
+    </DemoProvider>
+  </StrictMode>,
 );

@@ -1,13 +1,38 @@
-<!DOCTYPE html>
-<html lang="pl">
+<!doctype html>
+<html lang="pl" data-prototype-id="kompas-flow">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#13463d" />
-    <title>Kompas — Prototyp przepływu mentoringowego</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kompas — prototyp przepływów (kompas-flow)</title>
+    <link rel="stylesheet" href="./review/prototype.css" />
   </head>
-  <body>
+  <body class="bg-surface-page font-sans text-text-default">
+    <!--
+      Review toolbar: outside the product (task rule 5). The review engine (review/prototype.js)
+      inserts its mode controls before #theme-toggle; React portals the screen, account and
+      scenario controls into #review-controls.
+    -->
+    <div
+      class="doc-toolbar sticky top-0 flex items-center gap-inline overflow-x-auto border-b border-border-control bg-surface-sunken px-panel py-tight text-body-dense"
+      role="region"
+      aria-label="Pasek przeglądu prototypu (nie jest częścią produktu)"
+    >
+      <strong
+        class="shrink-0 rounded-tag bg-surface-inverse px-inline py-tight text-label font-semibold text-text-inverse"
+        >Prototyp</strong
+      >
+      <div id="review-controls" class="flex shrink-0 items-center gap-inline"></div>
+      <button
+        id="theme-toggle"
+        type="button"
+        class="min-h-control-sm shrink-0 rounded-control border border-border-control bg-surface-panel px-field-x text-label text-text-default hover:bg-surface-hover"
+      >
+        Motyw: jasny
+      </button>
+    </div>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script src="./review/comments.js"></script>
+    <script src="./review/prototype.js"></script>
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 ---
 title: Klikalny prototyp kompas-flow na @kompas/ui
-status: draft
+status: in-progress
 created: 2026-11-21
 implemented:
 related:
@@ -47,3 +47,9 @@ Szczegółowy plan (stack, kolejność, kontrolki, konta, komponenty na ekran, l
 ## Decyzje i zmiany
 - 2026-11-21 — Przebudowa zamiast łatania pierwszej wersji (decyzja użytkownika). Stary kod zostaje w historii gita (commit `ea4e3f4`).
 - 2026-11-21 — Oceny i opinie z szarego prototypu mogą zostać (decyzja użytkownika).
+- 2026-11-21 — Plan zaakceptowany („dalej”). Ścieżki silnika przeglądu nie podano; użyty silnik znaleziony w `.agents/skills/om-ux-design/references/assets/` (głównego checkoutu). Skopiowany do `public/review/` z adapterem dla Reacta (zmiany oznaczone „kompas-flow adapter”) — README skilla zaznacza, że silnik DOM nie jest gotowym adapterem Reacta.
+- 2026-11-21 — U1 dostępny dla gościa do momentu „Dalej” (przepływ F1: wybór terminu → logowanie z zachowanym slotem), mimo że KONCEPCJA §3.2 mówi „trasy U* wymagają zalogowania”. Sprzeczność w specyfikacji — pytanie do właściciela.
+- 2026-11-21 — Opłata serwisowa 3 zł i kod KOMPAS10 (−10% ceny sesji) wzięte z szarego prototypu (KONCEPCJA wymienia oba elementy bez wartości).
+- 2026-11-21 — Rejestracja w P4 tworzy konto „Nowe konto” (uczeń bez danych) — F1 od zera; rejestracja mentora otwiera konto demo Adam Górski.
+- 2026-11-21 — Konfiguracja repo (nie kod aplikacji ani DS): `eslint.config.js` ignoruje `prototypes/*/public/review/**`, `knip.json` dostał wpis workspace prototypu (skrypty silnika ładowane z `index.html`). `pnpm-workspace.yaml` z `prototypes/*` zostaje (potrzebne do `workspace:*`).
+- 2026-11-21 — Bez `@vitejs/plugin-react`: Vite 8 kompiluje JSX przez oxc; jedna zależność mniej, brak Fast Refresh.

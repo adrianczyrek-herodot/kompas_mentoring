@@ -39,6 +39,9 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 
 ## Kod i mockupy
 
+- **2026-11-21** — `packages/ui/POSTEP.md` i `docs/design-system.md` wymieniają 45 komponentów produktu, a `packages/ui/src/index.ts` eksportuje 16 (brak m.in. `FilterPanel`, `WeekPicker`, `PasswordField`, `OnboardingStepper`; `FilterPanel` jest tylko w `.storybook/examples`). Przed planowaniem ekranu sprawdzaj eksport `index.ts`, nie dokumentację. `BottomNav` nie jest osobnym komponentem — jest w `AppHeader`.
+- **2026-11-21** — Prototyp poza `apps/` (np. `prototypes/*`) z hash-routerem: `AppHeader` renderuje sztywne `href="/sesje"` bez `render`, więc kliknięcia trzeba przechwycić i zamienić na nawigację routera (`interceptAppLinks` w `prototypes/kompas-flow/src/lib/router.ts`).
+
 - **2026-11-10** — Lokalne e2e używają bazy z docker-compose, której testy nie migrują — po dodaniu migracji uruchom `pnpm db:migrate`, inaczej rejestracja kończy się 500 (hook zapisu zgód) i padają niezwiązane testy.
 - **2026-11-10** — W RSC wywołuj `await headers()`/`cookies()` **przed** `getContainer()`: inaczej `next build` próbuje prerenderować stronę, buduje kontener i pada na walidacji env (brak `DATABASE_URL`).
 

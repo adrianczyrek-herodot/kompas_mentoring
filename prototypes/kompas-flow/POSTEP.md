@@ -4,10 +4,50 @@ Specyfikacja: [`.ai/specs/2026-11-21-prototyp-kompas-flow.md`](../../.ai/specs/2
 
 | Etap | Stan |
 |---|---|
-| 0 — plan (wersja 2, na `@kompas/ui`) | czeka na „dalej” i ścieżkę silnika przeglądu |
-| 1 — szkielet i ścieżka F1 | — |
+| 0 — plan (wersja 2, na `@kompas/ui`) | zaakceptowany 2026-11-21 |
+| 1 — szkielet i ścieżka F1 | zrobiony 2026-11-21, czeka na „dalej” |
 | 2 — stany, role, scenariusze | — |
 | 3 — uczciwość i sprawdzenie | — |
+
+## Etap 1 — szkielet i ścieżka F1 (2026-11-21)
+
+### Uruchomienie
+
+```bash
+pnpm install
+pnpm --filter @kompas/prototype-kompas-flow dev      # http://localhost:5173
+pnpm --filter @kompas/prototype-kompas-flow build    # dist/
+# podgląd w Storybooku: pnpm --filter @kompas/ui build-storybook, potem
+pnpm --filter @kompas/prototype-kompas-flow build:storybook   # → storybook-static/prototypes/kompas-flow/index.html
+```
+
+### Co powstało
+
+- Stack jak w DS: React 19.3.1, TS 6, Vite 8, Tailwind 4 przez `@kompas/ui/styles.css`. Bez `@vitejs/plugin-react` (JSX kompiluje oxc w Vite 8; brak Fast Refresh — przy prototypie bez znaczenia).
+- Router na hashu (`src/lib/router.ts`) z mapą ekranów (`src/screens/registry.ts`, ID i trasy z KONCEPCJA §3.1 — U3 = `/rezerwacja/:bookingId/potwierdzenie`). Linki `AppHeader` (`href="/sesje"`) przechwytywane i zamieniane na hash.
+- Stan demo (`src/state/`): konta, rezerwacje, salda, szkic rezerwacji z blokadą 10 min (odlicza realne sekundy), scenariusze. Zegar stały `2026-10-20 14:00` (`src/lib/clock.ts`), zero `Date.now()`.
+- Silnik przeglądu: kopia w `public/review/` z adapterem oznaczonym „kompas-flow adapter” (nawigacja, „Back”, wątki z niezamontowanych ekranów — `src/review/engine-adapter.ts`), `prototypeId` = `kompas-flow`, mostek kolorów na tokeny w `src/styles.css`.
+- Pasek przeglądu (`index.html` + `src/review/`): „Prototyp”, wybór ekranu, konto demo, scenariusze (stan danych, wynik płatności, błąd następnego żądania, konflikt 409, wygaśnięcie blokady), motyw; tryby silnika (Clickable / Comment / Presentation / Threads / „← Back”).
+- Ekrany F1: P1, P2 (filtry w URL), P3, P4, U1, U2, U3, U4, U5 (anuluj / przełóż / zgłoś problem). Pozostałe 14 ekranów: uczciwa strona „w przygotowaniu (etap 2)”. Bramki: zaloguj się, inna rola, mentor przed weryfikacją, już zalogowany.
+
+### Sprawdzone
+
+- `tsc --noEmit` — 0 błędów; `pnpm lint` (ESLint, dependency-cruiser, knip), `pnpm typecheck` (7/7), `pnpm build` (z prototypem) — kod 0. 22 ostrzeżenia `max-lines-per-function` w prototypie (repo je dopuszcza).
+- `packages/ui/scripts/check-tokens.mjs` na `src/` prototypu — 0 wartości spoza tokenów.
+- Playwright (Chromium): 32 trasy × 6 kont bez `pageerror`/błędów konsoli; F1 gość → P1 → P2 → P3 → U1 → P4 (rejestracja) → U2 (blokada, walidacja, KOMPAS10, odrzucona płatność z zachowanym celem, sukces) → U3 → U4; Adrian: rezerwacja z salda (3 → 2), anulowanie ≥ 12 h (saldo wraca), przełożenie, blokada przełożenia < 12 h, zgłoszenie problemu (walidacja); silnik: komentarz → localStorage `om-prototype-comments:v2:kompas-flow`, wątek widoczny z innego ekranu, klik przenosi, prezentacja i „Back”.
+- 320 px (bez przewijania w poziomie) i ciemny motyw — zrzuty P2, U1, U4.
+- axe (WCAG 2.2 AA, serious/critical) w ramce produktu: P1, P2, P3, P4, U1, U3, U4, U5 × jasny/ciemny — 0 naruszeń.
+
+### Niesprawdzone w etapie 1
+
+- U2 w axe (wymaga szkicu rezerwacji), pełna obsługa klawiaturą (sprawdzona tylko kolejność Tab w pasku), Safari/Firefox.
+- Komentarze w nakładkach (Dialog, Sheet, Select) — silnik kotwiczy tylko w `.frame`, a nakładki Base UI są w portalu poza nią.
+
+### Luki DS znalezione przy budowie (`// DS-GAP` w kodzie)
+
+GuestHeader/AdminHeader, TopicSearch, CategoryList, FilterPanel (jest tylko jako nieeksportowany przykład Storybooka), FavoriteToggle, VideoPlayer, MentorSummaryBar, DurationToggle, TimezoneSelect, OrderSummary, PaymentMethodSelector, PromoCodeField, GuaranteeNote, CalendarButtons, PrepChecklist, BalancePill, NotesPanel, PasswordField (miernik siły), RoleChoice, ConsentField, SocialSignInButtons. `BottomNav` nie jest luką — jest wbudowany w `AppHeader`.
+
+Usterki DS (poza zakresem, do zgłoszenia): `checkbox.tsx` — brak spacji w `hover:bg-surface-hoveraria-invalid:`, więc nie działa ani hover, ani obramowanie błędu; `AppHeader` ma sztywne `href` bez `render`/`linkRender` (aplikacja z routerem musi przechwytywać kliknięcia).
 
 ## Etap 0 — plan
 
@@ -19,7 +59,7 @@ Specyfikacja: [`.ai/specs/2026-11-21-prototyp-kompas-flow.md`](../../.ai/specs/2
 | Szary prototyp | `kompas-mentoring/mockupy/` (dane w `src/mocks.ts`, `NOW = 2026-10-20 14:00 +02:00`) — brak `revision-NNN/` ze skilla om-mockup-prototype |
 | Design system | `packages/ui` (`@kompas/ui`), skrót `docs/design-system.md`, Storybook |
 | Brief i backlog | `.ai/specs/product-brief.md`, `.ai/specs/backlog.md` |
-| Silnik przeglądu | **ścieżka do podania przez użytkownika** |
+| Silnik przeglądu | `.agents/skills/om-ux-design/references/assets/` w głównym checkoucie (prototype.js, prototype.css, comments.js) — znaleziony na dysku, ścieżki nie podano |
 
 ### Technologia i uruchomienie
 
