@@ -33,6 +33,8 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-21** — Nakładki Base UI (Select, Combobox, później Menu, Dialog) wchodzą i wychodzą z animacją przezroczystości: w play function `toBeVisible()` zaraz po otwarciu i „fokus wrócił na pole” / „lista zniknęła” zaraz po wyborze padają. Takie asercje owijaj w `waitFor(...)`. Dotyczy też `Tabs`: po przełączeniu stary panel jest chwilę w DOM (`data-ending-style`), więc `getByRole('tabpanel')` znajduje dwa — sporadyczne błędy pełnego przebiegu miały tę przyczynę.
 - **2026-11-21** — `pnpm lint` z kodem 0 może mieć ostrzeżenia Biome (format „Found N warning.”), których nie łapie grep po formacie ESLint (`12:3 warning`). Sprawdzając lint, szukaj obu: `sed 's/\x1b\[[0-9;]*m//g' log | grep -E "Found [0-9]+ (warning|error)|[0-9]+:[0-9]+ +(warning|error)"`.
 
+- **2026-11-21** — Prototyp `prototypes/kompas-flow` był raportowany jako „build OK”, a `npm run build` (`tsc && vite build`) padał na 156 błędach TS; samo `vite build` nie sprawdza typów, więc przechodziło mimo wywołań nieistniejących funkcji (5 ekranów crashowało). „Działa” = `tsc --noEmit` z kodem 0 **i** przejście ekranów w przeglądarce bez `pageerror`. Pakiet dopisany do `pnpm-workspace.yaml` wchodzi do `turbo build/typecheck` całego repo. Szczegóły: [runs/2026-11-21-przeglad-prototypu-kompas-flow.md](runs/2026-11-21-przeglad-prototypu-kompas-flow.md)
+
 ## Domena i produkt
 
 ## Kod i mockupy
