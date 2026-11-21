@@ -9,7 +9,8 @@ type ErrorStateProps = Omit<React.ComponentProps<'div'>, 'title'> & {
   description?: React.ReactNode;
   /** Usually a Button "Ponów" (KONCEPCJA, state Er). */
   action?: React.ReactNode;
-  titleAs?: 'h2' | 'h3' | 'p';
+  /** `h1` when the error replaces the whole screen (e.g. 404 „Profil niedostępny”). */
+  titleAs?: 'h1' | 'h2' | 'h3' | 'p';
 };
 
 // Area that failed to load (state Er). role="alert": it replaces content after a failed request, so

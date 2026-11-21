@@ -2,101 +2,131 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { ViewportFrame } from '../../.storybook/blocks/component-docs';
-import { type DaySlots, type Slot, SlotGrid, SlotGridSkeleton } from './slot-grid';
+import {
+  emptyWeek,
+  NEXT_FREE,
+  TZ,
+  TZ_LABEL,
+  WEEK_LABEL,
+  week,
+} from '../../.storybook/fixtures/kompas';
+import { type Slot, SlotGrid, type SlotGridProps } from './slot-grid';
 
-const sampleDays: DaySlots[] = [
-  {
-    date: '2026-11-25',
-    dayName: 'Wtorek, 25 lis',
-    slots: [
-      { id: 's1', time: '16:00', available: true },
-      { id: 's2', time: '16:30', available: true },
-      { id: 's3', time: '17:00', available: false },
-      { id: 's4', time: '17:30', available: true },
-    ],
-  },
-  {
-    date: '2026-11-26',
-    dayName: 'Środa, 26 lis',
-    slots: [
-      { id: 's5', time: '10:00', available: true },
-      { id: 's6', time: '11:00', available: false },
-      { id: 's7', time: '14:00', available: true },
-      { id: 's8', time: '15:00', available: true },
-    ],
-  },
-  {
-    date: '2026-11-27',
-    dayName: 'Czwartek, 27 lis',
-    slots: [
-      { id: 's9', time: '17:00', available: true },
-      { id: 's10', time: '18:00', available: true },
-      { id: 's11', time: '19:00', available: false },
-      { id: 's12', time: '19:30', available: false },
-    ],
-  },
-];
+const onSelect = fn();
+
+function Interactive(props: Partial<SlotGridProps>) {
+  const [selected, setSelected] = useState<string | undefined>(props.selectedSlotId);
+  return (
+    <SlotGrid
+      days={week}
+      timeZone={TZ}
+      timeZoneLabel={TZ_LABEL}
+      weekLabel={WEEK_LABEL}
+      canGoPrev={false}
+      {...props}
+      selectedSlotId={selected}
+      onSelect={(slot: Slot) => {
+        setSelected(slot.id);
+        onSelect(slot.id);
+      }}
+    />
+  );
+}
 
 const meta = {
   title: 'Produkt/E3 Dostępność i rezerwacje/SlotGrid',
   component: SlotGrid,
   args: {
-    days: sampleDays,
-    selectedSlotId: 's1',
-    timezone: 'Europe/Warsaw',
-    onSlotSelect: fn(),
+    days: week,
+    timeZone: TZ,
+    timeZoneLabel: TZ_LABEL,
+    weekLabel: WEEK_LABEL,
+    status: 'ready',
+    canGoPrev: false,
+  },
+  argTypes: {
+    status: { control: 'inline-radio', options: ['ready', 'loading', 'error'] },
+    days: { control: false },
   },
 } satisfies Meta<typeof SlotGrid>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Playground: Story = {};
 
-function InteractiveDemo() {
-  const [selected, setSelected] = useState<string>('s2');
-  return (
-    <SlotGrid
-      days={sampleDays}
-      selectedSlotId={selected}
-      onSlotSelect={(slot: Slot) => {
-        setSelected(slot.id);
-      }}
-    />
-  );
-}
-
-export const Interactive: Story = {
-  name: 'Wybór slotu z zapamiętaniem',
-  render: () => <InteractiveDemo />,
+export const Selected: Story = {
+  name: 'Wybrany termin',
+  render: () => <Interactive selectedSlotId="2026-10-22-18" />,
 };
 
-export const NarrowScreen: Story = {
-  name: 'Ekran 320 px',
+export const Loading: Story = { name: 'Ładowanie', args: { status: 'loading' } };
+
+export const ErrorLoading: Story = { name: 'Błąd', args: { status: 'error' } };
+
+export const EmptyWithNext: Story = {
+  name: 'Pusto — jest następny wolny termin',
+  args: { days: emptyWeek, nextAvailable: NEXT_FREE },
+};
+
+export const EmptyNoSlots: Story = {
+  name: 'Pusto — brak terminów w 14 dni',
+  args: { days: emptyWeek },
+};
+
+export const ManySlots: Story = {
+  name: 'Dużo danych (pełny tydzień)',
+  args: {
+    days: week.map((day) => ({
+      ...day,
+      slots: [8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20].map((hour) => {
+        const date = day.date.slice(0, 10);
+        const hh = String(hour).padStart(2, '0');
+        return { id: `${date}-${hh}`, startsAt: `${date}T${hh}:00:00+02:00` };
+      }),
+    })),
+  },
+};
+
+export const OtherTimeZone: Story = {
+  name: 'Inna strefa ucznia (Londyn)',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Te same sloty pokazane w strefie ucznia (reguła 10 briefu): 18:00 w Warszawie to 17:00 w Londynie.',
+      },
+    },
+  },
+  args: { timeZone: 'Europe/London', timeZoneLabel: 'Londyn (GMT+1)' },
+};
+
+export const Narrow: Story = {
+  name: 'Wąski ekran 320 px',
   render: () => (
     <ViewportFrame width={320}>
-      <SlotGrid days={sampleDays} selectedSlotId="s1" />
+      <Interactive />
     </ViewportFrame>
   ),
 };
 
-export const Loading: Story = {
-  name: 'Stan ładowania (Skeleton)',
-  render: () => <SlotGridSkeleton />,
-};
-
-export const SelectSlotTest: Story = {
-  name: 'Test: wybór slotu i ignorowanie zablokowanego',
-  play: async ({ canvasElement, args }) => {
+export const SelectTest: Story = {
+  name: 'Test: wybór terminu klawiaturą, aria-pressed',
+  render: () => <Interactive />,
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const availableSlot = canvas.getByRole('button', { name: '16:30' });
-    await userEvent.click(availableSlot);
-    await expect(args.onSlotSelect).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 's2', time: '16:30' }),
-      expect.objectContaining({ date: '2026-11-25' }),
-    );
-
-    const disabledSlot = canvas.getByRole('button', { name: '17:00' });
-    await expect(disabledSlot).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: 'Poprzedni tydzień' })).toBeDisabled();
+    const thursday = canvas.getByRole('group', { name: 'czw., 22 paź' });
+    const slot = within(thursday).getByRole('button', { name: '18:00' });
+    await expect(slot).toHaveAttribute('aria-pressed', 'false');
+    slot.focus();
+    onSelect.mockClear();
+    await userEvent.keyboard(' ');
+    await expect(slot).toHaveAttribute('aria-pressed', 'true');
+    await expect(onSelect).toHaveBeenCalledWith('2026-10-22-18');
+    const other = within(thursday).getByRole('button', { name: '19:00' });
+    await userEvent.click(other);
+    await expect(slot).toHaveAttribute('aria-pressed', 'false');
+    await expect(other).toHaveAttribute('aria-pressed', 'true');
   },
 };

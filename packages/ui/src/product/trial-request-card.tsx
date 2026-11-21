@@ -1,92 +1,91 @@
-import { Clock } from 'lucide-react';
 import * as React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/avatar';
-import { Badge } from '../components/badge';
+import { Avatar, AvatarFallback } from '../components/avatar';
 import { Button } from '../components/button';
-import { Card, CardContent } from '../components/card';
+import { initialsOf } from '../lib/format';
 import { cn } from '../lib/utils';
+import { DateTime } from './date-time';
 
-export interface TrialRequestCardProps extends React.ComponentProps<'div'> {
-  studentName: string;
-  studentInitials: string;
-  avatarUrl?: string;
+type TrialRequest = {
+  id: string;
+  student: string;
+  startsAt: string;
+  /** Student's goal for the trial („Z czym przychodzisz?”, 20–500 characters, KONCEPCJA §U2). */
   goal: string;
-  requestedDateTime: string; // e.g. "Środa, 26 listopada 2026, 17:30"
-  hoursLeftToRespond: number;
-  onAccept?: () => void;
-  onReject?: () => void;
-}
+  /** Requested at + 24 h: after that the request is accepted automatically if the slot is free. */
+  respondBy: string;
+};
 
-export function TrialRequestCard({
-  studentName,
-  studentInitials,
-  avatarUrl,
-  goal,
-  requestedDateTime,
-  hoursLeftToRespond,
+type TrialRequestCardProps = Omit<React.ComponentProps<'li'>, 'children'> & {
+  request: TrialRequest;
+  timeZone: string;
+  onAccept?: () => void;
+  /** Opens the decision-with-reason dialog (pattern „Decyzja z powodem”). */
+  onDecline?: () => void;
+  /** Accept request in flight: blocks a double click (KONCEPCJA §P4 L). */
+  accepting?: boolean;
+};
+
+// A trial request in M2 (E3-S7). The 24 h SLA is stated as a fact with its consequence, not as a
+// countdown or red urgency (A02). Both actions are secondary: M2 has several requests (R01.6).
+function TrialRequestCard({
+  request,
+  timeZone,
   onAccept,
-  onReject,
+  onDecline,
+  accepting = false,
   className,
   ...props
 }: TrialRequestCardProps) {
-  const isUrgent = hoursLeftToRespond <= 4;
-
+  const nameId = React.useId();
   return (
-    <Card
-      className={cn('w-full border-border-divider bg-surface-panel p-panel', className)}
+    <li
+      data-slot="trial-request-card"
+      className={cn('flex flex-col gap-inline border-b border-border-divider py-row-y', className)}
       {...props}
     >
-      <CardContent className="flex flex-col gap-group p-0">
-        <div className="flex flex-col gap-group sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-group">
-            <Avatar size="md" className="shrink-0">
-              {avatarUrl ? <AvatarImage src={avatarUrl} alt={studentName} /> : null}
-              <AvatarFallback>{studentInitials}</AvatarFallback>
-            </Avatar>
-            <div className="space-y-tight">
-              <div className="flex items-center gap-inline">
-                <h3 className="text-body font-medium text-text-default">{studentName}</h3>
-                <Badge variant="warning">Nowa prośba 30 min</Badge>
-              </div>
-              <p className="text-meta text-text-muted">
-                Proponowany termin:{' '}
-                <strong className="font-normal text-text-default tabular-nums">
-                  {requestedDateTime}
-                </strong>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-tight text-meta tabular-nums">
-            <Clock
-              className={cn('size-icon-sm', isUrgent ? 'text-status-danger-fg' : 'text-text-muted')}
-            />
-            <span
-              className={cn(isUrgent ? 'text-status-danger-fg font-medium' : 'text-text-muted')}
-            >
-              Odpowiedz w ciągu: {hoursLeftToRespond} h
+      <div className="flex items-start gap-inline">
+        <Avatar size="sm">
+          <AvatarFallback>{initialsOf(request.student)}</AvatarFallback>
+        </Avatar>
+        <div className="flex min-w-0 flex-col gap-tight">
+          <p id={nameId} className="text-body-dense font-medium text-text-default">
+            {request.student}
+            <span className="font-normal text-text-muted">
+              {' '}
+              · Sesja próbna 30 min · <DateTime value={request.startsAt} timeZone={timeZone} />
             </span>
-          </div>
+          </p>
+          <blockquote className="max-w-measure text-body-dense text-text-default">
+            {request.goal}
+          </blockquote>
+          <p className="text-meta text-text-muted">
+            Odpowiedz do <DateTime value={request.respondBy} timeZone={timeZone} />. Bez odpowiedzi
+            prośba zostanie przyjęta automatycznie, jeśli termin będzie wolny.
+          </p>
         </div>
-
-        <div className="rounded-control bg-surface-sunken p-panel">
-          <p className="text-meta font-medium text-text-muted">Cel sesji zgłoszony przez ucznia:</p>
-          <p className="text-body-dense text-text-default mt-tight">{goal}</p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-end gap-inline border-t border-border-divider pt-group">
-          {onReject ? (
-            <Button variant="outline" size="sm" onClick={onReject}>
-              Odrzuć z powodem
-            </Button>
-          ) : null}
-          {onAccept ? (
-            <Button size="sm" onClick={onAccept}>
-              Zaakceptuj prośbę
-            </Button>
-          ) : null}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="flex flex-wrap gap-inline">
+        <Button
+          variant="outline"
+          size="sm"
+          loading={accepting}
+          onClick={onAccept}
+          aria-describedby={nameId}
+        >
+          Przyjmij
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={accepting}
+          onClick={onDecline}
+          aria-describedby={nameId}
+        >
+          Odrzuć…
+        </Button>
+      </div>
+    </li>
   );
 }
+
+export { type TrialRequest, TrialRequestCard, type TrialRequestCardProps };

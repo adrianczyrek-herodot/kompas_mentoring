@@ -1,119 +1,115 @@
-import { CalendarCheck, Video } from 'lucide-react';
+import { CalendarCheck } from 'lucide-react';
 import * as React from 'react';
 import { Button } from '../components/button';
 import { EmptyState } from '../components/empty-state';
+import { ErrorState } from '../components/error-state';
 import { Skeleton } from '../components/skeleton';
 import { cn } from '../lib/utils';
+import { DateTime } from './date-time';
+import type { SessionSummary } from './session-list-item';
 
-export interface AgendaItem {
-  id: string;
-  timeRange: string; // e.g. "16:00 – 17:00"
-  studentName: string;
-  topic: string;
-  isNow?: boolean;
-}
+type AgendaItem = SessionSummary & {
+  /** Room is open (start − 10 min … end) — from the domain. */
+  joinOpen: boolean;
+};
 
-export interface TodayAgendaProps extends React.ComponentProps<'div'> {
+type TodayAgendaProps = Omit<React.ComponentProps<'section'>, 'children'> & {
+  status?: 'ready' | 'loading' | 'error';
   items: AgendaItem[];
-  dateTitle?: string;
-  onJoinRoom?: (item: AgendaItem) => void;
-}
+  timeZone: string;
+  onJoin?: (item: AgendaItem) => void;
+  /** Per-section retry (KONCEPCJA §M2 Er). */
+  onRetry?: () => void;
+  /** Action of the empty state, e.g. Link to M3 calendar. */
+  emptyAction?: React.ReactNode;
+  headingAs?: 'h2' | 'h3';
+};
 
-export function TodayAgenda({
+// Today's sessions in M2 (KONCEPCJA §M2 TodayAgenda): time, student, goal; „Dołącz” only on the
+// session whose room is open — at most one primary action at a time (R01.6).
+function TodayAgenda({
+  status = 'ready',
   items,
-  dateTitle = 'Dzisiaj, 25 listopada',
-  onJoinRoom,
+  timeZone,
+  onJoin,
+  onRetry,
+  emptyAction,
+  headingAs: Heading = 'h2',
   className,
   ...props
 }: TodayAgendaProps) {
-  if (items.length === 0) {
-    return (
-      <div
-        className={cn(
-          'rounded-panel border border-border-divider bg-surface-panel p-panel',
-          className,
-        )}
-        {...props}
-      >
-        <EmptyState
-          icon={<CalendarCheck className="size-icon-lg text-text-muted" />}
-          title="Twój kalendarz ma dziś wolne"
-          description="Brak zaplanowanych sesji na dzisiaj. Możesz sprawdzić prośby uczniów lub uzupełnić grafik na kolejny tydzień."
-        />
-      </div>
-    );
-  }
-
+  const headingId = React.useId();
   return (
-    <div
-      className={cn(
-        'rounded-panel border border-border-divider bg-surface-panel p-panel space-y-group',
-        className,
-      )}
+    <section
+      data-slot="today-agenda"
+      aria-labelledby={headingId}
+      aria-busy={status === 'loading' || undefined}
+      className={cn('flex flex-col gap-inline', className)}
       {...props}
     >
-      <div className="flex items-center justify-between border-b border-border-divider pb-tight">
-        <h3 className="text-section-title font-medium text-text-default">{dateTitle}</h3>
-        <span className="text-meta text-text-muted">Zaplanowane sesje: {items.length}</span>
-      </div>
-
-      <div className="divide-y divide-border-divider">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="flex flex-col gap-tight py-group sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="space-y-tight">
-              <span className="text-body font-medium text-text-default tabular-nums">
-                {item.timeRange}
-              </span>
-              <p className="text-body-dense text-text-default font-medium">
-                Uczeń: {item.studentName}
+      <Heading id={headingId} className="text-section-title font-semibold text-text-default">
+        Dzisiaj
+      </Heading>
+      {status === 'loading' ? (
+        <ul aria-hidden="true">
+          {[0, 1, 2].map((row) => (
+            <li key={row} className="flex gap-group border-b border-border-divider py-row-y">
+              <Skeleton className="h-lh w-1/6" />
+              <Skeleton className="h-lh flex-1" />
+            </li>
+          ))}
+        </ul>
+      ) : status === 'error' ? (
+        <ErrorState
+          titleAs="p"
+          className="py-group"
+          title="Nie udało się wczytać dzisiejszych sesji"
+          description="Pozostałe sekcje panelu działają. Spróbuj wczytać tę jeszcze raz."
+          action={
+            <Button variant="outline" onClick={onRetry}>
+              Ponów
+            </Button>
+          }
+        />
+      ) : items.length === 0 ? (
+        <EmptyState
+          titleAs="p"
+          className="py-group"
+          icon={<CalendarCheck />}
+          title="Brak sesji dzisiaj"
+          description="Nowe rezerwacje pojawią się tutaj. Im więcej wolnych godzin w kalendarzu, tym więcej terminów do wyboru mają uczniowie."
+          action={emptyAction}
+        />
+      ) : (
+        <ul>
+          {items.map((item) => (
+            <li
+              key={item.id}
+              className="flex flex-col gap-inline border-b border-border-divider py-row-y md:flex-row md:items-center md:gap-group"
+            >
+              <p className="text-label font-medium text-text-default tabular-nums md:w-1/6">
+                <DateTime value={item.startsAt} timeZone={timeZone} format="time" />
+                <span className="font-normal text-text-muted"> · {item.durationMin} min</span>
               </p>
-              <p className="text-meta text-text-muted">{item.topic}</p>
-            </div>
-
-            {onJoinRoom ? (
-              <Button
-                size="sm"
-                onClick={() => {
-                  onJoinRoom(item);
-                }}
-                className="gap-tight shrink-0 self-start sm:self-center"
-              >
-                <Video className="size-icon-sm" />
-                Pokój sesji
-              </Button>
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-tight">
+                <p className="text-body-dense font-medium text-text-default">
+                  {item.withName}
+                  <span className="font-normal text-text-muted">
+                    {' '}
+                    · {item.type === 'trial' ? 'Sesja próbna' : 'Plan'}
+                  </span>
+                </p>
+                <p className="line-clamp-2 text-body-dense text-text-muted">{item.goal}</p>
+              </div>
+              {item.joinOpen ? (
+                <Button onClick={() => onJoin?.(item)}>Dołącz do sesji</Button>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
-export function TodayAgendaSkeleton() {
-  return (
-    <div
-      className="rounded-panel border border-border-divider bg-surface-panel p-panel space-y-group"
-      aria-busy="true"
-    >
-      <div className="flex items-center justify-between border-b border-border-divider pb-tight">
-        <Skeleton className="h-6 w-48 rounded-control" />
-        <Skeleton className="h-4 w-28 rounded-control" />
-      </div>
-      <div className="space-y-group py-group">
-        {[1, 2].map((i) => (
-          <div key={i} className="flex items-center justify-between">
-            <div className="space-y-tight">
-              <Skeleton className="h-4 w-32 rounded-control" />
-              <Skeleton className="h-4 w-44 rounded-control" />
-              <Skeleton className="h-3 w-64 rounded-control" />
-            </div>
-            <Skeleton className="h-8 w-28 rounded-control" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+export { type AgendaItem, TodayAgenda, type TodayAgendaProps };

@@ -134,44 +134,65 @@ export {
   TooltipTrigger,
 } from './components/tooltip.tsx';
 export {
+  type CountForms,
+  type Currency,
+  type DateTimeStyle,
+  formatCount,
+  formatDateTime,
+  formatMoney,
+  initialsOf,
+} from './lib/format.ts';
+export { cn } from './lib/utils.ts';
+export {
+  type ActiveFilter,
+  ActiveFilters,
+  type ActiveFiltersProps,
+} from './product/active-filters.tsx';
+export { AppHeader, type AppHeaderProps, type NavRole } from './product/app-header.tsx';
+export {
+  type BookingStatus,
+  BookingStatusBadge,
+  type BookingStatusBadgeProps,
+} from './product/booking-status-badge.tsx';
+export { DateTime, type DateTimeProps } from './product/date-time.tsx';
+export { HoldCountdown, type HoldCountdownProps } from './product/hold-countdown.tsx';
+export {
   MentorCard,
-  MentorCardSkeleton,
   type MentorCardProps,
+  MentorCardSkeleton,
+  type MentorSummary,
 } from './product/mentor-card.tsx';
-export {
-  ProfileHero,
-  ProfileHeroSkeleton,
-  type ProfileHeroProps,
-} from './product/profile-hero.tsx';
-export {
-  SlotGrid,
-  SlotGridSkeleton,
-  type SlotGridProps,
-  type Slot,
-  type DaySlots,
-} from './product/slot-grid.tsx';
-export {
-  HoldCountdown,
-  type HoldCountdownProps,
-} from './product/hold-countdown.tsx';
+export { Money, type MoneyProps } from './product/money.tsx';
+export { NextSessionCard, type NextSessionCardProps } from './product/next-session-card.tsx';
+export { PageHeader, type PageHeaderProps } from './product/page-header.tsx';
 export {
   PolicyNotice,
   type PolicyNoticeProps,
+  type PolicyState,
 } from './product/policy-notice.tsx';
 export {
-  SessionCard,
-  SessionCardSkeleton,
-  type SessionCardProps,
-  type SessionStatus,
-} from './product/session-card.tsx';
+  type MentorProfileSummary,
+  ProfileHero,
+  type ProfileHeroProps,
+  ProfileHeroSkeleton,
+} from './product/profile-hero.tsx';
 export {
+  SessionListItem,
+  type SessionListItemProps,
+  SessionListItemSkeleton,
+  type SessionSummary,
+} from './product/session-list-item.tsx';
+export {
+  type DaySlots,
+  type Slot,
+  SlotGrid,
+  type SlotGridProps,
+  SlotGridSkeleton,
+} from './product/slot-grid.tsx';
+export { StickyBookingBar, type StickyBookingBarProps } from './product/sticky-booking-bar.tsx';
+export { type AgendaItem, TodayAgenda, type TodayAgendaProps } from './product/today-agenda.tsx';
+export {
+  type TrialRequest,
   TrialRequestCard,
   type TrialRequestCardProps,
 } from './product/trial-request-card.tsx';
-export {
-  TodayAgenda,
-  TodayAgendaSkeleton,
-  type TodayAgendaProps,
-  type AgendaItem,
-} from './product/today-agenda.tsx';
-export { cn } from './lib/utils.ts';

@@ -1,143 +1,128 @@
+import { BadgeCheck } from 'lucide-react';
 import * as React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/avatar';
 import { Badge } from '../components/badge';
-import { Button } from '../components/button';
 import { Skeleton } from '../components/skeleton';
+import { formatCount, initialsOf } from '../lib/format';
 import { cn } from '../lib/utils';
 
-export interface ProfileHeroProps extends React.ComponentProps<'section'> {
+/** Header data of the mentor profile (KONCEPCJA §P3: hero + StatsRow). */
+type MentorProfileSummary = {
   name: string;
   headline: string;
-  bio: string;
-  avatarUrl?: string;
-  initials: string;
-  tags: string[];
-  trialRate: string;
-  standardRate: string;
-  responseTime?: string;
-  languages?: string[];
-  isNew?: boolean;
-  onBookClick?: () => void;
+  photoUrl?: string;
+  languages: string[];
+  companies: string[];
+  yearsExp: number;
+  verified: boolean;
+  acceptingNew: boolean;
+  rating: number;
+  reviewsCount: number;
+  sessions: number;
+  /** Share of students who booked again, 0–100. */
+  returningPct: number;
+  responseHours: number;
+};
+
+type ProfileHeroProps = Omit<React.ComponentProps<'section'>, 'children'> & {
+  mentor: MentorProfileSummary;
+};
+
+const ratingFormat = new Intl.NumberFormat('pl-PL', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+
+function Stat({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-tight border-l border-border-divider pl-group first:border-l-0 first:pl-0">
+      <dt className="text-meta text-text-muted">{label}</dt>
+      <dd className="text-section-title font-semibold text-text-default tabular-nums">
+        {children}
+      </dd>
+    </div>
+  );
 }
 
-export function ProfileHero({
-  name,
-  headline,
-  bio,
-  avatarUrl,
-  initials,
-  tags,
-  trialRate,
-  standardRate,
-  responseTime = 'zwykle do 24 godzin',
-  languages = ['polski', 'angielski'],
-  isNew,
-  onBookClick,
-  className,
-  ...props
-}: ProfileHeroProps) {
+// Top of P3: who the mentor is and why to trust them, before the fold. Serif only here and on P1
+// (K6, R01.2). Stats without reviews collapse to „Nowy mentor” (KONCEPCJA §P3, state E).
+function ProfileHero({ mentor, className, ...props }: ProfileHeroProps) {
+  const isNew = mentor.reviewsCount === 0;
+  const nameId = React.useId();
   return (
     <section
-      className={cn(
-        'w-full border-b border-border-divider bg-surface-panel px-panel py-section',
-        className,
-      )}
+      data-slot="profile-hero"
+      aria-labelledby={nameId}
+      className={cn('flex flex-col gap-group', className)}
       {...props}
     >
-      <div className="mx-auto flex max-w-content flex-col gap-section sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-group sm:flex-row sm:items-start">
-          <Avatar size="lg" className="shrink-0">
-            {avatarUrl ? <AvatarImage src={avatarUrl} alt={name} /> : null}
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          <div className="space-y-group">
-            <div className="space-y-tight">
-              <div className="flex flex-wrap items-center gap-inline">
-                <h1 className="font-serif text-display font-medium text-text-default">{name}</h1>
-                {isNew ? (
-                  <Badge variant="warning">Nowy mentor</Badge>
-                ) : (
-                  <Badge variant="neutral">Zweryfikowany</Badge>
-                )}
-              </div>
-              <p className="text-body font-medium text-text-muted">{headline}</p>
-            </div>
-
-            <p className="max-w-measure text-body text-text-default">{bio}</p>
-
-            <div className="flex flex-wrap items-center gap-inline">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="neutral">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-group text-meta text-text-muted">
-              <span>
-                Czas odpowiedzi:{' '}
-                <strong className="text-text-default font-normal">{responseTime}</strong>
-              </span>
-              <span>
-                Języki:{' '}
-                <strong className="text-text-default font-normal">{languages.join(', ')}</strong>
-              </span>
-            </div>
+      <div className="flex flex-col gap-group md:flex-row md:items-center">
+        <Avatar size="lg">
+          {mentor.photoUrl ? <AvatarImage src={mentor.photoUrl} alt="" /> : null}
+          <AvatarFallback>{initialsOf(mentor.name)}</AvatarFallback>
+        </Avatar>
+        <div className="flex min-w-0 flex-col gap-tight">
+          <h1 id={nameId} className="font-serif text-display text-text-default">
+            {mentor.name}
+          </h1>
+          <p className="max-w-measure text-body text-text-muted">{mentor.headline}</p>
+          <div className="flex flex-wrap items-center gap-inline pt-tight">
+            {mentor.verified ? (
+              <Badge variant="success">
+                <BadgeCheck aria-hidden="true" />
+                Zweryfikowany
+              </Badge>
+            ) : null}
+            {isNew ? <Badge variant="neutral">Nowy mentor</Badge> : null}
+            {mentor.acceptingNew ? null : (
+              <Badge variant="neutral">Nie przyjmuje teraz nowych uczniów</Badge>
+            )}
           </div>
-        </div>
-
-        <div className="flex w-full shrink-0 flex-col gap-group rounded-panel border border-border-divider bg-surface-panel p-panel sm:w-72">
-          <div className="space-y-tight">
-            <span className="text-meta text-text-muted">Sesja próbna 30 min:</span>
-            <p className="text-page-title font-medium text-text-default tabular-nums">
-              {trialRate}
-            </p>
-            <p className="text-meta text-text-subtle tabular-nums">
-              Pełna sesja 60 min: {standardRate}
-            </p>
-          </div>
-          <Button onClick={onBookClick} className="w-full">
-            Wybierz termin sesji
-          </Button>
-          <p className="text-center text-meta text-text-muted">
-            Bezpłatne odwołanie do 12 h przed spotkaniem.
-          </p>
         </div>
       </div>
+
+      <dl className="flex flex-wrap gap-x-group gap-y-group">
+        {isNew ? null : (
+          <>
+            <Stat label="Ocena">
+              {ratingFormat.format(mentor.rating)}{' '}
+              <span className="text-body font-normal text-text-muted">
+                (
+                {formatCount(mentor.reviewsCount, { one: 'opinia', few: 'opinie', many: 'opinii' })}
+                )
+              </span>
+            </Stat>
+            <Stat label="Sesje">{new Intl.NumberFormat('pl-PL').format(mentor.sessions)}</Stat>
+            <Stat label="Wracający uczniowie">{mentor.returningPct}%</Stat>
+          </>
+        )}
+        <Stat label="Odpowiada zwykle w">{mentor.responseHours} h</Stat>
+        <Stat label="Doświadczenie">
+          {formatCount(mentor.yearsExp, { one: 'rok', few: 'lata', many: 'lat' })}
+        </Stat>
+      </dl>
+
+      <p className="text-body-dense text-text-muted">
+        Języki sesji: {mentor.languages.join(', ')}
+        {mentor.companies.length > 0 ? ` · Firmy: ${mentor.companies.join(', ')}` : ''}
+      </p>
     </section>
   );
 }
 
-export function ProfileHeroSkeleton() {
+function ProfileHeroSkeleton() {
   return (
-    <section
-      className="w-full border-b border-border-divider bg-surface-panel px-panel py-section"
-      aria-busy="true"
-    >
-      <div className="mx-auto flex max-w-content flex-col gap-section sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-group sm:flex-row sm:items-start">
-          <Skeleton className="size-avatar-lg shrink-0 rounded-round" />
-          <div className="space-y-group">
-            <div className="space-y-tight">
-              <Skeleton className="h-9 w-64 rounded-control" />
-              <Skeleton className="h-5 w-80 rounded-control" />
-            </div>
-            <div className="space-y-tight">
-              <Skeleton className="h-4 w-full max-w-measure rounded-control" />
-              <Skeleton className="h-4 w-4/5 rounded-control" />
-            </div>
-            <div className="flex gap-inline">
-              <Skeleton className="h-6 w-20 rounded-tag" />
-              <Skeleton className="h-6 w-24 rounded-tag" />
-              <Skeleton className="h-6 w-16 rounded-tag" />
-            </div>
-          </div>
-        </div>
-        <div className="flex w-full shrink-0 flex-col gap-group rounded-panel border border-border-divider p-panel sm:w-72">
-          <Skeleton className="h-8 w-32 rounded-control" />
-          <Skeleton className="h-11 w-full rounded-control" />
+    <div aria-hidden="true" className="flex flex-col gap-group">
+      <div className="flex flex-col gap-group md:flex-row md:items-center">
+        <Skeleton className="size-avatar-lg rounded-round" />
+        <div className="flex flex-1 flex-col gap-inline">
+          <Skeleton className="h-lh w-1/2 text-display" />
+          <Skeleton className="h-lh w-2/3" />
         </div>
       </div>
-    </section>
+      <Skeleton className="h-lh w-full text-section-title md:w-2/3" />
+    </div>
   );
 }
+
+export { type MentorProfileSummary, ProfileHero, type ProfileHeroProps, ProfileHeroSkeleton };
