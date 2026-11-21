@@ -1,0 +1,66 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Czego unikać" />
+
+# Czego unikać
+
+Trzy kategorie. Każdy punkt: jak rozpoznać w kodzie, dlaczego problem, czym zastąpić.
+
+---
+
+## 1. Antywzorce mojego produktu (z referencji)
+
+| # | Antywzorzec | Jak rozpoznać w kodzie | Dlaczego problem | Zastąpić |
+|---|---|---|---|---|
+| A01 | Generyczny wygląd AI: gradienty w tle, tekście, na przyciskach; szkło/rozmycie; poświata; iskierki jako symbol AI | `bg-gradient-to`, `backdrop-blur`, `shadow-[0_0_20px]`, `text-transparent bg-clip-text`, `animate-pulse` na ikonach AI | Rozprasza, nie buduje zaufania, nie jest nasz | Ciepłe tła (`surface-page`, `surface-panel`), jeden akcent (`action-primary`), proste cienie (`shadow-overlay` tylko na nakładkach) |
+| A02 | Sztuczna pilność: liczniki odwrotne poza blokadą, „zostaje 3 minuty”, pulsujące czerwone przyciski | `setInterval` odliczający poza `HoldCountdown`, `animate-bounce` na `Button.destructive` | Użytkownik uczy się ignorować; blokada to jedyny realny limit | Tylko `HoldCountdown` (U1); `AlertDialog` z pełnym tekstem reguły 12 h (A04) |
+| A03 | Gamifikacja: punkty, odznaki, streaki, confetti, „gratulacje!” | Stan `points`/`badges`, `Alert` z `CircleCheck` + „Gratulacje!”, emoji w UI | Mentoring to relacja, nie gra; dezorientuje w sprawach płatnych | Puste stany z humorem (K5), proste potwierdzenia (`Toast`) |
+| A04 | Drobny druk: reguła 12 h w `text-meta`/`text-subtle`, zasady w `Tooltip`, warunki w stopce | `text-text-muted` / `text-text-subtle` przy kluczowych decyzjach, `Tooltip` z warunkami anulowania | Użytkownik nie widzi, co traci; narusza prawo (RODO, konsumenckie) | Pełny tekst obok akcji: `PolicyNotice`, `AlertDialogDescription` (A04) |
+
+---
+
+## 2. Generyczny wygląd AI (wzorce, które się powtarzają w wygenerowanym kodzie)
+
+| # | Wzorzec AI | Jak rozpoznać w kodzie | Dlaczego problem | Zastąpić |
+|---|---|---|---|---|
+| G01 | Gradienty w tle sekcji / na przyciskach | `bg-gradient-to-r from-blue-500 to-purple-600`, `bg-gradient-to-t` w `Card` | Nie pochodzi z tokenów; łamie spójność | `bg-surface-panel`, `bg-action-primary` (tylko przycisk główny) |
+| G02 | Gradienty w tekście (text-transparent bg-clip-text) | `text-transparent bg-clip-text bg-gradient-to-r` na nagłówkach | Niski kontrast, nieczytelne w trybie wysokiego kontrastu | `text-text-default`, `text-page-title` |
+| G03 | Szkło i rozmycie (glassmorphism) | `backdrop-blur-md bg-white/10`, `bg-opacity-10` na panelach | Nie działa w ciemnym motywie, problemy z wydajnością | `bg-surface-panel` + `border-border-divider` |
+| G04 | Poświatka (glow) na kartach / przyciskach | `shadow-[0_0_20px_rgba(99,102,241,0.5)]`, `ring-ring/50` na `Card` | Nie jest nasz styl; `ring` na kartach to Z9 | `shadow-overlay` tylko na `Dialog`/`Menu`/`Popover`/`Toast` |
+| G05 | Emoji zamiast ikon | `🎉`, `✅`, `⚠️`, `🔥` w JSX | Nie skalują się, inne w systemach, nie są `lucide` | `CircleCheck`, `CircleX`, `AlertTriangle`, `Flame` z `lucide-react` |
+| G06 | Iskierki / gwiazdki jako symbol AI | `animate-pulse` na `Sparkles`, `Star` ikona przy funkcjach AI | Nie mamy funkcji AI w UI; myli użytkownika | Zwykłe ikony funkcyjne; jeśli AI — `Bot` z `lucide` (tylko jeśli potrzebne) |
+| G07 | Trzy identyczne karty z ikoną w hero | `grid grid-cols-3` z `Card` + `Icon` + `h3` + `p` | Szablonowy landing page, nie nasz produkt | `ProfileHero` (P3), `MentorCard` (P2) — realne dane |
+| G08 | Wszystko w pigułkach (duże zaokrąglenia) | `rounded-full` na `Button`, `Badge`, `Card`, `Input` | A01 („duże zaokrąglenia na każdym elemencie”) | `rounded-control` 6 px, `rounded-tag` 4 px, `rounded-panel` 8 px |
+| G09 | Karta w karcie (zagnieżdżone `Card`) | `<Card><Card>...</Card></Card>` | Nadmiar ramki, gubienie hierarchii | `Separator` między sekcjami, `Card` najwyżej 1 poziom |
+| G10 | Cień jako jedyny sposób oddzielenia treści | `shadow-lg`/`shadow-xl` na wszystkim, brak `border` | Nie działa w ciemnym motywie, brak hierarchii | `border-border-divider` (linie), `shadow-overlay` (tylko nakładki) |
+| G11 | Wszystko wyśrodkowane (text-center, mx-auto na wszystkim) | `text-center` na sekcjach, `mx-auto` na kontenerach bez `max-w` | Trudne do czytania, nie gęste (R01.1) | `text-left`, `max-w-content` 1160 px, `gap-section` 32/48 px |
+
+---
+
+## 3. Błędy implementacji (łamienie systemu)
+
+| # | Błąd | Jak rozpoznać w kodzie | Dlaczego problem | Zastąpić |
+|---|---|---|---|---|
+| I01 | Wartość spoza tokenów (hex/rgb/hsl/oklch) | `#13463d`, `rgb(19,70,61)`, `oklch(0.5 0.15 140)` w `className` lub `style` | Łamie zasadę 3, nie działa w motywach | Tokeny: `bg-surface-panel`, `text-action-primary`, `border-border-control` |
+| I02 | Klasy palety Tailwinda | `bg-zinc-900`, `text-white`, `border-gray-300`, `hover:bg-slate-700` | Paleta wyłączona w `globals.css`; nie motywowe | Tokeny znaczeniowe |
+| I03 | Wartości arbitralne Tailwinda | `p-[13px]`, `mt-3.5`, `gap-1.5`, `w-[327px]` | Nie ze skali tokenów (4-8-12-16-24-32-48-64) | Tokeny: `p-panel`, `gap-group`, `w-full max-w-content` |
+| I04 | Wariant dodany „przy okazji” (bez planu) | Nowy `cva` variant w `Button`/`Badge` bez wpisu w POSTEP.md i stronie dokumentacji | Rozduża API, niespójność | Proces: ta sama potrzeba w ≥ 2 miejscach → strona „Czego brakuje” → decyzja |
+| I05 | `div`/`span` zamiast przycisku | `<div onClick={...} className="...">Zapisz</div>` | Brak klawiatury, brak ARIA, brak fokusu | `Button` (akcja) / `Link` (nawigacja) |
+| I06 | Placeholder zamiast etykiety | `<Input placeholder="E-mail" />` bez `<FieldLabel>` | WCAG 3.3.2, czytnik nie ogłasza nazwy pola | `Field` z `FieldLabel` + `placeholder="np. jan@kowalski.pl"` |
+| I07 | Status oznaczony tylko kolorem | `<span className="text-green-600">Zaplanowana</span>` bez ikony | WCAG 1.4.1, daltoniści nie widzą | `Badge variant="success"` (ikona + tekst) |
+| I08 | Zablokowany przycisk bez wyjaśnienia | `<Button disabled>Dalej</Button>` bez opisu dlaczego | Użytkownik nie wie, co poprawić (D2) | `Button disabled aria-describedby={reasonId}` + `<p id={reasonId}>Wybierz termin…</p>` |
+| I09 | Toast z błędem wymagającym działania | `toast.add({ title: 'Błąd', description: 'Nie udało się zapłacić', variant: 'danger' })` | Toast znika, użytkownik traci kontekst (R02.4, Z8) | `Alert variant="danger" role="alert"` w treści strony |
+| I10 | Podpowiedź z informacją niezbędną do działania | `<Tooltip content="Musisz zaakceptować regulamin, by kontynuować" />` na przycisku | Tooltip znika na mobile, Escape, hover; informacja zaginie | `FieldDescription` lub `Alert` w treści |
+| I11 | `dark:` w komponentach (zamiast tokenów motywu) | `dark:bg-gray-800`, `dark:text-gray-100` w `className` | Tokeny same przełączają motyw; `dark:` duplikuje logikę | Usuń `dark:`; upewnij się, że tokeny mają wersję `.dark` |
+| I12 | `var(--raw-*)` poza `tokens.css` | `var(--raw-amber-500)` w `Button` zamiast `var(--action-primary)` | Surowa warstwa tylko w `tokens.css`; zmiana = 1 miejsce | Tokeny znaczeniowe (warstwa 2) |
+| I13 | Import z `packages/core` poza `index.ts` | `import { ... } from '@kompas/core/src/modules/...'` | Łamie regułę modułów 4 (spec §2.4) | Import z `@kompas/core/<module>` (publiczne `index.ts`) |
+| I14 | `Date.now()` / `new Date()` / `Math.random()` w `domain/**` | Wykrywany przez `eslint-plugin-boundaries` (`domainPurity`) | Domena musi być deterministyczna (spec §4.1) | `Clock` port / `Temporal.Instant` parametr / `FakeClock` w testach |
+
+---
+
+## Jak to pilnować
+
+1. **`pnpm --filter @kompas/ui check:tokens`** — wykrywa I01, I02, I03, I11, I12 (kod wyjścia ≠ 0)
+2. **`pnpm lint`** — ESLint (`no-restricted-syntax` w `domain/**`) wykrywa I13, I14; TypeScript widzi I04 (nowe warianty bez dokumentacji)
+3. **Code review** — lista kontrolna z `CODE_REVIEW.md` sprawdza I05–I10
+4. **Storybook** — każdy komponent ma sekcję „Dobrze i źle” z parami G01–G11, I01–I12

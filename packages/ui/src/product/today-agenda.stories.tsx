@@ -70,7 +70,8 @@ export const JoinTest: Story = {
     const join = canvas.getAllByRole('button', { name: 'Dołącz do sesji' });
     await expect(join).toHaveLength(1);
     onJoin.mockClear();
-    await userEvent.click(join[0]!);
+    const joinButton = join[0];
+    if (joinButton) await userEvent.click(joinButton);
     await expect(onJoin).toHaveBeenCalledWith(expect.objectContaining({ withName: 'Adrian C.' }));
   },
 };

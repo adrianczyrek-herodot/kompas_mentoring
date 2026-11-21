@@ -1,0 +1,63 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Czego brakuje" />
+
+# Czego brakuje
+
+Tabela pokrycia backlogu Now (E1–E3). Stan: **gotowy** = komponent/ekran w Storybooku ze wszystkimi stanami; **częściowy** = brakuje stanów lub dokumentacji; **brak** = nie zrobiony.
+
+| Pozycja backlogu | Komponent / ekran | Stan | Priorytet | Uwagi |
+|---|---|---|---|---|
+| **E1 Tożsamość** | | | | |
+| P4 Logowanie / rejestracja | `PasswordField`, `RoleChoice`, `ConsentField`, `SocialSignInButtons`, ekran P4 | Gotowy | High | Formularz ze wszystkimi stanami API |
+| S3 Konto | `DataRequestRow`, `ConsentField`, ekran S3 | Gotowy | High | |
+| **E2 Katalog i onboarding** | | | | |
+| P1 Strona główna | `TopicSearch`, `CategoryList`, ekran P1 | Gotowy | High | |
+| P2 Wyszukiwarka | `MentorCard`, `FilterPanel`, `ActiveFilters`, `ResultCount`, ekran P2 | Gotowy | High | Mapa stanów: loading, empty, error, results, narrow |
+| P3 Profil mentora | `ProfileHero`, `StatsRow`, `SkillTags`, `StickyBookingBar`, `FavoriteToggle`, ekran P3 | Gotowy | High | Mapa stanów: loading, not-found, paused, active, narrow |
+| M1 Onboarding (kroki 1–6) | `OnboardingStepper`, `PhotoUpload`, `VideoLinkField`, `RateField`, `ProfileStatus` | Częściowy | Medium | Brakuje: `PhotoUpload`, `VideoLinkField`, `RateField` (tylko szkielety) |
+| A1 Weryfikacja | `ApplicationQueue`, `VerificationChecklist`, `DecisionForm`, ekran A1 | Gotowy | High | Tabela + formularz decyzji ze stanami API |
+| E2-S8 Ulubieni mentorzy | *(zostawiony na test agentem)* | Brak | — | Opis w POSTEP.md Etap 5 |
+| **E3 Dostępność i rezerwacje** | | | | |
+| U1 Wybór terminu | `WeekPicker`, `SlotGrid`, `DurationToggle`, `TimezoneSelect`, `HoldCountdown`, `MentorSummaryBar`, ekran U1 | Gotowy | High | Mapa stanów: free, hold, held, expired, conflict, narrow |
+| U4 Moje sesje | `NextSessionCard`, `SessionListItem`, `BookingStatusBadge`, ekran U4 | Gotowy | High | Mapa stanów: loading, upcoming, room-opens, in-progress, past, narrow |
+| U5 Szczegóły sesji | `PolicyNotice`, `CancelDialog`, `RescheduleSheet`, ekran U5 | Gotowy | High | Mapa stanów: loading, upcoming, room-opens, in-progress, late-cancel, past, narrow |
+| M2 Panel mentora | `TrialRequestCard`, `TodayAgenda`, ekran M2 | Gotowy | High | Mapa stanów: loading, empty, error, requests, agenda, narrow |
+| M3 Kalendarz | `AvailabilityWeek`, `ExceptionForm`, `CalendarSettingsForm` | Brak | Medium | Later (L1) — tylko na tej stronie |
+| S2 Powiadomienia | `NotificationItem` | Brak | Low | Later (L2) — tylko na tej stronie |
+| **Later (L1–L3)** | | | | |
+| U2 Lista oczekujących | — | Brak | — | L1 |
+| U3 Historia | — | Brak | — | L1 |
+| U6 Pokój sesji | — | Brak | — | L1 (rozmowa w centrum, K2) |
+| U7 Notatki po sesji | — | Brak | — | L1 |
+| U8 Cel / kamień / zadanie | — | Brak | — | L2 |
+| U9 Wypłaty mentora | — | Brak | — | L2 |
+| S1 Wiadomości | — | Brak | — | L3 (rozmowa w centrum, K2) |
+| M4 Profil publiczny mentora | — | Brak | — | L3 |
+| M5 Zarobki (szczegóły) | — | Brak | — | L3 |
+| A2 Admin panel | — | Brak | — | L3 |
+
+## Komponenty produktu w gotowych ekranach (spis)
+
+| Komponent | Używany w | Stan dokumentacji |
+|---|---|---|
+| `Money`, `DateTime`, `PageHeader`, `AppHeader` | Wszystkie ekrany | Pełna (13 sekcji) |
+| `MentorCard`, `FilterPanel`, `ActiveFilters`, `ProfileHero`, `StickyBookingBar` | P2, P3 | Pełna |
+| `SlotGrid`, `HoldCountdown`, `PolicyNotice` | U1, U5 | Pełna |
+| `SessionListItem`, `NextSessionCard`, `BookingStatusBadge` | U4, M2 | Pełna |
+| `TrialRequestCard`, `TodayAgenda` | M2 | Pełna |
+| `ApplicationQueue`, `DecisionForm` | A1 | Pełna |
+
+## Co zrobić przed Later
+
+1. Dokończyć `PhotoUpload`, `VideoLinkField`, `RateField` (M1 kroki 2, 3, 4)
+2. Dodać `AvailabilityWeek`, `ExceptionForm`, `CalendarSettingsForm` (M3)
+3. Dodać `NotificationItem` (S2)
+4. Ekran E2-S8 „Ulubieni mentorzy” — test agentem (Etap 5)
+5. Przenieść Later do osobnych specyfikacji / issues
+
+## Propozycje nowych komponentów (gdy pojawią się w ≥ 2 miejscach)
+
+- `ProgressStepper` — jeśli M1 i inne kreatory będą miały wspólny wzorzec kroków
+- `FileDropzone` — jeśli `PhotoUpload` i inne uploady
+- `RevenueChart` — jeśli M5 i U9 będą miały wykresy

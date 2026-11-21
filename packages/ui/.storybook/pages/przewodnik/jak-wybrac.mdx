@@ -1,0 +1,72 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Jak wybrać" />
+
+# Jak wybrać komponent
+
+Tabele decyzyjne: „jeśli… to użyj…”. Każda z przykładem z produktu.
+
+## Akcje: Button vs Link vs ToggleGroup vs Menu
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| Wywołujesz akcję na bieżącej stronie (zapis, rezerwacja, anulowanie) | `Button` (wariant: `default` = główna, `outline` = drugorzędna, `ghost` = cicha, `destructive` = nieodwracalna) | „Zarezerwuj sesję próbną” (P3), „Anuluj sesję” (U5) |
+| Nawigujesz do innego URL / ekranu | `Link` (render=`next/link` w aplikacji) | „Nie pamiętasz hasła?” (P4), „Zostań mentorem” (P1) |
+| Użytkownik wybiera 1 lub kilka widocznych opcji obok siebie (2–4) | `ToggleGroup` (single/multiple) | Długość sesji 30/60 min (U1), pora dnia w filtrze (P2) |
+| Potrzebujesz menu profilu lub akcji wiersza (nawigacja strzałkami, Escape) | `Menu` | Menu awatara (Konto, Zmień rolę, Wyloguj), akcje wiersza w A1 |
+
+## Wybór z listy: RadioGroup vs Select vs Combobox
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| 2–6 opcji, każda z opisem skutku, wyłącznie jeden wybór | `RadioGroup` | Rola: uczyć się / mentorować (P4), powód odrzucenia z opisem (M2, A1) |
+| 7–20 opcji, proste etykiety, lista zawsze pod polem | `Select` | Strefa czasowa (U1, S3), sortowanie (P2), wyprzedzenie/bufor (M3) |
+| Wiele opcji (>15) lub użytkownik musi wyszukać | `Combobox` (single) | Temat w P1/P2, tagi mentora w M1 (multiple z chipami) |
+
+## Przełącznik vs Checkbox
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| Binarne on/off z natychmiastowym efektem (bez zapisu formularza) | `Switch` | „Przyjmuję nowych uczniów” (M3), preferencje powiadomień (S3) |
+| Tak/nie w formularzu (zgoda, filtr), zapis przy submit | `Checkbox` | Zgody P4, „tylko zweryfikowani” (P2), checklista A1 |
+
+## Nakładki: Dialog vs AlertDialog vs Sheet vs Popover vs Tooltip
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| Zadanie wymagające skupienia, formularz, potwierdzenie (focus trap, Escape) | `Dialog` (480/640 px) | Decyzja weryfikacji (A1), wyjątek kalendarza (M3) |
+| Nieodwracalna akcja, czasownik na przycisku, domyślny fokus na „Wróć” | `AlertDialog` | Anulowanie < 12 h (U5), usuwanie konta (S3), usuń z ulubionych (E2-S8) |
+| Panel boczny/dolny, nie blokuje całego ekranu (mobile: pełna szerokość) | `Sheet` (side: right/left/bottom/top) | Filtry na mobile (P2), przełożenie (U5) |
+| Pływające okienko pomocnicze, auto-placement, nie blokuje tła | `Popover` | Wybór tygodnia (U1), filtr pory dnia desktop (P2) |
+| Tylko tekst do odczytu przy ikonie/przycisku, Escape zamyka natychmiast | `Tooltip` | Przyciski samej ikony (M3, U1 nawigacja tygodnia) |
+
+## Komunikaty: FieldError vs Alert vs Toast
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| Błąd walidacji przy polu (ramka + ikona + tekst pod polem) | `FieldError` (w `Field`) | „Wpisz e-mail” (P4), „Opis 10–300 znaków” (M2) |
+| Status w treści strony (baner, reguła 12 h, wstrzymanie) | `Alert` (bez roli domyślnie, `role="alert"` jawnie dla dynamicznych błędów) | „Uczniowie nie mogą cię zarezerwować” (M3), reguła 12 h (U5) |
+| Potwierdzenie po akcji, 409 konflikt, zapisano (aria-live polite) | `Toast` (useToast) | „Termin zajęty” (U1), „Zapisano” (M3), po decyzji (M2, A1) |
+| **Błąd wymagający działania** (np. nieudane zapłaty, brak dostępu) | **`Alert` w treści z `role="alert"`** | Nigdy nie jest toastem (R02.4, WCAG) |
+
+## Ładowanie: Skeleton vs Spinner
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| Cała struktura wczytuje się (karta, wiersz, tabela) | `Skeleton` (aria-hidden, pulsowanie, reduced-motion) | Stan L każdego ekranu (P2, P3, U4, M2) |
+| Wskaźnik w przycisku (loading) lub sekcja | `Spinner` (role="status", aria-label) | Przycisk wysyłania (P4), zapis kroku (M1) |
+
+## Dane: Table vs Lista vs Karty
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| Gęsta tabela liczb z wyrównaniem do prawej, przewijanie poziome | `Table` | Kolejka weryfikacji A1 |
+| Wiersze ze statusem i akcją, gęste, cienkie linie | `SessionListItem` | Moje sesje (U4), panel mentora (M2) |
+| Karty z awatarem, tagami, CTA (wyszukiwarka, profil) | `MentorCard` | Wyszukiwarka (P2), profil (P3), ulubieni (E2-S8) |
+
+## Zakładki vs Osobne strony
+
+| Jeśli… | To użyj | Przykład z produktu |
+|---|---|---|
+| 2–4 widoki tej samej encji, przełączanie bez przeładowania | `Tabs` (podkreślenie, pasek 2 px) | Nadchodzące/Minione (U4), Logowanie/Rejestracja (P4) |
+| Zupełnie różne konteksty, własne URL, SEO | Osobne strony | P2 Wyszukiwarka vs P3 Profil vs U1 Wybór terminu |

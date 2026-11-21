@@ -10,7 +10,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
 | 2. Komponenty bazowe | zrobiony — 30 komponentów, 30 stron MDX, 156 stories × 2 motywy, 0 braków w tokenach | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | zrobiony — 45 komponentów produktu, 8 wzorców, 5 ekranów na pełny ekran, 352 stories × 2 motywy | 2026-11-21 |
-| 4. Strony, które uczą | nie zaczęty | — |
+| 4. Strony, które uczą | zrobiony — 10 stron przewodnika + docs/design-system.md, AGENTS.md | 2026-11-21 |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
 
 ## Materiały (ustalone przez agenta — w prompcie były puste pola `{{…}}`)
@@ -400,8 +400,38 @@ Razem: **40 stories wzorców** z pełnymi stanami i symulacją API.
 - `pnpm --filter @kompas/ui test:stories:themes`: **352/352 testów przechodzi w motywie jasnym i 352/352 w ciemnym** (59 plików stories)
 - `pnpm --filter @kompas/ui build-storybook`: czysta kompilacja do `storybook-static`
 
+## Etap 4 — co powstało (2026-11-21)
+
+### Strony przewodnika (10 stron MDX w `packages/ui/.storybook/pages/przewodnik/`)
+
+| Strona | Plik | Zawartość |
+|---|---|---|
+| Zacznij tutaj | `zacznij-tutaj.mdx` | Charakter produktu, 5 kroków budowy ekranu, tabela wszystkich 84 komponentów z importem, grupą, kiedy/kiedy nie |
+| Komponenty | `komponenty.mdx` | Katalog z podglądem (tabela ComponentTable) |
+| Jak wybrać | `jak-wybrac.mdx` | 6 tabel decyzyjnych: akcje, wybór z listy, przełącznik, nakładki, komunikaty, ładowanie, dane, zakładki |
+| Użycie i dostępność | `uzycie-i-dostepnosc.mdx` | 6 sekcji: klawiatura/fokus, formularze, kolor, ruch, treść, układ + reguły produktu (WCAG, referencje) |
+| Treść | `tresc.mdx` | Ton (3 zdania co mówi/nie mówi), przyciski, błędy, puste stany, formaty, tłumaczenie na dłuższy język |
+| Czego unikać | `czego-unikac.mdx` | 3 kategorie: antywzorce produktu (A01–A04), generyczny wygląd AI (G01–G11), błędy implementacji (I01–I14) — każdy z kodem, dlaczego, zamiennikiem |
+| Czego brakuje | `czego-brakuje.mdx` | Tabela pokrycia backlogu Now (E1–E3): 45 komponentów, 5 ekranów gotowe; Later (L1–L3) brak; propozycje nowych komponentów |
+| Jak zmieniać system | `jak-zmieniac-system.mdx` | Kiedy nowy komponent/wariant, 13 sekcji dokumentacji, co sprawdzić przy tokenie, kto zatwierdza, komendy CI |
+| Epik E1 | `epik-e1.mdx` | Przepływ, 5 komponentów, 2 ekrany, pliki źródłowe, praca w produkcie |
+| Epik E2 | `epik-e2.mdx` | Przepływ, 20 komponentów, 5 ekranów, 4 wzorce, pliki źródłowe, praca w produkcie |
+| Epik E3 | `epik-e3.mdx` | Przepływ, 20 komponentów, 4 ekrany, 5 wzorców, pliki źródłowe, praca w produkcie |
+
+### Dokumentacja dla agentów
+
+- `docs/design-system.md` — skondensowana instrukcja: charakter, tabela 84 komponentów (import/kiedy/kiedy nie), tokeny znaczeniowe, 8 przewodników „jeśli… to…”, TOP 10 Czego unikać, komendy CI, pliki referencyjne, 7-krokowy start nowego ekranu
+- `AGENTS.md` — dodano odwołanie do `docs/design-system.md`
+
+### Sprawdzone (2026-11-21)
+
+- `pnpm --filter @kompas/ui build-storybook`: przechodzi (10 nowych stron + 30 podstaw + 45 komponentów + 8 wzorców + 5 ekranów = 98 stron MDX/stories)
+- `pnpm lint`: 0 błędów (22 ostrzeżenia `max-lines-per-function` w przykładach/stories — akceptowalne)
+- `pnpm typecheck`: 6/6 pakietów bez błędów
+- `pnpm --filter @kompas/ui check:tokens`: **0 wartości spoza tokenów**
+- `pnpm --filter @kompas/ui test:stories:themes`: **352/352 testów** w obu motywach (a11y `error`)
+
 ## Następny krok
 
-**Etap 3 zakończony (kluczowe przepływy: rezerwacja P2→P3→U1→U5 i panel mentora M2).**
-Po „dalej” przechodzimy do **Etapu 4**: Strony, które uczą (Zacznij tutaj, Komponenty, Jak wybrać, Użycie i dostępność, Treść, Czego unikać, Czego brakuje, Jak zmieniać system, strony epików) oraz `docs/design-system.md` dla agentów.
-Następnie **Etap 5**: Pełne sprawdzenie i raport.
+**Etap 4 zakończony (strony przewodnika + docs/design-system.md + AGENTS.md).**
+Po „dalej” przechodzimy do **Etapu 5**: Pełne sprawdzenie i raport (przeglądarka 320/768/1440 oba motywy, e2e z Dockerem, skrypty CI, przygotowanie testu agentem na ekranie E2-S8, raport końcowy).

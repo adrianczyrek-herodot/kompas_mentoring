@@ -1,0 +1,77 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Epik E2 Katalog i onboarding" />
+
+# Epik E2: Katalog i onboarding
+
+Strona główna, wyszukiwarka, profil mentora, onboarding mentora, weryfikacja.
+
+## Przepływ
+
+1. **P1 Strona główna** — wyszukiwanie tematów, kategorie, CTA „Zostań mentorem”
+2. **P2 Wyszukiwarka** — lista mentorów z filtrami, sortowaniem, siatką wyników
+3. **P3 Profil mentora** — hero, statystyki, tagi, opis, widoczność, StickyBookingBar
+4. **M1 Onboarding mentora (kroki 1–6)** — tożsamość, opis+wideo, stawka, dostępność, kalendarz, podsumowanie
+5. **A1 Weryfikacja** — kolejka wniosków, checklisty, forma decyzji
+6. **E2-S8 Ulubieni mentorzy** — (zostawiony na test agentem)
+
+## Komponenty
+
+| Komponent | Ekrany | Stan dokumentacji |
+|---|---|---|
+| `TopicSearch` | P1, P2 | Pełna |
+| `CategoryList` | P1 | Pełna |
+| `MentorCard` / `MentorCardMini` | P2, P1, E2-S8 | Pełna |
+| `FilterPanel` | P2 | Pełna |
+| `ActiveFilters` | P2 | Pełna |
+| `ResultCount` | P2 | Pełna |
+| `ProfileHero` | P3 | Pełna |
+| `StatsRow` | P3 | Pełna |
+| `SkillTags` | P3 | Pełna |
+| `StickyBookingBar` | P3 | Pełna |
+| `FavoriteToggle` | P2, P3, E2-S8 | Pełna |
+| `OnboardingStepper` | M1 | Pełna |
+| `PhotoUpload` | M1 | Częściowy (szkielet) |
+| `VideoLinkField` | M1 | Częściowy (szkielet) |
+| `RateField` | M1 | Częściowy (szkielet) |
+| `ProfileStatus` | M1 | Pełna |
+| `ApplicationQueue` | A1 | Pełna |
+| `VerificationChecklist` | A1 | Pełna |
+| `DecisionForm` | A1 | Pełna |
+
+## Ekrany jako stories
+
+| Story | Plik | Stany (mapa) |
+|---|---|---|
+| P1 Strona główna | `p1-home.stories.tsx` | loading, empty, error, results, narrow |
+| P2 Wyszukiwarka | `p2-search.stories.tsx` | loading, empty, error, results, narrow |
+| P3 Profil mentora | `p3-profile.stories.tsx` | loading, not-found, paused, active, narrow |
+| M1 Onboarding | `m1-onboarding.stories.tsx` | step-1..6, loading, error, narrow |
+| A1 Weryfikacja | `a1-verification.stories.tsx` | loading, empty, error, queue, decision, narrow |
+
+## Wzorce używane
+
+- **Lista z filtrami** (P2) — `FilterPanel` + `ActiveFilters` + `ResultCount` + `MentorCard` list
+- **Widok szczegółów** (P3) — `ProfileHero` + `StickyBookingBar` + sekcje
+- **Formularz** (M1) — `OnboardingStepper` + `ProfileForm` pattern
+- **Decyzja z powodem** (A1) — `DecisionForm` pattern
+
+## Pliki źródłowe
+
+- `packages/ui/src/product/mentor-card.tsx`
+- `packages/ui/src/product/filter-panel.tsx`
+- `packages/ui/src/product/active-filters.tsx`
+- `packages/ui/src/product/profile-hero.tsx`
+- `packages/ui/src/product/sticky-booking-bar.tsx`
+- `packages/ui/src/product/onboarding-stepper.tsx`
+- `packages/ui/src/product/application-queue.tsx`
+- `packages/ui/src/product/decision-form.tsx`
+- `packages/ui/src/screens/p2-search.stories.tsx`
+- `packages/ui/src/screens/p3-profile.stories.tsx`
+- `packages/ui/.storybook/pages/przewodnik/epik-e2.mdx` (ten plik)
+
+## Praca, która zostaje w produkcie
+
+- Dokończenie `PhotoUpload`, `VideoLinkField`, `RateField` (M1 kroki 2–4)
+- Podłączenie wyszukiwarki do API (paginacja, debounce)
+- E2E testy ścieżki P1 → P2 → P3 → U1

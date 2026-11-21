@@ -1,0 +1,80 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="Przewodnik/Treść" />
+
+# Treść i komunikaty
+
+Wszystkie teksty UI w `apps/web/messages/pl.json`. Tu — zasady pisania.
+
+## Ton (z referencji R05.2, R06.1)
+
+**Trzy zdania, które produkt mówi:**
+1. „Oto Twoje wolne terminy — wybierz ten, co Ci pasuje.”
+2. „Sesja została zarezerwowana. Mentor dostał powiadomienie.”
+3. „Nie udało się zapisać zmian. Spróbuj ponownie za chwilę.”
+
+**Trzy zdania, których produkt NIE mówi:**
+1. „Congratulations! You've successfully booked a session!” (angielski, entuzjazm)
+2. „Error 500: Internal server error” (żargon programistyczny)
+3. „🎉 Twój profil jest gotowy! Otrzymujesz 100 punktów!” (emoji, gamifikacja — A03)
+
+## Przyciski
+
+| Reguła | Przykład | Źródło |
+|---|---|---|
+| Czasownik + obiekt (co robi i na czym) | „Zarezerwuj sesję próbną”, „Usuń profil”, „Przełóż sesję” | R05.3 |
+| Akcja destrukcyjna: czasownik bez „potwierdź”/„OK” | „Usuń konto”, „Anuluj sesję”, „Odrzuć prośbę” | Wzorzec potwierdzenia usunięcia |
+| Akcja drugorzędna: „Wróć”, „Anuluj”, „Później” | „Wróć” w `AlertDialog`, „Później” w `Dialog` | R01.6 |
+| Akcja cicha (`ghost`): tylko tekst, brak ramki/tła | „Zmień rolę” w menu profilu | R01.6 |
+| Maks. ~4 słowa, bez końcówek „-ić” jeśli możliwe | „Zapisz” nie „Zapisz zmiany” | Propozycja |
+
+## Błędy
+
+| Reguła | Przykład | Źródło |
+|---|---|---|
+| Co się stało + co zrobić (bez żargonu) | „Nie udało się zarezerwować terminu. Wybierz inny termin.” | R05.2 |
+| Błąd pola: konkretna wymagana poprawka | „E-mail musi zawierać @”, „Opis 10–300 znaków (teraz 5)” | D5, WCAG 3.3.1 |
+| Błąd serwera: proste, bez szczegółów technicznych | „To błąd po naszej stronie. Spróbuj ponownie za chwilę.” | R06.1 |
+| Brak sieci: „Brak połączenia z internetem. Prośba nadal czeka — spróbuj ponownie.” | `ApiResult.kind === 'offline'` | Wzorzec formularza |
+| 409 konflikt terminu: toast z akcją | „Ten termin został właśnie zajęty. Wybierz inny.” | U1, R02.4 |
+
+## Puste stany
+
+| Wariant | Szablon | Przykład | Źródło |
+|---|---|---|---|
+| **Brak wyników dla filtrów** | „Nie znaleziono mentorów pasujących do filtrów.” + przycisk „Wyczyść filtry” | P2, `EmptyState` variant `no-results` | Wzorzec lista z filtrami |
+| **Jeszcze nic tu nie ma** (pierwsze użycie) | „Nie masz jeszcze zaplanowanych sesji.” + przycisk „Znajdź mentora” / „Ustaw dostępność” | U4 (uczeń), M2 (mentor), `EmptyState` variant `first-use` | Wzorzec lista z filtrami |
+| **Brak danych** (np. brak wniosków) | „Nie masz oczekujących wniosków.” (bez przycisku, jeśli nie ma akcji) | A1 (pusta kolejka) | `EmptyState` variant `empty` |
+| Humor **tylko** w powitaniach i pustych stanach pierwszych | „Tu pusto. Jak Twoja kalendarz po urlopie.” | K5 |
+
+## Formaty
+
+| Typ | Komponent | Format PL | Źródło |
+|---|---|---|---|
+| Kwota | `Money` | `4 950 zł` (tabelaryczne, spacja nielamliwa) | R01.3, Spec §6.3 |
+| Kwota w tekście | `Money` | `4 950 zł` | R01.3 |
+| Data | `DateTime` | `15 stycznia 2026` | Brief reguła 10 |
+| Godzina | `DateTime` | `14:30` (24 h) | Brief reguła 10 |
+| Data i godzina | `DateTime` | `15 sty 2026, 14:30` | Brief reguła 10 |
+| Zakres dat | `DateTime` (2×) | `15–21 stycznia 2026` | U1 tydzień |
+| Strefa czasowa | `DateTime` / `TimezoneSelect` | `Europe/Warsaw (UTC+1)` | U1, S3 |
+| Liczba porządkowa | — | `1.`, `2.` (z kropką) | Propozycja |
+| Procent | — | `15 %` (spacja przed %) | Propozycja |
+
+## Tłumaczenie na dłuższy język
+
+- Projektuj na **angielski** (ok. +30 % długości) — polski bywa dłuższy od angielskiego w przyciskach („Zarezerwuj sesję próbną” vs „Book trial session”)
+- `Button` `size="lg"` ma padding 16 px — pomieści do ~25 znaków
+- `FieldLabel` może zawijać się (nie `nowrap`)
+- `Tooltip` max 100 znaków; dłużej → `Popover`
+
+## Czego NIE pisać
+
+| Nigdy | Zamiast |
+|---|---|
+| „Pomyślnie…”, „Udało się…” | Konkretny efekt: „Sesja zarezerwowana” |
+| „Błąd”, „Coś poszło nie tak” | Co się stało + co zrobić |
+| „OK”, „Tak”, „Nie” na przyciskach | Czasownik + obiekt |
+| Emoji w interfejsie | Ikony `lucide-react` (funkcyjne) |
+| „Loading…”, „Spinner” | `Skeleton` (struktura) / `Spinner` (w przycisku) |
+| „0 zł” zamiast braku danych | `EmptyState` / `Skeleton` |

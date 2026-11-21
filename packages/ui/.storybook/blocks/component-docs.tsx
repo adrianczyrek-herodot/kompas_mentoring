@@ -127,3 +127,53 @@ export function ViewportFrame({
     </div>
   );
 }
+
+export interface ComponentIndexItem {
+  name: string;
+  import: string;
+  group: string;
+  when: string;
+  whenNot: string;
+}
+
+/** Table used on "Zacznij tutaj" and "Komponenty" pages. */
+export function ComponentTable({
+  components,
+}: {
+  components: readonly ComponentIndexItem[];
+}) {
+  const groups = [...new Set(components.map((c) => c.group))];
+  return (
+    <div className="space-section">
+      {groups.map((group) => (
+        <section key={group} className="space-panel">
+          <h3 className="text-section-title text-text-default">{group}</h3>
+          <div className="overflow-x-auto">
+            <table className="border-collapse text-left text-body-dense w-full">
+              <thead>
+                <tr className="border-b border-border-control">
+                  <th scope="col" className="px-inline py-row-y text-label font-medium">Komponent</th>
+                  <th scope="col" className="px-inline py-row-y text-label font-medium">Import</th>
+                  <th scope="col" className="px-inline py-row-y text-label font-medium">Kiedy używać</th>
+                  <th scope="col" className="px-inline py-row-y text-label font-medium">Kiedy nie</th>
+                </tr>
+              </thead>
+              <tbody>
+                {components
+                  .filter((c) => c.group === group)
+                  .map((c) => (
+                    <tr key={c.name} className="border-b border-border-divider">
+                      <td className="px-inline py-row-y font-mono text-code">{c.name}</td>
+                      <td className="px-inline py-row-y font-mono text-code">{c.import}</td>
+                      <td className="px-inline py-row-y">{c.when}</td>
+                      <td className="px-inline py-row-y">{c.whenNot}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
