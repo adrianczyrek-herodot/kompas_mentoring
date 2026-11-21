@@ -19,7 +19,7 @@ export function matchRoute(path: string): RouteMatch | null {
   const parts = path.split('/').filter(Boolean);
   
   for (const screen of SCREENS) {
-    const patternParts = screen.pattern.split('/').filter(Boolean);
+    const patternParts = screen.path.split('/').filter(Boolean);
     if (patternParts.length !== parts.length) continue;
     
     const params: Record<string, string> = {};
@@ -79,7 +79,7 @@ export function buildPath(screenId: ScreenId, params: Record<string, string> = {
   const screen = SCREENS.find(s => s.id === screenId);
   if (!screen) return '/';
   
-  let path = screen.pattern;
+  let path = screen.path;
   for (const [key, value] of Object.entries(params)) {
     path = path.replace(`:${key}`, encodeURIComponent(value));
   }

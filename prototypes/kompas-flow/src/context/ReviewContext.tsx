@@ -24,7 +24,7 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
     return [];
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
+  const [activeCommentId, setActiveComment] = useState<string | null>(null);
 
   // Persist to localStorage
   React.useEffect(() => {
