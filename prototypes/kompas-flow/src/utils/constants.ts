@@ -52,3 +52,6 @@ export const DECLINE_REASONS = [
   'Przeciążenie',
   'Inne',
 ];
+
+export const DURATION_OPTIONS = [30, 60];
+export const PLAN_OPTIONS = [1, 2, 3, 5];

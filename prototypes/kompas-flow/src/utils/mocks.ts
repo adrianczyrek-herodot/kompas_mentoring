@@ -181,6 +181,46 @@ export const PLAN_OPTIONS = [1, 2, 3, 5];
 
 export const DURATION_OPTIONS = [30, 60];
 
+export interface Student {
+  id: string; name: string; status: 'aktywny' | 'próbny' | 'nieaktywny'; goal: string; sessions: number;
+  balance: number; plan: string; nextSession?: string; hue: number;
+}
+export const STUDENTS: Student[] = [
+  { id: 'st1', name: 'Adrian C.', status: 'aktywny', goal: 'Pierwsza praca jako frontend dev do marca 2027', sessions: 6, balance: 3, plan: '1×60 min / tydz.', nextSession: '2026-10-20T14:05:00+02:00', hue: 12 },
+  { id: 'st2', name: 'Julia M.', status: 'aktywny', goal: 'Awans na mid w obecnej firmie', sessions: 14, balance: 5, plan: '2×60 min / tydz.', nextSession: '2026-10-20T17:00:00+02:00', hue: 300 },
+  { id: 'st3', name: 'Paweł R.', status: 'próbny', goal: 'Przygotowanie do rozmowy w scale-upie', sessions: 0, balance: 0, plan: '—', nextSession: '2026-10-22T09:00:00+02:00', hue: 190 },
+  { id: 'st4', name: 'Monika K.', status: 'nieaktywny', goal: 'Nauka TypeScript', sessions: 4, balance: 0, plan: 'anulowany', hue: 50 },
+];
+
+export interface Application {
+  id: string; name: string; headline: string; submitted: string; kyc: 'zweryfikowano' | 'oczekuje' | 'niezgodność'; linkedin: boolean; hue: number; categories: string[];
+}
+export const APPLICATIONS: Application[] = [
+  { id: 'a1', name: 'Adam Górski', headline: 'Product Manager · discovery, metryki', submitted: '2026-10-17', kyc: 'zweryfikowano', linkedin: true, hue: 90, categories: ['Product Management'] },
+  { id: 'a2', name: 'Robert Zając', headline: 'iOS Developer · Swift, SwiftUI', submitted: '2026-10-18', kyc: 'oczekuje', linkedin: true, hue: 20, categories: ['Frontend'] },
+  { id: 'a3', name: 'Laura Bielecka', headline: 'Cloud Architect · Azure, Terraform', submitted: '2026-10-19', kyc: 'niezgodnosc', linkedin: false, hue: 230, categories: ['DevOps & Cloud'] },
+];
+
+export interface Earning { date: string; student: string; type: string; gross: number; fee: number; status: 'dostępne' | 'oczekujące' | 'wypłacone'; }
+export const EARNINGS: Earning[] = [
+  { date: '2026-10-19', student: 'Julia M.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'oczekujące' },
+  { date: '2026-10-17', student: 'Julia M.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'dostępne' },
+  { date: '2026-10-18', student: 'Adrian C.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'dostępne' },
+  { date: '2026-10-14', student: 'Monika K.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'dostępne' },
+  { date: '2026-10-09', student: 'Adrian C.', type: 'Sesja próbna', gross: 49, fee: 49, status: 'wypłacone' },
+  { date: '2026-10-08', student: 'Julia M.', type: 'Plan 60 min', gross: 180, fee: 36, status: 'wypłacone' },
+];
+
+export interface Dispute { id: string; sessionId: string; student: string; mentor: string; reason: string; opened: string; amount: number; events: string[]; studentSays: string; mentorSays: string; resolved?: boolean; }
+export const DISPUTES: Dispute[] = [
+  { id: 'd1', sessionId: 's-901', student: 'Filip W.', mentor: 'Marek Lis', reason: 'Mentor się nie pojawił', opened: '2026-10-18', amount: 260,
+    events: ['18:00:12 — uczeń dołączył do pokoju', '18:10:40 — uczeń kliknął „Mentor się nie pojawił”', '18:14:02 — mentor dołączył do pokoju', '18:15:30 — uczeń opuścił pokój'],
+    studentSays: 'Czekałem 10 minut, potem zgłosiłem problem i wyszedłem.', mentorSays: 'Miałem awarię internetu, dołączyłem z 14-minutowym opóźnieniem.' },
+  { id: 'd2', sessionId: 's-877', student: 'Hanna P.', mentor: 'Natalia Kurek', reason: 'Sesja niezgodna z opisem', opened: '2026-10-19', amount: 150,
+    events: ['17:00:01 — obie strony w pokoju', '17:58:44 — koniec sesji'],
+    studentSays: 'Chciałam omówić research, a rozmawiałyśmy tylko o Figmie.', mentorSays: 'Cel sesji w rezerwacji dotyczył Figmy.' },
+];
+
 // Helper functions
 export const mentorById = (id: string) => MENTORS.find((m) => m.id === id);
 export const sessionById = (id: string) => SESSIONS.find((s) => s.id === id);
@@ -267,6 +307,8 @@ export function formatDayName(date: Date): string {
 export function formatDayNumber(date: Date): string {
   return date.toLocaleString('pl-PL', { day: '2-digit' });
 }
+
+export const OFF_PLATFORM = /(\+?\d[\d\s-]{7,}\d)|([^\s@]+@[^\s@]+\.[a-z]{2,})|(whatsapp|telegram|revolut|blik na)/i;
 
 export interface StudentPersona {
   id: string;

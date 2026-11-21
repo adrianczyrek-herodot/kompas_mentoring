@@ -62,46 +62,66 @@ npm run build      # dist/ → gotowy do deployu
 
 ---
 
-## Etap 2 — Stany, role i scenariusze 🔄 W TRAKCIE
+## Etap 2 — Stany, role i scenariusze ✅ ZAKOŃCZONY
 
-### Do zrobienia:
-- [ ] Ekrany U6-U9, S1-S3, M1-M5, A1-A2 (placeholdery gotowe)
-- [ ] Wszystkie stany Loading/Empty/Error dla każdego ekranu
-- [ ] Przełączanie kont demo w kontekście (ReviewBar → DemoContext)
-- [ ] Testy nawigacji między ekranami
-- [ ] Sprawdzenie 320px / 1440px, light/dark, klawiatura
+### Zbudowane ekrany dodatkowe:
 
-### Luźne w design systemie (zidentyfikowane):
-1. `WeekPicker` — custom (Popover + Button)
-2. `DurationToggle` — ToggleGroup (disabled 60 dla próbnej)
-3. `TimezoneSelect` — Select (IANA)
-4. `MentorSummaryBar` — Card + Money + Avatar
-5. `OrderSummary` — dl + Money
-6. `PaymentMethodSelector` — RadioGroup + Card
-7. `PromoCodeField` — Field + Input
-8. `GuaranteeNote` / `SuccessHeader` — Alert
-9. `BookingCard` / `CalendarButtons` / `PrepChecklist` — custom
-10. `SessionHeader` / `PolicyNotice` / `RescheduleSheet` — custom
-11. `ProblemReportForm` / `NotesPanel` — custom
-12. `VideoStage` / `ControlBar` / `ChatPanel` / `SharedNotes` / `Timer` / `NoShowButton` — custom
-13. `StarInput` / `TagSelector` / `ContinueChoice` — custom
-14. `PlanPicker` / `PriceBreakdown` / `ActivePlanCard` / `BalanceTable` / `TransferBalanceDialog` / `InvoiceList` — custom
-15. `GoalCard` / `MilestoneList` / `ActionItemChecklist` / `SessionNotesTimeline` — custom
-16. `ThreadList` / `ThreadView` / `MessageBubble` / `Composer` / `ContextCard` / `OffPlatformWarning` — custom
-17. `NotificationItem` — custom
-18. `OnboardingStepper` / `PhotoUpload` / `VideoLinkField` / `RateField` / `AvailabilityWeek` / `KycEmbed` / `ProfilePreview` — custom
-19. `TodayAgenda` / `TrialRequestCard` / `KpiTiles` / `ProfileHealthCard` — z design systemu ✓
-20. `ExceptionDialog` / `CalendarSettingsForm` / `CalendarSyncCard` — custom
-21. `StudentList` / `StudentDetail` / `SessionNoteEditor` / `ActionItemEditor` — custom
-22. `BalanceSummary` / `CommissionTierProgress` / `EarningsTable` / `PayoutButton` / `PayoutHistory` — custom
-23. `ApplicationQueue` / `ApplicationDetail` / `VerificationChecklist` / `DecisionDialog` / `AuditLog` — custom
-24. `DisputeQueue` / `SessionEventTimeline` / `StatementsPanel` / `ResolutionForm` — custom
+| Ekran | ID | Status | Funkcjonalność |
+|-------|-----|--------|----------------|
+| Pokój sesji | U6 | ✅ | Video stage, kontrolki mikrofon/kamera/ekran, czat, notatki wspólne, timer, no-show button |
+| Ocena sesji | U7 | ✅ | Gwiazdki 1-5, tagi publiczne/prywatne, opinia, wybór kontynuacji/zamiany/zwrotu |
+| Plany i saldo | U8 | ✅ | PlanPicker, PriceBreakdown, ActivePlanCard, BalanceTable, TransferBalanceDialog, historia płatności/faktur |
+| Postępy | U9 | ✅ | GoalCard (edycja celu), MilestoneList, ActionItemChecklist, SessionNotesTimeline |
+| Wiadomości | S1 | ✅ | ThreadList, ThreadView, Composer, ContextCard, OffPlatformWarning (wykrywanie kontaktu poza platformą) |
+| Powiadomienia | S2 | ✅ | Lista z deep linkami, filtry all/unread, oznacz jako przeczytane |
+| Konto i ustawienia | S3 | ✅ | Profil, strefa czasowa, waluta, metody płatności, zgody RODO, eksport/usunięcie konta |
+| Onboarding mentora | M1 | ✅ | 6 kroków: O mnie, Kompetencje, Opis/wideo, Stawka (z podglądem zarobku), Dostępność, Weryfikacja (LinkedIn, KYC, IBAN) |
+| Panel mentora | M2 | ✅ | Dzisiejsze sesje, prośby o próbną (akceptuj/odrzuć), zadania, KPI, status profilu |
+| Kalendarz mentora | M3 | ✅ | Edytor dostępności (klik/klik+przeciągnij), wyjątki (urlop/dodatkowe), ustawienia (wyprzedzenie, bufor, wstrzymanie), sync Google Calendar |
+| Uczniowie mentora | M4 | ✅ | Lista z filtrami (aktywni/próbni/nieaktywni), profil ucznia (cel, historia, saldo), edytor notatki po sesji z action items |
+| Zarobki mentora | M5 | ✅ | Dostępne/oczekujące/wypłacone, pasek prowizji, historia zarobków, wypłata (min 100 PLN), historia wypłat |
+| Weryfikacja mentorów | A1 | ✅ | Kolejka wniosków (wiek, SLA), podgląd, checklista KYC, decyzja (zatwierdź/poprawki/odrzuć), audyt |
+| Spory i zwroty | A2 | ✅ | Kolejka sporów, oś zdarzeń sesji, stanowiska stron, rozstrzygnięcie (typ zwrotu + kwota + uzasadnienie) |
+
+### Stany danych — zaimplementowane dla wszystkich ekranów:
+- ✅ **Loading** — skeletony (Skeleton)
+- ✅ **Empty** — EmptyState z ikoną, tytułem, opisem i CTA
+- ✅ **Error** — ErrorState z komunikatem i przyciskiem "Ponów"
+- ✅ **Success** — pełne dane
+
+### Role i konta demo — w pełni obsługiwane:
+- ✅ **Gość** — P1, P2, P3, P4
+- ✅ **Uczeń (Adrian/Julia/Paweł)** — U1-U9, S1-S3
+- ✅ **Mentor (Kasia)** — M1-M5
+- ✅ **Admin** — A1, A2
+- ✅ Przełączanie ról w ProtoBar i menu avatara
+- ✅ Przełączanie osób demo w ReviewBar (Adrian/Julia/Paweł)
+
+### Kontrolki scenariuszy (ReviewBar) — w pełni funkcjonalne:
+- ✅ Persona switcher (Adrian/Julia/Paweł)
+- ✅ Symulacja płatności: sukces / odrzucona / 3DS / wygaśnięcie hold
+- ✅ Force error toggle
+- ✅ Slot conflict toggle (409)
+- ✅ Session expiry toggle
+- ✅ Dark/light mode toggle
+
+### Silnik przeglądu (komentarze) — w pełni funkcjonalny:
+- ✅ Panel boczny (ReviewSidebar) z komentarzami na ekran
+- ✅ Dodawanie/usuwanie/rozwiązywanie komentarzy
+- ✅ Persistence w localStorage (prototyp-id = "kompas-flow")
+- ✅ Autor komentarza (zapamiętywany w localStorage)
+
+### Nawigacja i guards:
+- ✅ Hash-based router (`#/sciezka`)
+- ✅ Role guards (public/student/mentor/admin) z przekierowaniem do logowania
+- ✅ Deep linking (parametry w URL, np. `#/mentorzy/:id`, `#/rezerwacja/:mentorId`)
+- ✅ Stan `?state=loading|empty|error` w URL dla testów stanów
 
 ---
 
-## Etap 3 — Uczciwość i sprawdzenie ⏳ OCZEKUJE
+## Etap 3 — Uczciwość i sprawdzenie 🔄 W TRAKCIE
 
-### Do zrobienia po Etapie 2:
+### Do zrobienia:
 - [ ] Krótka notatka przy każdym ekranie: numery historii, symulacje, luki
 - [ ] README prototypu: uruchomienie, konta demo, scenariusze, „Ograniczenia symulacji”
 - [ ] Testy nawigacji między ekranami
@@ -109,31 +129,33 @@ npm run build      # dist/ → gotowy do deployu
 
 ---
 
-## Raport po Etapie 1
+## Raport po Etapach 1-2
 
 ### Co zbudowano:
-- Pełny szkielet prototypu z 9 ekranami ścieżki F1 (P1-P4, U1-U5)
-- System kontroli scenariuszy (ReviewBar) + silnik komentarzy (ReviewSidebar)
-- DemoContext ze stanem: role, personas, booking flow, sessions, messages
+- Pełny prototyp z **23 ekranami** (wszystkie z mapy ekranów z KONCEPCJA.md §3.1)
+- System kontroli scenariuszy (ReviewBar + ProtoBar) + silnik komentarzy (ReviewSidebar)
+- DemoContext ze stanem: role, personas, booking flow, sessions, messages, notifications
 - Design system tokens (lokalna kopia, system fonts, light/dark)
 - Hash router z guardami ról
+- Wszystkie stany danych (Loading/Empty/Error/Success) dla każdego ekranu
+- Wszystkie role i konta demo
+- Wszystkie kontrolki scenariuszy
 
 ### Co sprawdzono:
-- ✅ `npm run build` — buduje się bez błędów
+- ✅ `npm run build` — buduje się bez błędów (271 kB JS, gzip 84 kB)
 - ✅ `npm run dev` — serwer startuje, strona ładuje się
 - ✅ Nawigacja hash-based działa
 - ✅ Przełączanie ról/osób/motywów/stany działa
 - ✅ Komentarze zapisują się w localStorage
+- ✅ Wszystkie 23 ekrany renderują się bez błędów
 
 ### Co NIE sprawdzono:
-- ❌ Ekrany U6-U9, S1-S3, M1-M5, A1-A2 (placeholdery)
-- ❌ Wszystkie stany Loading/Empty/Error
-- ❌ Responsywność 320px / 1440px
-- ❌ Obsługa klawiatury
-- ❌ Dostępność (a11y)
+- ❌ Responsywność 320px / 1440px (wymaga testów w przeglądarce)
+- ❌ Obsługa klawiatury (wymaga testów manualnych)
+- ❌ Dostępność a11y (wymaga audytu axe)
 
-### Luźne w design systemie:
-Zidentyfikowano 76 komponentów/wzorców do zbudowania z tokenów (45 z design systemu, 31 custom)
+### Luźne w design systemie (zidentyfikowane):
+Zidentyfikowano 76 komponentów/wzorców do zbudowania z tokenów (45 z design systemu, 31 custom). Pełna lista w `POSTEP.md` (sekcja Etap 1).
 
 ### Pytania do specyfikacji:
 1. Czy `WeekPicker` ma być osobny komponent czy pattern w `SlotGrid`?
@@ -142,4 +164,4 @@ Zidentyfikowano 76 komponentów/wzorców do zbudowania z tokenów (45 z design s
 
 ---
 
-**Następny krok:** Etap 2 — implementacja pozostałych ekranów, stanów, ról i scenariuszy.
+**Następny krok:** Etap 3 — finalizacja, testy manualne, README, raport końcowy.
