@@ -1,0 +1,52 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as M2Stories from './m2-dashboard.stories';
+
+<Meta of={M2Stories} />
+
+# M2 · Panel mentora
+
+**Cel:** Zobaczyć, co wymaga uwagi dzisiaj: sesje i prośby o sesję próbną (KONCEPCJA §M2, E3-S7).
+**Kto i gdzie:** Mentor · `/mentor`. Ekran składa się wyłącznie z komponentów pakietu; dane z mockupów.
+
+## Mapa stanów
+
+Każdy stan ekranu ma swoją story. Oznaczenia L / E / Er / S jak w KONCEPCJI (ładowanie, pusto, błąd, sukces).
+
+| Stan | Co widzi użytkownik | Story |
+|---|---|---|
+| S — typowy dzień | Dzisiejsze sesje („Dołącz” przy otwartym pokoju) i prośby z akcjami | `Typical` |
+| E — brak sesji dzisiaj | Pusty stan z następnym krokiem (kalendarz) | `NoSessions` |
+| E — brak próśb | Pusty stan sekcji próśb | `NoRequests` |
+| L — ładowanie | Szkielety obu sekcji | `Loading` |
+| Er — błąd jednej sekcji | Błąd z Ponów tylko w sekcji, która padła (KONCEPCJA §M2 „Ponów per sekcja”) | `SectionError` |
+
+## Z czego jest zbudowany
+
+- `AppHeader` (mentor), `PageHeader`, `TodayAgenda`, `TrialRequestCard`, `Dialog`, `RadioGroup`, `Textarea`, `Toast`
+- Wzorzec: [Decyzja z powodem](?path=/docs/wzorce-decyzja-z-powodem--docs)
+
+## Co zostaje w produkcie
+
+- Nieodpisane wiadomości, zadania „uzupełnij notatkę”, statystyki tygodnia (`KpiTiles`), status profilu — w „Czego brakuje”.
+
+## Stany
+
+### S — typowy dzień
+
+<Canvas of={M2Stories.Typical} layout="fullscreen" />
+
+### E — brak sesji dzisiaj
+
+<Canvas of={M2Stories.NoSessions} layout="fullscreen" />
+
+### E — brak próśb
+
+<Canvas of={M2Stories.NoRequests} layout="fullscreen" />
+
+### L — ładowanie
+
+<Canvas of={M2Stories.Loading} layout="fullscreen" />
+
+### Er — błąd jednej sekcji
+
+<Canvas of={M2Stories.SectionError} layout="fullscreen" />

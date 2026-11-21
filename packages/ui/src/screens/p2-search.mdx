@@ -1,0 +1,53 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as P2Stories from './p2-search.stories';
+
+<Meta of={P2Stories} />
+
+# P2 · Wyszukiwarka mentorów
+
+**Cel:** Porównać mentorów i wybrać 1–3 do obejrzenia (KONCEPCJA §P2, E2-S5).
+**Kto i gdzie:** Uczeń / gość · `/mentorzy`. Ekran składa się wyłącznie z komponentów pakietu; dane z mockupów.
+
+## Mapa stanów
+
+Każdy stan ekranu ma swoją story. Oznaczenia L / E / Er / S jak w KONCEPCJI (ładowanie, pusto, błąd, sukces).
+
+| Stan | Co widzi użytkownik | Story |
+|---|---|---|
+| S — lista wyników | Lista `MentorCard`, licznik, filtry z boku (≥ 768 px) albo w panelu dolnym | `Results` |
+| S — aktywne filtry | Filtry jako przyciski do usunięcia, licznik po każdej zmianie | `Filtered` |
+| L — ładowanie | 6 szkieletów wierszy (KONCEPCJA §P2 L) | `Loading` |
+| E — brak wyników dla filtrów | „Brak mentorów dla tych filtrów” + „Wyczyść filtr X” dla filtra najbardziej zawężającego (E2-S5 T3) | `NoResults` |
+| Er — błąd | „Nie udało się wczytać listy” + Ponów, filtry zostają | `ErrorLoading` |
+
+## Z czego jest zbudowany
+
+- `AppHeader`, `PageHeader`, `ActiveFilters`, `MentorCard`, `Select`, `Slider`, `Switch`, `Sheet`, `EmptyState`, `ErrorState`
+- Wzorzec: [Lista z filtrami](?path=/docs/wzorce-lista-z-filtrami--docs)
+
+## Co zostaje w produkcie
+
+- Sortowanie (`SortSelect`), paginacja nieskończona, ulubione (E2-S8), podgląd wideo, filtry dostępności (E2-S5 T4) i języka — w „Czego brakuje”.
+- Filtry w URL i filtrowanie po stronie serwera — po stronie aplikacji.
+
+## Stany
+
+### S — lista wyników
+
+<Canvas of={P2Stories.Results} layout="fullscreen" />
+
+### S — aktywne filtry
+
+<Canvas of={P2Stories.Filtered} layout="fullscreen" />
+
+### L — ładowanie
+
+<Canvas of={P2Stories.Loading} layout="fullscreen" />
+
+### E — brak wyników dla filtrów
+
+<Canvas of={P2Stories.NoResults} layout="fullscreen" />
+
+### Er — błąd
+
+<Canvas of={P2Stories.ErrorLoading} layout="fullscreen" />

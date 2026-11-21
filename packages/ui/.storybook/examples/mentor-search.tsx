@@ -166,6 +166,7 @@ export function MentorSearch({
   onRetry?: () => void;
 }) {
   const [filters, setFilters] = useState(initialFilters);
+  const resultsId = useId();
   const results = mentors.filter((mentor) => matches(mentor, filters));
   const active = activeOf(filters);
   // „Wyczyść filtr X” for the filter whose removal brings back the most results (E2-S5 T3).
@@ -204,7 +205,13 @@ export function MentorSearch({
         </Sheet>
       </div>
 
-      <section aria-label="Wyniki" className="flex min-w-0 flex-1 flex-col gap-inline">
+      <section
+        aria-labelledby={`${resultsId}-h`}
+        className="flex min-w-0 flex-1 flex-col gap-inline"
+      >
+        <h2 id={`${resultsId}-h`} className="sr-only">
+          Wyniki
+        </h2>
         {status === 'ready' ? (
           <ActiveFilters
             resultCount={results.length}
@@ -223,7 +230,7 @@ export function MentorSearch({
           </div>
         ) : status === 'error' ? (
           <ErrorState
-            titleAs="h2"
+            titleAs="h3"
             title="Nie udało się wczytać listy"
             description="Sprawdź połączenie i spróbuj ponownie. Filtry zostaną zachowane."
             action={
@@ -234,7 +241,7 @@ export function MentorSearch({
           />
         ) : results.length === 0 ? (
           <EmptyState
-            titleAs="h2"
+            titleAs="h3"
             icon={<SearchX />}
             title="Brak mentorów dla tych filtrów"
             description={

@@ -76,14 +76,14 @@ oglądającego — godziny przelicza `timeZone`:
 |---|---|---|
 | Najechanie, fokus, wciśnięcie slotu | jak `Button outline` | zob. strona `Button`, D3, D4 |
 | Wybrany | tylko jeden slot naraz; ponowny wybór innego zdejmuje poprzedni | KONCEPCJA §U1 |
-| Zablokowany „Poprzedni tydzień” | w bieżącym tygodniu (`canGoPrev={false}`) — rezerwacja wstecz jest niemożliwa. **Do poprawy:** komponent nie pokazuje powodu tekstem, czego wymaga D2 | KONCEPCJA §U1, D2 |
+| Bez „Poprzedni tydzień” | w bieżącym tygodniu (`canGoPrev={false}`) przycisku nie ma — rezerwacja wstecz jest niemożliwa, a zablokowany przycisk bez powodu łamałby D2 | KONCEPCJA §U1, D2 |
 | Slot zajęty w międzyczasie (409) | ekran pokazuje toast „Ten termin został właśnie zajęty” i odświeża sloty | KONCEPCJA §U1 (Er), F1 |
 
 ## 7. Zachowanie i dostępność
 
 | Zasada | Źródło |
 |---|---|
-| Kolejność Tab: „Poprzedni tydzień” → „Następny tydzień” → sloty dzień po dniu, od góry. | WCAG 2.4.3 |
+| Kolejność Tab: „Poprzedni tydzień” (jeśli jest) → „Następny tydzień” → sloty dzień po dniu, od góry. | WCAG 2.4.3 |
 | Slot to przycisk przełącznika: Enter lub Spacja wybiera; czytnik ogłasza grupę dnia i stan, np. „czw., 22 paź, grupa — 18:00, przycisk przełącznika, niewciśnięty”. | WAI-ARIA APG (Button, toggle), WCAG 4.1.2, story `SelectTest` |
 | Dzień jako `fieldset` + `legend` — godzina ma kontekst dnia bez powtarzania daty w każdym przycisku. | WCAG 1.3.1 |
 | Przyciski tygodnia z samą ikoną mają `aria-label` („Poprzedni tydzień”, „Następny tydzień”); ikony `aria-hidden`. | WCAG 4.1.2, 1.1.1 |
@@ -124,7 +124,8 @@ oglądającego — godziny przelicza `timeZone`:
 | `selectedSlotId` | `string` | — | id wybranego slotu |
 | `onSelect` | `(slot: Slot) => void` | — | wybór slotu |
 | `onPrevWeek` / `onNextWeek` | `() => void` | — | przewijanie tygodni |
-| `canGoPrev` | `boolean` | `true` | `false` w bieżącym tygodniu |
+| `canGoPrev` | `boolean` | `true` | `false` w bieżącym tygodniu — ukrywa „Poprzedni tydzień” |
+| `layout` | `'week' \| 'stacked'` | `'week'` | `week` — 7 kolumn od 768 px; `stacked` — dni jeden pod drugim (wąskie panele, `Sheet` przełożenia w U5) |
 | `nextAvailable` | `string` (ISO) | — | pierwszy wolny termin po tym tygodniu (stan pusty) |
 | `onJumpToNext` | `() => void` | — | skok do tygodnia z `nextAvailable` |
 | `onRetry` | `() => void` | — | „Ponów” w stanie błędu |

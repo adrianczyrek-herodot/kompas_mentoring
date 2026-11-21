@@ -1,0 +1,67 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as U1Stories from './u1-booking.stories';
+
+<Meta of={U1Stories} />
+
+# U1 · Wybór terminu
+
+**Cel:** Wybrać slot sesji próbnej lub kolejnej sesji i zablokować go na 10 minut (KONCEPCJA §U1, E3-S4).
+**Kto i gdzie:** Uczeń · `/rezerwacja/:mentorId`. Ekran składa się wyłącznie z komponentów pakietu; dane z mockupów.
+
+## Mapa stanów
+
+Każdy stan ekranu ma swoją story. Oznaczenia L / E / Er / S jak w KONCEPCJI (ładowanie, pusto, błąd, sukces).
+
+| Stan | Co widzi użytkownik | Story |
+|---|---|---|
+| Start | Siatka tygodnia w strefie ucznia, „Dalej” zablokowane z powodem | `Default` |
+| Sesja z planu | Dodatkowo wybór długości 30 / 60 min | `Plan` |
+| S — termin wybrany | Slot zaznaczony (`aria-pressed`), „Dalej” aktywne | `Selected` |
+| Blokada aktywna | Odliczanie 10 min i „Przejdź do płatności” | `Held` |
+| Er — konflikt 409 | Toast „Ten termin został właśnie zajęty”, slot znika z siatki | `Conflict` |
+| L — ładowanie | Szkielet siatki | `Loading` |
+| E — brak terminów | „Następny wolny termin” albo informacja o 14 dniach | `Empty` |
+| Er — błąd pobrania | „Nie udało się wczytać terminów” + Ponów | `ErrorLoading` |
+
+## Z czego jest zbudowany
+
+- `PageHeader`, `SlotGrid`, `ToggleGroup`, `PolicyNotice`, `HoldCountdown`, `Money`, `Toast`
+- Wzorzec: [Wybór terminu z blokadą](?path=/docs/wzorce-wybór-terminu-z-blokadą--docs)
+
+## Co zostaje w produkcie
+
+- Zmiana strefy czasowej (`TimezoneSelect`), przewijanie tygodni z danymi, checkout U2 — w „Czego brakuje”.
+
+## Stany
+
+### Start
+
+<Canvas of={U1Stories.Default} layout="fullscreen" />
+
+### Sesja z planu
+
+<Canvas of={U1Stories.Plan} layout="fullscreen" />
+
+### S — termin wybrany
+
+<Canvas of={U1Stories.Selected} layout="fullscreen" />
+
+### Blokada aktywna
+
+<Canvas of={U1Stories.Held} layout="fullscreen" />
+
+### Er — konflikt 409
+
+<Canvas of={U1Stories.Conflict} layout="fullscreen" />
+
+### L — ładowanie
+
+<Canvas of={U1Stories.Loading} layout="fullscreen" />
+
+### E — brak terminów
+
+<Canvas of={U1Stories.Empty} layout="fullscreen" />
+
+### Er — błąd pobrania
+
+<Canvas of={U1Stories.ErrorLoading} layout="fullscreen" />
