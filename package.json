@@ -18,7 +18,9 @@
     "test:e2e": "turbo run test:e2e",
     "db:migrate": "pnpm --filter @kompas/core run db:migrate",
     "db:seed": "pnpm --filter @kompas/core run db:seed",
-    "hooks:install": "lefthook install"
+    "hooks:install": "lefthook install",
+    "storybook": "pnpm --filter @kompas/ui storybook",
+    "build-storybook": "pnpm --filter @kompas/ui build-storybook"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

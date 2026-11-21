@@ -1,0 +1,293 @@
+/*
+ * Kompas design tokens — the only file allowed to contain raw values (colours, sizes, durations).
+ * Approved table: lekcja-06/tokeny.md (2026-11-11). Decision ids: R/A/K → lekcja-06/referencje.md,
+ * P-T → agent proposals approved with the table, Z → packages/ui/POSTEP.md.
+ *
+ * Layer 1  --raw-*        raw palette and scales; never referenced outside this file.
+ * Layer 2  semantic       named by purpose (surface-page, action-primary, space-section…).
+ * Layer 3  component      only where a component needs its own value.
+ *
+ * Theme: light on :root, dark on `.dark` set on <html> (documentElement), so portalled
+ * dialogs, menus and popovers inherit it.
+ */
+
+/* ---------- Layer 1: raw values ---------- */
+:root {
+  /* warm neutrals, light (R03.1, R04.1) */
+  --raw-paper-50: #fdfbf7;
+  --raw-paper-100: #f6f3ec;
+  --raw-paper-200: #efeae0;
+  --raw-paper-300: #e3ddd1;
+  --raw-stone-500: #8c8275;
+  --raw-stone-600: #6b6358;
+  --raw-stone-700: #5a5249;
+  --raw-ink-900: #211d18;
+  /* warm neutrals, dark */
+  --raw-night-950: #141210;
+  --raw-night-900: #1a1714;
+  --raw-night-800: #24201b;
+  --raw-night-700: #38322b;
+  --raw-night-500: #857a6c;
+  --raw-sand-300: #a89d8e;
+  --raw-sand-200: #c4b9aa;
+  --raw-sand-50: #f1ebe1;
+  /* amber accent (K4, R06.2) */
+  --raw-amber-100: #fbeadb;
+  --raw-amber-450: #de8240;
+  --raw-amber-500: #d4702a;
+  --raw-amber-550: #cc6c28;
+  --raw-amber-800: #a4480f;
+  --raw-amber-dark-200: #f4b47e;
+  --raw-amber-dark-300: #f3ac70;
+  --raw-amber-dark-400: #f0a060;
+  --raw-amber-dark-500: #e8904c;
+  --raw-amber-dark-900: #3d2c1d;
+  /* status hues */
+  --raw-white: #ffffff;
+  --raw-red-100: #fbe5e2;
+  --raw-red-700: #b4352a;
+  --raw-red-dark-400: #f07b6f;
+  --raw-red-dark-900: #3d211d;
+  --raw-green-100: #e2f2e7;
+  --raw-green-700: #2f7a4a;
+  --raw-green-dark-400: #6fcf8f;
+  --raw-green-dark-900: #1b3324;
+  --raw-yellow-100: #fdf1d6;
+  --raw-yellow-800: #8a5a00;
+  --raw-yellow-dark-400: #e8b85a;
+  --raw-yellow-dark-900: #3a2f16;
+  --raw-shadow-light: rgb(33 29 24 / 0.12);
+  --raw-shadow-dark: rgb(0 0 0 / 0.5);
+
+  /* spacing scale (4-based) */
+  --raw-space-0: 0px;
+  --raw-space-1: 4px;
+  --raw-space-2: 8px;
+  --raw-space-3: 12px;
+  --raw-space-4: 16px;
+  --raw-space-6: 24px;
+  --raw-space-8: 32px;
+  --raw-space-12: 48px;
+  --raw-space-16: 64px;
+
+  /* radii */
+  --raw-radius-4: 4px;
+  --raw-radius-6: 6px;
+  --raw-radius-8: 8px;
+  --raw-radius-full: 9999px;
+
+  /* type scale (px → rem at 16 px root) */
+  --raw-font-13: 0.8125rem;
+  --raw-font-14: 0.875rem;
+  --raw-font-16: 1rem;
+  --raw-font-18: 1.125rem;
+  --raw-font-22: 1.375rem;
+  --raw-font-24: 1.5rem;
+  --raw-font-28: 1.75rem;
+  --raw-font-36: 2.25rem;
+  --raw-leading-18: 1.125rem;
+  --raw-leading-20: 1.25rem;
+  --raw-leading-24: 1.5rem;
+  --raw-leading-26: 1.625rem;
+  --raw-leading-28: 1.75rem;
+  --raw-leading-32: 2rem;
+  --raw-leading-36: 2.25rem;
+  --raw-leading-44: 2.75rem;
+
+  /* durations */
+  --raw-duration-100: 100ms;
+  --raw-duration-160: 160ms;
+  --raw-duration-200: 200ms;
+}
+
+/* ---------- Layer 2: semantic tokens, light theme ---------- */
+/* `.light` forces the light theme on a subtree (docs show both themes side by side). */
+:root,
+.light {
+  color-scheme: light;
+
+  /* surfaces */
+  --surface-page: var(--raw-paper-100); /* R03.1: warm, off-white page background */
+  --surface-panel: var(
+    --raw-paper-50
+  ); /* R03.1, R04.1: panels, overlays, fields — not pure white */
+  --surface-sunken: var(--raw-paper-200); /* R04.1: table header, code, skeleton */
+
+  /* text */
+  --text-default: var(--raw-ink-900); /* R03.1: ink, not black */
+  --text-muted: var(
+    --raw-stone-700
+  ); /* R04.1: metadata, descriptions; never the 12 h rule or prices (A04) */
+  --text-subtle: var(
+    --raw-stone-600
+  ); /* P-T1: placeholder, timestamps; never information needed to act */
+  --text-link: var(--raw-amber-800); /* R04.2: links and text actions */
+  --text-on-action: var(--raw-ink-900); /* K4 + WCAG 1.4.3: text on action-primary (4.91 : 1) */
+  --text-on-danger: var(--raw-white); /* WCAG 1.4.3: text on action-danger (6.03 : 1) */
+
+  /* actions */
+  --action-primary: var(--raw-amber-500); /* K4, R06.2, R01.6: the one primary action per screen */
+  --action-primary-hover: var(--raw-amber-450); /* K4 */
+  --action-primary-pressed: var(--raw-amber-550); /* K4 */
+  --action-danger: var(--raw-red-700); /* WCAG, A02: irreversible actions only */
+
+  /* selection and focus */
+  --selected-bg: var(--raw-amber-100); /* R04.2, K4: selected slot, tab, option */
+  --selected-border: var(--raw-amber-800); /* R04.2, K4 */
+  --focus-ring: var(--raw-amber-800); /* WCAG 2.4.7, 2.4.11: 5.40 : 1 on page */
+
+  /* lines */
+  --border-divider: var(--raw-paper-300); /* R01.4: row lines, separators (decorative) */
+  --border-control: var(
+    --raw-stone-500
+  ); /* WCAG 1.4.11 (Z5): field and control boundaries, 3.65 : 1 on panel */
+
+  /* status — always paired with an icon or text (WCAG 1.4.1) */
+  --status-success-fg: var(--raw-green-700); /* brief statuses U4/U5; green only for success (Q2) */
+  --status-success-bg: var(--raw-green-100);
+  --status-warning-fg: var(--raw-yellow-800); /* brief, Z5: darkened for 5.29 : 1 */
+  --status-warning-bg: var(--raw-yellow-100);
+  --status-danger-fg: var(--raw-red-700); /* brief */
+  --status-danger-bg: var(--raw-red-100);
+  --status-neutral-fg: var(--text-muted); /* P-T3: no blue "info" — one accent (K4) */
+  --status-neutral-bg: var(--surface-sunken);
+
+  /* depth. Class: shadow-overlay */
+  --depth-overlay: 0 4px 16px var(--raw-shadow-light); /* R01.4, A01, P-T4: overlays only, never panels */
+
+  /* shape (A01: no large radii; values P-T5). Classes: rounded-tag / -control / -panel / -round */
+  --shape-tag: var(--raw-radius-4); /* badge, checkbox */
+  --shape-control: var(--raw-radius-6); /* button, field */
+  --shape-panel: var(--raw-radius-8); /* panel, dialog */
+  --shape-round: var(--raw-radius-full); /* avatar, radio */
+
+  /* typography (K6, R01.2, Q3) */
+  --font-family-sans: "IBM Plex Sans", system-ui, sans-serif; /* text and data */
+  --font-family-mono: "IBM Plex Mono", ui-monospace, monospace; /* code only (R01.2) */
+  --font-family-serif: "IBM Plex Serif", Georgia, serif; /* large headings on P1 and P3 only (K6) */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --numeric: tabular-nums; /* R01.3: times, amounts, tables */
+
+  /* type roles (body 16: R05.1; dense 14: K1; sizes P-T6) */
+  --type-display-size: var(--raw-font-28); /* serif, P1/P3 hero; 36 from 768 px */
+  --type-display-leading: var(--raw-leading-36);
+  --type-display-size-wide: var(--raw-font-36);
+  --type-display-leading-wide: var(--raw-leading-44);
+  --type-page-title-size: var(--raw-font-22); /* 24 from 768 px */
+  --type-page-title-leading: var(--raw-leading-28);
+  --type-page-title-size-wide: var(--raw-font-24);
+  --type-page-title-leading-wide: var(--raw-leading-32);
+  --type-section-title-size: var(--raw-font-18);
+  --type-section-title-leading: var(--raw-leading-26);
+  --type-body-size: var(--raw-font-16);
+  --type-body-leading: var(--raw-leading-24);
+  --type-body-dense-size: var(--raw-font-14); /* lists and tables (K1) */
+  --type-body-dense-leading: var(--raw-leading-20);
+  --type-label-size: var(--raw-font-14);
+  --type-label-leading: var(--raw-leading-20);
+  --type-meta-size: var(--raw-font-13); /* never for the 12 h rule or prices (A04) */
+  --type-meta-leading: var(--raw-leading-18);
+  --type-code-size: var(--raw-font-14);
+  --type-code-leading: var(--raw-leading-20);
+  --measure-text: 65ch; /* R05.1: running text */
+
+  /* spacing relations (values P-T7) */
+  --space-inline: var(--raw-space-2); /* within a group: icon–text, items of one group */
+  --space-group: var(--raw-space-4); /* between groups: fields, blocks */
+  --space-panel: var(--raw-space-4); /* inside a panel; 24 from 768 px */
+  --space-panel-wide: var(--raw-space-6);
+  --space-section: var(--raw-space-8); /* between sections; 48 from 768 px */
+  --space-section-wide: var(--raw-space-12);
+  --space-row-y: var(--raw-space-3); /* R01.1, K1: dense list rows and tables */
+
+  /* sizes */
+  --control-height: 2.75rem; /* K1: 44 px controls */
+  --target-min: 2.75rem; /* K1: 44 px touch targets */
+  --content-max: 72.5rem; /* mockup .main: 1160 px */
+  --form-max: 40rem; /* mockup .narrow: 640 px */
+  --icon-sm: 1rem; /* P-T9: 16 / 20 / 24 */
+  --icon-md: 1.25rem;
+  --icon-lg: 1.5rem;
+  --focus-ring-width: 2px; /* P-T2 */
+  --focus-ring-offset: 2px; /* P-T2 */
+
+  /* motion (P-T8 — no motion reference yet) */
+  --duration-fast: var(--raw-duration-100); /* hover */
+  --duration-base: var(--raw-duration-160); /* state change */
+  --duration-overlay: var(--raw-duration-200); /* overlays */
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ---------- Layer 2: semantic tokens, dark theme ---------- */
+.dark {
+  color-scheme: dark;
+
+  --surface-page: var(--raw-night-900);
+  --surface-panel: var(--raw-night-800);
+  --surface-sunken: var(--raw-night-950);
+
+  --text-default: var(--raw-sand-50);
+  --text-muted: var(--raw-sand-200);
+  --text-subtle: var(--raw-sand-300);
+  --text-link: var(--raw-amber-dark-300);
+  --text-on-action: var(--raw-night-900); /* 8.42 : 1 */
+  --text-on-danger: var(--raw-night-900); /* 6.60 : 1 */
+
+  --action-primary: var(--raw-amber-dark-400);
+  --action-primary-hover: var(--raw-amber-dark-200);
+  --action-primary-pressed: var(--raw-amber-dark-500);
+  --action-danger: var(--raw-red-dark-400);
+
+  --selected-bg: var(--raw-amber-dark-900);
+  --selected-border: var(--raw-amber-dark-300);
+  --focus-ring: var(--raw-amber-dark-300);
+
+  --border-divider: var(--raw-night-700);
+  --border-control: var(--raw-night-500);
+
+  --status-success-fg: var(--raw-green-dark-400);
+  --status-success-bg: var(--raw-green-dark-900);
+  --status-warning-fg: var(--raw-yellow-dark-400);
+  --status-warning-bg: var(--raw-yellow-dark-900);
+  --status-danger-fg: var(--raw-red-dark-400);
+  --status-danger-bg: var(--raw-red-dark-900);
+
+  --depth-overlay: 0 4px 16px var(--raw-shadow-dark);
+}
+
+/* Wider screens: roomier panels, sections and titles (KONCEPCJA §3.2 breakpoint 768 px). */
+@media (min-width: 768px) {
+  :root,
+  .light {
+    --space-panel: var(--space-panel-wide);
+    --space-section: var(--space-section-wide);
+    --type-display-size: var(--type-display-size-wide);
+    --type-display-leading: var(--type-display-leading-wide);
+    --type-page-title-size: var(--type-page-title-size-wide);
+    --type-page-title-leading: var(--type-page-title-leading-wide);
+  }
+}
+
+/* WCAG 2.3.3: no movement for users who ask for reduced motion; short fades stay. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  .light {
+    --duration-base: var(--raw-duration-100);
+    --duration-overlay: var(--raw-duration-100);
+  }
+}
+
+/* ---------- Layer 3: component tokens ---------- */
+/* Declared on every theme scope so they re-resolve inside a `.light` / `.dark` subtree. */
+:root,
+.light,
+.dark {
+  --button-height: var(--control-height); /* K1 */
+  --input-border: var(--border-control); /* WCAG 1.4.11 */
+  --row-divider: var(--border-divider); /* R01.4 */
+  --slot-selected-bg: var(--selected-bg); /* R04.2 */
+  --slot-selected-border: var(--selected-border);
+  --dialog-width: 30rem; /* P-T10: 480 px */
+}

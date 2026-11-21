@@ -18,6 +18,7 @@ docs/decisions (ADR), kompas-mentoring (koncepcja i mockupy), docker-compose.yml
 ```
 
 - Weryfikacja aplikacji: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. Lokalnie: `docker compose up -d`, `pnpm db:migrate`, `pnpm db:seed`.
+- Design system: `packages/ui` (tokeny w `src/styles/tokens.css`, Storybook w `packages/ui/.storybook`, postęp w `packages/ui/POSTEP.md`). Sprawdzenie: `pnpm storybook`, `pnpm build-storybook`, `pnpm --filter @kompas/ui test:stories:themes`, `pnpm --filter @kompas/ui check:tokens`.
 
 ## Standardy inżynieryjne
 

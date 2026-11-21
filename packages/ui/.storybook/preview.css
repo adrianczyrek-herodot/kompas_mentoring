@@ -1,0 +1,53 @@
+/*
+ * Storybook-only styles (not exported from the package).
+ * Docs pages follow the selected theme: the docs container uses the product surface and text
+ * tokens, so previews wrapped in <Unstyled> sit on the same background as in the product.
+ */
+.sbdocs.sbdocs-wrapper,
+.sbdocs.sbdocs-preview,
+.docs-story {
+  background: var(--surface-page);
+  color: var(--text-default);
+}
+
+.sbdocs.sbdocs-content {
+  color: var(--text-default);
+  font-family: var(--font-family-sans);
+}
+
+.sbdocs.sbdocs-content :is(h1, h2, h3, h4, p, li, td, th) {
+  color: var(--text-default);
+}
+
+.sbdocs.sbdocs-content :is(a) {
+  color: var(--text-link);
+}
+
+.sbdocs.sbdocs-content :is(table) :is(td, th) {
+  background: var(--surface-page);
+  border-color: var(--border-divider);
+  overflow-wrap: anywhere;
+}
+
+/* Markdown tables stay inside the page at 320 px: long code wraps, wide tables scroll. */
+.sbdocs.sbdocs-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Inline code and the table of contents follow the theme too. */
+.sbdocs.sbdocs-content :not(pre) > code {
+  background: var(--surface-sunken);
+  border-color: var(--border-divider);
+  color: var(--text-default);
+}
+
+/* Storybook styles the TOC with high-specificity emotion classes; plain selectors lose. */
+.toc-wrapper a.toc-link.toc-link {
+  color: var(--text-muted);
+}
+
+.toc-wrapper a.toc-link.is-active-link.is-active-link {
+  color: var(--text-link);
+}

@@ -1,0 +1,13 @@
+<title>Kompas</title>
+<script>
+  // Storybook appends "⋅ Storybook" to the tab title; only the product name may show (rule 10).
+  (() => {
+    const fix = () => {
+      if (document.title.includes('Storybook')) {
+        document.title = document.title.replace(/\s*⋅\s*Storybook$/, ' ⋅ Kompas').replace(/^Storybook$/, 'Kompas');
+      }
+    };
+    new MutationObserver(fix).observe(document.head, { subtree: true, childList: true, characterData: true });
+    fix();
+  })();
+</script>

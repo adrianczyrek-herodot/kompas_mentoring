@@ -4,7 +4,8 @@
     "jsx": "react-jsx",
     "paths": {
       "@kompas/ui/*": ["./src/*"]
-    }
+    },
+    "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src", ".storybook/**/*.ts", ".storybook/**/*.tsx", "vitest.config.ts"]
 }
