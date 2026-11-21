@@ -133,4 +133,45 @@ export {
   TooltipProvider,
   TooltipTrigger,
 } from './components/tooltip.tsx';
+export {
+  MentorCard,
+  MentorCardSkeleton,
+  type MentorCardProps,
+} from './product/mentor-card.tsx';
+export {
+  ProfileHero,
+  ProfileHeroSkeleton,
+  type ProfileHeroProps,
+} from './product/profile-hero.tsx';
+export {
+  SlotGrid,
+  SlotGridSkeleton,
+  type SlotGridProps,
+  type Slot,
+  type DaySlots,
+} from './product/slot-grid.tsx';
+export {
+  HoldCountdown,
+  type HoldCountdownProps,
+} from './product/hold-countdown.tsx';
+export {
+  PolicyNotice,
+  type PolicyNoticeProps,
+} from './product/policy-notice.tsx';
+export {
+  SessionCard,
+  SessionCardSkeleton,
+  type SessionCardProps,
+  type SessionStatus,
+} from './product/session-card.tsx';
+export {
+  TrialRequestCard,
+  type TrialRequestCardProps,
+} from './product/trial-request-card.tsx';
+export {
+  TodayAgenda,
+  TodayAgendaSkeleton,
+  type TodayAgendaProps,
+  type AgendaItem,
+} from './product/today-agenda.tsx';
 export { cn } from './lib/utils.ts';
