@@ -1,0 +1,146 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import * as FormStories from './form.stories';
+
+<Meta of={FormStories} />
+
+# Formularz
+
+Pozwala wpisać dane bez zgadywania, co jest wymagane, i bez utraty wpisanego tekstu przy błędzie.
+W Kompasie: onboarding mentora M1 (krok „Opis i wideo”, E2-S2), a także logowanie P4, checkout U2
+i każdy inny ekran z polami.
+
+<Canvas of={FormStories.Playground} />
+<Controls of={FormStories.Playground} />
+
+## Kiedy używać
+
+| Sytuacja | Źródło |
+|---|---|
+| Użytkownik wpisuje lub zmienia dane zapisywane na serwerze (profil M1, cel sesji U2, logowanie P4) | KONCEPCJA §M1, §U2, §P4 |
+| Krok wieloetapowego procesu z zapisem szkicu po kroku | KONCEPCJA F4, E2-S2 T3 |
+
+## Kiedy nie używać
+
+| Zamiast formularza | Użyj | Źródło |
+|---|---|---|
+| Wybór z listy z powodem w oknie (odrzucenie prośby, decyzja A1) | wzorzec **Decyzja z powodem** | E3-S7 T1, E2-S4 |
+| Zawężanie listy wyników | wzorzec **Lista z filtrami** — filtry działają od razu, bez przycisku „Zapisz” | KONCEPCJA §P2 |
+| Potwierdzenie nieodwracalnej akcji bez danych do wpisania | wzorzec **Potwierdzenie usunięcia** | D6, WAI-ARIA APG (Alert Dialog) |
+
+## Zasady
+
+| Zasada | Jak to zrobić w kodzie | Źródło |
+|---|---|---|
+| Etykieta zawsze widoczna nad polem, powiązana z kontrolką. | `Field` + `FieldLabel htmlFor` = `id` pola | WCAG 1.3.1, 3.3.2 |
+| Placeholder to tylko przykład wartości, nigdy nazwa pola ani instrukcja. | `placeholder="np. Senior Frontend Engineer · React, TypeScript"`; wymagania w `FieldDescription` | P-T6 (POSTEP R8), WCAG 3.3.2 |
+| Wymagania (długość, format) widoczne przed wpisaniem, połączone z polem. | `FieldDescription id="…-hint"` w `aria-describedby` | WCAG 3.3.2, KONCEPCJA §M1 „Walidacje” |
+| Pole nieobowiązkowe oznaczone słowem, nie gwiazdką przy obowiązkowych. | `<FieldOptional />` w `FieldLabel` | WCAG 3.3.2 |
+| Limity z domeny, nie z głowy: nagłówek 20–80 znaków, opis 300–2000, wideo YouTube / Vimeo. | `validate()` w kompozycji; w aplikacji ten sam schemat zod co serwer | KONCEPCJA §M1 „Walidacje”, E2-S2 T1 |
+| Długi tekst z licznikiem znaków. | `Textarea showCount maxLength={2000}` | KONCEPCJA §M1 („RichTextarea z licznikiem”) |
+| Walidacja po opuszczeniu pola, nie przy każdym znaku świeżego pola; pokazany błąd aktualizuje się przy pisaniu i znika po poprawie. | `onBlur` → `validate`; `onChange` waliduje tylko pole, które już ma błąd | WCAG 3.3.1 |
+| Walidacja całego formularza przy wysłaniu; przy błędach nic nie idzie do API. | `onSubmit`: `validate` dla każdego pola, `return` przed `onSubmit(values)` | WCAG 3.3.1 |
+| Po nieudanym wysłaniu fokus na pierwszym błędnym polu (w kolejności DOM). | `refs[firstInvalid].current?.focus()` | WCAG 3.3.1, 2.4.3 |
+| Błąd przy polu: ramka, ikona i tekst, co poprawić; kontrolka ma `aria-invalid`. | `Field data-invalid`, `aria-invalid`, `FieldError id="…-error"` w `aria-describedby` | D5, WCAG 3.3.1, 3.3.3, 1.4.1 |
+| Dane zostają w polach po każdym błędzie (walidacji, serwera, sieci). | stan `values` nie jest czyszczony w żadnej gałęzi | WCAG 3.3.7 |
+| Podwójne wysłanie zablokowane; przycisk zostaje w kolejności fokusu. | `Button type="submit" loading={submitting}` + `if (submitting) return` | KONCEPCJA §P4 L |
+| Sukces dopiero po odpowiedzi serwera, jako komunikat statusu. | `Alert variant="success" role="status"` tylko gdy `answer.ok` | WCAG 4.1.3; **Propozycja:** brak optymistycznego „Zapisano” w formularzach |
+| Błąd pola z serwera trafia na to pole (komunikat + fokus), nie do ogólnego alertu. | `answer.kind === 'field'` → `setErrors({ [field]: message })` + `focus()` | KONCEPCJA §M1 Er („błędy pól inline”), WCAG 3.3.1 |
+| Błąd serwera i brak sieci: `Alert` z `role="alert"` nad przyciskiem — co się stało + co zrobić + że dane zostały. Nigdy toast. | `Alert variant="danger" role="alert"`, ikony `CircleX` / `WifiOff` z `aria-hidden` | Z8, R05.2, WCAG 4.1.3 |
+| Jedna akcja główna, czasownik + obiekt. | `Button` `default`: „Zapisz szkic” | R01.6, R05.3, R05.2 |
+| Pole tekstowe 16 px także na desktopie; szerokość formularza z tokenu. | `Input` / `Textarea` (rola `body`), kontener `max-w-form`, odstępy `gap-group` | R05.1, P-T6 |
+
+## Odpowiedzi API
+
+Przełącznik „Odpowiedź API” (`api`) w panelu kontrolek zmienia odpowiedź symulowanego serwera.
+
+| Odpowiedź | Co widzi użytkownik | Story |
+|---|---|---|
+| `success` | „Zapisaliśmy szkic profilu” + „Możesz wrócić do niego w każdej chwili.” (`role="status"`), dane w polach | `Success` |
+| `pending` | „Zapisz szkic” z wskaźnikiem i `aria-busy`, kolejne kliknięcie nic nie wysyła | `Pending` |
+| `field-error` | Fokus na „Nagłówek profilu”, pod polem: „Nagłówek nie może zawierać e-maila, telefonu ani linku — kontakt odbywa się w Kompasie.” | `FieldErrorFromServer` |
+| `server-error` | „Nie udało się zapisać szkicu” + „To błąd po naszej stronie. Wpisane dane zostały w formularzu — spróbuj ponownie za chwilę.” | `ServerError` |
+| `offline` | „Brak połączenia z internetem” + „Szkic nie został zapisany. Dane zostały w formularzu — zapisz ponownie, gdy połączenie wróci.” | `Offline` |
+
+## Mapa stanów
+
+| Stan | Story |
+|---|---|
+| Pusty formularz | `Playground` |
+| Wypełniony | `Filled` |
+| Walidacja po opuszczeniu pola | `BlurValidation` |
+| Błędy przy wysłaniu — fokus na pierwszym | `SubmitErrors` |
+| API: oczekiwanie (blokada podwójnego wysłania) | `Pending` |
+| API: sukces po potwierdzeniu serwera | `Success` |
+| API: błąd pola | `FieldErrorFromServer` |
+| API: błąd serwera | `ServerError` |
+| API: brak sieci | `Offline` |
+| Wąski ekran 320 px | `Narrow` |
+
+### Wypełniony
+
+<Canvas of={FormStories.Filled} />
+
+### Walidacja po opuszczeniu pola
+
+<Canvas of={FormStories.BlurValidation} />
+
+### Błędy przy wysłaniu — fokus na pierwszym
+
+<Canvas of={FormStories.SubmitErrors} />
+
+### API: oczekiwanie
+
+<Canvas of={FormStories.Pending} />
+
+### API: sukces
+
+<Canvas of={FormStories.Success} />
+
+### API: błąd pola
+
+<Canvas of={FormStories.FieldErrorFromServer} />
+
+### API: błąd serwera
+
+<Canvas of={FormStories.ServerError} />
+
+### API: brak sieci
+
+<Canvas of={FormStories.Offline} />
+
+### Wąski ekran 320 px
+
+<Canvas of={FormStories.Narrow} />
+
+## Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<p className="text-body-dense">Etykieta „Nagłówek profilu”, przykład w placeholderze, wymagania „20–80 znaków…” pod polem.</p>}
+      goodNote="Nazwa i wymagania zostają widoczne także po wpisaniu tekstu."
+      bad={<p className="text-body-dense">Brak etykiety, placeholder „Nagłówek profilu (20–80 znaków)”.</p>}
+      badNote="Placeholder znika przy pisaniu, a z nim nazwa pola i wymagania (WCAG 3.3.2)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Błąd serwera: alert nad przyciskiem „Nie udało się zapisać szkicu”, wpisane dane zostają w polach.</p>}
+      goodNote="Użytkownik wie, co się stało i co zrobić, i nie traci tekstu."
+      bad={<p className="text-body-dense">Toast „Coś poszło nie tak” i wyczyszczony formularz.</p>}
+      badNote="Toast znika, a utrata danych zmusza do ponownego pisania (Z8, WCAG 3.3.7)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Komunikat sukcesu dopiero po odpowiedzi serwera; do tego czasu przycisk ma wskaźnik i nie przyjmuje kliknięć.</p>}
+      goodNote="Komunikat sukcesu zawsze oznacza zapisane dane."
+      bad={<p className="text-body-dense">„Zapisano” zaraz po kliknięciu, a przycisk aktywny w trakcie wysyłania.</p>}
+      badNote="Fałszywy sukces przy błędzie i podwójne wysłanie (KONCEPCJA §P4 L)."
+    />
+  </div>
+</Unstyled>
+
+## Powiązane
+
+- **Komponenty:** `Field`, `FieldLabel`, `FieldDescription`, `FieldError`, `FieldGroup`, `FieldOptional`, `Input`, `Textarea`, `Button`, `Alert`.
+- **Wzorce:** [Decyzja z powodem](?path=/docs/wzorce-decyzja-z-powodem--docs) (formularz w oknie), [Lista z filtrami](?path=/docs/wzorce-lista-z-filtrami--docs) (pola bez wysyłania).
+- **Ekrany:** M1 Onboarding mentora (E2-S2), P4 Logowanie, U2 Checkout.
+- W aplikacji formularz budujemy z react-hook-form i schematem zod z `contracts`; kompozycja w Storybooku (`.storybook/examples/profile-form.tsx`) pokazuje tylko zachowanie.

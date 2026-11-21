@@ -1,0 +1,124 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import * as FilterListStories from './filter-list.stories';
+
+<Meta of={FilterListStories} />
+
+# Lista z filtrami
+
+Pozwala zawęzić długą listę i od razu zobaczyć, ile zostało wyników oraz który filtr je ograniczył.
+W Kompasie: wyszukiwarka mentorów P2 (E2-S5); te same zasady obowiązują inne listy z filtrem,
+np. filtr po mentorze w U4 (E3-S5 T1).
+
+<Canvas of={FilterListStories.Results} />
+<Controls of={FilterListStories.Results} />
+
+## Kiedy używać
+
+| Sytuacja | Źródło |
+|---|---|
+| Porównanie wielu pozycji tego samego typu po kilku cechach (temat, cena, weryfikacja) | KONCEPCJA §P2, E2-S5 |
+| Lista, którą użytkownik przegląda, a nie wypełnia | R01.1 |
+
+## Kiedy nie używać
+
+| Zamiast listy z filtrami | Użyj | Źródło |
+|---|---|---|
+| Kilka pozycji, które mieszczą się na ekranie (dzisiejsze sesje M2) | zwykła lista (`TodayAgenda`) bez filtrów | KONCEPCJA §M2 |
+| Użytkownik nic jeszcze nie utworzył | `EmptyState` z jedną akcją utworzenia, bez filtrów (story `NothingYet`) | KONCEPCJA §U4 E |
+| Wpisywanie danych do zapisania | wzorzec **Formularz** | KONCEPCJA §M1 |
+| Przełączenie dwóch widoków tej samej listy (Nadchodzące / Minione) | `Tabs` | KONCEPCJA §U4 |
+
+## Zasady
+
+| Zasada | Jak to zrobić w kodzie | Źródło |
+|---|---|---|
+| Filtr działa od razu po zmianie, bez przycisku „Zastosuj” na desktopie. | `onValueChange` / `onCheckedChange` → `setFilters` | KONCEPCJA §P2 |
+| Liczba wyników widoczna nad listą i ogłaszana uprzejmie po każdej zmianie, z polską odmianą. | `ActiveFilters resultCount countForms={{ one, few, many }}` | KONCEPCJA §P2 (ResultCount), WCAG 4.1.3 |
+| Aktywne filtry widoczne nad listą, każdy usuwalny jednym kliknięciem, plus „wyczyść wszystkie”. | `ActiveFilters filters onRemove onClearAll`; nazwa przycisku „Frontend — usuń filtr” | KONCEPCJA §P2 (ActiveFilterChips), E2-S5, WCAG 2.5.3 |
+| „Brak wyników dla filtrów” to inny stan niż „jeszcze nic tu nie ma”. | wyniki = 0 przy aktywnych filtrach → `EmptyState` „Brak mentorów dla tych filtrów”; pusta kolekcja → `EmptyState` z akcją utworzenia | KONCEPCJA §P2 E, §U4 E |
+| Przy braku wyników jedna akcja: wyczyść filtr, który najbardziej zawęża (jego usunięcie przywraca najwięcej wyników), z nazwą filtra. | `narrowest` = filtr z największą liczbą wyników po resecie; `Button variant="outline"` „Wyczyść filtr: Backend” | KONCEPCJA §P2 E, F1, E2-S5 T3 |
+| Pierwszy pusty stan („Nie masz jeszcze sesji”) ma akcję utworzenia, nie filtry. | `EmptyState action={<Button>Znajdź mentora</Button>}` | KONCEPCJA §U4 E |
+| Na desktopie filtry w kolumnie obok listy; poniżej 768 px w panelu dolnym otwieranym przyciskiem „Filtry”, zamykanym „Pokaż wyniki”. | `aside` `hidden md:block md:w-1/4`; `Sheet` + `SheetContent side="bottom"` w `md:hidden` | KONCEPCJA §P2 (FilterBar), §3.2, E2-S5 T3 |
+| Ten sam panel filtrów w obu układach — jeden stan, jeden komponent. | `FilterPanel filters onChange` użyty w `aside` i w `Sheet` | **Propozycja:** jeden komponent panelu dla obu szerokości |
+| Ładowanie: szkielety wierszy, region zajęty, tekst dla czytnika. | 6 × `MentorCardSkeleton` w `div aria-busy="true"` + `sr-only` „Wczytujemy mentorów…” | KONCEPCJA §P2 L, WAI-ARIA 1.2 (`aria-busy`) |
+| Błąd wczytania: co się stało + Ponów; filtry zostają. | `ErrorState` „Nie udało się wczytać listy” + `Button variant="outline"` „Ponów” | KONCEPCJA §P2 Er, R05.2 |
+| Lista gęsta: wiersze oddzielone liniami, bez kart z cieniem. | `ul aria-label="Mentorzy"` z `MentorCard` | R01.1, R01.4, K1 |
+| Akcja w wierszu ma w nazwie obiekt, żeby kilka przycisków „Zarezerwuj” dało się odróżnić. | `Button size="sm"` + `<span className="sr-only"> — {mentor.name}</span>` | WCAG 2.4.6, 2.5.3 |
+| Zakres ceny 0–1000 zł z widocznym wynikiem obok suwaka. | `Slider min={0} max={1000} step={10} thumbLabels`, `<output>` z cyframi tabelarycznymi | KONCEPCJA §P2 „Walidacje”, R01.3 |
+| W aplikacji filtry w URL i filtrowanie na serwerze (link do udostępnienia). | parametry `GET /mentors?topic=&priceMin=…` | KONCEPCJA §P2 „Walidacje”, E2-S5 T2 |
+
+## Mapa stanów
+
+| Stan | Story |
+|---|---|
+| Wyniki | `Results` |
+| Aktywne filtry | `WithActiveFilters` |
+| Ładowanie | `Loading` |
+| Błąd | `ErrorLoading` |
+| Brak wyników dla filtrów | `NoResultsForFilters` |
+| Jeszcze nic tu nie ma (U4) | `NothingYet` |
+| Dużo danych i długie teksty | `ManyResults` |
+| Wąski ekran 320 px | `Narrow` |
+| Test: usunięcie filtra zmienia licznik | `RemoveFilterTest` |
+| Test: „Wyczyść filtr X” przywraca wyniki | `ClearNarrowestTest` |
+| Test: błąd z ponowieniem | `RetryTest` |
+
+### Aktywne filtry
+
+<Canvas of={FilterListStories.WithActiveFilters} />
+
+### Ładowanie
+
+<Canvas of={FilterListStories.Loading} />
+
+### Błąd
+
+<Canvas of={FilterListStories.ErrorLoading} />
+
+### Brak wyników dla filtrów
+
+<Canvas of={FilterListStories.NoResultsForFilters} />
+
+### Jeszcze nic tu nie ma (U4)
+
+<Canvas of={FilterListStories.NothingYet} />
+
+### Dużo danych i długie teksty
+
+<Canvas of={FilterListStories.ManyResults} />
+
+### Wąski ekran 320 px
+
+<Canvas of={FilterListStories.Narrow} />
+
+## Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<p className="text-body-dense">„Brak mentorów dla tych filtrów” + „Najbardziej zawęża wyniki filtr „Backend”.” + przycisk „Wyczyść filtr: Backend”.</p>}
+      goodNote="Jedno kliknięcie przywraca wyniki, a użytkownik wie, który filtr był winny."
+      bad={<p className="text-body-dense">„Brak wyników” bez wskazania filtra i bez akcji.</p>}
+      badNote="Użytkownik musi zgadywać, który filtr zdjąć (KONCEPCJA F1, E2-S5 T3)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Nowy uczeń w U4: „Nie masz jeszcze sesji” + „Znajdź mentora”.</p>}
+      goodNote="Pierwszy pusty stan prowadzi do utworzenia, nie do filtrów."
+      bad={<p className="text-body-dense">Nowy uczeń widzi filtry i komunikat „Brak wyników dla filtrów”.</p>}
+      badNote="Sugeruje, że coś ukryły filtry, choć kolekcja jest pusta (KONCEPCJA §U4 E)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Aktywne filtry nad listą jako przyciski „Frontend — usuń filtr”, obok licznik „1 mentor”.</p>}
+      goodNote="Widać, co zawęża listę, nawet gdy panel filtrów jest zamknięty (mobile)."
+      bad={<p className="text-body-dense">Filtry widoczne tylko w zamkniętym panelu dolnym, bez licznika.</p>}
+      badNote="Na telefonie nie widać, że lista jest zawężona (KONCEPCJA §P2)."
+    />
+  </div>
+</Unstyled>
+
+## Powiązane
+
+- **Komponenty:** `ActiveFilters`, `MentorCard`, `MentorCardSkeleton`, `Select`, `Slider`, `Switch`, `Field`, `Sheet`, `EmptyState`, `ErrorState`, `Button`.
+- **Wzorce:** [Formularz](?path=/docs/wzorce-formularz--docs) (pola z wysyłaniem), [Widok szczegółów](?path=/docs/wzorce-widok-szczegółów--docs) (po kliknięciu pozycji).
+- **Ekrany:** P2 Wyszukiwarka mentorów (E2-S5), U4 Moje sesje (stan „jeszcze nic tu nie ma”).

@@ -105,6 +105,11 @@
   overflow-x: auto;
 }
 
+/* Long component names as page titles (e.g. BookingStatusBadge) wrap at 320 px. */
+.sbdocs.sbdocs-content :is(h1, h2, h3) {
+  overflow-wrap: anywhere;
+}
+
 /* Long inline code in prose wraps instead of widening the page at 320 px. */
 .sbdocs.sbdocs-content :not(pre) > code {
   white-space: normal;

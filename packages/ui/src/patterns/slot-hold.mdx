@@ -1,0 +1,154 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import * as SlotHoldStories from './slot-hold.stories';
+
+<Meta of={SlotHoldStories} />
+
+# Wybór terminu z blokadą
+
+Daje uczniowi pewność, że wybrany termin nie zniknie w trakcie płatności: po „Dalej” trzymamy go
+przez 10 minut, a gdy ktoś był szybszy, od razu pokazujemy inne terminy. W Kompasie: wybór terminu
+U1 przed checkoutem U2 (E3-S4).
+
+<Canvas of={SlotHoldStories.NothingSelected} />
+<Controls of={SlotHoldStories.NothingSelected} />
+
+## Kiedy używać
+
+| Sytuacja | Źródło |
+|---|---|
+| Rezerwacja terminu, który może zająć ktoś inny, przed płatnością (sesja próbna, sesja z planu) | brief reguła 5, KONCEPCJA F1, §U1, E3-S4 |
+
+## Kiedy nie używać
+
+| Zamiast blokady | Użyj | Źródło |
+|---|---|---|
+| Przełożenie umówionej sesji | panel „Przełóż sesję” ze `SlotGrid` we wzorcu **Zmiana z regułą 12 h** | KONCEPCJA §U5 (RescheduleSheet), E3-S6 T2 |
+| Mentor ustawia własną dostępność | edytor dostępności M3 | KONCEPCJA §M3 |
+| Odliczanie czegokolwiek innego (promocja, czas do sesji, termin bezpłatnej zmiany) | nic albo godzina jako tekst — inne liczniki są zakazane | A02, A04 |
+
+## Zasady
+
+| Zasada | Jak to zrobić w kodzie | Źródło |
+|---|---|---|
+| Na górze mentor i rodzaj sesji z ceną — uczeń wie, co rezerwuje. | `Avatar` + nazwa + „Sesja próbna · 30 min · `<Money />`” | KONCEPCJA §U1 (MentorSummaryBar), R01.3 |
+| Sesja próbna ma stałe 30 min; sesja z planu — wybór 30 / 60 min przed siatką. | `ToggleGroup` z `FieldTitle` tylko dla `sessionType="plan"` | KONCEPCJA §U1, brief reguła 1, 2 |
+| Sloty w strefie oglądającego, z nazwą strefy przy siatce. | `SlotGrid timeZone timeZoneLabel weekLabel` | brief reguła 10, Z9, KONCEPCJA §U1 |
+| Reguła 12 h widoczna przed rezerwacją, pełnym tekstem. | `PolicyNotice state="free"` pod siatką | KONCEPCJA §U1, E3-S4 T2, A04 |
+| „Dalej” zablokowane, dopóki nie ma wybranego slotu; powód obok, przycisk w kolejności fokusu. | `Button disabled={!selected} focusableWhenDisabled aria-describedby` → „Wybierz termin, żeby przejść dalej.” | KONCEPCJA §U1 S, D2 |
+| Przycisk „Dalej” przyklejony do dołu ekranu, większy rozmiar na ekranie rezerwacji. | kontener `sticky bottom-0`, `Button size="lg"` | KONCEPCJA §U1 (StickyContinueButton), K1 |
+| „Dalej” tworzy blokadę; w trakcie wskaźnik i blokada podwójnego wysłania. | `loading={holding}` + `if (holding) return`; w aplikacji `POST /bookings/holds` | KONCEPCJA §U1 (API), §P4 L |
+| Blokada trwa 10 minut i nie da się jej przedłużyć. | `HoldCountdown secondsLeft expiresAt timeZone` liczony od `expiresAt` z serwera | brief reguła 5, E3-S4 T1 |
+| To jedyne odliczanie w Kompasie — pokazuje rzeczywistą blokadę, nie presję. Obok zawsze godzina końca. | wyłącznie `HoldCountdown`; brak innych liczników | A02 (wyjątek HoldCountdown) |
+| Ostatnie 2 minuty: kolor ostrzeżenia i ogłoszenie dla czytnika, bez przenoszenia fokusu. | wbudowane w `HoldCountdown` (`role="timer"`, region `aria-live="polite"`) | K4, WCAG 4.1.3, 2.2.1 |
+| Konflikt 409 („ktoś był szybszy”): toast, odświeżona siatka bez tego slotu, wybór wyczyszczony. | `toast.add({ title: 'Ten termin został właśnie zajęty', description: 'Odświeżyliśmy listę — wybierz inny termin.' })` + nowe `days` | KONCEPCJA §U1 Er, F1, E3-S4 T1 |
+| Wygaśnięcie blokady: komunikat i powrót do wyboru terminu z zachowanym mentorem. | `HoldCountdown onChooseAgain` czyści blokadę i wybór, mentor zostaje | KONCEPCJA §U2 Er, F1 |
+| Błąd serwera i brak sieci: alert pod siatką, wybrany slot zostaje zaznaczony. | `Alert variant="danger" role="alert"` „Termin nie został zarezerwowany”, `selected` bez zmian | Z8, R05.2, WCAG 3.3.7 |
+| Stan blokady (czy trwa, ile zostało) liczy serwer i wstrzyknięty zegar, nie `Date.now()` w komponencie. | `secondsLeft` z `expiresAt` i `Clock` aplikacji | KONCEPCJA §U1 (API: `expiresAt`), AGENTS.md („Pieniądze i czas”) |
+
+## Odpowiedzi API
+
+Przełącznik „Odpowiedź API (blokada)” (`holdAnswer`) zmienia odpowiedź na „Dalej”.
+
+| Odpowiedź | Co widzi użytkownik | Story |
+|---|---|---|
+| `success` | Licznik „10:00”, godzina końca blokady i „Przejdź do płatności” | `HoldActive` |
+| `conflict` (409) | Toast „Ten termin został właśnie zajęty” — „Odświeżyliśmy listę — wybierz inny termin.”; slot znika z siatki | `Conflict` |
+| `pending` | „Dalej” z wskaźnikiem i `aria-busy` | `Pending` |
+| `server-error` | „Termin nie został zarezerwowany” — „To błąd po naszej stronie. Wybrany termin zostaje zaznaczony — spróbuj ponownie za chwilę.” | `ServerError` |
+| `offline` | „Termin nie został zarezerwowany” — „Brak połączenia z internetem. Wybrany termin zostaje zaznaczony — spróbuj ponownie.” | `Offline` |
+
+Wczytanie terminów (`slotsStatus`) ma osobne stany: `Loading`, `ErrorLoading`, `NoSlots`.
+
+## Mapa stanów
+
+| Stan | Story |
+|---|---|
+| Nic nie wybrano | `NothingSelected` |
+| Sesja z planu (30 / 60 min) | `PlanSession` |
+| Ładowanie terminów | `Loading` |
+| Błąd wczytania terminów | `ErrorLoading` |
+| Brak terminów w tygodniu | `NoSlots` |
+| Test: „Dalej” zablokowane z powodem do wyboru terminu | `DisabledContinueTest` |
+| Blokada aktywna | `HoldActive` |
+| Blokada: ostatnie 2 minuty | `HoldLastMinutes` |
+| Blokada wygasła | `HoldExpired` |
+| Konflikt 409: termin zajęty | `Conflict` |
+| Tworzenie blokady (oczekiwanie) | `Pending` |
+| Błąd serwera | `ServerError` |
+| Brak sieci | `Offline` |
+
+### Sesja z planu (30 / 60 min)
+
+<Canvas of={SlotHoldStories.PlanSession} />
+
+### Ładowanie terminów
+
+<Canvas of={SlotHoldStories.Loading} />
+
+### Błąd wczytania terminów
+
+<Canvas of={SlotHoldStories.ErrorLoading} />
+
+### Brak terminów w tygodniu
+
+<Canvas of={SlotHoldStories.NoSlots} />
+
+### Blokada aktywna
+
+<Canvas of={SlotHoldStories.HoldActive} />
+
+### Blokada: ostatnie 2 minuty
+
+<Canvas of={SlotHoldStories.HoldLastMinutes} />
+
+### Blokada wygasła
+
+<Canvas of={SlotHoldStories.HoldExpired} />
+
+### Konflikt 409: termin zajęty
+
+<Canvas of={SlotHoldStories.Conflict} />
+
+### Tworzenie blokady (oczekiwanie)
+
+<Canvas of={SlotHoldStories.Pending} />
+
+### Błąd serwera
+
+<Canvas of={SlotHoldStories.ServerError} />
+
+### Brak sieci
+
+<Canvas of={SlotHoldStories.Offline} />
+
+## Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<p className="text-body-dense">Zablokowane „Dalej”, obok: „Wybierz termin, żeby przejść dalej.”</p>}
+      goodNote="Uczeń wie, czego brakuje, a czytnik czyta powód razem z przyciskiem."
+      bad={<p className="text-body-dense">Zablokowane „Dalej” bez powodu albo aktywne „Dalej”, które po kliknięciu pokazuje błąd.</p>}
+      badNote="Blokada bez wyjaśnienia lub błąd po fakcie (D2, KONCEPCJA §U1 S)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">Licznik blokady i godzina jej końca tylko w kroku płatności.</p>}
+      goodNote="Odliczanie pokazuje rzeczywistą blokadę terminu."
+      bad={<p className="text-body-dense">Licznik „Oferta ważna jeszcze…” na profilu albo przy cenie planu.</p>}
+      badNote="Sztuczna presja sprzedażowa jest zakazana (A02)."
+    />
+    <DoDont
+      good={<p className="text-body-dense">409: toast „Ten termin został właśnie zajęty”, siatka odświeżona bez tego slotu.</p>}
+      goodNote="Uczeń od razu wybiera z aktualnych terminów."
+      bad={<p className="text-body-dense">409: ogólny błąd i ta sama siatka z zajętym slotem.</p>}
+      badNote="Uczeń klika ten sam slot i znów dostaje błąd (KONCEPCJA §U1 Er)."
+    />
+  </div>
+</Unstyled>
+
+## Powiązane
+
+- **Komponenty:** `SlotGrid`, `HoldCountdown`, `PolicyNotice`, `ToggleGroup`, `FieldTitle`, `Avatar`, `Money`, `Button`, `Alert`, `Toast`.
+- **Wzorce:** [Zmiana z regułą 12 h](?path=/docs/wzorce-zmiana-z-regułą-12-h--docs) (przełożenie z tą samą siatką), [Formularz](?path=/docs/wzorce-formularz--docs) (blokada podwójnego wysłania).
+- **Ekrany:** U1 Wybór terminu (E3-S4), U2 Checkout (licznik blokady), P3 Profil mentora (wejście do U1).
