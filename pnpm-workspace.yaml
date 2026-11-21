@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - prototypes/*
 
 # Supply chain (spec §8): do not install versions younger than 3 days (in minutes).
 minimumReleaseAge: 4320
