@@ -9,7 +9,8 @@
   "scripts": {
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
-    "lint": "turbo run typegen && eslint . && biome ci . && pnpm run lint:deps && pnpm run lint:dead",
+    "lint": "turbo run typegen && eslint . && pnpm run lint:deps && pnpm run lint:dead",
+    "lint:biome": "biome ci .",
     "lint:deps": "node scripts/check-dependencies.mjs",
     "lint:dead": "knip",
     "format": "biome check --write .",
