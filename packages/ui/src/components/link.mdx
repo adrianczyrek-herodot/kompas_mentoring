@@ -1,0 +1,146 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import { Link } from './link';
+import * as LinkStories from './link.stories';
+
+<Meta of={LinkStories} />
+
+# Link
+
+## 1. Do czego służy
+
+Prowadzi do innej strony lub miejsca, żeby użytkownik wiedział, że po kliknięciu zmieni się widok,
+a nie wykona akcja.
+
+<Canvas of={LinkStories.Playground} />
+<Controls of={LinkStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| „Nie pamiętasz hasła?” pod formularzem logowania (P4) | KONCEPCJA §P4, backlog E3-S9 |
+| „Zostań mentorem” na stronie głównej (P1) | KONCEPCJA §2.2 F4 |
+| Odnośnik w zdaniu: „Zasady przekładania i anulowania” przy regule 12 h (U5) | A04 |
+| Głębokie linki z powiadomień do U5, M2 (S2) | KONCEPCJA §3.2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast linku | Użyj | Źródło |
+|---|---|---|
+| Akcja na tej samej stronie (zapis, wysłanie, otwarcie dialogu) | `Button`, w zdaniu `variant="link"` | WAI-ARIA APG (Link, Button) |
+| Główny krok ekranu („Zarezerwuj sesję próbną”) | `Button` `default` — link jest za słaby | R01.6 |
+| Nawigacja główna (5 pozycji) | `BottomNav` / `AppHeader` (etap 3) | R02.6 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Tekst | tak | `text-link`, zawsze podkreślony |
+| Obszar fokusu | tak | obrys `focus-ring` wokół tekstu, promień `rounded-tag` |
+
+## 5. Warianty
+
+<Canvas of={LinkStories.Variants} />
+
+Link ma jeden wygląd: w tekście i samodzielnie. Rozmiar dziedziczy z otaczającego tekstu
+(`text-body`, `text-body-dense`). Nie dodajemy wariantów kolorystycznych (K4: jeden akcent).
+
+## 6. Stany
+
+<Canvas of={LinkStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | grubsze podkreślenie (`decoration-2`) | propozycja |
+| Fokus | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Wciśnięty, wybrany, ładowanie, błąd | nie dotyczy | — |
+| Zablokowany | nie dotyczy — linku do niedostępnego miejsca nie renderujemy; zamiast tego zdanie z powodem | D2 |
+| Odwiedzony | bez osobnego koloru (K4) | propozycja |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Element `<a href>`; Enter otwiera cel. Bez `href` to nie jest link — użyj `Button`. | WAI-ARIA APG (Link) |
+| Zawsze podkreślony, więc nie wyróżnia się tylko kolorem. | WCAG 1.4.1 |
+| Tekst linku mówi, dokąd prowadzi, także poza zdaniem (czytnik wylicza listę linków). Nie „kliknij tutaj”. | WCAG 2.4.4 |
+| W Next.js: `render={<NextLink href="/konto" />}` — zachowuje wygląd i prefetch. | Base UI `useRender` |
+| Link w zdaniu może mieć mniej niż 24 px wysokości — wyjątek „inline” WCAG. Samodzielny link w formularzu stoi w wierszu o wysokości ≥ 24 px. | WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Nazwij cel, nie gest. | „Zasady przekładania i anulowania”, nie „tutaj” | WCAG 2.4.4 |
+| Pytanie dozwolone dla pomocy. | „Nie pamiętasz hasła?” | KONCEPCJA §P4 |
+| Długi link zawija się w tekście; nie skracaj adresu e-mail ani nazwy. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={LinkStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | zawija się z tekstem; samodzielny link w osobnym wierszu | propozycja |
+| 768 / 1440 px | bez zmian; tekst ciągły z linkami ma najwyżej `measure-text` (65 znaków) | R05.1 |
+
+<Unstyled>
+  <div className="flex flex-col gap-group md:flex-row">
+    <ViewportFrame width={320}>
+      <p className="text-body-dense text-text-default"><Link href="#reset">Nie pamiętasz hasła?</Link></p>
+    </ViewportFrame>
+  </div>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `href` | `string` | — | cel; wymagany |
+| `render` | `ReactElement \| (props) => ReactElement` | `<a>` | inny element, np. `NextLink` |
+| `className` | `string` | — | tylko układ; nie zmieniaj koloru |
+| pozostałe | atrybuty `<a>` | — | `target`, `rel`, `aria-*` |
+
+## 11. Kod
+
+```tsx
+import { Link } from '@kompas/ui';
+
+<Link href="/haslo/reset">Nie pamiętasz hasła?</Link>
+```
+
+Typowy przykład z produktu (Next.js):
+
+```tsx
+import NextLink from 'next/link';
+
+<p className="text-body-dense">
+  {t('noAccount')} <Link render={<NextLink href="/rejestracja" />}>{t('signUp')}</Link>
+</p>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Link href="#zasady">Zasady przekładania i anulowania</Link>}
+      goodNote="Tekst mówi, dokąd prowadzi link."
+      bad={<span className="text-body text-text-default">Zasady znajdziesz <Link href="#zasady">tutaj</Link></span>}
+      badNote="„Tutaj” nic nie znaczy poza zdaniem (WCAG 2.4.4)."
+    />
+    <DoDont
+      good={<Button variant="link">Pokaż zasady anulowania</Button>}
+      goodNote="Rozwinięcie treści na tej stronie to akcja, więc przycisk."
+      bad={<Link href="#">Pokaż zasady anulowania</Link>}
+      badNote="Link z pustym celem udaje przycisk."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Button variant="link"` (akcja tekstowa, nie nawigacja).
+- **Wzorce:** formularz (link do resetu hasła), widok szczegółów (link do profilu mentora), zmiana z regułą 12 h (link do zasad).

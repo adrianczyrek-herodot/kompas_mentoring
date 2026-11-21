@@ -10,6 +10,9 @@ const theme = process.env['KOMPAS_THEME'] === 'dark' ? 'dark' : 'light';
 
 export default defineConfig({
   define: { __KOMPAS_TEST_THEME__: JSON.stringify(theme) },
+  // Pre-bundle every dependency the stories import before tests start; otherwise Vite discovers
+  // a new one mid-run (e.g. @base-ui/react/use-render), reloads, and every suite fails to import.
+  optimizeDeps: { entries: ['src/**/*.stories.tsx', '.storybook/**/*.tsx'] },
   test: {
     projects: [
       {

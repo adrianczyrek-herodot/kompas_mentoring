@@ -77,6 +77,14 @@
   --color-action-primary-hover: var(--action-primary-hover);
   --color-action-primary-pressed: var(--action-primary-pressed);
   --color-action-danger: var(--action-danger);
+  --color-action-danger-hover: var(--action-danger-hover);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-disabled: var(--surface-disabled);
+  --color-text-disabled: var(--text-disabled);
+  --color-border-disabled: var(--border-disabled);
+  --color-border-invalid: var(--border-invalid);
+  --color-checkbox-checked: var(--checkbox-checked-bg);
+  --color-checkbox-check: var(--checkbox-check);
   --color-selected-bg: var(--selected-bg);
   --color-selected-border: var(--selected-border);
   --color-focus-ring: var(--focus-ring);
@@ -167,6 +175,7 @@
   --shadow-overlay: var(--depth-overlay);
 
   /* spacing relations: gap-inline, p-panel, py-row-y, gap-section… */
+  --spacing-tight: var(--space-tight);
   --spacing-inline: var(--space-inline);
   --spacing-group: var(--space-group);
   --spacing-panel: var(--space-panel);
@@ -174,6 +183,12 @@
   --spacing-row-y: var(--space-row-y);
   --spacing-control: var(--control-height);
   --spacing-target: var(--target-min);
+  --spacing-control-lg: var(--button-height-lg);
+  --spacing-control-sm: var(--button-height-sm);
+  --spacing-button-x: var(--button-padding-x);
+  --spacing-field-x: var(--field-padding-x);
+  --spacing-field-y: var(--field-padding-y);
+  --spacing-checkbox: var(--checkbox-size);
   --spacing-icon-sm: var(--icon-sm);
   --spacing-icon-md: var(--icon-md);
   --spacing-icon-lg: var(--icon-lg);

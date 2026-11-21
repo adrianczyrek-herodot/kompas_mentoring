@@ -1,0 +1,158 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Field, FieldDescription, FieldLabel } from './field';
+import { Input } from './input';
+import { Textarea } from './textarea';
+import * as TextareaStories from './textarea.stories';
+
+<Meta of={TextareaStories} />
+
+# Textarea
+
+## 1. Do czego służy
+
+Pozwala napisać dłuższy tekst (opis, powód, komentarz) i widzieć, ile znaków zostało do limitu.
+
+<Canvas of={TextareaStories.Playground} />
+<Controls of={TextareaStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Limit | Źródło |
+|---|---|---|
+| Opis profilu mentora (M1, krok 3) | 300–2000 znaków | backlog E2-S2 |
+| Powód odrzucenia prośby „inne” (M2) | 10–300 znaków | backlog E3-S7 |
+| Cel sesji przy rezerwacji próbnej (U2) | 20–500 znaków | KONCEPCJA §U2 |
+| Komentarz do decyzji weryfikacji (A1) | bez limitu, opcjonalny | KONCEPCJA §A1 |
+
+## 3. Kiedy nie używać
+
+| Zamiast pola wielowierszowego | Użyj | Źródło |
+|---|---|---|
+| Wartość jednowierszowa (nagłówek 20–80 znaków) | `Input` z podpowiedzią limitu | backlog E2-S2 |
+| Wybór powodu z listy | `RadioGroup`, `Textarea` tylko dla „inne” | KONCEPCJA §M2 |
+| Rozmowa (S1) | komponent wiadomości (Later) | K2 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Etykieta | tak | `FieldLabel`, zawsze widoczna |
+| Pole | tak | jak `Input`, domyślnie 4 wiersze, rozciąganie w pionie |
+| Licznik | nie | `długość / limit` pod polem, po prawej, cyfry tabelaryczne; wymaga `maxLength` |
+| Podpowiedź | zalecana przy limicie | „Od 300 do 2000 znaków” |
+| Błąd | gdy błąd | `FieldError` |
+
+## 5. Warianty
+
+<Canvas of={TextareaStories.Variants} />
+
+| Odmiana | Kiedy wybrać | Źródło |
+|---|---|---|
+| Z licznikiem (`showCount` + `maxLength`) | jest górny limit znaków | backlog E2-S2, E3-S7 |
+| Bez licznika | tekst bez limitu lub opcjonalny | propozycja |
+
+## 6. Stany
+
+<Canvas of={TextareaStories.States} />
+
+Stany jak w `Input`: fokus (obrys `focus-ring`), błąd (ramka `border-invalid` + `FieldError`, D5),
+zablokowany (D2, powód w `FieldDescription`). Najechanie, wciśnięcie, wybór i ładowanie nie dotyczą.
+Licznik nie zmienia koloru przy limicie — `maxLength` nie pozwala go przekroczyć, a za krótki tekst
+zgłasza `FieldError` po opuszczeniu pola (propozycja).
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Element `<textarea>` z etykietą przez `htmlFor`. Enter dodaje nowy wiersz, nie wysyła formularza. | WCAG 1.3.1 |
+| Licznik w `aria-describedby`: czytnik czyta „120 / 2000” przy fokusie, nie przy każdym znaku (bez `aria-live`). | WAI-ARIA, propozycja |
+| Minimum znaków podaj w podpowiedzi przed pisaniem, nie dopiero w błędzie. | WCAG 3.3.2 |
+| Cel kliknięcia: całe pole, wysokość ≥ 44 px. | K1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Podpowiedź mówi, po co jest tekst i kto go zobaczy. | „Uczeń zobaczy ten tekst.” | R05.2 |
+| Limit słowami: „Od 300 do 2000 znaków”. | — | backlog E2-S2 |
+| Błąd mówi, ile brakuje: „Dopisz jeszcze kilka zdań”. | — | R05.2 |
+
+## 9. Responsywność
+
+<Canvas of={TextareaStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | pełna szerokość, 4–6 wierszy | propozycja |
+| 768 / 1440 px | najwyżej `form-max` (640 px), tekst w polu ≤ ok. 65 znaków w linii | R05.1 |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Field>
+      <FieldLabel htmlFor="r-goal">Cel sesji</FieldLabel>
+      <Textarea id="r-goal" showCount maxLength={500} rows={3} />
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `showCount` | `boolean` | `false` | licznik `długość / maxLength`; bez `maxLength` się nie pokazuje |
+| `maxLength` | `number` | — | twardy limit znaków |
+| `rows` | `number` | `4` | wysokość początkowa |
+| `aria-invalid` | `boolean` | — | stan błędu |
+| pozostałe | atrybuty `<textarea>` | — | `id`, `value`, `defaultValue`, `onChange`, `aria-describedby` (łączy się z licznikiem) |
+
+## 11. Kod
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="reason">Powód odrzucenia</FieldLabel>
+  <Textarea id="reason" showCount maxLength={300} />
+</Field>
+```
+
+Typowy przykład z produktu (M1, opis profilu):
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="bio">{t('bio')}</FieldLabel>
+  <Textarea
+    id="bio"
+    showCount
+    maxLength={2000}
+    rows={6}
+    aria-describedby="bio-hint"
+    aria-invalid={Boolean(error) || undefined}
+  />
+  <FieldDescription id="bio-hint">{t('bioHint')}</FieldDescription>
+  {error ? <FieldError>{error}</FieldError> : null}
+</Field>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Field><FieldLabel htmlFor="dd-t1">Powód odrzucenia</FieldLabel><Textarea id="dd-t1" rows={2} showCount maxLength={300} aria-describedby="dd-t1-h" /><FieldDescription id="dd-t1-h">Od 10 do 300 znaków.</FieldDescription></Field>}
+      goodNote="Limit znany przed pisaniem, licznik pokazuje postęp."
+      bad={<Field><FieldLabel htmlFor="dd-t2">Powód odrzucenia</FieldLabel><Textarea id="dd-t2" rows={2} /></Field>}
+      badNote="Limit wychodzi na jaw dopiero w błędzie po wysłaniu."
+    />
+    <DoDont
+      good={<Field><FieldLabel htmlFor="dd-t3">Nagłówek profilu</FieldLabel><Input id="dd-t3" /></Field>}
+      goodNote="Krótka wartość w jednowierszowym polu."
+      bad={<Field><FieldLabel htmlFor="dd-t4">Nagłówek profilu</FieldLabel><Textarea id="dd-t4" rows={4} /></Field>}
+      badNote="Duże pole sugeruje długi tekst, a limit to 80 znaków."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Input` (jedna linia).
+- **Wzorce:** formularz, kreator ze szkicem (M1 opis), decyzja z powodem (A1, M2).

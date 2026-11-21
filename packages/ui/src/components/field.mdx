@@ -1,0 +1,179 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Field, FieldError, FieldLabel, FieldOptional } from './field';
+import { Input } from './input';
+import * as FieldStories from './field.stories';
+
+<Meta of={FieldStories} />
+
+# Field
+
+`Field` składa etykietę, kontrolkę, podpowiedź i błąd w jedną całość. Części: `Field`,
+`FieldLabel`, `FieldOptional`, `FieldDescription`, `FieldError`, `FieldContent`, `FieldGroup`,
+`FieldSet`, `FieldLegend`, `FieldSeparator`, `FieldTitle`, a samą etykietę poza polem daje `Label`.
+
+## 1. Do czego służy
+
+Mówi użytkownikowi, co wpisać, jaka jest reguła i co poprawić, w tym samym miejscu przy każdym polu.
+
+<Canvas of={FieldStories.Playground} />
+<Controls of={FieldStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Każde pole formularza: P4, S3, M1, U2, M2, A1 | WCAG 3.3.2 |
+| Grupa zgód w rejestracji (`FieldSet` + `FieldLegend`) | KONCEPCJA §P4 |
+| Separator „lub e-mailem” między logowaniem Google/LinkedIn a e-mailem | teksty P4 (`orEmail`) |
+
+## 3. Kiedy nie używać
+
+| Zamiast `Field` | Użyj | Źródło |
+|---|---|---|
+| Komunikat dotyczący całego formularza (błąd serwera, brak sieci) | `Alert` | WCAG 3.3.1, prompt (wzorzec formularza) |
+| Wynik akcji, który nie wymaga działania („Zapisano”) | `Toast` (partia 4) | R02.4 |
+| Nagłówek sekcji strony | typografia `section-title` | — |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `FieldLabel` | tak | `text-label`, nad polem (układ pionowy) lub po prawej od checkboxa |
+| `FieldOptional` | tylko pola opcjonalne | „(opcjonalnie)”, `text-text-muted` |
+| kontrolka | tak | `Input`, `Textarea`, `Checkbox`… |
+| `FieldDescription` | nie | reguła lub kontekst, `text-body-dense`, `text-text-muted`, najwyżej 65 znaków w linii |
+| `FieldError` | gdy błąd | ikona + tekst, `status-danger-fg`, rola `alert` |
+| odstępy | — | etykieta–pole `space-inline` (8 px), etykieta–opis w `FieldContent` `space-tight` (4 px), pole–pole `space-group` (16 px) |
+
+## 5. Warianty
+
+<Canvas of={FieldStories.Variants} />
+
+| Układ (`orientation`) | Kiedy wybrać | Źródło |
+|---|---|---|
+| `vertical` (domyślny) | pola tekstowe: etykieta nad polem | propozycja |
+| `horizontal` | checkbox i przełącznik: kontrolka przed etykietą | WAI-ARIA APG (Checkbox) |
+| `responsive` | ustawienia S3: etykieta obok pola od szerokości kontenera `md` | propozycja |
+
+`FieldSet` + `FieldLegend` grupują powiązane pola (zgody, kroki onboardingu). `FieldSeparator`
+oddziela alternatywne drogi („lub e-mailem”).
+
+## 6. Stany
+
+<Canvas of={FieldStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Z podpowiedzią | `FieldDescription` pod polem | WCAG 3.3.2 |
+| Opcjonalne | „(opcjonalnie)” przy etykiecie; wymagane nie są oznaczane | KONCEPCJA §P4 (zgoda marketingowa), propozycja |
+| Błąd | ramka pola `border-invalid` + `FieldError` z ikoną; etykieta nie zmienia koloru | D5, WCAG 1.4.1 |
+| Zablokowany | `data-disabled` na `Field`: etykieta `text-disabled`; powód w `FieldDescription` | D2 |
+| Najechanie, fokus, wciśnięty, ładowanie | stan kontrolki, nie pola (zob. `Input`, `Checkbox`) | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| `FieldLabel htmlFor` = `id` kontrolki; kliknięcie etykiety ustawia fokus lub przełącza checkbox. | WCAG 1.3.1 |
+| `FieldDescription` i `FieldError` mają `id` podane w `aria-describedby` kontrolki. | WCAG 3.3.1, 3.3.2 |
+| `FieldError` ma rolę `alert` — czytnik ogłasza błąd, gdy pojawi się po opuszczeniu pola. Przy wysłaniu fokus idzie na pierwsze błędne pole. | WAI-ARIA, prompt (wzorzec formularza) |
+| Walidacja po opuszczeniu pola, nie przy każdym znaku; błąd znika po poprawieniu i opuszczeniu pola. | prompt (wzorzec formularza) |
+| `FieldSet` z `FieldLegend` — czytnik podaje nazwę grupy przy pierwszym polu. | WCAG 1.3.1 |
+| `Field` ma rolę `group`; nie zagnieżdżaj `Field` w `Field`. | WAI-ARIA |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykieta: rzeczownik, 1–3 słowa, bez dwukropka. | „Nowe hasło” | teksty P4/S3 |
+| Podpowiedź: reguła i skutek. | „Min. 10 znaków. Po zmianie wylogujemy Cię na innych urządzeniach.” | teksty S3 |
+| Błąd: co się stało i co zrobić, bez obwiniania. | „Imię musi mieć od 2 do 50 znaków.” | R05.2, teksty P4 |
+| Logowanie: błąd nie wskazuje, które pole jest złe. | „Nieprawidłowy e-mail lub hasło.” (w `Alert`) | F1 wymaganie 2 |
+| Opcjonalne: „(opcjonalnie)” w nawiasie po etykiecie. | „Chcę dostawać wskazówki i oferty (opcjonalnie)” | teksty P4 |
+
+## 9. Responsywność
+
+<Canvas of={FieldStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | wszystkie układy pionowe; długa etykieta i błąd się zawijają | propozycja |
+| 768 px | `responsive` ustawia etykietę obok pola; formularz ≤ `form-max` | makieta (`.narrow`) |
+| 1440 px | bez zmian względem 768 px | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Field>
+      <FieldLabel htmlFor="r-code">Kod rabatowy <FieldOptional>(opcjonalnie)</FieldOptional></FieldLabel>
+      <Input id="r-code" />
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Field` | `orientation` | `'vertical' \| 'horizontal' \| 'responsive'` | `'vertical'` | układ etykiety i kontrolki |
+| `Field` | `data-disabled` | `boolean` | — | wygląd zablokowanego pola (etykieta) |
+| `FieldLabel` | `htmlFor` | `string` | — | `id` kontrolki; wymagane |
+| `FieldError` | `errors` | `{ message?: string }[]` | — | lista błędów (np. z walidacji); jeden = tekst, kilka = lista |
+| `FieldError` | `children` | `ReactNode` | — | treść błędu (zamiast `errors`) |
+| `FieldLegend` | `variant` | `'legend' \| 'label'` | `'legend'` | nagłówek grupy albo etykieta grupy |
+| `FieldSeparator` | `children` | `ReactNode` | — | tekst na linii, np. „lub e-mailem” |
+| wszystkie | `className` | `string` | — | tylko układ |
+
+## 11. Kod
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="name">Imię</FieldLabel>
+  <Input id="name" required />
+</Field>
+```
+
+Typowy przykład z produktu (P4, zgody):
+
+```tsx
+<FieldSet>
+  <FieldLegend>{t('consents')}</FieldLegend>
+  <Field orientation="horizontal">
+    <Checkbox id="terms" required aria-invalid={termsError || undefined} aria-describedby="terms-error" />
+    <FieldContent>
+      <FieldLabel htmlFor="terms">{t('terms')}</FieldLabel>
+      {termsError ? <FieldError id="terms-error">{t('errors.terms')}</FieldError> : null}
+    </FieldContent>
+  </Field>
+  <Field orientation="horizontal">
+    <Checkbox id="marketing" />
+    <FieldLabel htmlFor="marketing">
+      {t('marketingLabel')} <FieldOptional>{t('optional')}</FieldOptional>
+    </FieldLabel>
+  </Field>
+</FieldSet>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Field><FieldLabel htmlFor="dd-f1">Imię</FieldLabel><Input id="dd-f1" defaultValue="A" aria-invalid aria-describedby="dd-f1-e" /><FieldError id="dd-f1-e">Imię musi mieć od 2 do 50 znaków.</FieldError></Field>}
+      goodNote="Błąd pod polem mówi, jaka jest reguła."
+      bad={<Field><FieldLabel htmlFor="dd-f2">Imię</FieldLabel><Input id="dd-f2" defaultValue="A" aria-invalid aria-describedby="dd-f2-e" /><FieldError id="dd-f2-e">Błędna wartość.</FieldError></Field>}
+      badNote="„Błędna wartość” nie mówi, co poprawić (R05.2)."
+    />
+    <DoDont
+      good={<Field><FieldLabel htmlFor="dd-f3">Telefon <FieldOptional>(opcjonalnie)</FieldOptional></FieldLabel><Input id="dd-f3" type="tel" /></Field>}
+      goodNote="Oznaczone tylko pole opcjonalne, słowem."
+      bad={<Field><FieldLabel htmlFor="dd-f4">Imię *</FieldLabel><Input id="dd-f4" /></Field>}
+      badNote="Gwiazdka bez legendy nic nie mówi; wymagane jest domyślne (propozycja)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Alert` (komunikat dla całego formularza), `Label` (sama etykieta bez obsługi podpowiedzi i błędu).
+- **Wzorce:** formularz (wszystkie stany), kreator ze szkicem (M1), decyzja z powodem (A1, M2).

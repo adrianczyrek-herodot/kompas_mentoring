@@ -1,0 +1,198 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { CalendarPlus, ChevronLeft } from 'lucide-react';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Button } from './button';
+import * as ButtonStories from './button.stories';
+
+<Meta of={ButtonStories} />
+
+# Button
+
+## 1. Do czego służy
+
+Uruchamia akcję na bieżącym ekranie (wysłanie, zapis, rezerwacja), żeby użytkownik wiedział, co
+się stanie po kliknięciu.
+
+<Canvas of={ButtonStories.Playground} />
+<Controls of={ButtonStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Wariant | Źródło |
+|---|---|---|
+| Najważniejszy krok ekranu: „Zarezerwuj sesję próbną” (P3), „Zaloguj się” (P4), „Dołącz do sesji” (U4) | `default` | R01.6, R05.3 |
+| Akcja obok głównej: „Zmień termin”, „Pobierz moje dane” (S3) | `outline` | R01.6 |
+| Rezygnacja i akcje pomocnicze: „Anuluj” w dialogu, nawigacja tygodnia w U1 | `ghost` / `icon` | R05.3 |
+| Akcja nieodwracalna po potwierdzeniu: „Tak, usuń moje konto” (S3) | `destructive` | A02, R9 |
+| Akcja w zdaniu, która nie zmienia strony: „Pokaż zasady anulowania” | `link` | R04.2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast przycisku | Użyj | Źródło |
+|---|---|---|
+| Przejście na inną stronę lub do innego miejsca („Zobacz profil”) | `Link` — przycisk nie nawiguje | WAI-ARIA APG (Link, Button) |
+| Druga akcja główna na tym samym ekranie | `outline` albo `link` | R01.6, R05.3 |
+| Włączanie i wyłączanie ustawienia | `Switch` (partia 2) | WAI-ARIA APG (Switch) |
+| Wybór jednej z kilku opcji (30 / 60 min) | `ToggleGroup` (partia 2) | — (propozycja) |
+| Kilka akcji dla wiersza listy | `Menu` z przyciskiem `icon-sm` (partia 3) | R01.4 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Kontener | tak | `rounded-control`, wysokość `--button-height` (44 px) |
+| Etykieta | tak, poza `icon` | czasownik + obiekt, `text-label` |
+| Ikona na początku | nie | lucide 16 px (`size-icon-sm`), dekoracyjna (`aria-hidden`) |
+| Wskaźnik ładowania | tylko gdy `loading` | zastępuje ikonę, ma ruch tylko bez `prefers-reduced-motion` |
+
+## 5. Warianty
+
+<Canvas of={ButtonStories.Variants} />
+
+| Wariant | Kiedy wybrać | Źródło |
+|---|---|---|
+| `default` | jedna akcja główna na ekranie, ciepły akcent `action-primary` | R01.6, K4 |
+| `outline` | akcja drugorzędna; widoczna ramka `border-control` (3,65 : 1) | WCAG 1.4.11 |
+| `ghost` | akcja cicha: „Anuluj”, paski narzędzi, przycisk z ikoną | R05.3 |
+| `destructive` | tylko nieodwracalne usuwanie lub anulowanie, zawsze po potwierdzeniu | A02, D6/R9 |
+| `link` | akcja tekstowa w zdaniu lub pod formularzem | R04.2 |
+
+Rozmiary: `default` 44 px, `lg` 48 px tylko na ekranach rezerwacji (P3, U1), `sm` 32 px wizualnie
+z polem kliknięcia 44 px tylko w gęstych wierszach (A1), `icon` 44 px, `icon-sm` 32 px / 44 px
+(K1, R01.1, Z6).
+
+<Canvas of={ButtonStories.Sizes} />
+
+## 6. Stany
+
+<Canvas of={ButtonStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | `action-primary-hover`; drugorzędny i cichy — tło `surface-hover` | K4, D4 |
+| Fokus | obrys 2 px `focus-ring` z odstępem 2 px, ten sam na każdym elemencie | WCAG 2.4.7, 2.4.11, P-T2 |
+| Wciśnięty | tylko kolor `*-pressed`, bez przesunięcia | D3 |
+| Zablokowany | `text-disabled` na `surface-disabled`, bez przezroczystości | D2 |
+| Ładowanie | wskaźnik + `aria-busy`, klik zablokowany, fokus zostaje | KONCEPCJA P4 („przycisk ze spinnerem, blokada podwójnego wysłania”) |
+| Wybrany, błąd | nie dotyczy — przycisk nie ma stanu wyboru ani błędu; błąd pokazuje pole (`FieldError`) lub `Alert` | — |
+
+**Jak użytkownik dowie się, dlaczego akcja jest zablokowana:** obok przycisku zawsze stoi zdanie
+z powodem (tekst `meta` lub `FieldDescription`), np. „Przełożenie jest niedostępne: sesja już się
+zaczęła”. Powód nie może być tylko w podpowiedzi (`Tooltip`), bo zablokowany przycisk nie dostaje
+fokusu (D2, KONCEPCJA §2.2 F5 „przycisk nieaktywny z wyjaśnieniem”).
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Element `<button>`; Enter i Spacja uruchamiają akcję. Nigdy `div` z `onClick`. | WAI-ARIA APG (Button) |
+| Kolejność fokusu = kolejność w DOM; akcja główna na końcu formularza. | WCAG 2.4.3 |
+| Przycisk z samą ikoną ma `aria-label` z obiektem: „Poprzedni tydzień”, „Więcej akcji dla wniosku Anny Kowalczyk”. | WCAG 4.1.2 |
+| `loading` ustawia `aria-busy="true"` i `aria-disabled`; fokus nie ucieka, czytnik ogłasza „zajęty”. | WAI-ARIA 1.2 (`aria-busy`) |
+| `disabled` wyjmuje przycisk z kolejności fokusu; gdy użytkownik musi do niego dojść (np. kolejka A1), ustaw `focusableWhenDisabled`. | Base UI, WCAG 2.1.1 |
+| Cel kliknięcia ≥ 44 × 44 px, także `sm` i `icon-sm` (warstwa `::after`). Minimum WCAG to 24 × 24 px. | K1, WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Czasownik + obiekt, bez „OK” i „Tak” bez obiektu. | „Usuń konto”, nie „OK” | R05.2, prompt (Treść) |
+| Najwyżej ok. 4 słowa (ok. 30 znaków); dłuższy kontekst w zdaniu obok. | „Zarezerwuj sesję próbną” | propozycja |
+| Bez wersalików i bez wykrzyknika. | „Zapisz”, nie „ZAPISZ!” | propozycja (Typografia) |
+| Kwota w przycisku z cyframi tabelarycznymi i walutą użytkownika. | „Zapłać 180 zł” | R01.3, brief reguła 10 |
+| Długa etykieta zawija się (`whitespace-normal`) na wąskim ekranie, nie ucina się. Na angielski lub niemiecki planuj +30 % długości. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={ButtonStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | akcja główna formularza na całą szerokość (`w-full`), etykieta się zawija | K1, propozycja |
+| 768 px | szerokość według treści; akcje w jednym rzędzie, główna po prawej | propozycja |
+| 1440 px | jak 768 px; przycisk nie rośnie z ekranem | propozycja |
+
+<Unstyled>
+  <div className="flex flex-col gap-group md:flex-row">
+    <ViewportFrame width={320}>
+      <Button className="w-full">Zaloguj się</Button>
+    </ViewportFrame>
+    <ViewportFrame width={768}>
+      <div className="flex justify-end gap-inline">
+        <Button variant="ghost">Anuluj</Button>
+        <Button>Zapisz dostępność</Button>
+      </div>
+    </ViewportFrame>
+  </div>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `variant` | `'default' \| 'outline' \| 'ghost' \| 'destructive' \| 'link'` | `'default'` | rola akcji (sekcja 5) |
+| `size` | `'default' \| 'lg' \| 'sm' \| 'icon' \| 'icon-sm'` | `'default'` | wysokość; `icon*` wymaga `aria-label` |
+| `loading` | `boolean` | `false` | wskaźnik, `aria-busy`, blokada kliknięć z zachowaniem fokusu |
+| `disabled` | `boolean` | `false` | blokada; dodaj widoczny powód obok |
+| `focusableWhenDisabled` | `boolean` | `false` | zablokowany przycisk zostaje w kolejności fokusu |
+| `render` | `ReactElement` | — | inny element (Base UI), np. przycisk-link do formularza w Next.js |
+| `className` | `string` | — | tylko układ (`w-full`, `self-start`); nie zmieniaj kolorów ani promieni |
+| pozostałe | atrybuty `<button>` | — | `type`, `onClick`, `aria-*` |
+
+`buttonVariants({ variant, size })` zwraca klasy dla elementu, który nie może być `Button`.
+
+## 11. Kod
+
+```tsx
+import { Button } from '@kompas/ui';
+
+<Button onClick={save}>Zapisz</Button>
+```
+
+Typowy przykład z produktu (P4, wysyłanie formularza):
+
+```tsx
+<form onSubmit={submit} className="flex flex-col gap-group">
+  {/* pola */}
+  <Button type="submit" size="lg" loading={pending}>
+    {t('submitLogin')}
+  </Button>
+</form>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<><Button variant="ghost">Anuluj</Button><Button>Zarezerwuj sesję próbną</Button></>}
+      goodNote="Jedna akcja główna, rezygnacja jako przycisk cichy."
+      bad={<><Button>Anuluj</Button><Button>Zarezerwuj sesję próbną</Button></>}
+      badNote="Dwie akcje główne konkurują ze sobą (R01.6)."
+    />
+    <DoDont
+      good={<Button variant="destructive">Usuń konto</Button>}
+      goodNote="Czasownik i obiekt mówią, co się stanie."
+      bad={<Button variant="destructive">OK</Button>}
+      badNote="„OK” nie mówi, co zostanie usunięte."
+    />
+    <DoDont
+      good={<><Button disabled>Przełóż sesję</Button><span className="text-meta text-text-muted">Sesja już się zaczęła.</span></>}
+      goodNote="Powód blokady jest widoczny obok przycisku."
+      bad={<Button disabled>Przełóż sesję</Button>}
+      badNote="Użytkownik nie wie, dlaczego nie może kliknąć (D2)."
+    />
+    <DoDont
+      good={<Button variant="outline" size="icon" aria-label="Poprzedni tydzień"><ChevronLeft /></Button>}
+      goodNote="Ikona funkcyjna z nazwą dla czytnika ekranu."
+      bad={<Button variant="outline"><CalendarPlus />✨ Dodaj</Button>}
+      badNote="Emoji i iskierki zamiast ikony to generyczny wygląd (A01, R02.5)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Link` (nawigacja, nie akcja), `Switch` (stan ustawienia), `ToggleGroup` (wybór opcji).
+- **Wzorce:** formularz (wysyłanie, blokada podwójnego wysłania), potwierdzenie usunięcia
+  (`destructive` + `ghost`), wybór terminu z blokadą (`lg` w U1), decyzja z powodem (A1, M2).

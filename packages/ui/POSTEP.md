@@ -8,7 +8,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 |---|---|---|
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
 | 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
-| 2. Komponenty bazowe | **w toku — lista różnic względem bazy czeka na decyzje D1–D6, Z6, Z8** | 2026-11-21 |
+| 2. Komponenty bazowe | **w toku — partia 1 z 5 zrobiona, czeka na „dalej”** | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
@@ -213,7 +213,7 @@ Szacunek: ok. 30 stron przewodnika i podstaw + 75 stron komponentów; ok. 220 st
 
 ## Etap 2 — różnice względem bazy (shadcn `base-nova`), przed pierwszą partią
 
-Stan: **czeka na decyzję właściciela** (D1–D6, Z6, Z8). Wartości bez źródła oznaczone „propozycja”.
+Stan: **zatwierdzone 2026-11-21** (D1–D5 tak, Z6 „zostaw `sm` dla gęstych wierszy”, Z8 tak, D6 „usuń `secondary`”).
 
 | # | Element | shadcn (dziś w pakiecie) | Kompas | Źródło |
 |---|---|---|---|---|
@@ -240,13 +240,46 @@ Pytania (materiały milczą — propozycje do decyzji):
 - **Z8 `role` w `Alert`**: `apps/web` już przekazuje `role="alert"` jawnie przy błędach (`auth-form.tsx`, `form-status.tsx`). Propozycja: domyślnie bez roli (baner statyczny), `role="alert"` tylko jawnie dla błędów pojawiających się dynamicznie — bez zmian w aplikacji.
 - **Checkbox i radio** (propozycja, zależy od D1): pole 20 px (`icon-md`) zamiast 16, cel kliknięcia 44 px przez etykietę / pseudo-element.
 
+## Etap 2 — partie
+
+| Partia | Komponenty | Stan |
+|---|---|---|
+| 1 | Button, Link, Input, Textarea, Field (+ Label, FieldOptional), Checkbox | **zrobiona 2026-11-21** |
+| 2 | Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider | następna |
+| 3 | Card, Separator, Badge, Avatar, Table, Tabs | — |
+| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | — |
+| 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | — |
+
+### Partia 1 — co powstało
+
+- Komponenty przepisane na tokeny i decyzje R1–R10, D1–D6: `button.tsx` (warianty `default`, `outline`, `ghost`, `destructive`, `link`; rozmiary `default`, `lg`, `sm`, `icon`, `icon-sm`; nowy stan `loading`), `input.tsx`, `checkbox.tsx` (20 px, `indeterminate`, pole kliknięcia 44 px), `label.tsx`, `field.tsx` (`FieldError` z ikoną, nowy `FieldOptional`). Nowe: `link.tsx` (`render` dla `NextLink`), `textarea.tsx` (licznik `showCount`).
+- Tokeny: `surface-hover`, `surface-disabled`, `text-disabled`, `border-disabled`, `border-invalid`, `action-danger-hover` (**P-T11**, propozycja), `space-tight` (**P-T12**, propozycja), tokeny komponentów przycisku, pól i checkboxa — `tokens.css`, `globals.css`, `lekcja-06/tokeny.md`.
+- Dokumentacja: 6 stron MDX z 13 sekcjami (`src/components/*.mdx`), 6 plików stories (Playground, warianty, macierz stanów z `data-preview-state`, długa treść / 320 px, testy interakcji). Pomocnicze bloki `.storybook/blocks/component-docs.tsx` (macierz stanów, Dobrze i źle, ramka szerokości).
+- Naprawione przy okazji: `cn()` gubił klasy rozmiaru tekstu (`text-label`) obok koloru (tailwind-merge); Vitest padał przy nowej zależności (przeładowanie Vite) → `optimizeDeps.entries`; bloki Storybooka (tabela propsów, kod) nieczytelne w ciemnym motywie; tabele dokumentacji łamały słowa na 320 px.
+
+### Partia 1 — sprawdzone (2026-11-21)
+
+- `pnpm lint` (0 błędów, 0 ostrzeżeń), `pnpm typecheck`, `pnpm test`, `pnpm build` — przechodzą.
+- `test:stories:themes` z wyczyszczoną pamięcią podręczną: 35 testów × 2 motywy przechodzą (a11y `error` + 14 testów interakcji w partii 1).
+- `build-storybook` + Playwright: 6 stron × 2 motywy × 320 / 1440 px — 13 sekcji, 0 surowych tabel, brak przewijania poziomego strony, brak błędów konsoli; zrzuty obejrzane (macierz stanów przycisku w ciemnym motywie, strona Checkbox w ciemnym, Field na 320 px).
+- `check:tokens`: komponenty partii 1 czyste; zostaje 5 wartości w `card.tsx` (4) i `alert.tsx` (1) — partie 3 i 5.
+
+### Partia 1 — niesprawdzone
+
+- Ekrany `apps/web` (P4, S3) w przeglądarce po zmianie wyglądu przycisków, pól i checkboxów — wymagają Postgresa (Docker). Typecheck i build `apps/web` przechodzą.
+- Szerokość 768 px stron komponentów (sprawdzone 320 i 1440).
+
 ## Otwarte pytania (do właściciela)
 
-- Z6 (rozmiary przycisków < 44 px) i Z8 (`role` w `Alert`) — decyzja przy etapie 2.
+- **P-T11** `action-danger-hover` (`#962c22` / `#f4978c`) i **P-T12** `space-tight` (4 px) — nowe tokeny w partii 1, do zatwierdzenia.
+- Reguły bez źródła oznaczone „propozycja” na stronach partii 1 (m.in.: oznaczamy tylko pola opcjonalne; etykieta przycisku ≤ ok. 4 słowa; +30 % długości przy tłumaczeniu; układ akcji 320 / 768 px; link bez koloru „odwiedzony”; karta wyboru dla checklisty A1).
+
 - Propozycja: dołączyć `test:stories:themes` i `check:tokens` do CI po etapie 2 (dziś `check:tokens` pada na istniejących komponentach).
 - Propozycja (bez źródła w materiałach): „bez wersalików w etykietach, pogrubienie najwyżej 600” na stronie Typografia; „klasa `.light` tylko w dokumentacji” na stronie Motywy.
 
 ## Zatwierdzone decyzje
+
+- 2026-11-21 — etap 2: D1–D5 zatwierdzone; Z6 — zostają `sm` i `icon-sm` (32 px, pole kliknięcia 44 px) tylko dla gęstych wierszy, usunięte `xs`, `icon-xs`, `icon-lg`; Z8 — `Alert` bez domyślnej roli, `role="alert"` jawnie dla błędów dynamicznych; D6 — wariant `secondary` usunięty.
 
 - 2026-11-11 — tabela tokenów zatwierdzona w całości (P-T1–P-T10), zapis w `lekcja-06/tokeny.md`. Zatwierdzenie rozstrzyga Z1, Z3, Z4, Z5, Z7, Z9.
 - 2026-11-11 Q1 — tabelę tokenów proponuje agent (wg `od-decyzji-do-tokenow-devmentor.txt`), właściciel zatwierdza przed zapisem.
@@ -258,4 +291,4 @@ Pytania (materiały milczą — propozycje do decyzji):
 
 ## Następny krok
 
-Etap 2: po decyzjach D1–D6, Z6, Z8 (sekcja „Etap 2 — różnice względem bazy”) wpisać je do „Zatwierdzone decyzje”, dopisać ewentualne tokeny komponentów (`--control-padding-x`, `--surface-hover`) do `tokens.css` i `lekcja-06/tokeny.md`. Potem partie po ~6 komponentów (pierwsza: Button, Link, Input, Textarea, Field, Checkbox) ze stroną 13 sekcji, macierzą stanów (`data-preview-state`) i play functions.
+Po „dalej” (i decyzji o P-T11, P-T12): partia 2 — Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider, ta sama budowa (13 sekcji, macierz stanów, testy interakcji), potem `test:stories:themes`, `check:tokens`, `build-storybook` + zrzuty.

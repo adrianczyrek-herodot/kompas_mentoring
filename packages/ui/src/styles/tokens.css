@@ -46,7 +46,9 @@
   --raw-white: #ffffff;
   --raw-red-100: #fbe5e2;
   --raw-red-700: #b4352a;
+  --raw-red-800: #962c22;
   --raw-red-dark-400: #f07b6f;
+  --raw-red-dark-300: #f4978c;
   --raw-red-dark-900: #3d211d;
   --raw-green-100: #e2f2e7;
   --raw-green-700: #2f7a4a;
@@ -130,6 +132,9 @@
   --action-primary-hover: var(--raw-amber-450); /* K4 */
   --action-primary-pressed: var(--raw-amber-550); /* K4 */
   --action-danger: var(--raw-red-700); /* WCAG, A02: irreversible actions only */
+  --action-danger-hover: var(
+    --raw-red-800
+  ); /* P-T11: hover on action-danger (7.84 : 1 with text-on-danger) */
 
   /* selection and focus */
   --selected-bg: var(--raw-amber-100); /* R04.2, K4: selected slot, tab, option */
@@ -194,6 +199,7 @@
   --measure-text: 65ch; /* R05.1: running text */
 
   /* spacing relations (values P-T7) */
+  --space-tight: var(--raw-space-1); /* P-T12: label–hint, items of one message */
   --space-inline: var(--raw-space-2); /* within a group: icon–text, items of one group */
   --space-group: var(--raw-space-4); /* between groups: fields, blocks */
   --space-panel: var(--raw-space-4); /* inside a panel; 24 from 768 px */
@@ -239,6 +245,7 @@
   --action-primary-hover: var(--raw-amber-dark-200);
   --action-primary-pressed: var(--raw-amber-dark-500);
   --action-danger: var(--raw-red-dark-400);
+  --action-danger-hover: var(--raw-red-dark-300); /* 8.20 : 1 with text-on-danger */
 
   --selected-bg: var(--raw-amber-dark-900);
   --selected-border: var(--raw-amber-dark-300);
@@ -255,6 +262,19 @@
   --status-danger-bg: var(--raw-red-dark-900);
 
   --depth-overlay: 0 4px 16px var(--raw-shadow-dark);
+}
+
+/* State aliases of other semantic tokens — declared on every theme scope so they follow `.dark`. */
+:root,
+.light,
+.dark {
+  --surface-hover: var(
+    --surface-sunken
+  ); /* D4: hover on secondary and quiet actions, field cards */
+  --surface-disabled: var(--surface-sunken); /* D2: disabled controls, instead of opacity */
+  --text-disabled: var(--text-subtle); /* D2: 4.93 : 1 light / 7.01 : 1 dark on surface-disabled */
+  --border-disabled: var(--border-divider); /* D2 */
+  --border-invalid: var(--status-danger-fg); /* D5: field error border, no glow */
 }
 
 /* Wider screens: roomier panels, sections and titles (KONCEPCJA §3.2 breakpoint 768 px). */
@@ -285,6 +305,16 @@
 .light,
 .dark {
   --button-height: var(--control-height); /* K1 */
+  --button-height-lg: 3rem; /* R01.1: roomy booking (P3, U1) */
+  --button-height-sm: 2rem; /* Z6: dense rows only (A1 table); tap area stays target-min */
+  --button-padding-x: var(--space-group); /* D1: 16 px */
+  --field-padding-x: var(--raw-space-3); /* D1: 12 px in inputs, selects, textareas */
+  --field-padding-y: var(--raw-space-2); /* D1: textarea, so 24 px lines sit in a 44 px row */
+  --checkbox-size: var(--icon-md); /* 20 px box; tap area via label or target-min */
+  --checkbox-checked-bg: var(--selected-border); /* R04.2, K4: selection accent */
+  --checkbox-check: var(
+    --surface-panel
+  ); /* 5.78 : 1 light / 8.44 : 1 dark on checkbox-checked-bg */
   --input-border: var(--border-control); /* WCAG 1.4.11 */
   --row-divider: var(--border-divider); /* R01.4 */
   --slot-selected-bg: var(--selected-bg); /* R04.2 */

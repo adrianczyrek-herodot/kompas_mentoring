@@ -25,6 +25,10 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-11** — Zmienna CSS zdefiniowana jako `var(--inna)` na `:root` jest rozwiązywana raz, na korzeniu, i dziedziczona już jako wartość — w poddrzewie `.dark` / `.light` alias (np. `--card: var(--surface-panel)`) zostaje z motywu korzenia. Aliasy i tokeny komponentów deklaruj na `:root, .light, .dark`.
 - **2026-11-11** — Wynik `build-storybook` (`storybook-static/`) musi być wykluczony z ESLint (`packages/config/eslint`), dependency-cruiser (`.dependency-cruiser.cjs`) i `.gitignore`, inaczej `pnpm lint` zgłasza tysiące błędów w zbudowanych plikach.
 
+- **2026-11-21** — `cn()` (tailwind-merge) nie zna własnych rozmiarów tekstu z `@theme` — `text-label` brał za kolor i usuwał go obok `text-text-default` (lub odwrotnie), po cichu. Każdą nową rolę `--text-*` w `globals.css` dopisz do `extendTailwindMerge` w `packages/ui/src/lib/utils.ts`.
+- **2026-11-21** — Testy stories (Vitest browser) padały całymi plikami („Failed to fetch dynamically imported module”), gdy story importowała zależność, której Vite jeszcze nie zoptymalizował (przeładowanie w trakcie). Przyczyna to nie podział plików (jak zakładał log etapu 1): `optimizeDeps.entries` w `packages/ui/vitest.config.ts` skanuje stories przed startem; nie dodawaj tam `main.ts` (ładuje natywny `@tailwindcss/oxide`).
+- **2026-11-21** — Bloki Storybooka (tabela propsów `docblock-argstable`, kod `docblock-source`) mają style tylko jasne — w ciemnym motywie trzeba je nadpisać w `.storybook/preview.css` (podwójna klasa, żeby wygrać z emotion). Sprawdzaj każdą nową stronę w obu motywach.
+
 ## Domena i produkt
 
 ## Kod i mockupy

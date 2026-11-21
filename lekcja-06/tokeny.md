@@ -74,6 +74,21 @@ Oznaczenia: **P-T…** — wartość zaproponowana przez agenta (materiały jej 
 | `slot-selected-bg` / `-border` | `selected-bg` / `selected-border` | R04.2 |
 | `dialog-width` | 480 px | P-T10 |
 
+## Uzupełnienia etapu 2 (2026-11-21)
+
+Decyzje właściciela D1–D5, Z6 (lista różnic w `packages/ui/POSTEP.md`) i dwie propozycje agenta (**P-T11**, **P-T12** — do zatwierdzenia).
+
+| Token | Jasny / ciemny | Źródło | Do czego |
+|---|---|---|---|
+| `surface-hover` | = `surface-sunken` | D4 | najechanie na akcje drugorzędne i ciche, karty wyboru |
+| `surface-disabled`, `text-disabled`, `border-disabled` | = `surface-sunken`, `text-subtle`, `border-divider` | D2 | zablokowane kontrolki zamiast przezroczystości (tekst 4,93 : 1 / 7,01 : 1) |
+| `border-invalid` | = `status-danger-fg` | D5 | ramka pola z błędem, bez poświaty |
+| `action-danger-hover` | `#962c22` / `#f4978c` | **P-T11** (propozycja) | najechanie na akcję destrukcyjną (7,84 : 1 / 8,20 : 1 z `text-on-danger`) |
+| `space-tight` | 4 px | **P-T12** (propozycja) | etykieta–opis, elementy jednego komunikatu |
+| `button-height-lg` / `-sm` | 48 / 32 px | R01.1 / Z6 | rezerwacja (P3, U1) / gęste wiersze (A1) z polem kliknięcia 44 px |
+| `button-padding-x`, `field-padding-x`, `field-padding-y` | 16 / 12 / 8 px | D1 | odstępy wewnętrzne kontrolek |
+| `checkbox-size`, `checkbox-checked-bg`, `checkbox-check` | 20 px, `selected-border`, `surface-panel` | K1, R04.2 | pole wyboru (znacznik 5,78 : 1 / 8,44 : 1) |
+
 ## Kontrast (policzony dla wartości z tabeli)
 
 | Para | Jasny | Ciemny | Próg |
