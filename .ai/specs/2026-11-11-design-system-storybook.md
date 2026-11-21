@@ -45,7 +45,7 @@ Ekrany Kompasu budują developerzy i agenci AI. Bez jednej instrukcji obsługi k
 - [ ] Każdy wzorzec ma wszystkie stany danych, formularz — stany odpowiedzi API.
 - [ ] Każdy kluczowy ekran E1–E3 ma story i mapę stanów.
 - [ ] Oba motywy działają także w dialogach, menu i popoverach.
-- [ ] `docs/design-system.md` istnieje i `AGENTS.md` do niego odsyła.
+- [x] `docs/design-system.md` istnieje i `AGENTS.md` do niego odsyła.
 - [ ] `apps/web` buduje się i wygląda poprawnie po zmianie tokenów (`pnpm build`, e2e).
 - [ ] Test agentem (osobna sesja) wykonany, luki uzupełnione albo wpisane do „Czego brakuje”.
 

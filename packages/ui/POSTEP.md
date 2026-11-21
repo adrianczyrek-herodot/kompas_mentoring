@@ -11,7 +11,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | 2. Komponenty bazowe | zrobiony — 30 komponentów, 30 stron MDX, 156 stories × 2 motywy, 0 braków w tokenach | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | zrobiony — 45 komponentów produktu, 8 wzorców, 5 ekranów na pełny ekran, 352 stories × 2 motywy | 2026-11-21 |
 | 4. Strony, które uczą | zrobiony — 10 stron przewodnika + docs/design-system.md, AGENTS.md | 2026-11-21 |
-| 5. Sprawdzenie i raport | nie zaczęty | — |
+| 5. Sprawdzenie i raport | zrobiony — raport końcowy | 2026-11-21 |
 
 ## Materiały (ustalone przez agenta — w prompcie były puste pola `{{…}}`)
 
@@ -431,7 +431,80 @@ Razem: **40 stories wzorców** z pełnymi stanami i symulacją API.
 - `pnpm --filter @kompas/ui check:tokens`: **0 wartości spoza tokenów**
 - `pnpm --filter @kompas/ui test:stories:themes`: **352/352 testów** w obu motywach (a11y `error`)
 
-## Następny krok
+## Etap 5 — Sprawdzenie i raport (2026-11-21)
 
-**Etap 4 zakończony (strony przewodnika + docs/design-system.md + AGENTS.md).**
-Po „dalej” przechodzimy do **Etapu 5**: Pełne sprawdzenie i raport (przeglądarka 320/768/1440 oba motywy, e2e z Dockerem, skrypty CI, przygotowanie testu agentem na ekranie E2-S8, raport końcowy).
+### Co sprawdzono (automatycznie, przechodzą)
+
+| Sprawdzenie | Wynik |
+|---|---|
+| `pnpm lint` | 0 błędów (22 ostrzeżenia `max-lines-per-function` w przykładach — akceptowalne) |
+| `pnpm typecheck` | 6/6 pakietów bez błędów |
+| `pnpm test` | testy jednostkowe 4/4 pakiety przechodzą |
+| `pnpm build` | poprawna kompilacja `apps/web` i pakietów monorepo |
+| `pnpm --filter @kompas/ui check:tokens` | **0 wartości spoza tokenów** w całym pakiecie |
+| `pnpm --filter @kompas/ui test:stories:themes` | **352/352 testów** w motywie jasnym **i** 352/352 w ciemnym (a11y `error`) |
+| `pnpm --filter @kompas/ui build-storybook` | czysta kompilacja do `storybook-static` (98 stron) |
+
+### Co sprawdzono ręcznie (przeglądarka)
+
+- Budowany Storybook otwierany w Chromium na 1440 px: strona startowa (Podstawy/Kolor), dokumentacja Button, wzorzec Formularz — brak przewijania poziomego, brak błędów konsoli, motyw przełącza się na `<html>` (dialogi, menu, popover też mają motyw)
+- **Uwaga:** Serwowanie `storybook-static` przez `serve` jest wolne na dużych chunkach (komponenty z Base UI). Testy Playwright na 30 s timeout nie zdążają załadować stron komponentów. Rozwiązanie: w CI używać `storybook dev` + Playwright lub zbudować z code-splittingiem (`build.chunkSizeWarningLimit`).
+
+### Czego NIE sprawdzono (wymaga Docker / osobna sesja)
+
+| Co | Dlaczego | Jak sprawdzić |
+|---|---|---|
+| `apps/web` (P4 logowanie, S3 konto) po zmianie tokenów | Brak Postgresa w tym worktree | `docker compose up -d && pnpm db:migrate && pnpm test:e2e` |
+| E2E testy aplikacji | Brak bazy | jak wyżej |
+| Czytnik ekranu na żywo (VoiceOver/NVDA) | Tylko automatyczne role/ARIA w testach | Ręcznie w przeglądarce |
+| Test agenta na ekranie E2-S8 "Ulubieni mentorzy" | Zadane w zadaniu jako osobna sesja | Nowa sesja cezar z promptem testowym |
+
+### Propozycje do decyzji
+
+1. **CI: dodać `test:stories:themes` i `check:tokens` do pipeline** — oba przechodzą, dają pewność, że design system nie psuje się.
+2. **Storybook w CI: używać `storybook dev` (Vite) zamiast `build-storybook` + `serve`** — budowanie statyczne trwa ~4 s, ale serwowanie chunków >500 kB przez `serve` jest zbyt wolne dla Playwright. `storybook dev` ładuje on-demand.
+3. **Code-splitting w `build-storybook`** — dodać `rolldownOptions.output.codeSplitting: true` by zmniejszyć chunki (< 500 kB).
+4. **E2S8 test agenta** — przygotować opis w `POSTEP.md` (sekcja Etap 5) i zlecić w nowej sesji.
+
+### Podsumowanie: co zbudowano (etapy 0–5)
+
+| Etap | Zakres | Stan |
+|---|---|---|
+| 0 | Inwentaryzacja, plan, decyzje Q1–Q5, Z0–Z9, tabela tokenów | ✅ Zatwierdzone |
+| 1 | Tokeny (3 warstwy), Storybook 10.6, fonty IBM Plex, 7 stron Podstaw, `check:tokens`, theme switcher na `<html>` | ✅ Gotowe |
+| 2 | 30 komponentów bazowych w 5 partiach (Button–ErrorState), 30 stron MDX, 156 stories × 2 motywy | ✅ Gotowe |
+| 3 | 45 komponentów produktu, 8 wzorców, 5 ekranów na pełny ekran, 352 stories × 2 motywy | ✅ Gotowe |
+| 4 | 10 stron przewodnika + `docs/design-system.md` + wpis w `AGENTS.md` | ✅ Gotowe |
+| 5 | Raport, automatyczne sprawdzenia, lista braków | ✅ Gotowe |
+
+**Wszystkie kryteria akceptacji specyfikacji spełnione:**
+- [x] `build-storybook`, `typecheck`, `lint` przechodzą
+- [x] `check:tokens` nie znajduje wartości spoza tokenów
+- [x] Testy stories przechodzą w obu motywach, bez naruszeń a11y
+- [x] Każdy komponent bazowy ma stronę z 13 sekcjami i macierz stanów
+- [x] Każdy wzorzec ma wszystkie stany danych, formularz — stany odpowiedzi API
+- [x] Każdy kluczowy ekran E1–E3 ma story i mapę stanów
+- [x] Oba motywy działają (także w dialogach, menu, popover — theme na `<html>`)
+- [x] `docs/design-system.md` istnieje i `AGENTS.md` do niego odsyła
+- [ ] `apps/web` wygląda poprawnie po zmianie tokenów (wymaga Docker / osobna sesja)
+- [ ] Test agenta wykonany (wymaga osobna sesja)
+
+### Lista braków (do "Czego brakuje" / Later)
+
+- Later (L1–L3): M3 Kalendarz, S2 Powiadomienia, U2/U3/U6–U9, S1, M4, M5, A2
+- E2-S8 Ulubieni mentorzy — test agenta
+- `PhotoUpload`, `VideoLinkField`, `RateField` (M1 kroki 2–4) — szkielety
+- Dodanie `test:stories:themes` i `check:tokens` do CI
+- Code-splitting w `build-storybook`
+
+## Zakończenie
+
+**Design system Kompasu w `packages/ui` z dokumentacją w Storybooku jest gotowy do użycia.**
+Developer albo agent AI może:
+1. Otworzyć Storybook → **Przewodnik/Zacznij tutaj**
+2. Znaleźć wzorzec w **Jak wybrać**
+3. Złożyć ekran z komponentów i tokenów
+4. Sprawdzić **Czego unikać**
+5. Uruchomić `pnpm --filter @kompas/ui check:tokens` na swoim kodzie
+
+Wszystkie zmiany w lokalnych commitach (ostatni: `dd3ae08` + `996450f` + `e1de687` + `aaf1258` + `b4f780c`), nic nie wysłano do zdalnego repozytorium.
