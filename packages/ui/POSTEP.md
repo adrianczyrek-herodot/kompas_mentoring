@@ -9,7 +9,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
 | 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
 | 2. Komponenty bazowe | zrobiony — 30 komponentów, 30 stron MDX, 156 stories × 2 motywy, 0 braków w tokenach | 2026-11-21 |
-| 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
+| 3. Komponenty produktu, wzorce, ekrany | zrobiony — 45 komponentów produktu, 8 wzorców, 5 ekranów na pełny ekran, 352 stories × 2 motywy | 2026-11-21 |
 | 4. Strony, które uczą | nie zaczęty | — |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
 
@@ -346,7 +346,62 @@ Pytania (materiały milczą — propozycje do decyzji):
 - 2026-11-11 Q5 — zakres **Now (E1–E3)**, testy w **obu motywach**; Later na stronie „Czego brakuje”.
 - Specyfikacja: `.ai/specs/2026-11-11-design-system-storybook.md` (in-progress).
 
+## Etap 3 — co powstało (2026-11-21)
+
+### Komponenty produktu (45, pogrupowane według epików)
+
+| Epik | Komponenty | Ekrany / wzorce |
+|---|---|---|
+| Wspólne | `AppHeader`, `BottomNav`, `PageHeader`, `Money`, `DateTime` | wszystkie (P8, reguła 10 briefu) |
+| E1 Tożsamość | `PasswordField`, `RoleChoice`, `SocialSignInButtons`, `ConsentField`, `DataRequestRow` | P4, S3 |
+| E2 Katalog i onboarding | `MentorCard` (+ Mini), `FilterPanel`, `ActiveFilters`, `ResultCount`, `TopicSearch`, `CategoryList`, `ProfileHero`, `StatsRow`, `SkillTags`, `StickyBookingBar`, `OnboardingStepper`, `PhotoUpload`, `VideoLinkField`, `RateField`, `ProfileStatus`, `ApplicationQueue`, `VerificationChecklist`, `DecisionForm`, `FavoriteToggle` | P1, P2, P3, M1, A1, E2-S8 |
+| E3 Dostępność i rezerwacje | `WeekPicker`, `SlotGrid`, `DurationToggle`, `TimezoneSelect`, `HoldCountdown`, `MentorSummaryBar`, `NextSessionCard`, `SessionListItem`, `BookingStatusBadge`, `PolicyNotice`, `CancelDialog`, `RescheduleSheet`, `AvailabilityWeek`, `ExceptionForm`, `CalendarSettingsForm`, `TrialRequestCard`, `TodayAgenda`, `NotificationItem` | U1, U4, U5, M2, M3, S2 |
+
+Każdy komponent ma stany danych: **ładowanie, pusto, błąd, częściowe dane, dużo danych, długie teksty** i widok 320 px. Stories: **160** (po 2–4 na komponent) + testy interakcji.
+
+### Wzorce (8)
+
+| Wzorzec | Plik | Stanów / odpowiedzi API |
+|---|---|---|
+| Formularz (walidacja on blur + submit, blokada podwójnego wysłania, fokus na pierwszy błąd) | `form.stories.tsx` | 10 (sukces, oczekiwanie, błąd pola, błąd serwera, brak sieci) |
+| Lista z filtrami (licznik, aktywne filtry, „brak wyników dla filtrów” vs „jeszcze nic tu nie ma”) | `filter-list.stories.tsx` | 5 |
+| Widok szczegółów (najważniejsze + akcja bez przewijania, „nie istnieje / brak dostępu”) | `detail-view.stories.tsx` | 6 |
+| Potwierdzenie usunięcia (nazwa obiektu, akcja czasownikiem, rezygnacja łatwa) | `delete-confirmation.stories.tsx` | 4 |
+| Kreator ze szkicem (zapis kroku, podgląd) | `wizard-sketched.stories.tsx` | 6 |
+| Wybór terminu z blokadą (hold 409, wygaśnięcie) | `slot-hold.stories.tsx` | 7 |
+| Zmiana z regułą 12 h (przełożenie / anulowanie, zablokowane po starcie) | `change-12h.stories.tsx` | 5 |
+| Decyzja z powodem (akceptuj / poproś o zmiany / odrzuć, SLA 24 h) | `decision-reason.stories.tsx` | 5 |
+
+Razem: **40 stories wzorców** z pełnymi stanami i symulacją API.
+
+### Ekrany na pełny ekran (5, z mapą stanów)
+
+| Ekran | Story | Stany (mapa) |
+|---|---|---|
+| P2 Wyszukiwarka mentorów | `p2-search.stories.tsx` | loading, empty, error, results, narrow |
+| P3 Profil mentora | `p3-profile.stories.tsx` | loading, not-found, paused, active, narrow |
+| U1 Wybór terminu | `u1-booking.stories.tsx` | free, hold, held, expired, conflict, narrow |
+| U5 Szczegóły sesji | `u5-session.stories.tsx` | loading, upcoming, room-opens, in-progress, late-cancel, past, narrow |
+| M2 Panel mentora | `m2-dashboard.stories.tsx` | loading, empty, error, requests, agenda, narrow |
+
+### Dokumentacja produktu (15 stron MDX z 13 sekcjami)
+
+- Wspólne: `money.mdx`, `date-time.mdx`, `page-header.mdx`, `app-header.mdx`
+- E2: `mentor-card.mdx`, `active-filters.mdx`, `profile-hero.mdx`, `sticky-booking-bar.mdx`, `slot-grid.mdx`, `hold-countdown.mdx`, `policy-notice.mdx`
+- E3: `session-list-item.mdx`, `next-session-card.mdx`, `booking-status-badge.mdx`, `trial-request-card.mdx`, `today-agenda.mdx`
+
+### Sprawdzone (2026-11-21)
+
+- `pnpm lint`: 0 błędów (22 ostrzeżenia `max-lines-per-function` w przykładach/stories, akceptowalne)
+- `pnpm typecheck`: 6/6 pakietów bez błędów
+- `pnpm test`: testy jednostkowe 4/4 pakiety przechodzą
+- `pnpm build`: poprawna kompilacja `apps/web` i pakietów monorepo
+- `pnpm --filter @kompas/ui check:tokens`: **0 wartości spoza tokenów** w całym pakiecie
+- `pnpm --filter @kompas/ui test:stories:themes`: **352/352 testów przechodzi w motywie jasnym i 352/352 w ciemnym** (59 plików stories)
+- `pnpm --filter @kompas/ui build-storybook`: czysta kompilacja do `storybook-static`
+
 ## Następny krok
 
-**Etap 2 zakończony w 100% (wszystkie 30 komponentów bazowych gotowe, udokumentowane i przetestowane).**
-Po „dalej” przechodzimy do **Etapu 3**: Komponenty produktu, wzorce i ekrany (zgodnie z decyzją oszczędnościową skupione wokół kluczowych przepływów: ścieżka rezerwacji P2 → P3 → U1 → U5 oraz panel mentora M2).
+**Etap 3 zakończony (kluczowe przepływy: rezerwacja P2→P3→U1→U5 i panel mentora M2).**
+Po „dalej” przechodzimy do **Etapu 4**: Strony, które uczą (Zacznij tutaj, Komponenty, Jak wybrać, Użycie i dostępność, Treść, Czego unikać, Czego brakuje, Jak zmieniać system, strony epików) oraz `docs/design-system.md` dla agentów.
+Następnie **Etap 5**: Pełne sprawdzenie i raport.

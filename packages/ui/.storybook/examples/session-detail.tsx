@@ -199,7 +199,9 @@ export function SessionDetail({
               disabled={late || blocked}
               focusableWhenDisabled
               aria-describedby={late || blocked ? policyId : undefined}
-              onClick={() => setRescheduleOpen(true)}
+              onClick={() => {
+                setRescheduleOpen(true);
+              }}
             >
               Przełóż
             </Button>
@@ -208,7 +210,9 @@ export function SessionDetail({
               disabled={blocked}
               focusableWhenDisabled
               aria-describedby={blocked ? policyId : undefined}
-              onClick={() => setCancelOpen(true)}
+              onClick={() => {
+                setCancelOpen(true);
+              }}
             >
               Anuluj sesję
             </Button>
@@ -216,7 +220,12 @@ export function SessionDetail({
         </section>
       ) : null}
 
-      <AlertDialog open={cancelOpen} onOpenChange={(open) => !cancelling && setCancelOpen(open)}>
+      <AlertDialog
+        open={cancelOpen}
+        onOpenChange={(open) => {
+          if (!cancelling) setCancelOpen(open);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -238,7 +247,13 @@ export function SessionDetail({
             </Alert>
           ) : null}
           <AlertDialogFooter>
-            <Button variant="outline" disabled={cancelling} onClick={() => setCancelOpen(false)}>
+            <Button
+              variant="outline"
+              disabled={cancelling}
+              onClick={() => {
+                setCancelOpen(false);
+              }}
+            >
               Zostaw sesję
             </Button>
             <Button variant="destructive" loading={cancelling} onClick={() => void cancel()}>
@@ -263,11 +278,18 @@ export function SessionDetail({
             weekLabel={WEEK_LABEL}
             canGoPrev={false}
             selectedSlotId={slot}
-            onSelect={(next) => setSlot(next.id)}
+            onSelect={(next) => {
+              setSlot(next.id);
+            }}
             layout="stacked"
           />
           <SheetFooter>
-            <Button disabled={!slot} onClick={() => setRescheduleOpen(false)}>
+            <Button
+              disabled={!slot}
+              onClick={() => {
+                setRescheduleOpen(false);
+              }}
+            >
               Przełóż na wybrany termin
             </Button>
           </SheetFooter>

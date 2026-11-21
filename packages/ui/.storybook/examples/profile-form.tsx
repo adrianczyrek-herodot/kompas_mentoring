@@ -3,7 +3,7 @@
  * the way a screen should do it. Storybook only — the app builds its own with react-hook-form.
  */
 import { CircleCheck, CircleX, WifiOff } from 'lucide-react';
-import { type FormEvent, useRef, useState } from 'react';
+import { type SyntheticEvent, useRef, useState } from 'react';
 import {
   Alert,
   AlertDescription,
@@ -72,10 +72,11 @@ export function ProfileForm({
     if (errors[name]) setErrors((current) => ({ ...current, [name]: validate(name, value) }));
   };
   // Validate on leaving the field (WCAG 3.3.1), not on every keystroke of a fresh field.
-  const blur = (name: FieldName) =>
+  const blur = (name: FieldName) => {
     setErrors((current) => ({ ...current, [name]: validate(name, values[name]) }));
+  };
 
-  const submit = async (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return; // Double submit blocked (KONCEPCJA §P4 L).
     const next = Object.fromEntries(order.map((name) => [name, validate(name, values[name])]));
@@ -87,14 +88,17 @@ export function ProfileForm({
     }
     setSubmitting(true);
     setResult(null);
-    const answer = await onSubmit(values);
-    setSubmitting(false);
-    setResult(answer);
-    if (!answer.ok && answer.kind === 'field') {
-      const field = answer.field as FieldName;
-      setErrors((current) => ({ ...current, [field]: answer.message }));
-      refs[field].current?.focus();
-    }
+    const run = async () => {
+      const answer = await onSubmit(values);
+      setSubmitting(false);
+      setResult(answer);
+      if (!answer.ok && answer.kind === 'field') {
+        const field = answer.field as FieldName;
+        setErrors((current) => ({ ...current, [field]: answer.message }));
+        refs[field].current?.focus();
+      }
+    };
+    void run();
   };
 
   const describedBy = (name: FieldName, hint?: boolean) =>
@@ -102,7 +106,13 @@ export function ProfileForm({
     undefined;
 
   return (
-    <form noValidate onSubmit={submit} className="flex max-w-form flex-col gap-group">
+    <form
+      noValidate
+      onSubmit={(event) => {
+        submit(event);
+      }}
+      className="flex max-w-form flex-col gap-group"
+    >
       <FieldGroup>
         <Field data-invalid={errors.headline ? true : undefined}>
           <FieldLabel htmlFor="headline">Nagłówek profilu</FieldLabel>
@@ -115,8 +125,12 @@ export function ProfileForm({
             placeholder="np. Senior Frontend Engineer · React, TypeScript"
             aria-invalid={errors.headline ? true : undefined}
             aria-describedby={describedBy('headline', true)}
-            onChange={(event) => change('headline', event.target.value)}
-            onBlur={() => blur('headline')}
+            onChange={(event) => {
+              change('headline', event.target.value);
+            }}
+            onBlur={() => {
+              blur('headline');
+            }}
           />
           <FieldDescription id="headline-hint">
             20–80 znaków. Kim jesteś i w czym pomagasz — pokażemy to w wynikach wyszukiwania.
@@ -136,8 +150,12 @@ export function ProfileForm({
             value={values.bio}
             aria-invalid={errors.bio ? true : undefined}
             aria-describedby={describedBy('bio', true)}
-            onChange={(event) => change('bio', event.target.value)}
-            onBlur={() => blur('bio')}
+            onChange={(event) => {
+              change('bio', event.target.value);
+            }}
+            onBlur={() => {
+              blur('bio');
+            }}
           />
           <FieldDescription id="bio-hint">
             300–2000 znaków. Z czym przychodzą do Ciebie uczniowie i jak wygląda pierwsza sesja.
@@ -159,8 +177,12 @@ export function ProfileForm({
             placeholder="https://www.youtube.com/watch?v=…"
             aria-invalid={errors.video ? true : undefined}
             aria-describedby={describedBy('video', true)}
-            onChange={(event) => change('video', event.target.value)}
-            onBlur={() => blur('video')}
+            onChange={(event) => {
+              change('video', event.target.value);
+            }}
+            onBlur={() => {
+              blur('video');
+            }}
           />
           <FieldDescription id="video-hint">YouTube albo Vimeo, od 30 s do 3 min.</FieldDescription>
           {errors.video ? <FieldError id="video-error">{errors.video}</FieldError> : null}

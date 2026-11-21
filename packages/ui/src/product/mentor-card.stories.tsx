@@ -13,7 +13,13 @@ const onBook = fn();
 /** Booking action of a row: secondary (R01.6), name extended for screen readers (WCAG 2.4.4). */
 function BookAction({ mentor }: { mentor: MentorSummary }) {
   return (
-    <Button variant="outline" size="sm" onClick={() => onBook(mentor.id)}>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => {
+        onBook(mentor.id);
+      }}
+    >
       Zarezerwuj sesję próbną<span className="sr-only"> — {mentor.name}</span>
     </Button>
   );

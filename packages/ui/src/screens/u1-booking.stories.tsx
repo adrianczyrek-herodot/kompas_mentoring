@@ -15,7 +15,7 @@ type Args = {
 
 function U1Screen({ slotsStatus, holdAnswer, empty, sessionType }: Args) {
   return (
-    <ScreenShell role="student" current="search">
+    <ScreenShell navRole="student" current="search">
       <PageHeader
         title="Wybierz termin"
         description="Godziny w Twojej strefie czasowej. Wybrany termin trzymamy dla Ciebie przez 10 minut."

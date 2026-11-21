@@ -88,6 +88,8 @@ function AppHeader({ role, current, actions, className, ...props }: AppHeaderPro
         )}
         {...props}
       >
+        {/* packages/ui is framework-agnostic; apps/web wraps this link with next/link where needed. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className="rounded-control text-section-title font-semibold text-text-default">
           Kompas
         </a>

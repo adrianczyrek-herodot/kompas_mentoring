@@ -72,8 +72,12 @@ function Ticking({ from }: { from: number }) {
   const [left, setLeft] = useState(from);
   useEffect(() => {
     if (left <= 0) return;
-    const id = setTimeout(() => setLeft((value) => value - 1), 1000);
-    return () => clearTimeout(id);
+    const id = setTimeout(() => {
+      setLeft((value) => value - 1);
+    }, 1000);
+    return () => {
+      clearTimeout(id);
+    };
   }, [left]);
   return (
     <HoldCountdown

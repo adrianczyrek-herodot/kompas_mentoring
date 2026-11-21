@@ -77,7 +77,13 @@ function ExceptionList({ api, startOpen = false }: { api: ApiScenario; startOpen
                 <span className="text-body-dense font-medium">{item.label}</span>
                 <span className="text-meta text-text-muted">{item.note}</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setTarget(item)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setTarget(item);
+                }}
+              >
                 Usuń<span className="sr-only"> wyjątek {item.label}</span>
               </Button>
             </li>
@@ -108,7 +114,13 @@ function ExceptionList({ api, startOpen = false }: { api: ApiScenario; startOpen
             </Alert>
           ) : null}
           <AlertDialogFooter>
-            <Button variant="outline" disabled={pending} onClick={() => setTarget(null)}>
+            <Button
+              variant="outline"
+              disabled={pending}
+              onClick={() => {
+                setTarget(null);
+              }}
+            >
               Zostaw wyjątek
             </Button>
             <Button variant="destructive" loading={pending} onClick={() => void remove()}>

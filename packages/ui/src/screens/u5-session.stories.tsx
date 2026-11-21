@@ -8,7 +8,7 @@ import { Link } from '../components/link';
 
 function U5Screen(props: SessionDetailProps) {
   return (
-    <ScreenShell role="student" current="sessions">
+    <ScreenShell navRole="student" current="sessions">
       <div>
         <Link href="/sesje">Wróć do moich sesji</Link>
       </div>

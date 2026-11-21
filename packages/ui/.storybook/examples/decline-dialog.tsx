@@ -3,7 +3,7 @@
  * 10–300 characters). Real @kompas/ui components; Storybook only.
  */
 import { CircleX } from 'lucide-react';
-import { type FormEvent, useId, useRef, useState } from 'react';
+import { type SyntheticEvent, useId, useRef, useState } from 'react';
 import {
   Alert,
   AlertDescription,
@@ -71,7 +71,7 @@ export function DeclineDialog({
   const noteRef = useRef<HTMLTextAreaElement>(null);
   const firstRadio = useRef<HTMLButtonElement>(null);
 
-  const submit = async (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (pending) return;
     const next: typeof errors = {};
@@ -80,25 +80,45 @@ export function DeclineDialog({
     if (reason === 'other' && (length < 10 || length > 300))
       next.note = `Opisz powód w 10–300 znakach (teraz ${String(length)}).`;
     setErrors(next);
-    if (next.reason) return firstRadio.current?.focus();
-    if (next.note) return noteRef.current?.focus();
+    if (next.reason) {
+      firstRadio.current?.focus();
+      return;
+    }
+    if (next.note) {
+      noteRef.current?.focus();
+      return;
+    }
     setPending(true);
     setFailure(null);
-    const answer = await onSubmit(reason, note);
-    setPending(false);
-    if (answer.ok) onOpenChange(false);
-    else
-      setFailure(
-        answer.kind === 'offline'
-          ? 'Brak połączenia z internetem. Prośba nadal czeka — spróbuj ponownie.'
-          : 'Nie udało się odrzucić prośby. Spróbuj ponownie za chwilę.',
-      );
+    const run = async () => {
+      const answer = await onSubmit(reason, note);
+      setPending(false);
+      if (answer.ok) onOpenChange(false);
+      else
+        setFailure(
+          answer.kind === 'offline'
+            ? 'Brak połączenia z internetem. Prośba nadal czeka — spróbuj ponownie.'
+            : 'Nie udało się odrzucić prośby. Spróbuj ponownie za chwilę.',
+        );
+    };
+    void run();
   };
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !pending && onOpenChange(next)}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!pending) onOpenChange(next);
+      }}
+    >
       <DialogContent closeLabel="Zamknij">
-        <form noValidate onSubmit={submit} className="flex flex-col gap-group">
+        <form
+          noValidate
+          onSubmit={(event) => {
+            submit(event);
+          }}
+          className="flex flex-col gap-group"
+        >
           <DialogHeader>
             <DialogTitle>Odrzucić prośbę: {request.student}?</DialogTitle>
             <DialogDescription>
@@ -146,7 +166,9 @@ export function DeclineDialog({
                 value={note}
                 aria-invalid={errors.note ? true : undefined}
                 aria-describedby={errors.note ? `${id}-note-error` : undefined}
-                onChange={(event) => setNote(event.target.value)}
+                onChange={(event) => {
+                  setNote(event.target.value);
+                }}
               />
               {errors.note ? <FieldError id={`${id}-note-error`}>{errors.note}</FieldError> : null}
             </Field>
@@ -163,7 +185,9 @@ export function DeclineDialog({
               type="button"
               variant="outline"
               disabled={pending}
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                onOpenChange(false);
+              }}
             >
               Wróć
             </Button>

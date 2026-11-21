@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 import { StateMatrix } from '../../.storybook/blocks/component-docs';
 import { Money } from './money';
 

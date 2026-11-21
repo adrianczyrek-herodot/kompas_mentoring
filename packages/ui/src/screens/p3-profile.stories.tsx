@@ -57,7 +57,7 @@ function P3Screen({ variant }: { variant: Variant }) {
   const mentor = variant === 'new' ? adam : variant === 'paused' ? marek : kasia;
   if (variant === 'not-found') {
     return (
-      <ScreenShell role="student" current="search">
+      <ScreenShell navRole="student" current="search">
         <ErrorState
           titleAs="h1"
           title="Profil niedostępny"
@@ -69,7 +69,7 @@ function P3Screen({ variant }: { variant: Variant }) {
   }
   if (variant === 'loading') {
     return (
-      <ScreenShell role="student" current="search">
+      <ScreenShell navRole="student" current="search">
         <div aria-busy="true" className="flex flex-col gap-section">
           <p className="sr-only">Wczytujemy profil…</p>
           <ProfileHeroSkeleton />
@@ -80,7 +80,7 @@ function P3Screen({ variant }: { variant: Variant }) {
   }
   const reviews = variant === 'paused' ? marekReviews : variant === 'new' ? [] : kasiaReviews;
   return (
-    <ScreenShell role="student" current="search">
+    <ScreenShell navRole="student" current="search">
       <ProfileHero mentor={mentor} />
       <StickyBookingBar
         trialPrice={mentor.trialPrice}

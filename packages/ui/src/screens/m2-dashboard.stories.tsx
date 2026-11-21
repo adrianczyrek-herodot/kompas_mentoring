@@ -73,7 +73,9 @@ function Requests({ state }: { state: Section }) {
                   });
                 });
               }}
-              onDecline={() => setDeclining(request)}
+              onDecline={() => {
+                setDeclining(request);
+              }}
             />
           ))}
         </ul>
@@ -82,7 +84,9 @@ function Requests({ state }: { state: Section }) {
         <DeclineDialog
           request={declining}
           open
-          onOpenChange={(open) => !open && setDeclining(null)}
+          onOpenChange={(open) => {
+            if (!open) setDeclining(null);
+          }}
           onSubmit={async () => {
             const answer = await fakeRequest('success');
             if (answer.ok) {
@@ -102,7 +106,7 @@ function Requests({ state }: { state: Section }) {
 
 function M2Screen({ agendaState, requestsState }: Args) {
   return (
-    <ScreenShell role="mentor" current="dashboard">
+    <ScreenShell navRole="mentor" current="dashboard">
       <PageHeader title="Panel" description="Co wymaga Twojej uwagi dzisiaj." />
       <div className="flex flex-col gap-section md:flex-row">
         <TodayAgenda

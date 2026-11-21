@@ -35,20 +35,20 @@ function AccountMenu({ initials }: { initials: string }) {
 }
 
 export function ScreenShell({
-  role,
+  navRole,
   current,
   children,
 }: {
-  role: NavRole;
+  navRole: NavRole;
   current: string;
   children: ReactNode;
 }) {
   return (
     <div className="min-h-dvh bg-surface-page text-text-default">
       <AppHeader
-        role={role}
+        role={navRole}
         current={current}
-        actions={<AccountMenu initials={role === 'mentor' ? 'KN' : 'AC'} />}
+        actions={<AccountMenu initials={navRole === 'mentor' ? 'KN' : 'AC'} />}
       />
       <main className="mx-auto flex max-w-content flex-col gap-section px-panel pt-section pb-bottom-nav md:pb-section">
         {children}

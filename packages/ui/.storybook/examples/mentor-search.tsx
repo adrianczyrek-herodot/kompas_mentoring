@@ -105,7 +105,9 @@ function FilterPanel({
         <Select
           items={categoryItems}
           value={filters.category}
-          onValueChange={(value) => onChange({ ...filters, category: String(value) })}
+          onValueChange={(value) => {
+            onChange({ ...filters, category: String(value) });
+          }}
         >
           <SelectTrigger id={`${id}-topic`}>
             <SelectValue />
@@ -134,9 +136,9 @@ function FilterPanel({
           step={10}
           largeStep={100}
           value={filters.price}
-          onValueChange={(next) =>
-            onChange({ ...filters, price: Array.isArray(next) ? next : [next as number] })
-          }
+          onValueChange={(next) => {
+            onChange({ ...filters, price: Array.isArray(next) ? next : [next as number] });
+          }}
         />
         <FieldDescription>Od 0 do 1000 zł.</FieldDescription>
       </Field>
@@ -145,7 +147,9 @@ function FilterPanel({
         <Switch
           id={`${id}-verified`}
           checked={filters.verifiedOnly}
-          onCheckedChange={(checked) => onChange({ ...filters, verifiedOnly: checked })}
+          onCheckedChange={(checked) => {
+            onChange({ ...filters, verifiedOnly: checked });
+          }}
         />
       </Field>
     </div>
@@ -218,7 +222,9 @@ export function MentorSearch({
             countForms={mentorForms}
             filters={active}
             onRemove={reset}
-            onClearAll={() => setFilters(noFilters)}
+            onClearAll={() => {
+              setFilters(noFilters);
+            }}
           />
         ) : null}
         {status === 'loading' ? (
@@ -251,7 +257,12 @@ export function MentorSearch({
             }
             action={
               narrowest ? (
-                <Button variant="outline" onClick={() => reset(narrowest.id)}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    reset(narrowest.id);
+                  }}
+                >
                   Wyczyść filtr: {narrowest.label}
                 </Button>
               ) : null

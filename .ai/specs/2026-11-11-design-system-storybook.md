@@ -1,8 +1,8 @@
 ---
 title: Design system Kompasu z dokumentacją w Storybooku
-status: in-progress
+status: implemented
 created: 2026-11-11
-implemented:
+implemented: 2026-11-21
 related:
   - packages/ui/POSTEP.md
   - .ai/runs/2026-11-11-design-system-storybook.md

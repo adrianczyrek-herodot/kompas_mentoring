@@ -9,7 +9,7 @@ type Args = { status: 'ready' | 'loading' | 'error'; initialFilters: Filters };
 
 function P2Screen({ status, initialFilters }: Args) {
   return (
-    <ScreenShell role="student" current="search">
+    <ScreenShell navRole="student" current="search">
       <PageHeader
         title="Znajdź mentora"
         description="Porównaj mentorów i zarezerwuj tańszą sesję próbną 30 min, zanim wykupisz plan."

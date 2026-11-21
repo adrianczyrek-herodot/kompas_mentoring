@@ -62,8 +62,12 @@ export function BookingSlotPicker({
 
   useEffect(() => {
     if (!tick || secondsLeft === null || secondsLeft <= 0) return;
-    const id = setTimeout(() => setSecondsLeft((value) => (value ?? 1) - 1), 1000);
-    return () => clearTimeout(id);
+    const id = setTimeout(() => {
+      setSecondsLeft((value) => (value ?? 1) - 1);
+    }, 1000);
+    return () => {
+      clearTimeout(id);
+    };
   }, [tick, secondsLeft]);
 
   const createHold = () => {
@@ -125,7 +129,9 @@ export function BookingSlotPicker({
           <ToggleGroup
             aria-labelledby={durationId}
             value={duration}
-            onValueChange={(value) => value.length > 0 && setDuration(value)}
+            onValueChange={(value) => {
+              if (value.length > 0) setDuration(value);
+            }}
           >
             <ToggleGroupItem value="30">30 min</ToggleGroupItem>
             <ToggleGroupItem value="60">60 min</ToggleGroupItem>
@@ -160,7 +166,9 @@ export function BookingSlotPicker({
             weekLabel={WEEK_LABEL}
             canGoPrev={false}
             selectedSlotId={selected}
-            onSelect={(slot) => setSelected(slot.id)}
+            onSelect={(slot) => {
+              setSelected(slot.id);
+            }}
           />
           <PolicyNotice state="free" timeZone={TZ} />
           {error ? (

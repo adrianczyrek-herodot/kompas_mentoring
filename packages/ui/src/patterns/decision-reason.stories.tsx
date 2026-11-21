@@ -26,7 +26,13 @@ function RequestWithDecision({
         <p className="py-row-y text-body-dense text-text-muted">Brak nowych próśb.</p>
       ) : (
         <ul>
-          <TrialRequestCard request={requestPawel} timeZone={TZ} onDecline={() => setOpen(true)} />
+          <TrialRequestCard
+            request={requestPawel}
+            timeZone={TZ}
+            onDecline={() => {
+              setOpen(true);
+            }}
+          />
         </ul>
       )}
       <DeclineDialog
