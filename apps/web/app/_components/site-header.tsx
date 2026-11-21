@@ -13,7 +13,7 @@ export async function SiteHeader() {
         aria-label={t('navLabel')}
         className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-2"
       >
-        <Link href="/" className="font-serif text-xl font-semibold text-primary">
+        <Link href="/" className="font-serif text-xl font-semibold text-text-link">
           {t('brand')}
         </Link>
         {user === null ? (
