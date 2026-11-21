@@ -1,0 +1,119 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Separator } from './separator';
+import * as SeparatorStories from './separator.stories';
+
+<Meta of={SeparatorStories} />
+
+# Separator
+
+## 1. Do czego służy
+
+Oddziela wiersze i grupy cienką linią, żeby gęsta treść była uporządkowana bez kart i cieni.
+
+<Canvas of={SeparatorStories.Playground} />
+<Controls of={SeparatorStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Między wierszami listy mentorów (P2) i sesji (U4) | R01.4 |
+| „lub e-mailem” między logowaniem Google/LinkedIn a formularzem (P4) | teksty P4 (`orEmail`) |
+| Między grupami w jednej karcie (S3) | A01 (zamiast karty w karcie) |
+| Pionowo między metadanymi w wierszu (stawka · języki) | R01.4, propozycja |
+
+## 3. Kiedy nie używać
+
+| Zamiast separatora | Użyj | Źródło |
+|---|---|---|
+| Granica pola lub kontrolki | `border-control` w komponencie | WCAG 1.4.11 |
+| Oddzielenie sekcji strony | odstęp `space-section` i nagłówek | P-T7 |
+| Linia pod każdym akapitem | odstęp `space-group` | propozycja |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Linia | tak | 1 px, `border-divider` (dekoracyjna, 1,22 : 1 / 1,41 : 1) |
+
+## 5. Warianty
+
+<Canvas of={SeparatorStories.Variants} />
+
+| Wariant (`orientation`) | Kiedy wybrać | Źródło |
+|---|---|---|
+| `horizontal` | między wierszami i grupami | R01.4 |
+| `vertical` | między metadanymi w jednym wierszu; wysokość ustaw z tokenu (`h-icon-md`) | propozycja |
+
+## 6. Stany
+
+<Canvas of={SeparatorStories.States} />
+
+Nie dotyczy — separator nie jest interaktywny i nie ma stanów.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `separator` z `aria-orientation`; nie dostaje fokusu. | WAI-ARIA (separator) |
+| Linia jest dekoracyjna, więc nie musi spełniać 3 : 1 — nie może być jedyną granicą kontrolki. | WCAG 1.4.11 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tekst na linii: krótki, małymi literami. | „lub e-mailem” | teksty P4 |
+
+## 9. Responsywność
+
+<Canvas of={SeparatorStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 / 768 / 1440 px | linia rozciąga się na szerokość kontenera; tekst na linii się zawija | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}><Separator /></ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | kierunek |
+| `className` | `string` | — | tylko układ (`flex-1`, wysokość pionowej z tokenu) |
+
+## 11. Kod
+
+```tsx
+<Separator />
+```
+
+Typowy przykład z produktu (P4, `auth-form.tsx`):
+
+```tsx
+<div className="flex items-center gap-inline text-body-dense text-text-muted">
+  <Separator className="flex-1" />
+  {t('orEmail')}
+  <Separator className="flex-1" />
+</div>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<div className="flex w-full flex-col gap-group text-body-dense"><span>Anna Kowalczyk</span><Separator /><span>Piotr Nowak</span></div>}
+      goodNote="Wiersze listy oddziela cienka linia."
+      bad={<div className="flex w-full flex-col gap-group text-body-dense"><span className="rounded-panel bg-surface-panel p-group shadow-overlay">Anna Kowalczyk</span><span className="rounded-panel bg-surface-panel p-group shadow-overlay">Piotr Nowak</span></div>}
+      badNote="Cień jako jedyny podział treści to generyczny wygląd (A01, R01.4)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** ramką `Card`, `border-control` pól.
+- **Wzorce:** lista z filtrami (wiersze P2), formularz (P4).

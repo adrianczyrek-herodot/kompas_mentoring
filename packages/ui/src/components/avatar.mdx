@@ -1,0 +1,132 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import sample from '../../.storybook/assets/avatar-sample.svg';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import * as AvatarStories from './avatar.stories';
+
+<Meta of={AvatarStories} />
+
+# Avatar
+
+## 1. Do czego służy
+
+Pokazuje zdjęcie osoby (mentora, ucznia), żeby łatwiej rozpoznać, z kim jest sesja; bez zdjęcia
+pokazuje inicjały.
+
+<Canvas of={AvatarStories.Playground} />
+<Controls of={AvatarStories.Playground} />
+
+Ilustracja w przykładach to rysunek zastępczy, nie zdjęcie prawdziwej osoby.
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Rozmiar | Źródło |
+|---|---|---|
+| Karta mentora w wyszukiwarce (P2) | `md` | KONCEPCJA §P2 |
+| Profil mentora (P3) | `lg` | KONCEPCJA §P3 |
+| Uczeń w prośbie o sesję próbną (M2), mentor w kolejce weryfikacji (A1) | `sm` | KONCEPCJA §M2, §A1 |
+| Menu konta w nagłówku | `md` | KONCEPCJA §3.2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast awatara | Użyj | Źródło |
+|---|---|---|
+| Logo firmy lub ilustracja dekoracyjna | `img` z odpowiednim `alt` | — |
+| Zmyślone zdjęcia „zadowolonych klientów” | nic | A01 |
+| Ikona funkcji | ikona lucide | R02.5 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Kontener | tak | koło (`rounded-round`), tło `surface-sunken` |
+| Zdjęcie (`AvatarImage`) | nie | `object-cover` |
+| Inicjały (`AvatarFallback`) | tak | 1–2 litery; widoczne podczas ładowania, bez zdjęcia i przy błędzie |
+
+## 5. Warianty
+
+<Canvas of={AvatarStories.Variants} />
+
+| Rozmiar | Kiedy wybrać | Źródło |
+|---|---|---|
+| `sm` 32 px | wiersze list | P-T15 (propozycja) |
+| `md` 40 px | karty i nagłówek | P-T15 (propozycja) |
+| `lg` 64 px | profil | P-T15 (propozycja) |
+
+## 6. Stany
+
+<Canvas of={AvatarStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Zdjęcie | zdjęcie w kole | — |
+| Ładowanie / brak zdjęcia / błąd | inicjały na `surface-sunken` | KONCEPCJA §P3 (stan L) |
+| Najechanie, fokus, wciśnięcie, zablokowanie, wybór | nie dotyczy — interaktywny jest otaczający link lub przycisk | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Gdy imię jest obok — `alt=""` na zdjęciu i `aria-hidden` na inicjałach (bez dublowania). | WCAG 1.1.1 |
+| Gdy imienia nie ma obok — `alt` z imieniem i nazwiskiem. | WCAG 1.1.1 |
+| Kontrast inicjałów `text-default` na `surface-sunken` ≥ 13 : 1. | WCAG 1.4.3 |
+| Awatar w przycisku (menu konta) — nazwa przycisku opisuje akcję („Konto: Anna”). | WCAG 4.1.2, teksty nagłówka |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Inicjały: pierwsza litera imienia i nazwiska, wielkie. | „AK” | propozycja |
+| Nazwisko dwuczłonowe: pierwsza litera pierwszego członu. | „KW” | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={AvatarStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | rozmiar bez zmian; tekst obok się zawija | propozycja |
+| 768 / 1440 px | bez zmian; `lg` tylko w profilu | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Avatar size="lg"><AvatarImage src={sample} alt="Przykładowy mentor" /><AvatarFallback>PM</AvatarFallback></Avatar>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Avatar` | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | rozmiar |
+| `AvatarImage` | `src`, `alt` | `string` | — | zdjęcie i tekst alternatywny |
+| `AvatarFallback` | `delay` | `number` | — | ms przed pokazaniem inicjałów (unika mignięcia) |
+
+## 11. Kod
+
+```tsx
+<Avatar>
+  <AvatarImage src={mentor.photoUrl} alt="" />
+  <AvatarFallback aria-hidden="true">{initials(mentor.name)}</AvatarFallback>
+</Avatar>
+```
+
+Typowy przykład z produktu (M2, prośba o sesję): `Avatar size="sm"` obok imienia ucznia w wierszu.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<span className="flex items-center gap-inline text-body"><Avatar size="sm"><AvatarFallback aria-hidden="true">AK</AvatarFallback></Avatar>Anna Kowalczyk</span>}
+      goodNote="Imię jest obok, więc inicjały są ukryte przed czytnikiem."
+      bad={<span className="flex items-center gap-inline text-body"><Avatar size="sm"><AvatarFallback>AK</AvatarFallback></Avatar>Anna Kowalczyk</span>}
+      badNote="Czytnik przeczyta „AK Anna Kowalczyk”."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** ikoną, logo.
+- **Wzorce:** lista z filtrami (karta mentora P2), widok szczegółów (profil P3), decyzja z powodem (A1, M2).

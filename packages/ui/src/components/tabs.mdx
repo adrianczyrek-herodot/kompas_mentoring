@@ -1,0 +1,137 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
+import { ToggleGroup, ToggleGroupItem } from './toggle-group';
+import * as TabsStories from './tabs.stories';
+
+<Meta of={TabsStories} />
+
+# Tabs
+
+## 1. Do czego służy
+
+Przełącza widoki tej samej strony (np. nadchodzące i minione sesje), żeby nie przechodzić na inną
+stronę i nie gubić kontekstu.
+
+<Canvas of={TabsStories.Playground} />
+<Controls of={TabsStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Moje sesje: Nadchodzące / Minione (U4) | KONCEPCJA §U4 |
+| Logowanie / Rejestracja (P4) | teksty P4 (`tabLogin`, `tabRegister`) |
+
+## 3. Kiedy nie używać
+
+| Zamiast zakładek | Użyj | Źródło |
+|---|---|---|
+| Wartość, która zmienia jedną listę (30 / 60 min) | `ToggleGroup` | KONCEPCJA §U1 |
+| Główna nawigacja (5 pozycji) | `BottomNav` / `AppHeader` (etap 3) | R02.6 |
+| Kroki procesu (onboarding M1) | `OnboardingStepper` (etap 3) | KONCEPCJA §M1 |
+| Więcej niż ok. 5 widoków | osobne strony | propozycja |
+| Treść, którą trzeba porównać naraz | jedna strona z sekcjami | propozycja |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| `TabsList` | tak | linia `border-divider` pod zakładkami, nazwa (`aria-label`) |
+| `TabsTrigger` | tak, 2–5 | 44 px, `text-label`; aktywna — tekst domyślny i pasek 2 px `track-on` |
+| `TabsContent` | tak | panel widoku |
+
+## 5. Warianty
+
+<Canvas of={TabsStories.Variants} />
+
+Jeden wygląd: podkreślenie (nie pigułki, A01). Zakładka może być zablokowana — powód w panelu albo
+obok.
+
+## 6. Stany
+
+<Canvas of={TabsStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | tekst `text-default` | propozycja |
+| Fokus | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Aktywna (wybrana) | `text-default` + pasek 2 px `track-on` | R04.2, K4, WCAG 1.4.1 |
+| Zablokowana | `text-disabled`; powód w treści („Wypłaty będą dostępne po weryfikacji danych do wypłat.”) | D2 |
+| Wciśnięta, ładowanie, błąd | nie dotyczy zakładki; panel pokazuje stany danych | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| `tablist` z nazwą, `tab` z `aria-selected`, `tabpanel` powiązany z zakładką. | WAI-ARIA APG (Tabs) |
+| Tab wchodzi na aktywną zakładkę; strzałki przesuwają fokus; Enter / Spacja aktywuje (aktywacja ręczna). | WAI-ARIA APG |
+| Bez liczników przy zakładkach. | R02.4 |
+| Wybrana zakładka różni się paskiem, nie tylko kolorem. | WCAG 1.4.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| 1–2 słowa, rzeczownik lub przymiotnik. | „Nadchodzące”, „Minione” | KONCEPCJA §U4 |
+| Bez ikon zamiast tekstu. | — | R02.5 |
+
+## 9. Responsywność
+
+<Canvas of={TabsStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | lista zakładek przewija się w poziomie | propozycja |
+| 768 / 1440 px | zakładki według treści, wyrównane do lewej | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Tabs defaultValue="u"><TabsList aria-label="Sesje (przykład 320 px)"><TabsTrigger value="u">Nadchodzące</TabsTrigger><TabsTrigger value="p">Minione</TabsTrigger></TabsList></Tabs>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Tabs` | `value` / `defaultValue` | `string` | — | aktywna zakładka |
+| `Tabs` | `onValueChange` | `(value) => void` | — | zmiana |
+| `TabsList` | `aria-label` | `string` | — | nazwa listy; wymagana |
+| `TabsList` | `activateOnFocus` | `boolean` | `false` | aktywacja przy strzałkach |
+| `TabsTrigger` | `value`, `disabled` | `string`, `boolean` | — | zakładka |
+| `TabsContent` | `value` | `string` | — | panel |
+
+## 11. Kod
+
+```tsx
+<Tabs defaultValue="upcoming">
+  <TabsList aria-label="Moje sesje">
+    <TabsTrigger value="upcoming">Nadchodzące</TabsTrigger>
+    <TabsTrigger value="past">Minione</TabsTrigger>
+  </TabsList>
+  <TabsContent value="upcoming">{/* lista */}</TabsContent>
+  <TabsContent value="past">{/* lista */}</TabsContent>
+</Tabs>
+```
+
+Typowy przykład z produktu (U4): wartość zakładki w URL (`?widok=minione`), żeby link z e-maila
+otwierał właściwy widok (KONCEPCJA §3.2 głębokie linki).
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Tabs defaultValue="u" className="w-full"><TabsList aria-label="Sesje (dobrze)"><TabsTrigger value="u">Nadchodzące</TabsTrigger><TabsTrigger value="p">Minione</TabsTrigger></TabsList></Tabs>}
+      goodNote="Dwa widoki tej samej strony."
+      bad={<ToggleGroup aria-label="Sesje (źle)" defaultValue={['u']}><ToggleGroupItem value="u">Nadchodzące</ToggleGroupItem><ToggleGroupItem value="p">Minione</ToggleGroupItem></ToggleGroup>}
+      badNote="Przełącznik wartości nie ma ról tablist/tabpanel, więc czytnik nie wie, że zmienia widok."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `ToggleGroup` (wartość), nawigacją główną, stepperem.
+- **Wzorce:** lista z filtrami (U4), formularz (P4 logowanie / rejestracja).

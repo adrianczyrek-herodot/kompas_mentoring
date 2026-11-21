@@ -197,6 +197,10 @@
   --spacing-switch-inset: var(--switch-inset);
   --spacing-slider-track: var(--slider-track);
   --spacing-slider-thumb: var(--slider-thumb);
+  --spacing-avatar-sm: var(--avatar-sm);
+  --spacing-avatar-md: var(--avatar-md);
+  --spacing-avatar-lg: var(--avatar-lg);
+  --spacing-tab-indicator: var(--tab-indicator);
   --spacing-icon-sm: var(--icon-sm);
   --spacing-icon-md: var(--icon-md);
   --spacing-icon-lg: var(--icon-lg);

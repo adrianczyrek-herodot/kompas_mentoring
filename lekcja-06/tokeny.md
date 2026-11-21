@@ -89,14 +89,22 @@ Decyzje właściciela D1–D5, Z6 (lista różnic w `packages/ui/POSTEP.md`) i d
 | `button-padding-x`, `field-padding-x`, `field-padding-y` | 16 / 12 / 8 px | D1 | odstępy wewnętrzne kontrolek |
 | `checkbox-size`, `checkbox-checked-bg`, `checkbox-check` | 20 px, `selected-border`, `surface-panel` | K1, R04.2 | pole wyboru (znacznik 5,78 : 1 / 8,44 : 1) |
 
-### Partia 2 (propozycje P-T13, P-T14 — do zatwierdzenia)
+### Partia 2 (P-T13, P-T14 — zatwierdzone 2026-11-21)
 
 | Token | Wartość | Źródło | Do czego |
 |---|---|---|---|
 | `track-off` / `track-on` | = `border-control` / `selected-border` | WCAG 1.4.11, R04.2 | tor przełącznika wyłączonego i suwaka (uchwyt na torze 3,65 : 1 / 3,85 : 1) / część włączona i wypełniona (5,40 : 1 / 9,30 : 1 do tła) |
-| `switch-width`, `switch-height`, `switch-thumb` | 44 × 24 px, uchwyt 20 px | **P-T14** (propozycja), K1 | przełącznik; pole kliknięcia 44 px |
-| `slider-track`, `slider-thumb` | 4 px, 20 px | **P-T14** (propozycja) | suwak ceny P2; pole kliknięcia uchwytu 44 px |
-| `layer-overlay` | 50 | **P-T13** (propozycja, techniczna) | warstwa list rozwijanych nad treścią |
+| `switch-width`, `switch-height`, `switch-thumb` | 44 × 24 px, uchwyt 20 px | **P-T14** (zatwierdzone), K1 | przełącznik; pole kliknięcia 44 px |
+| `slider-track`, `slider-thumb` | 4 px, 20 px | **P-T14** (zatwierdzone) | suwak ceny P2; pole kliknięcia uchwytu 44 px |
+| `layer-overlay` | 50 | **P-T13** (zatwierdzone, techniczne) | warstwa list rozwijanych nad treścią |
+
+### Partia 3 (propozycja P-T15 — do zatwierdzenia)
+
+| Token | Wartość | Źródło | Do czego |
+|---|---|---|---|
+| `avatar-sm` / `-md` / `-lg` | 32 / 40 / 64 px | **P-T15** (propozycja) | wiersze list (M2, A1) / karta mentora (P2), nagłówek / profil (P3) |
+| `tab-indicator` | 2 px (= `focus-ring-width`), kolor `track-on` | **P-T15** (propozycja), R04.2 | pasek pod aktywną zakładką |
+| `card-header-columns` | `1fr auto` | techniczny | układ tytułu i akcji w nagłówku karty |
 
 ## Kontrast (policzony dla wartości z tabeli)
 

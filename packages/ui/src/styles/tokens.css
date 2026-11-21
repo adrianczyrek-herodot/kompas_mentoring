@@ -322,17 +322,24 @@
   --slot-selected-bg: var(--selected-bg); /* R04.2 */
   --slot-selected-border: var(--selected-border);
   --dialog-width: 30rem; /* P-T10: 480 px */
-  --switch-width: var(--target-min); /* P-T14: 44 × 24 px track, 20 px thumb; tap area target-min */
+  --switch-width: var(
+    --target-min
+  ); /* P-T14 (approved 2026-11-21): 44 × 24 px track, 20 px thumb; tap area target-min */
   --switch-height: var(--icon-lg);
   --switch-thumb: var(--icon-md);
   --switch-inset: calc(
     (var(--switch-height) - var(--switch-thumb)) /
     2
   ); /* 2 px around the thumb */
-  --slider-track: var(--raw-space-1); /* P-T14: 4 px track, 20 px thumb */
+  --slider-track: var(--raw-space-1); /* P-T14 (approved): 4 px track, 20 px thumb */
   --slider-thumb: var(--icon-md);
-  --slider-thumb-border: 2px; /* P-T14: thumb outline in track-on, visible on any surface */
+  --slider-thumb-border: 2px; /* P-T14 (approved): thumb outline in track-on, visible on any surface */
   --track-off: var(--border-control); /* WCAG 1.4.11: switch off, empty slider track (3.65 : 1) */
   --track-on: var(--selected-border); /* R04.2, K4: on / filled part = selection accent */
-  --layer-overlay: 50; /* P-T13: popups (select, combobox) above page content */
+  --layer-overlay: 50; /* P-T13 (approved 2026-11-21): popups (select, combobox) above page content */
+  --avatar-sm: 2rem; /* P-T15: 32 px — lists, rows (M2 requests, A1 queue) */
+  --avatar-md: 2.5rem; /* P-T15: 40 px — mentor card (P2), header */
+  --avatar-lg: 4rem; /* P-T15: 64 px — profile hero (P3) */
+  --tab-indicator: var(--focus-ring-width); /* P-T15: 2 px bar under the active tab, in track-on */
+  --card-header-columns: 1fr auto; /* title and description | action */
 }

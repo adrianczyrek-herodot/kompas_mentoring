@@ -27,6 +27,8 @@ Zbudować design system `packages/ui` z dokumentacją w Storybooku jako instrukc
 
 - 2026-11-21 — Właściciel: P-T11, P-T12 tak, „dalej”. Partia 2 (Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider): komponenty, 6 stron MDX, stories, testy. Naprawione: przeładowanie Vite przy istniejącej pamięci podręcznej (`optimizeDeps.force`), testy nakładek czekają na koniec animacji, chipy Comboboxa w kolumnie, ToggleGroup za szeroki na 320 px, długi kod w tekście dokumentacji, ostrzeżenie Biome w CSS z partii 1 (raport partii 1 podawał „0 ostrzeżeń” — błąd filtra). Lint 0/0, typecheck, test, build, `test:stories:themes` 66 × 2 przechodzą.
 
+- 2026-11-21 — Właściciel: P-T13, P-T14 tak, „dalej”. Partia 3 (Card, Separator, Badge, Avatar, Table, Tabs): Card bez wartości spoza tokenów (zostaje 1 w Alert). Naprawione: zmyślone liczby w przykładzie (zasada 7), sporadyczny test zakładek (dwa panele w animacji), 404 w konsoli od story błędu zdjęcia. Lint 0/0, typecheck, test, build, `test:stories:themes` 96 × 2 (3× z rzędu w każdym motywie).
+
 ## Wynik
 W toku.
 

@@ -1,4 +1,6 @@
 export { Alert, AlertAction, AlertDescription, AlertTitle } from './components/alert.tsx';
+export { Avatar, AvatarFallback, AvatarImage, type AvatarProps } from './components/avatar.tsx';
+export { Badge, type BadgeProps, badgeVariants } from './components/badge.tsx';
 export { Button, type ButtonProps, buttonVariants } from './components/button.tsx';
 export {
   Card,
@@ -52,6 +54,16 @@ export {
 export { Separator } from './components/separator.tsx';
 export { Slider, type SliderProps } from './components/slider.tsx';
 export { Switch } from './components/switch.tsx';
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './components/table.tsx';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs.tsx';
 export { Textarea, type TextareaProps } from './components/textarea.tsx';
 export { ToggleGroup, ToggleGroupItem } from './components/toggle-group.tsx';
 export { cn } from './lib/utils.ts';

@@ -8,7 +8,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 |---|---|---|
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
 | 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
-| 2. Komponenty bazowe | **w toku — partie 1–2 z 5 zrobione, czeka na „dalej”** | 2026-11-21 |
+| 2. Komponenty bazowe | **w toku — partie 1–3 z 5 zrobione, czeka na „dalej”** | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
@@ -246,8 +246,8 @@ Pytania (materiały milczą — propozycje do decyzji):
 |---|---|---|
 | 1 | Button, Link, Input, Textarea, Field (+ Label, FieldOptional), Checkbox | **zrobiona 2026-11-21** |
 | 2 | Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider | **zrobiona 2026-11-21** |
-| 3 | Card, Separator, Badge, Avatar, Table, Tabs | następna |
-| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | — |
+| 3 | Card, Separator, Badge, Avatar, Table, Tabs | **zrobiona 2026-11-21** |
+| 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | następna |
 | 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | — |
 
 ### Partia 1 — co powstało
@@ -287,9 +287,30 @@ Pytania (materiały milczą — propozycje do decyzji):
 
 - Szerokość 768 px stron komponentów; czytnik ekranu na żywo (sprawdzone role i atrybuty ARIA w testach, nie VoiceOver/NVDA).
 
+### Partia 3 — co powstało
+
+- `card.tsx` przepisany na tokeny (ramka `border-divider`, `rounded-panel`, bez cienia, odstęp `space-panel`) — **usunięte 4 wartości spoza tokenów**; API bez zmian (`apps/web`: S3, P4). `separator.tsx` na `border-divider`.
+- Nowe: `badge.tsx` (`neutral`, `success`, `warning`, `danger`; `rounded-tag`, nie pigułka), `avatar.tsx` (`sm` / `md` / `lg`, inicjały przy braku zdjęcia i błędzie), `table.tsx` (gęsta, `numeric` dla liczb, przewijanie w poziomie), `tabs.tsx` (podkreślenie, pasek 2 px `track-on`, bez liczników).
+- Tokeny: `avatar-sm/-md/-lg`, `tab-indicator` (**P-T15**, do zatwierdzenia), `card-header-columns` (techniczny). Ilustracja zastępcza awatara: `.storybook/assets/avatar-sample.svg` (tylko dokumentacja, bez zdjęcia prawdziwej osoby).
+- 6 stron MDX × 13 sekcji, 6 plików stories (macierz statusów sesji i wniosku na warianty `Badge`, inicjały przy błędzie zdjęcia, nagłówki i akcja wiersza tabeli, strzałki w zakładkach).
+
+### Partia 3 — sprawdzone (2026-11-21)
+
+- `pnpm lint` (0 błędów, 0 ostrzeżeń — ESLint i Biome), `pnpm typecheck`, `pnpm test`, `pnpm build` — przechodzą.
+- `test:stories:themes`: 96 testów × 2 motywy; po naprawie testu zakładek 3 pełne przebiegi w każdym motywie z rzędu bez błędu.
+- Zbudowany Storybook: 6 nowych stron × 2 motywy × 320 / 1440 px — 13 sekcji, brak surowych tabel, brak przewijania poziomego, brak błędów konsoli; zrzuty tabeli (ciemny) i zakładek (jasny) obejrzane.
+- `check:tokens`: zostaje **1** wartość — `alert.tsx` (partia 5).
+- Znalezione i naprawione: zmyślone liczby („4,9 ocena · 128 sesji”) w przykładzie Separatora (zasada 7) → dane ze specyfikacji; test zakładek padał sporadycznie — dwa panele w trakcie animacji wyjścia (`waitFor`); błąd 404 w konsoli od story z celowo brakującym zdjęciem (`data:,` zamiast adresu); nagłówki w przykładach strony Card trafiałyby do spisu treści.
+
+### Partia 3 — niesprawdzone i uwagi
+
+- Szerokość 768 px; ekrany `apps/web` (S3, P4) z nową kartą w przeglądarce (build i typecheck przechodzą).
+- Zablokowana zakładka (`text-disabled`) różni się od nieaktywnej (`text-muted`) tylko nieznacznie — dokumentacja wymaga powodu w treści; jeśli to za mało, propozycja: ikona kłódki przy zablokowanej zakładce.
+
 ## Otwarte pytania (do właściciela)
 
-- **P-T13** `layer-overlay` (50) i **P-T14** wymiary: przełącznik 44 × 24 px z uchwytem 20 px, suwak 4 px z uchwytem 20 px i ramką 2 px — do zatwierdzenia.
+- **P-T15** rozmiary awatara 32 / 40 / 64 px i pasek aktywnej zakładki 2 px — do zatwierdzenia.
+
 - Reguły „propozycja” na stronach partii 2 (m.in.: lista Select zawsze pod polem; Select do ok. 10 opcji, dalej Combobox; decyzje ze skutkiem bez domyślnego wyboru w RadioGroup; przełącznik zapisuje od razu, błąd zapisu cofa go z toastem; ToggleGroup najwyżej 4 opcje; filtr ceny zapisywany w URL po puszczeniu uchwytu).
 
 - Reguły bez źródła oznaczone „propozycja” na stronach partii 1 (m.in.: oznaczamy tylko pola opcjonalne; etykieta przycisku ≤ ok. 4 słowa; +30 % długości przy tłumaczeniu; układ akcji 320 / 768 px; link bez koloru „odwiedzony”; karta wyboru dla checklisty A1).
@@ -298,6 +319,8 @@ Pytania (materiały milczą — propozycje do decyzji):
 - Propozycja (bez źródła w materiałach): „bez wersalików w etykietach, pogrubienie najwyżej 600” na stronie Typografia; „klasa `.light` tylko w dokumentacji” na stronie Motywy.
 
 ## Zatwierdzone decyzje
+
+- 2026-11-21 — P-T13 `layer-overlay` i P-T14 (przełącznik 44 × 24 px, suwak 4 px / uchwyt 20 px) zatwierdzone; „dalej” do partii 3.
 
 - 2026-11-21 — P-T11 `action-danger-hover` i P-T12 `space-tight` zatwierdzone; „dalej” do partii 2.
 
@@ -313,4 +336,4 @@ Pytania (materiały milczą — propozycje do decyzji):
 
 ## Następny krok
 
-Po „dalej” (i decyzji o P-T13, P-T14): partia 3 — Card (usunięcie 4 wartości spoza tokenów), Separator, Badge, Avatar, Table, Tabs; ta sama budowa.
+Po „dalej” (i decyzji o P-T15): partia 4 — Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip (nakładki; motyw z `<html>` w portalach, testy `waitFor` dla animacji).
