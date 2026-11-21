@@ -1,19 +1,36 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignore": ["kompas-mentoring/**", "packages/ui/.storybook/**"],
+  "ignore": [
+    "kompas-mentoring/**",
+    "packages/ui/.storybook/**"
+  ],
   "workspaces": {
     ".": {
-      "entry": ["scripts/*.mjs"],
-      "ignoreDependencies": ["playwright"]
+      "entry": [
+        "scripts/*.mjs"
+      ],
+      "ignoreDependencies": [
+        "playwright"
+      ]
     },
     "apps/web": {},
     "apps/worker": {},
     "packages/core": {
-      "entry": ["src/modules/*/index.ts", "src/shared/infrastructure/db/cli/*.ts"]
+      "entry": [
+        "src/modules/*/index.ts",
+        "src/shared/infrastructure/db/cli/*.ts"
+      ]
     },
     "packages/config": {
-      "ignoreDependencies": ["eslint-import-resolver-typescript"]
+      "ignoreDependencies": [
+        "eslint-import-resolver-typescript"
+      ]
     },
-    "packages/ui": {}
+    "packages/ui": {},
+    "prototypes/kompas-flow": {
+      "ignore": [
+        "public/review/**"
+      ]
+    }
   }
 }

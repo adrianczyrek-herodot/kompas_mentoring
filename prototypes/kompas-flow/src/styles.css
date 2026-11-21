@@ -1,0 +1,100 @@
+/*
+ * Kompas design system: tokens, fonts and Tailwind classes come only from @kompas/ui.
+ * The prototype adds no colours, spacing or components of its own — the only CSS here is the
+ * colour bridge of the review engine (review/prototype.css), mapped onto Kompas tokens.
+ */
+@import "@kompas/ui/styles.css";
+
+/* Classes used by the prototype's own files. */
+@source "./";
+@source "../index.html";
+
+/*
+ * Review engine bridge: the vendored engine reads these variables (with neutral fallbacks).
+ * Declared on every theme scope so they follow .light / .dark (lesson 2026-11-11).
+ * Review chrome uses the inverse surface so it is never mistaken for a product action.
+ */
+:root,
+.light,
+.dark {
+  --accent-indigo: var(--surface-inverse);
+  --accent-indigo-foreground: var(--text-inverse);
+  --status-success-icon: var(--status-success-fg);
+  --status-warning-icon: var(--status-warning-fg);
+  --status-warning-border: var(--status-warning-fg);
+  --status-warning-text: var(--status-warning-fg);
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-xl: var(--depth-overlay);
+  --z-index-dropdown: var(--layer-overlay);
+  --z-index-toast: var(--layer-overlay);
+  --z-index-top: var(--layer-overlay);
+  --font-geist-sans: var(--font-family-sans);
+}
+
+/* Controls created by the review engine (it expects these class names). */
+@layer components {
+  .doc-toolbar .btn,
+  .anno-panel .btn,
+  .proto-back {
+    @apply inline-flex min-h-control-sm shrink-0 items-center gap-tight rounded-control border border-transparent px-field-x text-label font-medium text-text-default;
+  }
+  .doc-toolbar .btn-outline,
+  .anno-panel .btn-outline,
+  .proto-back {
+    @apply border-border-control bg-surface-panel hover:bg-surface-hover;
+  }
+  .anno-panel .btn-ghost {
+    @apply hover:bg-surface-hover;
+  }
+  .doc-toolbar .btn-primary,
+  .anno-panel .btn-primary {
+    @apply bg-surface-inverse text-text-inverse;
+  }
+  .proto-back:disabled {
+    @apply border-border-disabled bg-surface-disabled text-text-disabled;
+  }
+  .doc-toolbar .proto-toolbar {
+    @apply ml-0 shrink-0;
+  }
+  .doc-toolbar .segmented {
+    @apply inline-flex shrink-0 overflow-hidden rounded-control border border-border-control;
+  }
+  .doc-toolbar .segmented button {
+    @apply min-h-control-sm bg-surface-panel px-field-x text-label text-text-default;
+  }
+  .doc-toolbar .segmented button[aria-selected="true"] {
+    @apply bg-surface-inverse text-text-inverse;
+  }
+  .anno-panel {
+    @apply text-text-default;
+  }
+  .anno-panel .input {
+    @apply min-h-control-sm w-full rounded-control border border-border-control bg-surface-panel px-field-x text-body-dense text-text-default;
+  }
+  .anno-panel .row {
+    @apply flex flex-wrap gap-inline;
+  }
+  .anno-panel .t-card-title {
+    @apply text-body font-semibold;
+  }
+  .anno-panel .t-overline {
+    @apply text-meta font-semibold text-text-muted;
+  }
+  .anno-panel .t-hint {
+    @apply text-meta text-text-muted;
+  }
+  .anno-panel .badge {
+    @apply rounded-tag px-tight text-meta;
+  }
+  .anno-panel .badge-warning {
+    @apply bg-status-warning-bg text-status-warning-fg;
+  }
+  .proto-toast {
+    @apply rounded-control bg-surface-inverse px-panel py-inline text-body-dense text-text-inverse shadow-overlay;
+  }
+  /* „Show hotspots”: every working control in the screen frame (the React app has no data-goto). */
+  .proto-hints .frame :is(a, button, [role="button"], input, select, textarea) {
+    @apply opacity-100 outline-2 outline-offset-2 outline-dashed outline-surface-inverse;
+  }
+}
