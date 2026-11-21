@@ -29,7 +29,7 @@ Dodać do `.github/workflows/ci.yml` osobny job uruchamiający testy stories skr
 - YAML parsuje się; joby: lint, typecheck, test, integration, build, e2e, storybook, deploy-preview.
 - Lokalnie: `pnpm install --frozen-lockfile`, `pnpm --filter @kompas/ui exec playwright install chromium`, `pnpm --filter @kompas/ui test:stories:themes` — exit 0, 2/2 testy w motywie jasnym i 2/2 w ciemnym.
 - `pnpm lint` i `pnpm typecheck` na scalonym drzewie — exit 0.
-- CI PR #54 (pierwszy przebieg): job `storybook` pass (1m2s); `e2e` fail (kontrast) — poprawione, wynik drugiego przebiegu w PR.
+- CI PR #54 (pierwszy przebieg): job `storybook` pass (1m2s); `e2e` fail (kontrast) — poprawione; drugi przebieg (run 44897732946): wszystkie joby pass, w tym `e2e` i `storybook`.
 - e2e lokalnie niesprawdzone (brak Dockera); `actionlint` niedostępny.
 
 ## Problemy i otwarte kwestie
