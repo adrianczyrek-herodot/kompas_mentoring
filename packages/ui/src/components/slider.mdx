@@ -1,0 +1,133 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Slider } from './slider';
+import * as SliderStories from './slider.stories';
+
+<Meta of={SliderStories} />
+
+# Slider
+
+## 1. Do czego służy
+
+Pozwala ustawić zakres lub wartość na skali, gdy dokładna liczba jest mniej ważna niż przybliżony
+przedział (np. budżet na sesję).
+
+<Canvas of={SliderStories.Playground} />
+<Controls of={SliderStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Filtr ceny za 60 min, zakres 0–1000 zł (P2) | KONCEPCJA §P2 („suwak”), backlog E2-S5 |
+| Lata doświadczenia mentora, minimum (P2) | KONCEPCJA §P2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast suwaka | Użyj | Źródło |
+|---|---|---|
+| Dokładna kwota (stawka mentora 40–1000 zł w M1) | `Input` z `inputMode="numeric"` | backlog E2-S2, propozycja |
+| Kilka wartości dyskretnych (30 / 60 min) | `ToggleGroup` | KONCEPCJA §U1 |
+| Ocena (gwiazdki) | — (Later, U7) | backlog L2 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Nazwa | tak | `FieldTitle` + `aria-labelledby` na `Slider` |
+| Wartość | tak | tekst nad suwakiem (`<output>`), sformatowany: „100 zł – 300 zł” |
+| Tor | tak | 4 px, `track-off`; część wybrana `track-on` |
+| Uchwyty | tak, 1 lub 2 | 20 px, ramka 2 px `track-on`, pole kliknięcia 44 px; każdy z nazwą (`thumbLabels`) |
+| Podpowiedź | zalecana | zakres skali „Od 0 do 1000 zł.” |
+
+## 5. Warianty
+
+<Canvas of={SliderStories.Variants} />
+
+| Odmiana | Kiedy wybrać | Źródło |
+|---|---|---|
+| Zakres (2 uchwyty) | filtr „od–do” | KONCEPCJA §P2 |
+| Jedna wartość | minimum | KONCEPCJA §P2 |
+
+## 6. Stany
+
+<Canvas of={SliderStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Fokus uchwytu | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Przeciąganie | wartość nad suwakiem zmienia się na bieżąco | propozycja |
+| Zablokowany | tor i uchwyty `border-disabled` / `surface-disabled`; powód w opisie | D2 |
+| Najechanie, błąd, ładowanie | nie dotyczy (zakres jest zawsze poprawny: min ≤ max) | KONCEPCJA §P2 |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Uchwyty mają rolę `slider` z `aria-valuenow`, `aria-valuemin`, `aria-valuemax` i własną nazwą („Cena od”, „Cena do”). | WAI-ARIA APG (Slider, Multi-Thumb) |
+| Strzałki zmieniają o `step` (10 zł), Page Up / Down o `largeStep` (100 zł), Home / End na krańce. | WAI-ARIA APG |
+| Uchwyty nie mijają się (min ≤ max). | KONCEPCJA §P2 |
+| Wartość jest też tekstem obok, więc nie trzeba odczytywać położenia. | WCAG 1.4.1 |
+| Pole kliknięcia uchwytu 44 px. | K1, WCAG 2.5.8 |
+| Filtr zapisuje się w URL po puszczeniu uchwytu, nie przy każdym kroku. | backlog E2-S5, propozycja |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Kwoty z walutą i cyframi tabelarycznymi (`Intl.NumberFormat`). | „100 zł – 300 zł” | R01.3, brief reguła 10 |
+| Nazwy uchwytów: „od” / „do” z nazwą pola. | „Cena od” | WAI-ARIA APG |
+
+## 9. Responsywność
+
+<Canvas of={SliderStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | pełna szerokość panelu filtrów (bottom sheet) | KONCEPCJA §P2 |
+| 768 / 1440 px | szerokość kolumny filtrów | KONCEPCJA §P2 |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Slider thumbLabels={['Cena od (przykład 320 px)', 'Cena do (przykład 320 px)']} min={0} max={1000} defaultValue={[100, 300]} />
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `thumbLabels` | `string[]` | — | nazwa każdego uchwytu; liczba nazw = liczba uchwytów; wymagane |
+| `value` / `defaultValue` | `number \| number[]` | — | wartość lub zakres |
+| `onValueChange` | `(value) => void` | — | zmiana w trakcie |
+| `onValueCommitted` | `(value) => void` | — | po puszczeniu uchwytu (zapis filtra) |
+| `min`, `max`, `step`, `largeStep` | `number` | `0`, `100`, `1`, `10` | skala |
+| `disabled`, `aria-labelledby` | — | — | blokada, nazwa |
+
+## 11. Kod
+
+```tsx
+<Slider aria-labelledby="price" thumbLabels={['Cena od', 'Cena do']} min={0} max={1000} step={10} defaultValue={[100, 300]} />
+```
+
+Typowy przykład z produktu (P2): story „Playground” — `value` w stanie, tekst `<output>`
+z `Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' })`, zapis w URL
+w `onValueCommitted`.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<div className="flex w-full flex-col gap-inline"><span className="text-body-dense tabular-nums">100 zł – 300 zł</span><Slider thumbLabels={['Od (dobrze)', 'Do (dobrze)']} min={0} max={1000} defaultValue={[100, 300]} /></div>}
+      goodNote="Wartość jest napisana obok suwaka."
+      bad={<div className="w-full"><Slider thumbLabels={['Od (źle)', 'Do (źle)']} min={0} max={1000} defaultValue={[100, 300]} /></div>}
+      badNote="Bez liczby użytkownik zgaduje kwotę z położenia uchwytu."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Input` (dokładna wartość), `ToggleGroup` (kilka wartości).
+- **Wzorce:** lista z filtrami (P2, bottom sheet na mobile).

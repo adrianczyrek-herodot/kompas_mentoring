@@ -8,7 +8,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 |---|---|---|
 | 0. Inwentaryzacja i plan | zrobiony — Q1–Q5 rozstrzygnięte; Z6 i Z8 zostają na etap 2 | 2026-11-11 |
 | 1. Fundamenty | zrobiony, „dalej” otrzymane | 2026-11-11 |
-| 2. Komponenty bazowe | **w toku — partia 1 z 5 zrobiona, czeka na „dalej”** | 2026-11-21 |
+| 2. Komponenty bazowe | **w toku — partie 1–2 z 5 zrobione, czeka na „dalej”** | 2026-11-21 |
 | 3. Komponenty produktu, wzorce, ekrany | nie zaczęty | — |
 | 4. Strony, które uczą | nie zaczęty | — |
 | 5. Sprawdzenie i raport | nie zaczęty | — |
@@ -245,8 +245,8 @@ Pytania (materiały milczą — propozycje do decyzji):
 | Partia | Komponenty | Stan |
 |---|---|---|
 | 1 | Button, Link, Input, Textarea, Field (+ Label, FieldOptional), Checkbox | **zrobiona 2026-11-21** |
-| 2 | Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider | następna |
-| 3 | Card, Separator, Badge, Avatar, Table, Tabs | — |
+| 2 | Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider | **zrobiona 2026-11-21** |
+| 3 | Card, Separator, Badge, Avatar, Table, Tabs | następna |
 | 4 | Dialog, AlertDialog, Sheet, Menu, Popover, Tooltip | — |
 | 5 | Alert (Z8), Toast, Skeleton, Spinner, EmptyState, ErrorState | — |
 
@@ -269,15 +269,37 @@ Pytania (materiały milczą — propozycje do decyzji):
 - Ekrany `apps/web` (P4, S3) w przeglądarce po zmianie wyglądu przycisków, pól i checkboxów — wymagają Postgresa (Docker). Typecheck i build `apps/web` przechodzą.
 - Szerokość 768 px stron komponentów (sprawdzone 320 i 1440).
 
+### Partia 2 — co powstało
+
+- Nowe komponenty na Base UI: `select.tsx` (`Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `SelectGroup`, `SelectGroupLabel`, `SelectSeparator`; lista zawsze pod polem), `combobox.tsx` (jeden wybór i `multiple` z chipami; `ComboboxInput` z wymaganym `triggerLabel` i opcjonalnym `clearLabel`), `radio-group.tsx`, `switch.tsx`, `toggle-group.tsx` (etykiety zawijają się na 320 px), `slider.tsx` (zakres, `thumbLabels` wymagane). Wspólne klasy list: `src/lib/overlay.ts` (użyje ich też Menu w partii 4).
+- Tokeny: `track-off`, `track-on`, `switch-*`, `slider-*`, `layer-overlay` — **P-T13** (warstwa list, techniczna) i **P-T14** (wymiary przełącznika i suwaka) do zatwierdzenia.
+- 6 stron MDX × 13 sekcji, 6 plików stories (macierz stanów, 320 px, testy: wybór z listy klawiaturą, filtrowanie i brak wyników, dodawanie i usuwanie tagów, strzałki w grupie radio, etykieta i spacja w przełączniku, strzałki w grupie przełączników, klawiatura na suwaku).
+
+### Partia 2 — sprawdzone (2026-11-21)
+
+- `pnpm lint` (0 błędów, 0 ostrzeżeń — także Biome), `pnpm typecheck`, `pnpm test`, `pnpm build` — przechodzą.
+- `test:stories:themes`: 66 testów × 2 motywy (partie 1–2; a11y obejmuje otwarte listy, bo testy kończą się z otwartą listą).
+- Zbudowany Storybook: 12 stron komponentów × 2 motywy × 320 / 1440 px — 13 sekcji, brak surowych tabel, brak przewijania poziomego, brak błędów konsoli. Otwarta lista `Select` w ciemnym motywie renderuje się w portalu poza story i ma ciemne tło (zasada 9) — sprawdzone w przeglądarce.
+- Znalezione i naprawione w trakcie: chipy Comboboxa układały się w kolumnę; trzy opcje ToggleGroup nie mieściły się na 320 px (opis story twierdził inaczej); długi kod w tekście dokumentacji rozpychał stronę na 320 px; ostrzeżenie Biome w CSS dokumentacji z partii 1 (zduplikowany selektor) — w raporcie partii 1 podałem „0 ostrzeżeń”, bo filtr nie łapał formatu Biome.
+- `check:tokens`: partie 1–2 czyste; zostaje 5 wartości w `card.tsx` (4) i `alert.tsx` (1).
+
+### Partia 2 — niesprawdzone
+
+- Szerokość 768 px stron komponentów; czytnik ekranu na żywo (sprawdzone role i atrybuty ARIA w testach, nie VoiceOver/NVDA).
+
 ## Otwarte pytania (do właściciela)
 
-- **P-T11** `action-danger-hover` (`#962c22` / `#f4978c`) i **P-T12** `space-tight` (4 px) — nowe tokeny w partii 1, do zatwierdzenia.
+- **P-T13** `layer-overlay` (50) i **P-T14** wymiary: przełącznik 44 × 24 px z uchwytem 20 px, suwak 4 px z uchwytem 20 px i ramką 2 px — do zatwierdzenia.
+- Reguły „propozycja” na stronach partii 2 (m.in.: lista Select zawsze pod polem; Select do ok. 10 opcji, dalej Combobox; decyzje ze skutkiem bez domyślnego wyboru w RadioGroup; przełącznik zapisuje od razu, błąd zapisu cofa go z toastem; ToggleGroup najwyżej 4 opcje; filtr ceny zapisywany w URL po puszczeniu uchwytu).
+
 - Reguły bez źródła oznaczone „propozycja” na stronach partii 1 (m.in.: oznaczamy tylko pola opcjonalne; etykieta przycisku ≤ ok. 4 słowa; +30 % długości przy tłumaczeniu; układ akcji 320 / 768 px; link bez koloru „odwiedzony”; karta wyboru dla checklisty A1).
 
 - Propozycja: dołączyć `test:stories:themes` i `check:tokens` do CI po etapie 2 (dziś `check:tokens` pada na istniejących komponentach).
 - Propozycja (bez źródła w materiałach): „bez wersalików w etykietach, pogrubienie najwyżej 600” na stronie Typografia; „klasa `.light` tylko w dokumentacji” na stronie Motywy.
 
 ## Zatwierdzone decyzje
+
+- 2026-11-21 — P-T11 `action-danger-hover` i P-T12 `space-tight` zatwierdzone; „dalej” do partii 2.
 
 - 2026-11-21 — etap 2: D1–D5 zatwierdzone; Z6 — zostają `sm` i `icon-sm` (32 px, pole kliknięcia 44 px) tylko dla gęstych wierszy, usunięte `xs`, `icon-xs`, `icon-lg`; Z8 — `Alert` bez domyślnej roli, `role="alert"` jawnie dla błędów dynamicznych; D6 — wariant `secondary` usunięty.
 
@@ -291,4 +313,4 @@ Pytania (materiały milczą — propozycje do decyzji):
 
 ## Następny krok
 
-Po „dalej” (i decyzji o P-T11, P-T12): partia 2 — Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider, ta sama budowa (13 sekcji, macierz stanów, testy interakcji), potem `test:stories:themes`, `check:tokens`, `build-storybook` + zrzuty.
+Po „dalej” (i decyzji o P-T13, P-T14): partia 3 — Card (usunięcie 4 wartości spoza tokenów), Separator, Badge, Avatar, Table, Tabs; ta sama budowa.

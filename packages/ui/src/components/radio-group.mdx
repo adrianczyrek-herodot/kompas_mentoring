@@ -1,0 +1,146 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Field, FieldLabel } from './field';
+import { RadioGroup, RadioGroupItem } from './radio-group';
+import * as RadioGroupStories from './radio-group.stories';
+
+<Meta of={RadioGroupStories} />
+
+# RadioGroup
+
+## 1. Do czego służy
+
+Pozwala wybrać dokładnie jedną z kilku opcji, które użytkownik widzi wszystkie naraz i może
+porównać.
+
+<Canvas of={RadioGroupStories.Playground} />
+<Controls of={RadioGroupStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| „Chcę się uczyć / mentorować” w rejestracji (P4) | KONCEPCJA §P4 |
+| Powód odrzucenia prośby o sesję próbną (M2): lista + „inne” | KONCEPCJA §M2, backlog E3-S7 |
+| Decyzja weryfikacji: zatwierdź / poproś o zmiany / odrzuć (A1) | KONCEPCJA §2.2 F4, backlog E2-S4 |
+
+## 3. Kiedy nie używać
+
+| Zamiast grupy radio | Użyj | Źródło |
+|---|---|---|
+| Więcej niż ok. 6 opcji | `Select` / `Combobox` | propozycja |
+| Kilka opcji naraz | `Checkbox` w `FieldSet` | WAI-ARIA APG |
+| Krótki przełącznik widoku lub długości (30 / 60 min) | `ToggleGroup` | KONCEPCJA §U1 |
+| Ustawienie wł./wył. | `Switch` | WAI-ARIA APG |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Nazwa grupy | tak | `FieldLegend` + `aria-labelledby` |
+| Opcja (`RadioGroupItem`) | tak | koło 20 px, `rounded-round`, pole kliknięcia 44 px |
+| Etykieta opcji | tak | `FieldLabel htmlFor` |
+| Opis opcji | nie | `FieldDescription` w `FieldContent` — skutek wyboru |
+| Błąd | gdy błąd | `FieldError` pod grupą |
+
+## 5. Warianty
+
+<Canvas of={RadioGroupStories.Variants} />
+
+| Odmiana | Kiedy wybrać | Źródło |
+|---|---|---|
+| Proste opcje | wybór oczywisty z samej etykiety | KONCEPCJA §P4 |
+| Z opisem | każda opcja ma inny skutek (co zobaczy uczeń) | R05.2, WCAG 3.3.2 |
+
+## 6. Stany
+
+<Canvas of={RadioGroupStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | tło `surface-hover` (niewybrana) | D4 |
+| Fokus | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Wybrany | ramka i kropka w kolorze wyboru (`track-on`) | R04.2, K4 |
+| Błąd | ramka `border-invalid` + `FieldError` przy grupie | D5 |
+| Zablokowany | `surface-disabled`, ramka `border-disabled`; powód w opisie | D2 |
+| Wciśnięty, ładowanie | nie dotyczy | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Grupa `radiogroup` z nazwą; opcje `radio` z `aria-checked`. | WAI-ARIA APG (Radio Group) |
+| Tab wchodzi do grupy (na wybraną opcję), strzałki zmieniają wybór, Tab wychodzi. | WAI-ARIA APG |
+| Brak domyślnego wyboru, gdy wybór ma skutek (decyzja A1, powód M2) — użytkownik wybiera świadomie. | A02, propozycja |
+| Pole kliknięcia 44 px i klikalna etykieta. | K1, WCAG 2.5.8 |
+| Wybór widać kropką, nie tylko kolorem. | WCAG 1.4.1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykiety równoległe gramatycznie, krótkie. | „się uczyć” / „mentorować” po „Chcę” | teksty P4 |
+| Opcja „Inne” zawsze ostatnia, z polem tekstowym po wyborze. | — | KONCEPCJA §M2 |
+| Opis opcji mówi o skutku dla drugiej strony. | „Uczeń dostanie link do Twoich wolnych terminów.” | R05.2 |
+
+## 9. Responsywność
+
+<Canvas of={RadioGroupStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | opcje jedna pod drugą, etykiety się zawijają | propozycja |
+| 768 / 1440 px | nadal pionowo; poziomo tylko 2 krótkie opcje (P4) | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <RadioGroup aria-label="Chcę" defaultValue="s">
+      <Field orientation="horizontal"><RadioGroupItem id="r-s" value="s" /><FieldLabel htmlFor="r-s">się uczyć</FieldLabel></Field>
+      <Field orientation="horizontal"><RadioGroupItem id="r-m" value="m" /><FieldLabel htmlFor="r-m">mentorować</FieldLabel></Field>
+    </RadioGroup>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `RadioGroup` | `value` / `defaultValue` | `string` | — | wybrana opcja |
+| `RadioGroup` | `onValueChange` | `(value) => void` | — | zmiana wyboru |
+| `RadioGroup` | `disabled`, `required`, `name` | — | — | formularz |
+| `RadioGroup` | `aria-labelledby` | `string` | — | `id` legendy; wymagane |
+| `RadioGroupItem` | `value`, `id`, `disabled`, `aria-invalid` | — | — | opcja |
+
+## 11. Kod
+
+```tsx
+<FieldSet>
+  <FieldLegend id="want" variant="label">Chcę</FieldLegend>
+  <RadioGroup aria-labelledby="want" defaultValue="student">
+    <Field orientation="horizontal">
+      <RadioGroupItem id="student" value="student" />
+      <FieldLabel htmlFor="student">się uczyć</FieldLabel>
+    </Field>
+  </RadioGroup>
+</FieldSet>
+```
+
+Typowy przykład z produktu: M2, powód odrzucenia z opisami — story „Odmiany”.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<RadioGroup aria-label="Decyzja"><Field orientation="horizontal"><RadioGroupItem id="dd-r1" value="a" /><FieldLabel htmlFor="dd-r1">Zatwierdź</FieldLabel></Field><Field orientation="horizontal"><RadioGroupItem id="dd-r2" value="r" /><FieldLabel htmlFor="dd-r2">Odrzuć</FieldLabel></Field></RadioGroup>}
+      goodNote="Decyzja ze skutkiem nie ma wyboru z góry."
+      bad={<RadioGroup aria-label="Decyzja" defaultValue="a"><Field orientation="horizontal"><RadioGroupItem id="dd-r3" value="a" /><FieldLabel htmlFor="dd-r3">Zatwierdź</FieldLabel></Field><Field orientation="horizontal"><RadioGroupItem id="dd-r4" value="r" /><FieldLabel htmlFor="dd-r4">Odrzuć</FieldLabel></Field></RadioGroup>}
+      badNote="Zaznaczone z góry „Zatwierdź” zachęca do decyzji bez czytania wniosku."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Checkbox` (wiele), `ToggleGroup` (przełączanie widoku), `Select` (lista ukryta).
+- **Wzorce:** decyzja z powodem (A1, M2), formularz (P4).

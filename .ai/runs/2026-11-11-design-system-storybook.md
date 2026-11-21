@@ -25,6 +25,8 @@ Zbudować design system `packages/ui` z dokumentacją w Storybooku jako instrukc
 - 2026-11-21 — nowa sesja (poprzednie padły: wygasłe OAuth, błąd modelu). Etap 2 rozpoczęty: lista różnic R1–R10 względem shadcn ze źródłami i pytania D1–D6, Z6, Z8 w `POSTEP.md`. `apps/web` nie używa rozmiarów przycisku < 44 px ani `secondary`, a `role="alert"` przekazuje jawnie — Z6/Z8/D6 nie wymagają zmian w aplikacji. Czeka na decyzje właściciela.
 - 2026-11-21 — Właściciel: D1–D5 tak, Z6 „zostaw `sm` dla gęstych wierszy”, Z8 tak, D6 „usuń `secondary`”. Partia 1 (Button, Link, Input, Textarea, Field, Checkbox): komponenty na tokenach, 6 stron MDX × 13 sekcji, stories z macierzą stanów i testami interakcji. Naprawione: `cn()` gubił `text-label` (tailwind-merge), przeładowanie Vite w Vitest (`optimizeDeps.entries`), bloki Storybooka w ciemnym motywie, łamanie słów w tabelach na 320 px. Lint, typecheck, test, build, `test:stories:themes` (35 × 2) przechodzą; `check:tokens` — 5 wartości w Card/Alert (kolejne partie).
 
+- 2026-11-21 — Właściciel: P-T11, P-T12 tak, „dalej”. Partia 2 (Select, Combobox, RadioGroup, Switch, ToggleGroup, Slider): komponenty, 6 stron MDX, stories, testy. Naprawione: przeładowanie Vite przy istniejącej pamięci podręcznej (`optimizeDeps.force`), testy nakładek czekają na koniec animacji, chipy Comboboxa w kolumnie, ToggleGroup za szeroki na 320 px, długi kod w tekście dokumentacji, ostrzeżenie Biome w CSS z partii 1 (raport partii 1 podawał „0 ostrzeżeń” — błąd filtra). Lint 0/0, typecheck, test, build, `test:stories:themes` 66 × 2 przechodzą.
+
 ## Wynik
 W toku.
 

@@ -1,0 +1,165 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from './combobox';
+import { Field, FieldLabel } from './field';
+import * as ComboboxStories from './combobox.stories';
+
+<Meta of={ComboboxStories} />
+
+# Combobox
+
+## 1. Do czego służy
+
+Pozwala znaleźć i wybrać wartość z długiej listy przez wpisanie kilku liter, zamiast przewijać ją
+w całości.
+
+<Canvas of={ComboboxStories.Playground} />
+<Controls of={ComboboxStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Tryb | Źródło |
+|---|---|---|
+| Wyszukiwanie tematu na stronie głównej (autocomplete) | jeden wybór | KONCEPCJA §P1 |
+| Filtr tematu w wyszukiwarce | jeden wybór | KONCEPCJA §P2 |
+| Tagi kompetencji mentora, 3–15 | wiele (`multiple`, chipy) | KONCEPCJA §M1, backlog E2-S2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast pola z wyszukiwaniem | Użyj | Źródło |
+|---|---|---|
+| Krótka lista (do ok. 10 opcji) bez potrzeby szukania | `Select` | Base UI, propozycja |
+| Dowolny tekst bez listy (cel sesji) | `Input` / `Textarea` | KONCEPCJA §U2 |
+| 2–4 opcje widoczne od razu | `RadioGroup` / `ToggleGroup` | WAI-ARIA APG |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Etykieta | tak | `FieldLabel htmlFor` = `id` pola |
+| Pole (`ComboboxInput`) | tak | wygląd `Input`; obrys fokusu obejmuje całe pole z przyciskami |
+| Przycisk listy | tak | 44 px, `triggerLabel` (np. „Pokaż tematy”) |
+| Przycisk czyszczenia | nie | gdy podasz `clearLabel` |
+| Chipy (`ComboboxChip`) | tylko `multiple` | wybrane wartości przed kursorem, każdy z przyciskiem usuwania |
+| Lista (`ComboboxContent` + `ComboboxList`) | tak | jak w `Select` |
+| Brak wyników (`ComboboxEmpty`) | tak | co wpisać zamiast (R05.2) |
+
+## 5. Warianty
+
+<Canvas of={ComboboxStories.Variants} />
+
+| Tryb | Kiedy wybrać | Źródło |
+|---|---|---|
+| Jeden wybór | temat, kategoria | KONCEPCJA §P1, §P2 |
+| `multiple` z chipami | tagi, języki — kilka wartości z listy | KONCEPCJA §M1 |
+
+## 6. Stany
+
+<Canvas of={ComboboxStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Fokus | obrys 2 px `focus-ring` wokół całego pola | WCAG 2.4.7, P-T2 |
+| Lista otwarta / podświetlenie / wybrane | jak `Select` | D4, WCAG 1.4.1 |
+| Brak wyników | `ComboboxEmpty` w liście, ogłaszany przez czytnik (`role="status"`) | WCAG 4.1.3 |
+| Błąd | ramka `border-invalid` + `FieldError` | D5 |
+| Zablokowany | `surface-disabled`; przyciski ukryte; powód w opisie | D2 |
+| Błąd podpowiedzi z serwera | pole działa jak zwykły tekst | KONCEPCJA §P1 (stan Er) |
+| Najechanie, wciśnięty | nie dotyczy pola | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Pole ma rolę `combobox` z `aria-expanded`; lista `listbox`. | WAI-ARIA APG (Combobox) |
+| Wpisywanie filtruje; strzałki przesuwają podświetlenie; Enter wybiera; Escape zamyka, drugi Escape czyści. | WAI-ARIA APG |
+| Chipy: strzałka w lewo z początku pola przechodzi do chipów, Backspace usuwa; przycisk usuwania ma nazwę „Usuń tag React”. | Base UI, WCAG 4.1.2 |
+| Przyciski listy i czyszczenia mają nazwy (`triggerLabel`, `clearLabel`); cel 44 px. | WCAG 4.1.2, K1 |
+| Komunikat „brak wyników” jest ogłaszany bez przenoszenia fokusu. | WCAG 4.1.3 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Placeholder z przykładami wartości. | „np. React, rozmowa rekrutacyjna” | prompt (wzorzec formularza) |
+| Brak wyników: co zrobić. | „Nie znamy takiego tematu. Spróbuj krótszej frazy, np. „React”.” | R05.2 |
+| Limit liczby wartości w podpowiedzi. | „Od 3 do 15 tagów.” | backlog E2-S2 |
+| Fraza 2–80 znaków. | — | KONCEPCJA §P1 |
+
+## 9. Responsywność
+
+<Canvas of={ComboboxStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | pole na całą szerokość, chipy zawijają się w kolejne wiersze | propozycja |
+| 768 / 1440 px | najwyżej `form-max`; na P1 pole w nagłówku strony | makieta |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Field>
+      <FieldLabel htmlFor="r-topic">Temat</FieldLabel>
+      <Combobox items={['React', 'UX research']}>
+        <ComboboxInput id="r-topic" triggerLabel="Pokaż tematy" placeholder="np. React" />
+        <ComboboxContent>
+          <ComboboxEmpty>Brak wyników.</ComboboxEmpty>
+          <ComboboxList>{(t) => <ComboboxItem key={t} value={t}>{t}</ComboboxItem>}</ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `Combobox` | `items` | `T[]` | — | wszystkie opcje (filtrowane lokalnie) |
+| `Combobox` | `multiple` | `boolean` | `false` | wiele wartości |
+| `Combobox` | `value` / `defaultValue`, `onValueChange` | `T \| T[] \| null` | — | wybór |
+| `Combobox` | `filteredItems` | `T[]` | — | wyniki z serwera (P1 `GET /topics?query=`) |
+| `ComboboxInput` | `triggerLabel` | `string` | — | nazwa przycisku listy; wymagana |
+| `ComboboxInput` | `clearLabel` | `string` | — | nazwa przycisku czyszczenia; bez niej brak przycisku |
+| `ComboboxInput` | `chips` | `ReactNode` | — | chipy przed kursorem (`multiple`) |
+| `ComboboxChip` | `removeLabel` | `string` | — | nazwa przycisku usuwania; wymagana |
+| `ComboboxEmpty` | `children` | `ReactNode` | — | komunikat braku wyników |
+
+## 11. Kod
+
+```tsx
+<Combobox items={topics}>
+  <ComboboxInput id="topic" triggerLabel="Pokaż tematy" />
+  <ComboboxContent>
+    <ComboboxEmpty>Nie znamy takiego tematu.</ComboboxEmpty>
+    <ComboboxList>{(t) => <ComboboxItem key={t} value={t}>{t}</ComboboxItem>}</ComboboxList>
+  </ComboboxContent>
+</Combobox>
+```
+
+Typowy przykład z produktu (M1, tagi): zob. story „Odmiany” — `multiple`, `ComboboxValue`
+z funkcją zwracającą `ComboboxInput` z `chips`.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<span className="text-body-dense text-text-default">„Nie znamy takiego tematu. Spróbuj krótszej frazy, np. „React”.”</span>}
+      goodNote="Pusty wynik mówi, co zrobić dalej."
+      bad={<span className="text-body-dense text-text-default">„Brak wyników”</span>}
+      badNote="Użytkownik nie wie, czy wpisał źle, czy tematu nie ma."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Select` (bez wpisywania), `Input` (bez listy).
+- **Wzorce:** lista z filtrami (temat P2), kreator ze szkicem (tagi M1), wyszukiwanie na P1.

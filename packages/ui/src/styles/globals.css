@@ -85,6 +85,8 @@
   --color-border-invalid: var(--border-invalid);
   --color-checkbox-checked: var(--checkbox-checked-bg);
   --color-checkbox-check: var(--checkbox-check);
+  --color-track-off: var(--track-off);
+  --color-track-on: var(--track-on);
   --color-selected-bg: var(--selected-bg);
   --color-selected-border: var(--selected-border);
   --color-focus-ring: var(--focus-ring);
@@ -189,6 +191,12 @@
   --spacing-field-x: var(--field-padding-x);
   --spacing-field-y: var(--field-padding-y);
   --spacing-checkbox: var(--checkbox-size);
+  --spacing-switch-w: var(--switch-width);
+  --spacing-switch-h: var(--switch-height);
+  --spacing-switch-thumb: var(--switch-thumb);
+  --spacing-switch-inset: var(--switch-inset);
+  --spacing-slider-track: var(--slider-track);
+  --spacing-slider-thumb: var(--slider-thumb);
   --spacing-icon-sm: var(--icon-sm);
   --spacing-icon-md: var(--icon-md);
   --spacing-icon-lg: var(--icon-lg);

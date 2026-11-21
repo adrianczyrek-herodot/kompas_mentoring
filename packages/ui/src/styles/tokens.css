@@ -134,7 +134,7 @@
   --action-danger: var(--raw-red-700); /* WCAG, A02: irreversible actions only */
   --action-danger-hover: var(
     --raw-red-800
-  ); /* P-T11: hover on action-danger (7.84 : 1 with text-on-danger) */
+  ); /* P-T11 (approved 2026-11-21): hover on action-danger (7.84 : 1 with text-on-danger) */
 
   /* selection and focus */
   --selected-bg: var(--raw-amber-100); /* R04.2, K4: selected slot, tab, option */
@@ -199,7 +199,9 @@
   --measure-text: 65ch; /* R05.1: running text */
 
   /* spacing relations (values P-T7) */
-  --space-tight: var(--raw-space-1); /* P-T12: label–hint, items of one message */
+  --space-tight: var(
+    --raw-space-1
+  ); /* P-T12 (approved 2026-11-21): label–hint, items of one message */
   --space-inline: var(--raw-space-2); /* within a group: icon–text, items of one group */
   --space-group: var(--raw-space-4); /* between groups: fields, blocks */
   --space-panel: var(--raw-space-4); /* inside a panel; 24 from 768 px */
@@ -320,4 +322,17 @@
   --slot-selected-bg: var(--selected-bg); /* R04.2 */
   --slot-selected-border: var(--selected-border);
   --dialog-width: 30rem; /* P-T10: 480 px */
+  --switch-width: var(--target-min); /* P-T14: 44 × 24 px track, 20 px thumb; tap area target-min */
+  --switch-height: var(--icon-lg);
+  --switch-thumb: var(--icon-md);
+  --switch-inset: calc(
+    (var(--switch-height) - var(--switch-thumb)) /
+    2
+  ); /* 2 px around the thumb */
+  --slider-track: var(--raw-space-1); /* P-T14: 4 px track, 20 px thumb */
+  --slider-thumb: var(--icon-md);
+  --slider-thumb-border: 2px; /* P-T14: thumb outline in track-on, visible on any surface */
+  --track-off: var(--border-control); /* WCAG 1.4.11: switch off, empty slider track (3.65 : 1) */
+  --track-on: var(--selected-border); /* R04.2, K4: on / filled part = selection accent */
+  --layer-overlay: 50; /* P-T13: popups (select, combobox) above page content */
 }

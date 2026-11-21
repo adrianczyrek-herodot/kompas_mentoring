@@ -76,18 +76,27 @@ Oznaczenia: **P-T…** — wartość zaproponowana przez agenta (materiały jej 
 
 ## Uzupełnienia etapu 2 (2026-11-21)
 
-Decyzje właściciela D1–D5, Z6 (lista różnic w `packages/ui/POSTEP.md`) i dwie propozycje agenta (**P-T11**, **P-T12** — do zatwierdzenia).
+Decyzje właściciela D1–D5, Z6 (lista różnic w `packages/ui/POSTEP.md`) i dwie propozycje agenta (**P-T11**, **P-T12** — zatwierdzone 2026-11-21).
 
 | Token | Jasny / ciemny | Źródło | Do czego |
 |---|---|---|---|
 | `surface-hover` | = `surface-sunken` | D4 | najechanie na akcje drugorzędne i ciche, karty wyboru |
 | `surface-disabled`, `text-disabled`, `border-disabled` | = `surface-sunken`, `text-subtle`, `border-divider` | D2 | zablokowane kontrolki zamiast przezroczystości (tekst 4,93 : 1 / 7,01 : 1) |
 | `border-invalid` | = `status-danger-fg` | D5 | ramka pola z błędem, bez poświaty |
-| `action-danger-hover` | `#962c22` / `#f4978c` | **P-T11** (propozycja) | najechanie na akcję destrukcyjną (7,84 : 1 / 8,20 : 1 z `text-on-danger`) |
-| `space-tight` | 4 px | **P-T12** (propozycja) | etykieta–opis, elementy jednego komunikatu |
+| `action-danger-hover` | `#962c22` / `#f4978c` | **P-T11** (zatwierdzone) | najechanie na akcję destrukcyjną (7,84 : 1 / 8,20 : 1 z `text-on-danger`) |
+| `space-tight` | 4 px | **P-T12** (zatwierdzone) | etykieta–opis, elementy jednego komunikatu |
 | `button-height-lg` / `-sm` | 48 / 32 px | R01.1 / Z6 | rezerwacja (P3, U1) / gęste wiersze (A1) z polem kliknięcia 44 px |
 | `button-padding-x`, `field-padding-x`, `field-padding-y` | 16 / 12 / 8 px | D1 | odstępy wewnętrzne kontrolek |
 | `checkbox-size`, `checkbox-checked-bg`, `checkbox-check` | 20 px, `selected-border`, `surface-panel` | K1, R04.2 | pole wyboru (znacznik 5,78 : 1 / 8,44 : 1) |
+
+### Partia 2 (propozycje P-T13, P-T14 — do zatwierdzenia)
+
+| Token | Wartość | Źródło | Do czego |
+|---|---|---|---|
+| `track-off` / `track-on` | = `border-control` / `selected-border` | WCAG 1.4.11, R04.2 | tor przełącznika wyłączonego i suwaka (uchwyt na torze 3,65 : 1 / 3,85 : 1) / część włączona i wypełniona (5,40 : 1 / 9,30 : 1 do tła) |
+| `switch-width`, `switch-height`, `switch-thumb` | 44 × 24 px, uchwyt 20 px | **P-T14** (propozycja), K1 | przełącznik; pole kliknięcia 44 px |
+| `slider-track`, `slider-thumb` | 4 px, 20 px | **P-T14** (propozycja) | suwak ceny P2; pole kliknięcia uchwytu 44 px |
+| `layer-overlay` | 50 | **P-T13** (propozycja, techniczna) | warstwa list rozwijanych nad treścią |
 
 ## Kontrast (policzony dla wartości z tabeli)
 

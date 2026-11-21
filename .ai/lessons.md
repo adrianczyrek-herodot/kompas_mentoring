@@ -26,8 +26,11 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-11** — Wynik `build-storybook` (`storybook-static/`) musi być wykluczony z ESLint (`packages/config/eslint`), dependency-cruiser (`.dependency-cruiser.cjs`) i `.gitignore`, inaczej `pnpm lint` zgłasza tysiące błędów w zbudowanych plikach.
 
 - **2026-11-21** — `cn()` (tailwind-merge) nie zna własnych rozmiarów tekstu z `@theme` — `text-label` brał za kolor i usuwał go obok `text-text-default` (lub odwrotnie), po cichu. Każdą nową rolę `--text-*` w `globals.css` dopisz do `extendTailwindMerge` w `packages/ui/src/lib/utils.ts`.
-- **2026-11-21** — Testy stories (Vitest browser) padały całymi plikami („Failed to fetch dynamically imported module”), gdy story importowała zależność, której Vite jeszcze nie zoptymalizował (przeładowanie w trakcie). Przyczyna to nie podział plików (jak zakładał log etapu 1): `optimizeDeps.entries` w `packages/ui/vitest.config.ts` skanuje stories przed startem; nie dodawaj tam `main.ts` (ładuje natywny `@tailwindcss/oxide`).
+- **2026-11-21** — Testy stories (Vitest browser) padały całymi plikami („Failed to fetch dynamically imported module”, „Vite unexpectedly reloaded a test”), gdy story importowała zależność, której Vite jeszcze nie zoptymalizował. `optimizeDeps.entries` skanuje tylko przy przebudowie pamięci podręcznej, więc w `packages/ui/vitest.config.ts` jest też `force: true` (ok. 4 s na start). Nie dodawaj do `entries` `main.ts` (ładuje natywny `@tailwindcss/oxide`).
 - **2026-11-21** — Bloki Storybooka (tabela propsów `docblock-argstable`, kod `docblock-source`) mają style tylko jasne — w ciemnym motywie trzeba je nadpisać w `.storybook/preview.css` (podwójna klasa, żeby wygrać z emotion). Sprawdzaj każdą nową stronę w obu motywach.
+
+- **2026-11-21** — Nakładki Base UI (Select, Combobox, później Menu, Dialog) wchodzą i wychodzą z animacją przezroczystości: w play function `toBeVisible()` zaraz po otwarciu i „fokus wrócił na pole” / „lista zniknęła” zaraz po wyborze padają. Takie asercje owijaj w `waitFor(...)`.
+- **2026-11-21** — `pnpm lint` z kodem 0 może mieć ostrzeżenia Biome (format „Found N warning.”), których nie łapie grep po formacie ESLint (`12:3 warning`). Sprawdzając lint, szukaj obu: `sed 's/\x1b\[[0-9;]*m//g' log | grep -E "Found [0-9]+ (warning|error)|[0-9]+:[0-9]+ +(warning|error)"`.
 
 ## Domena i produkt
 

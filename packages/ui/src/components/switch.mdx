@@ -1,0 +1,144 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { Checkbox } from './checkbox';
+import { Field, FieldLabel } from './field';
+import { Switch } from './switch';
+import * as SwitchStories from './switch.stories';
+
+<Meta of={SwitchStories} />
+
+# Switch
+
+## 1. Do czego służy
+
+Włącza lub wyłącza ustawienie, które działa od razu, bez wysyłania formularza.
+
+<Canvas of={SwitchStories.Playground} />
+<Controls of={SwitchStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Wstrzymanie przyjmowania nowych uczniów (M3) | KONCEPCJA §M3 |
+| Preferencje powiadomień e-mail / push per typ (S3) | KONCEPCJA §S3 |
+| Synchronizacja z Kalendarzem Google (M3) | KONCEPCJA §M3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast przełącznika | Użyj | Źródło |
+|---|---|---|
+| Zgoda lub wybór zatwierdzany przyciskiem „Zapisz” / „Załóż konto” | `Checkbox` | WAI-ARIA APG (Switch, Checkbox) |
+| Wybór jednej z kilku opcji | `RadioGroup` / `ToggleGroup` | WAI-ARIA APG |
+| Akcja jednorazowa („Wyloguj ze wszystkich urządzeń”) | `Button` | WAI-ARIA APG (Button) |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Etykieta | tak | po lewej, opisuje stan włączony („Przyjmuję nowych uczniów”) |
+| Opis | nie | skutek wyłączenia |
+| Tor | tak | 44 × 24 px, `rounded-round`; wyłączony `track-off`, włączony `track-on` |
+| Uchwyt | tak | 20 px `surface-panel`; po prawej = włączony |
+
+## 5. Warianty
+
+<Canvas of={SwitchStories.Variants} />
+
+Jeden rozmiar i wygląd (P-T14). Odmiany układu: pojedynczy z opisem albo lista ustawień
+w `FieldSet`.
+
+## 6. Stany
+
+<Canvas of={SwitchStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Wyłączony / włączony | położenie uchwytu i kolor toru | WCAG 1.4.1, R04.2 |
+| Fokus | obrys 2 px `focus-ring` | WCAG 2.4.7, P-T2 |
+| Błąd | obrys `border-invalid` + `FieldError` (rzadkie: np. nieudany zapis) | D5 |
+| Zablokowany | tor `border-disabled`, uchwyt `surface-disabled`; powód w opisie | D2 |
+| Ładowanie | nie ma osobnego stanu: zmiana jest od razu widoczna; błąd zapisu cofa przełącznik i pokazuje `Toast` (partia 5) | propozycja |
+| Najechanie, wciśnięty | bez zmiany | propozycja |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Rola `switch`, `aria-checked`; Spacja przełącza. | WAI-ARIA APG (Switch) |
+| Etykieta przez `htmlFor`; klik w etykietę przełącza. | WCAG 1.3.1 |
+| Zmiana działa od razu — nie łącz z przyciskiem „Zapisz”. | WAI-ARIA APG, propozycja |
+| Cel kliknięcia 44 × 44 px. | K1, WCAG 2.5.8 |
+| Uchwyt przesuwa się w `duration-fast`; przy `prefers-reduced-motion` czas jest skrócony. | WCAG 2.3.3, P-T8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Etykieta opisuje stan włączony, bez „Włącz…”. | „Przyjmuję nowych uczniów” | propozycja |
+| Opis podaje skutek wyłączenia. | „Wyłączone: nikt nowy nie zarezerwuje sesji próbnej.” | R05.2, A04 |
+| Bez napisów „wł./wył.” w torze. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={SwitchStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | etykieta po lewej się zawija, przełącznik przy prawej krawędzi | propozycja |
+| 768 / 1440 px | lista ustawień najwyżej `form-max` | makieta |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <Field orientation="horizontal">
+      <FieldLabel htmlFor="r-24h">24 godziny przed sesją</FieldLabel>
+      <Switch id="r-24h" defaultChecked />
+    </Field>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `checked` / `defaultChecked` | `boolean` | — / `false` | stan |
+| `onCheckedChange` | `(checked: boolean) => void` | — | zmiana — zapisz od razu |
+| `disabled` | `boolean` | `false` | blokada; powód w opisie |
+| `id`, `name`, `aria-invalid` | — | — | etykieta, formularz, błąd |
+
+## 11. Kod
+
+```tsx
+<Field orientation="horizontal">
+  <FieldLabel htmlFor="accepting">Przyjmuję nowych uczniów</FieldLabel>
+  <Switch id="accepting" defaultChecked />
+</Field>
+```
+
+Typowy przykład z produktu (M3, zapis od razu):
+
+```tsx
+<Switch
+  id="accepting"
+  checked={settings.acceptingNewStudents}
+  onCheckedChange={(on) => updateSettings({ acceptingNewStudents: on })}
+/>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<Field orientation="horizontal"><Checkbox id="dd-w1" /><FieldLabel htmlFor="dd-w1">Akceptuję regulamin</FieldLabel></Field>}
+      goodNote="Zgoda zatwierdzana przyciskiem to checkbox."
+      bad={<Field orientation="horizontal"><FieldLabel htmlFor="dd-w2">Akceptuję regulamin</FieldLabel><Switch id="dd-w2" /></Field>}
+      badNote="Przełącznik sugeruje, że zgoda zapisała się od razu."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Checkbox` (zatwierdzany formularzem), `ToggleGroup`.
+- **Wzorce:** formularz ustawień (M3, S3).

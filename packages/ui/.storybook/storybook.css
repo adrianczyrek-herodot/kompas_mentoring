@@ -29,3 +29,12 @@
   outline: var(--focus-ring-width) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
+
+/* Combobox: the outline sits on the input group (same as its has-[input:focus-visible] rule). */
+[data-slot="combobox-input-group"]:has([data-preview-state~="focus"]) {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+[data-slot="combobox-input"][data-preview-state~="focus"] {
+  outline: none;
+}

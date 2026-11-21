@@ -1,0 +1,135 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont, ViewportFrame } from '../../.storybook/blocks/component-docs';
+import { ToggleGroup, ToggleGroupItem } from './toggle-group';
+import * as ToggleGroupStories from './toggle-group.stories';
+
+<Meta of={ToggleGroupStories} />
+
+# ToggleGroup
+
+## 1. Do czego służy
+
+Pozwala szybko przełączyć jedną (lub kilka) z 2–4 krótkich opcji, które zawsze są widoczne
+obok siebie.
+
+<Canvas of={ToggleGroupStories.Playground} />
+<Controls of={ToggleGroupStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Tryb | Źródło |
+|---|---|---|
+| Długość sesji 30 / 60 min w wyborze terminu (U1) | jeden | KONCEPCJA §U1 (`DurationToggle`) |
+| Pora dnia w filtrze dostępności: rano / po południu / wieczorem (P2) | wiele (`multiple`) | KONCEPCJA §P2 |
+
+## 3. Kiedy nie używać
+
+| Zamiast przełącznika segmentowego | Użyj | Źródło |
+|---|---|---|
+| Przełączanie widoków z inną treścią (Nadchodzące / Minione) | `Tabs` (partia 3) | WAI-ARIA APG (Tabs) |
+| Opcje z opisem albo dłuższe niż 2 słowa | `RadioGroup` | propozycja |
+| Ustawienie wł./wył. | `Switch` | WAI-ARIA APG |
+| Akcje | `Button` | WAI-ARIA APG |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis |
+|---|---|---|
+| Nazwa grupy | tak | `FieldTitle` + `aria-labelledby` |
+| Ramka | tak | `border-control`, `rounded-control`, linie między opcjami |
+| Opcja (`ToggleGroupItem`) | tak, 2–4 | min. 44 px, `text-label`, odstęp 12 px (`field-x`), etykieta zawija się na wąskim ekranie; ikona opcjonalna |
+
+## 5. Warianty
+
+<Canvas of={ToggleGroupStories.Variants} />
+
+| Tryb | Kiedy wybrać | Źródło |
+|---|---|---|
+| Jeden wybór (domyślnie) | wartości wykluczające się | KONCEPCJA §U1 |
+| `multiple` | filtr, w którym można wybrać kilka | KONCEPCJA §P2 |
+
+## 6. Stany
+
+<Canvas of={ToggleGroupStories.States} />
+
+| Stan | Wygląd | Źródło |
+|---|---|---|
+| Najechanie | tło `surface-hover` (niewybrana) | D4 |
+| Fokus | obrys 2 px `focus-ring` nad sąsiadami | WCAG 2.4.7, P-T2 |
+| Wybrany (wciśnięty) | tło `selected-bg`, tekst `text-link`, pogrubienie 600 | R04.2, K4, WCAG 1.4.1 |
+| Zablokowany | `surface-disabled`, `text-disabled`; powód obok (np. „Sesja próbna ma stałe 30 min”) | D2, KONCEPCJA §U1 |
+| Błąd, ładowanie | nie dotyczy | — |
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Opcje to przyciski z `aria-pressed`; grupa `group` z nazwą. | WAI-ARIA APG (Toolbar / Button) |
+| Strzałki przechodzą między opcjami, Enter / Spacja wybiera; fokus zapętla się. | Base UI, WAI-ARIA APG |
+| Wybór widać też grubością tekstu, nie tylko kolorem. | WCAG 1.4.1 |
+| Opcje 44 px wysokości. | K1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| 1–2 słowa na opcję, liczby z jednostką. | „30 min”, „Po południu” | KONCEPCJA §U1, §P2 |
+| Najwyżej 4 opcje. | — | propozycja |
+
+## 9. Responsywność
+
+<Canvas of={ToggleGroupStories.LongContent} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | grupa na całą szerokość (`w-full`), opcje dzielą ją po równo, etykiety się zawijają | propozycja |
+| 768 / 1440 px | szerokość według treści | propozycja |
+
+<Unstyled>
+  <ViewportFrame width={320}>
+    <ToggleGroup aria-label="Długość sesji" defaultValue={['30']} className="w-full">
+      <ToggleGroupItem value="30">30 min</ToggleGroupItem>
+      <ToggleGroupItem value="60">60 min</ToggleGroupItem>
+    </ToggleGroup>
+  </ViewportFrame>
+</Unstyled>
+
+## 10. API
+
+| Komponent | Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|---|
+| `ToggleGroup` | `value` / `defaultValue` | `string[]` | — | wybrane opcje (tablica także dla jednego wyboru) |
+| `ToggleGroup` | `onValueChange` | `(value: string[]) => void` | — | zmiana |
+| `ToggleGroup` | `multiple` | `boolean` | `false` | wiele opcji |
+| `ToggleGroup` | `disabled`, `aria-labelledby` | — | — | blokada, nazwa grupy |
+| `ToggleGroupItem` | `value`, `disabled` | `string`, `boolean` | — | opcja |
+
+## 11. Kod
+
+```tsx
+<ToggleGroup aria-labelledby="duration" defaultValue={['30']}>
+  <ToggleGroupItem value="30">30 min</ToggleGroupItem>
+  <ToggleGroupItem value="60">60 min</ToggleGroupItem>
+</ToggleGroup>
+```
+
+Typowy przykład z produktu (U1): wartość steruje siatką slotów —
+`onValueChange={([minutes]) => setDuration(Number(minutes))}`.
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<ToggleGroup aria-label="Długość" defaultValue={['30']}><ToggleGroupItem value="30">30 min</ToggleGroupItem><ToggleGroupItem value="60">60 min</ToggleGroupItem></ToggleGroup>}
+      goodNote="Dwie krótkie wartości, widoczne i przełączane jednym kliknięciem."
+      bad={<ToggleGroup aria-label="Widok" defaultValue={['u']}><ToggleGroupItem value="u">Nadchodzące sesje</ToggleGroupItem><ToggleGroupItem value="p">Minione sesje i notatki</ToggleGroupItem></ToggleGroup>}
+      badNote="Inna treść pod spodem to zakładki (Tabs), nie wartość."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Mylony z:** `Tabs` (widoki), `RadioGroup` (opcje z opisem), `Switch`.
+- **Wzorce:** wybór terminu z blokadą (U1), lista z filtrami (P2).

@@ -59,6 +59,7 @@
  * Syntax colours are flattened to text tokens so code stays readable in both themes.
  */
 .sbdocs .docblock-argstable.docblock-argstable :is(th, td) {
+  min-width: 6rem;
   background: var(--surface-panel);
   color: var(--text-default);
   border-color: var(--border-divider);
@@ -98,12 +99,14 @@
   color: var(--text-default);
 }
 
-.sbdocs .docblock-argstable.docblock-argstable :is(th, td) {
-  min-width: 6rem;
-}
-
 .sbdocs .docblock-argstable.docblock-argstable {
   display: block;
   max-width: 100%;
   overflow-x: auto;
+}
+
+/* Long inline code in prose wraps instead of widening the page at 320 px. */
+.sbdocs.sbdocs-content :not(pre) > code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
