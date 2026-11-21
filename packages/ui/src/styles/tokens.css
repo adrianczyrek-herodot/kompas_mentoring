@@ -357,4 +357,9 @@
   --popover-width: 20rem; /* P-T16: 320 px */
   --tooltip-max: 15rem; /* P-T16: 240 px, short labels only */
   --toast-width: 22.5rem; /* P-T16: 360 px */
+  --bottom-nav-height: calc(
+    var(--target-min) +
+    2 *
+    var(--space-tight)
+  ); /* P-T17 (proposal): mobile bottom bar < 768 px (KONCEPCJA §3.2); page bottom padding so content is not hidden under it (WCAG 2.4.11) */
 }

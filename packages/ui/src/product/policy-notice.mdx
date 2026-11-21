@@ -1,0 +1,166 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { TZ } from '../../.storybook/fixtures/kompas';
+import { Button } from '../components/button';
+import { PolicyNotice } from './policy-notice';
+import * as PolicyNoticeStories from './policy-notice.stories';
+
+<Meta of={PolicyNoticeStories} />
+
+# PolicyNotice
+
+## 1. Do czego służy
+
+Mówi pełnym zdaniem, co się stanie z sesją, jeśli uczeń ją teraz przełoży albo anuluje: do 12 h
+przed sesją bez kosztów (sesja wraca do salda), później sesja przepada, po rozpoczęciu nic nie da
+się zmienić (brief reguła 4, KONCEPCJA Z4, F3, E3-S6). Zastępuje „drobny druk” — zasada stoi przy
+akcji, a nie w regulaminie (A04).
+
+<Canvas of={PolicyNoticeStories.Playground} />
+<Controls of={PolicyNoticeStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Szczegóły sesji U5 — nad przyciskami „Przełóż” i „Anuluj” | KONCEPCJA §U5 (PolicyNotice), E3-S6 |
+| Dialog potwierdzenia anulowania lub przełożenia (`ConfirmDialog`) — zwłaszcza w stanie `late` | KONCEPCJA F3 („ostrzeżenie »sesja przepadnie« → potwierdź”), E3-S6 |
+| Wybór terminu U1 — informacja o zasadzie 12 h przed rezerwacją | KONCEPCJA §U1, E3-S4 |
+
+## 3. Kiedy nie używać
+
+| Zamiast `PolicyNotice` | Użyj | Źródło |
+|---|---|---|
+| Profil P3 — jedno zdanie o zasadzie przy przycisku rezerwacji | linia w `StickyBookingBar` | KONCEPCJA §P3, A04 |
+| Błąd po akcji (np. przełożenie się nie udało) | `Alert variant="danger"` z `role="alert"` albo `Toast` | Z8 |
+| Zasady zwrotu płatności, opłata serwisowa | `PriceBreakdown` / `GuaranteeNote` (jeszcze nie ma w systemie) | A04, KONCEPCJA §U2 |
+| Przypis z gwiazdką lub zwinięty „Regulamin” | nic — zasada zawsze pełnym tekstem | A04 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| `Alert` | tak | wariant zależny od stanu (`neutral` lub `warning`), bez roli live | Z8 |
+| Ikona | tak | `Info` / `TriangleAlert` / `Ban`, dekoracyjna (`aria-hidden`) | WCAG 1.4.1, R02.5 |
+| Tytuł | tak | zasada jednym zdaniem | R05.2 |
+| Opis | tak | skutek dla salda; w stanie `free` z godziną graniczną (`<time>` w strefie oglądającego) | A04, brief reguła 10 |
+
+## 5. Warianty
+
+Warianty = trzy stany reguły 12 h z domeny (`canCancelFree`, E3-S6). Ekran ich nie liczy.
+
+<Canvas of={PolicyNoticeStories.States} />
+
+| `state` | Wygląd | Treść | Źródło |
+|---|---|---|---|
+| `free` (12 h lub więcej przed startem) | `neutral` + ikona informacji | „Zmiana bez kosztów do 12 godzin przed sesją” + „Do pt., 23 paź, 06:00 możesz przełożyć lub anulować sesję — wtedy wraca do salda. Później sesja przepada.” | Z4, A04 |
+| `late` (mniej niż 12 h) | `warning` + ikona ostrzeżenia | „Do sesji zostało mniej niż 12 godzin” + „…sesja przepadnie i nie wróci do salda.” | F3, E3-S6 |
+| `started` | `neutral` + ikona blokady | „Sesja już się zaczęła” + „Nie można jej przełożyć ani anulować… zgłoś problem — masz na to 72 godziny od końca sesji.” | brief reguła 4, KONCEPCJA §U5 „Walidacje” |
+
+## 6. Stany
+
+| Stan danych | Co pokazać | Źródło |
+|---|---|---|
+| Ładowanie | nic — komunikat pojawia się razem z danymi sesji (szkielet ekranu U5) | KONCEPCJA §U5 (L) |
+| Pusto | nie dotyczy — każda sesja ma jeden ze stanów `free` / `late` / `started` | E3-S6 |
+| Błąd | nie dotyczy komponentu — 404/403 sesji obsługuje ekran U5 (`ErrorState`) | KONCEPCJA §U5 (Er) |
+| Częściowe dane | `free` bez `freeUntil` → zdanie ogólne „…do 12 godzin przed jej początkiem…” zamiast godziny | Z4 |
+| Dużo danych | nie dotyczy — jeden komunikat na sesję | — |
+| Długie teksty / 320 px | tekst zawija się pod ikoną, szerokość opisu `max-w-measure` | sekcja 9 |
+
+Komponent nie jest interaktywny: najechanie, fokus, wciśnięcie i zablokowanie nie dotyczą.
+Gdy akcja jest zablokowana (`started`), przyciski „Przełóż” / „Anuluj” są zablokowane, a ten
+komunikat jest ich powodem (D2, KONCEPCJA F3 „zablokowane z wyjaśnieniem”).
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Brak roli live: komunikat jest stały, czytnik czyta go w kolejności treści, bez przerywania. | Z8 |
+| Stawiaj go w DOM przed przyciskami „Przełóż” / „Anuluj” — czytnik i klawiatura dochodzą do zasady, zanim trafią na akcję. | WCAG 1.3.2, 2.4.3, A04 |
+| **Propozycja:** w stanie `late` i `started` powiąż przyciski z komunikatem przez `aria-describedby`, żeby czytnik ogłosił skutek razem z nazwą przycisku. | — |
+| Godzina graniczna to `<time datetime="…">` w strefie oglądającego. | brief reguła 10, WCAG 1.3.1, story `FullTextTest` |
+| Stan nie tylko kolorem: każdy ma inną ikonę i inny tytuł. | WCAG 1.4.1 |
+| Cel kliknięcia — nie dotyczy (brak kontrolek). | WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Pełne zdania, ten sam rozmiar i kolor co tekst główny komunikatu — nigdy `meta`, przypis czy gwiazdka. | „Później sesja przepada.” | A04, tokeny (role tekstu) |
+| Konkretna godzina zamiast „12 h przed”, gdy ją znamy. | „Do pt., 23 paź, 06:00…” | brief reguła 10, A04 |
+| Skutek dla pieniędzy wprost: wraca do salda / przepada. | „…wtedy wraca do salda.” | R05.2, brief reguła 3 |
+| Bez humoru i bez łagodzenia — chodzi o pieniądze i terminy. | — | K5 |
+| Następny krok, gdy nic nie można zmienić. | „…zgłoś problem — masz na to 72 godziny…” | KONCEPCJA §U5, brief reguła 6 |
+
+## 9. Responsywność
+
+<Canvas of={PolicyNoticeStories.Narrow} />
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | ikona po lewej, tytuł i opis zawijają się obok | KONCEPCJA Z9, WCAG 1.4.10 |
+| 768 / 1440 px | pełna szerokość kolumny, opis do `max-w-measure` | R05.1 |
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `state` | `'free' \| 'late' \| 'started'` | — | z domeny (`canCancelFree`), nigdy liczony w UI |
+| `freeUntil` | `string` (ISO) | — | ostatnia chwila bezpłatnej zmiany (start − 12 h); dla `free` |
+| `timeZone` | `string` (IANA) | — | strefa oglądającego |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `<div>` | — | bez `children` |
+
+## 11. Kod
+
+```tsx
+import { PolicyNotice } from '@kompas/ui';
+
+<PolicyNotice state="late" timeZone={viewer.timeZone} />
+```
+
+Typowy przykład z produktu (U5, szczegóły sesji):
+
+```tsx
+<section className="flex flex-col gap-group">
+  <PolicyNotice
+    state={booking.policyState}
+    freeUntil={booking.freeChangeUntil}
+    timeZone={viewer.timeZone}
+  />
+  <div className="flex flex-wrap gap-inline">
+    <Button variant="outline" disabled={booking.policyState === 'started'} focusableWhenDisabled>
+      Przełóż sesję
+    </Button>
+    <Button variant="ghost" disabled={booking.policyState === 'started'} focusableWhenDisabled>
+      Anuluj sesję
+    </Button>
+  </div>
+</section>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<div className="flex w-full flex-col gap-group"><PolicyNotice state="late" timeZone={TZ} /><div className="flex gap-inline"><Button variant="outline">Przełóż sesję</Button><Button variant="ghost">Anuluj sesję</Button></div></div>}
+      goodNote="Skutek pełnym zdaniem tuż nad akcją (A04)."
+      bad={<div className="flex flex-col gap-tight"><div className="flex gap-inline"><Button variant="outline">Przełóż sesję</Button><Button variant="ghost">Anuluj sesję</Button></div><p className="text-meta text-text-subtle">* Obowiązuje regulamin anulowania.</p></div>}
+      badNote="Przypis z gwiazdką to drobny druk — uczeń nie wie, że straci sesję (A04)."
+    />
+    <DoDont
+      good={<PolicyNotice state="free" freeUntil="2026-10-23T06:00:00+02:00" timeZone={TZ} />}
+      goodNote="Konkretna godzina w strefie ucznia (brief reguła 10)."
+      bad={<p className="text-body-dense text-text-default">Bezpłatna zmiana do 04:00 UTC.</p>}
+      badNote="Czas w UTC zamiast strefy ucznia prowadzi do pomyłki (KONCEPCJA Z9)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Komponenty:** `Alert`, `DateTime`, `Button` (`focusableWhenDisabled`), `SlotGrid` (arkusz przełożenia), `BookingStatusBadge`.
+- **Mylony z:** linią o zasadzie 12 h w `StickyBookingBar` (P3), `HoldCountdown` (blokada terminu, nie zasada zmiany).
+- **Wzorce:** widok szczegółów sesji (U5), potwierdzenie anulowania (`ConfirmDialog` + `late`).

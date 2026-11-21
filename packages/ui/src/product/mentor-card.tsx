@@ -136,7 +136,8 @@ function MentorCard({
           <Money amount={mentor.rate60} className="font-semibold" />
           <span className="text-meta text-text-muted"> / 60 min</span>
         </p>
-        <p className="text-meta text-text-muted">
+        {/* Prices never in `meta` (A04, tokeny.md). */}
+        <p className="text-body-dense text-text-default">
           Sesja próbna 30 min: <Money amount={mentor.trialPrice} />
         </p>
         {mentor.acceptingNew ? (

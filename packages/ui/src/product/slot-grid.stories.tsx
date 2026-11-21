@@ -115,7 +115,7 @@ export const SelectTest: Story = {
   render: () => <Interactive />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('button', { name: 'Poprzedni tydzień' })).toBeDisabled();
+    await expect(canvas.queryByRole('button', { name: 'Poprzedni tydzień' })).toBeNull();
     const thursday = canvas.getByRole('group', { name: 'czw., 22 paź' });
     const slot = within(thursday).getByRole('button', { name: '18:00' });
     await expect(slot).toHaveAttribute('aria-pressed', 'false');

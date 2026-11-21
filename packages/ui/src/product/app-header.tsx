@@ -37,7 +37,7 @@ type AppHeaderProps = Omit<React.ComponentProps<'header'>, 'children'> & {
   role: NavRole;
   /** Id of the current item (`aria-current="page"`). */
   current?: string;
-  /** Right side: notifications, avatar menu (KONCEPCJA §3.2). */
+  /** Right side: notifications, avatar menu (KONCEPCJA §3.2). Pages add `pb-bottom-nav md:pb-0`. */
   actions?: React.ReactNode;
 };
 
@@ -51,7 +51,7 @@ function NavLinks({
   compact: boolean;
 }) {
   return (
-    <ul className={cn('flex', compact ? 'justify-around' : 'gap-tight')}>
+    <ul className={cn('flex', compact ? 'w-full justify-around' : 'gap-tight')}>
       {navItems[role].map(({ id, label, href, Icon }) => (
         <li key={id}>
           <a
@@ -98,7 +98,7 @@ function AppHeader({ role, current, actions, className, ...props }: AppHeaderPro
       </header>
       <nav
         aria-label="Główna (dolny pasek)"
-        className="fixed inset-x-0 bottom-0 border-t border-border-divider bg-surface-panel md:hidden"
+        className="fixed inset-x-0 bottom-0 flex h-bottom-nav items-center border-t border-border-divider bg-surface-panel md:hidden"
       >
         <NavLinks role={role} current={current} compact />
       </nav>

@@ -56,7 +56,8 @@ function StickyBookingBar({
           {reason}
         </p>
       ) : (
-        <p className="text-body-dense text-text-muted">
+        // The 12-hour rule in body text, never as fine print (A04).
+        <p className="text-body text-text-default">
           30 minut · możesz przełożyć lub anulować bez kosztów do 12 h przed sesją
         </p>
       )}

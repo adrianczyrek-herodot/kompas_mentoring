@@ -1,0 +1,150 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { Button } from '../components/button';
+import { Link } from '../components/link';
+import { PageHeader } from './page-header';
+import * as PageHeaderStories from './page-header.stories';
+
+<Meta of={PageHeaderStories} />
+
+# PageHeader
+
+## 1. Do czego służy
+
+Góra każdego ekranu: jedyny `h1`, opcjonalne zdanie „po co ten ekran” i akcja główna nad linią
+zgięcia — żeby użytkownik od razu wiedział, gdzie jest i jaki jest następny krok.
+
+<Canvas of={PageHeaderStories.Playground} />
+<Controls of={PageHeaderStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Każdy ekran aplikacji: „Moje sesje” (U4), „Panel” (M2), „Szczegóły sesji” (U5) | WCAG 2.4.6, 1.3.1 |
+| Ekran z jedną akcją główną, która ma być widoczna od razu („Znajdź mentora” w U4) | R01.6, R05.3 |
+| Ekran szczegółów z powrotem do listy jako linkiem | R05.3 |
+
+## 3. Kiedy nie używać
+
+| Zamiast nagłówka ekranu | Użyj | Źródło |
+|---|---|---|
+| Nagłówek sekcji wewnątrz ekranu („Dzisiaj”, „Prośby”) | `h2` sekcji (np. w `TodayAgenda`) | WCAG 1.3.1 |
+| Logo i nawigacja | `AppHeader` | KONCEPCJA §3.2 |
+| Profil mentora z ceną i rezerwacją (P3) | `ProfileHero` | KONCEPCJA §P3 |
+| Drugi `h1` na ekranie | jeden `PageHeader` na ekran | WCAG 1.3.1 |
+| Komunikat o błędzie lub ostrzeżenie | `Alert` pod nagłówkiem | WCAG 3.3.1 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Tytuł | tak | `h1`, rola `text-page-title` | WCAG 2.4.6, tokeny.md (role tekstu) |
+| Opis | nie | jedno zdanie, `text-body`, do `max-w-measure` | R05.1, R05.2 |
+| Akcje | nie | najwyżej jedna główna + drugorzędne (`outline`, `Link`) | R01.6, R05.3 |
+
+## 5. Warianty
+
+Brak propu wariantu — warianty to kombinacje slotów:
+
+<Canvas of={PageHeaderStories.TitleOnly} />
+<Canvas of={PageHeaderStories.SecondaryAction} />
+
+| Kombinacja | Kiedy | Źródło |
+|---|---|---|
+| Tytuł + opis + akcja główna | ekran listy z oczywistym następnym krokiem (U4) | R01.6 |
+| Tylko tytuł | panel, w którym akcja główna jest w treści („Dołącz” w M2) | R01.6 |
+| Tytuł + link drugorzędny | szczegóły z powrotem do listy (U5) | R05.3 |
+
+## 6. Stany
+
+Nagłówek nie ładuje danych ani nie jest interaktywny — stany ładowania, pustki i błędu należą do
+treści ekranu pod nim, a stany przycisków do `Button` i `Link`. **Propozycja:** gdy tytuł zależy od
+danych (U5), ekran pokazuje tytuł ogólny, dopóki dane się wczytują.
+
+<Canvas of={PageHeaderStories.LongContent} />
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Dokładnie jeden `h1` na ekranie — tytuł z `PageHeader`; czytnik ogłasza „nagłówek poziomu 1, Moje sesje”. | WCAG 1.3.1, 2.4.6 |
+| `header` wewnątrz `main` nie jest landmarkiem banner — nie koliduje z `AppHeader`. | WAI-ARIA (landmarks) |
+| Kolejność fokusu: akcje w kolejności DOM, akcja główna pierwsza. | WCAG 2.4.3 |
+| Tytuł strony (`title` dokumentu) zgadza się z `h1`. | WCAG 2.4.2 |
+| Cele akcji ≥ 24 × 24 px; `Button` ma 44 px. | WCAG 2.5.8, K1 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Tytuł to nazwa ekranu z nawigacji albo obiektu. | „Moje sesje”, „Szczegóły sesji” | KONCEPCJA §3.1 |
+| Opis: jedno zdanie, bez żargonu. | „Nadchodzące i minione sesje ze wszystkimi mentorami.” | R05.2 |
+| Akcja: czasownik + obiekt. | „Znajdź mentora” | R05.2 |
+| Teksty przekazuje ekran z `messages/pl.json` (komponent nie ma własnych). | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+| Szerokość | Zachowanie | Źródło |
+|---|---|---|
+| 320 px | tytuł, opis i akcje jeden pod drugim; długi tytuł się zawija | K1 |
+| od 768 px (`md`) | tytuł z opisem po lewej, akcje po prawej, wyrównane do dołu | **Propozycja:** akcje po prawej od 768 px |
+| 1440 px | jak 768 px; opis nie szerszy niż `max-w-measure` | R05.1, tokeny.md (`measure-text`) |
+
+Story „Długie teksty i 320 px” — sekcja 6.
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `title` | `ReactNode` | — | treść `h1` |
+| `description` | `ReactNode` | — | jedno zdanie pod tytułem |
+| `actions` | `ReactNode` | — | najwyżej jedna akcja główna + drugorzędne |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `header` | — | `aria-*`, `data-*` |
+
+## 11. Kod
+
+```tsx
+import { PageHeader } from '@kompas/ui';
+
+<PageHeader title="Panel" />
+```
+
+Typowy przykład z produktu (U4):
+
+```tsx
+import { Button, PageHeader } from '@kompas/ui';
+import NextLink from 'next/link';
+
+<PageHeader
+  title={t('mySessions')}
+  description={t('mySessionsDescription')}
+  actions={<Button render={<NextLink href="/mentorzy" />}>{t('findMentor')}</Button>}
+/>
+```
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<PageHeader title="Szczegóły sesji" actions={<Link href="/sesje">Wróć do listy sesji</Link>} className="w-full" />}
+      goodNote="Powrót jako link drugorzędny, akcja główna zostaje w treści."
+      bad={<PageHeader title="Szczegóły sesji" actions={<><Button>Wróć do listy sesji</Button><Button>Przełóż</Button></>} className="w-full" />}
+      badNote="Dwie akcje główne w nagłówku — nie wiadomo, co zrobić najpierw (R01.6)."
+    />
+    <DoDont
+      good={<PageHeader title="Moje sesje" className="w-full" />}
+      goodNote="Tytuł ekranu jako h1, który czytnik znajdzie skrótem."
+      bad={<p className="text-page-title font-semibold text-text-default">Moje sesje</p>}
+      badNote="Wygląda jak tytuł, ale nie jest nagłówkiem (WCAG 1.3.1)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Współpracuje z:** `AppHeader` (nad nim), `Button`, `Link`.
+- **Mylony z:** `ProfileHero` (nagłówek profilu P3), `CardHeader` (nagłówek panelu).
+- **Wzorce:** jedna akcja główna na ekran (R01.6), widok szczegółów (U5), lista z filtrami (U4).

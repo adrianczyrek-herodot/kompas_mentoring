@@ -204,6 +204,7 @@
   --spacing-avatar-md: var(--avatar-md);
   --spacing-avatar-lg: var(--avatar-lg);
   --spacing-tab-indicator: var(--tab-indicator);
+  --spacing-bottom-nav: var(--bottom-nav-height);
   --spacing-icon-sm: var(--icon-sm);
   --spacing-icon-md: var(--icon-md);
   --spacing-icon-lg: var(--icon-lg);

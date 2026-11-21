@@ -33,7 +33,7 @@ type SlotGridProps = Omit<React.ComponentProps<'section'>, 'children' | 'onSelec
   onSelect?: (slot: Slot) => void;
   onPrevWeek?: () => void;
   onNextWeek?: () => void;
-  /** False for the current week: booking in the past is impossible. */
+  /** False for the current week (booking in the past is impossible) — hides the button. */
   canGoPrev?: boolean;
   /** First free slot after this week (KONCEPCJA §U1, state E). */
   nextAvailable?: string | undefined;
@@ -41,6 +41,8 @@ type SlotGridProps = Omit<React.ComponentProps<'section'>, 'children' | 'onSelec
   onRetry?: () => void;
   /** Heading level of the week label. */
   headingAs?: 'h2' | 'h3';
+  /** `week`: 7 columns from 768 px; `stacked`: days one under another (narrow panels, Sheet). */
+  layout?: 'week' | 'stacked';
 };
 
 // Week of free slots in the viewer's zone (U1, U5 reschedule). Slots are toggle buttons with
@@ -60,6 +62,7 @@ function SlotGrid({
   onJumpToNext,
   onRetry,
   headingAs: Heading = 'h2',
+  layout = 'week',
   className,
   ...props
 }: SlotGridProps) {
@@ -76,15 +79,17 @@ function SlotGrid({
     >
       <div className="flex flex-wrap items-center justify-between gap-inline">
         <div className="flex items-center gap-inline">
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Poprzedni tydzień"
-            disabled={!canGoPrev}
-            onClick={onPrevWeek}
-          >
-            <ChevronLeft aria-hidden="true" />
-          </Button>
+          {/* Current week: no „previous” button instead of a disabled one without a reason (D2). */}
+          {canGoPrev ? (
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Poprzedni tydzień"
+              onClick={onPrevWeek}
+            >
+              <ChevronLeft aria-hidden="true" />
+            </Button>
+          ) : null}
           <Heading
             id={headingId}
             className="text-section-title font-semibold text-text-default tabular-nums"
@@ -131,7 +136,12 @@ function SlotGrid({
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-group md:grid-cols-7 md:gap-inline">
+        <div
+          className={cn(
+            'grid grid-cols-1 gap-group',
+            layout === 'week' && 'md:grid-cols-7 md:gap-inline',
+          )}
+        >
           {days.map((day) => (
             <DayColumn
               key={day.date}
@@ -139,6 +149,7 @@ function SlotGrid({
               timeZone={timeZone}
               selectedSlotId={selectedSlotId}
               onSelect={onSelect}
+              stacked={layout === 'stacked'}
             />
           ))}
         </div>
@@ -152,21 +163,28 @@ function DayColumn({
   timeZone,
   selectedSlotId,
   onSelect,
+  stacked,
 }: {
   day: DaySlots;
   timeZone: string;
   selectedSlotId: string | undefined;
   onSelect: ((slot: Slot) => void) | undefined;
+  stacked: boolean;
 }) {
   return (
-    <fieldset className="flex flex-col gap-inline border-b border-border-divider pb-group md:border-b-0 md:pb-0">
+    <fieldset
+      className={cn(
+        'flex flex-col gap-inline border-b border-border-divider pb-group',
+        !stacked && 'md:border-b-0 md:pb-0',
+      )}
+    >
       <legend className="pb-inline text-label font-medium text-text-default">
         {formatDateTime(day.date, timeZone, 'weekday')}
       </legend>
       {day.slots.length === 0 ? (
         <p className="text-meta text-text-muted">Brak terminów</p>
       ) : (
-        <div className="flex flex-wrap gap-inline md:flex-col">
+        <div className={cn('flex flex-wrap gap-inline', !stacked && 'md:flex-col')}>
           {day.slots.map((slot) => {
             const selected = slot.id === selectedSlotId;
             return (

@@ -1,0 +1,145 @@
+import { Canvas, Controls, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { DoDont } from '../../.storybook/blocks/component-docs';
+import { Badge } from '../components/badge';
+import { BookingStatusBadge } from './booking-status-badge';
+import * as BookingStatusBadgeStories from './booking-status-badge.stories';
+
+<Meta of={BookingStatusBadgeStories} />
+
+# BookingStatusBadge
+
+## 1. Do czego służy
+
+Pokazuje status rezerwacji (sesji) ikoną i słowem z jednego słownika, żeby uczeń, mentor i admin
+widzieli ten sam status w ten sam sposób na każdym ekranie.
+
+<Canvas of={BookingStatusBadgeStories.Playground} />
+<Controls of={BookingStatusBadgeStories.Playground} />
+
+## 2. Kiedy używać
+
+| Sytuacja w Kompasie | Źródło |
+|---|---|
+| Status w wierszu listy sesji (U4, M4) — już wbudowany w `SessionListItem` | KONCEPCJA §U4 |
+| Status w szczegółach sesji (U5), pod `PageHeader` | KONCEPCJA §U5 |
+| Sesja próbna czekająca na decyzję mentora (`requested`) | KONCEPCJA §M2, E3-S7 |
+
+## 3. Kiedy nie używać
+
+| Zamiast znacznika | Użyj | Źródło |
+|---|---|---|
+| Status wniosku mentora (M1, A1) | `Badge` z własnym mapowaniem | KONCEPCJA §M1 |
+| Komunikat, który wymaga działania („pokój otworzy się o…”) | tekst obok akcji albo `Alert` | D2, WCAG 3.3.1 |
+| Licznik („3 nowe”) | nic — bez liczników | R02.4 |
+| Odliczanie terminu odpowiedzi na prośbę | spokojne zdanie w `TrialRequestCard` | A02, E3-S7 |
+
+## 4. Anatomia
+
+| Część | Wymagana | Opis | Źródło |
+|---|---|---|---|
+| Ikona | tak | lucide 16 px, inna dla każdego statusu, `aria-hidden` | WCAG 1.4.1 |
+| Słowo | tak | etykieta ze słownika statusów | KONCEPCJA §U5 |
+| Tło i kolor | tak | wariant `Badge` (`neutral` / `success` / `warning` / `danger`) | P-T3 (statusy), K4 |
+| `data-status` | tak | wartość statusu do testów i stylów | — |
+
+## 5. Warianty
+
+Wariant wynika ze statusu — nie ustawiaj go ręcznie.
+
+<Canvas of={BookingStatusBadgeStories.AllStatuses} />
+
+| `status` | Etykieta | Wariant `Badge` | Źródło |
+|---|---|---|---|
+| `requested` | Oczekuje na mentora | `warning` | KONCEPCJA §M2, E3-S7 |
+| `scheduled` | Potwierdzona | `success` | KONCEPCJA §U5 |
+| `in_progress` | W trakcie | `success` | KONCEPCJA §U5 |
+| `completed` | Zakończona | `neutral` | KONCEPCJA §U5 |
+| `cancelled` | Anulowana | `danger` | KONCEPCJA §U5 |
+| `no_show` | Nieobecność | `danger` | KONCEPCJA §U5, §U6 |
+| `disputed` | Zgłoszony problem | `warning` | KONCEPCJA §U5, §A2 |
+
+## 6. Stany
+
+Znacznik nie jest interaktywny: najechanie, fokus, wciśnięcie i zablokowanie nie dotyczą. Stany
+danych (ładowanie, pusto, błąd, długie teksty) należą do komponentu nadrzędnego —
+`SessionListItem`, `PageHeader` w U5. Macierz w sekcji 5 pokazuje wszystkie wartości.
+
+## 7. Zachowanie i dostępność
+
+| Zasada | Źródło |
+|---|---|
+| Status zawsze słowem; ikona i kolor tylko wzmacniają. | WCAG 1.4.1 |
+| Zwykły `span` — czytnik czyta słowo w miejscu („Potwierdzona”), ikony nie czyta. Nie dostaje fokusu. | WAI-ARIA |
+| Zmianę statusu na żywo (np. po przełożeniu w U5) ogłasza rodzic — toast albo region `role="status"`. | KONCEPCJA §U5 (S — toast), WAI-ARIA (`status`) |
+| Kontrast tekstu do tła ≥ 4,5 : 1 w obu motywach — dziedziczy z `Badge`. | WCAG 1.4.3 |
+| Cel kliknięcia — nie dotyczy (element nieinteraktywny, WCAG 2.5.8 obejmuje cele wskazywania). | WCAG 2.5.8 |
+
+## 8. Treść
+
+| Zasada | Przykład | Źródło |
+|---|---|---|
+| Jedna etykieta na status w całym produkcie; nie przepisuj jej na ekranie. | „Anulowana”, nie „Odwołano” w jednym miejscu i „Anulowana” w drugim | **Propozycja:** spójny słownik statusów |
+| Status w formie przymiotnika lub krótkiej frazy, bez wykrzyknika. | „Oczekuje na mentora” | R05.2 |
+| Ograniczenie: etykiety są dziś w `statusConfig` komponentu; docelowo z `messages/pl.json`. | — | AGENTS.md (Język) |
+
+## 9. Responsywność
+
+Znacznik ma szerokość treści i nie zmienia się z ekranem; najdłuższa etykieta („Oczekuje na
+mentora”) mieści się w wierszu 320 px — zobacz `SessionListItem`, story „Długie teksty i 320 px”
+(K1).
+
+## 10. API
+
+| Prop | Typ | Domyślnie | Opis |
+|---|---|---|---|
+| `status` | `'requested' \| 'scheduled' \| 'in_progress' \| 'completed' \| 'cancelled' \| 'no_show' \| 'disputed'` | — | status rezerwacji z domeny |
+| `className` | `string` | — | tylko układ |
+| pozostałe | atrybuty `span` | — | bez `children` — tekst pochodzi ze statusu |
+
+Typ `BookingStatus` jest eksportowany z `@kompas/ui`.
+
+## 11. Kod
+
+```tsx
+import { BookingStatusBadge } from '@kompas/ui';
+
+<BookingStatusBadge status="scheduled" />
+```
+
+Typowy przykład z produktu (U5, nagłówek szczegółów sesji):
+
+```tsx
+import { BookingStatusBadge, PageHeader } from '@kompas/ui';
+
+<PageHeader title={t('sessionWith', { name: booking.withName })} />
+<div className="flex flex-wrap items-center gap-inline">
+  <BookingStatusBadge status={booking.status} />
+</div>
+```
+
+Status nie trafia do `actions` w `PageHeader` — to miejsce na akcję główną ekranu (R01.6).
+
+## 12. Dobrze i źle
+
+<Unstyled>
+  <div className="flex flex-col gap-section">
+    <DoDont
+      good={<BookingStatusBadge status="cancelled" />}
+      goodNote="Ikona i słowo mówią, co się stało z sesją."
+      bad={<span className="inline-block size-icon-sm rounded-round bg-status-danger-fg" title="Anulowana" />}
+      badNote="Sama kropka koloru nic nie mówi osobie, która nie rozróżnia barw (WCAG 1.4.1)."
+    />
+    <DoDont
+      good={<BookingStatusBadge status="requested" />}
+      goodNote="Status z jednego słownika, ten sam w U4, U5 i M2."
+      bad={<Badge variant="danger">Pilne!</Badge>}
+      badNote="Własny czerwony znacznik buduje presję zamiast mówić status (A02)."
+    />
+  </div>
+</Unstyled>
+
+## 13. Powiązane
+
+- **Oparty na:** `Badge`.
+- **Używany w:** `SessionListItem`; w U5 pod `PageHeader`.
+- **Mylony z:** `Badge` (statusy innych obiektów), `Alert` (komunikat do działania).
