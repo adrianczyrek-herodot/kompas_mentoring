@@ -18,6 +18,7 @@
 | Z7 | Płatności i wypłaty przez operatora z obsługą marketplace (np. Stripe Connect / PayU Marketplace) | Split płatności, KYC mentorów i wypłaty poza naszą odpowiedzialnością | rekomendacja |
 | Z8 | Wyróżnik vs Preply: **cele i plan rozwoju** — uczeń definiuje cel, mentor po każdej sesji zostawia notatkę i zadania (action items) | Mentoring mierzy się postępem, nie liczbą lekcji | propozycja |
 | Z9 | UI po polsku, mobile-first, strefa czasowa ucznia wyświetlana wszędzie | Rezerwacje między strefami to częsty błąd | wiążące |
+| Z10 | **Konto ma jedną rolę**: `student`, `mentor`, `admin_trust` albo `admin_finance`. Kto chce się uczyć i mentorować, zakłada **drugie konto** — w nagłówku nie ma przełącznika ról | Jedna rola = prostsze uprawnienia, brak stanu „jestem uczniem i mentorem naraz” w zapytaniach, jednoznaczny audyt decyzji w sporach i płatnościach. Przełączanie ról nie jest potrzebne w MVP | **decyzja właściciela 2026-11-22** |
 
 **Poza zakresem MVP:** zajęcia grupowe, aplikacje natywne, własny edytor tablicy, program afiliacyjny, firmowe konta B2B, AI-dopasowanie mentora (kandydat na v2).
 
@@ -189,7 +190,7 @@ WSPÓLNE: S2 Powiadomienia (/powiadomienia), S3 Konto i ustawienia (/konto)
 
 ### 3.2 Nawigacja i zasady
 
-- **Nagłówek:** logo, przełącznik waluty i strefy czasowej (gość), dzwonek powiadomień, awatar z menu (Konto, Zmień rolę — gdy użytkownik jest i uczniem, i mentorem, Wyloguj).
+- **Nagłówek:** logo, przełącznik waluty i strefy czasowej (gość), dzwonek powiadomień, awatar z menu (Konto, Wyloguj). **Bez przełącznika ról** — konto ma jedną rolę (Z10), rola decyduje o nawigacji i trasach startowych (student → U4, mentor → M2, admin → A1).
 - **Mobile (<768 px):** dolny pasek z 5 pozycjami zależnymi od roli; **desktop:** pasek w nagłówku.
 - **Głębokie linki** z e-maili i powiadomień prowadzą bezpośrednio do U5, U6, U7, M2 (prośby).
 - **Strażnicy tras:** trasy U*/M*/A* wymagają zalogowania; po zalogowaniu powrót do trasy docelowej (`returnTo`). M2–M5 dostępne dopiero po zatwierdzeniu profilu; wcześniej przekierowanie do M1 ze statusem weryfikacji.
@@ -226,7 +227,7 @@ Konwencje: **API** = REST `/api/v1`, JSON, auth przez cookie sesji (HttpOnly). S
 
 ### P4 · Logowanie / Rejestracja
 - **Cel:** założyć konto bez utraty kontekstu rezerwacji.
-- **Funkcje:** e-mail + hasło, Google, LinkedIn; wybór „Chcę się uczyć / Chcę mentorować”; reset hasła; zgody (regulamin — wymagany, marketing — opcjonalny, niezaznaczony).
+- **Funkcje:** e-mail + hasło, Google, LinkedIn; wybór „Chcę się uczyć / Chcę mentorować” (**rola zostaje na koncie — Z10**; druga rola wymaga drugiego konta); reset hasła; zgody (regulamin — wymagany, marketing — opcjonalny, niezaznaczony).
 - **Komponenty:** AuthTabs, SocialButtons, TextField, PasswordField z miernikiem siły, ConsentCheckbox, InlineError.
 - **Stany:** L — przycisk z spinnerem, blokada podwójnego wysłania; E — n/d; Er — „Nieprawidłowy e-mail lub hasło” (bez ujawniania, który), 429 → „Za dużo prób, spróbuj za X min”; S — przekierowanie do `returnTo`.
 - **Walidacje:** e-mail RFC; hasło ≥ 10 znaków, nie z listy wycieków; imię 2–50; akceptacja regulaminu wymagana.
@@ -375,7 +376,7 @@ Konwencje: **API** = REST `/api/v1`, JSON, auth przez cookie sesji (HttpOnly). S
 ## 5. Model danych (szkic)
 
 ```
-User(id, email, name, avatarUrl, timezone, currency, roles[student|mentor|admin_*], createdAt)
+User(id, email, name, avatarUrl, timezone, currency, role[student|mentor|admin_trust|admin_finance], createdAt)
 MentorProfile(userId, status[draft|submitted|changes_requested|approved|rejected|suspended],
               headline, bio, videoUrl, categories[], tags[], yearsExp, languages[],
               rate60, minNoticeHours, bufferMin, acceptingNew, ratingAvg, sessionsCount)
