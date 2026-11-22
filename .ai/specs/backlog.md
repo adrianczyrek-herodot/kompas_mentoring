@@ -53,7 +53,7 @@ Zgłoszenie epiku: [#22](https://github.com/adrianczyrek-herodot/kompas_mentorin
 
 ### E2 — Katalog i onboarding mentora (F2)
 
-Zgłoszenie epiku: [#23](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/23)  ·  P: high  ·  Moduły: `catalog`, `trust`
+Zgłoszenie epiku: [#23](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/23)  ·  P: high  ·  Moduły: `catalog`, `trust`, `payouts` (dane DAC7)  ·  Spec: [F2](2026-11-22-f2-katalog-onboarding.md) (approved 2026-11-22)
 
 | ID | Historia | P | Zależy od | Zgłoszenie |
 |---|---|---|---|---|
@@ -66,11 +66,11 @@ Zgłoszenie epiku: [#23](https://github.com/adrianczyrek-herodot/kompas_mentorin
 | E2-S7 | Strona główna P1 (wyszukiwanie tematu, kategorie, wyróżnieni) | med | E2-S5 | [#34](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/34) |
 | E2-S8 | Ulubieni mentorzy | low | E2-S5 | [#35](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/35) |
 
-- **E2-S1** — T1 Spec `.ai/specs/YYYY-MM-DD-f2-katalog-onboarding.md`: model `MentorProfile` i `MentorApplication`, maszyna stanów profilu (`draft → submitted → changes_requested/approved/rejected/suspended`), porty `StorageProvider` (R2) i KYC, read model wyszukiwarki (widok SQL, `pg_trgm`, `unaccent`), pola DAC7. T2 Odpowiedzi właściciela (m.in. dostawca KYC przed F4, szyfrowanie danych DAC7), `status: approved`.
+- **E2-S1** — T1 Spec `.ai/specs/YYYY-MM-DD-f2-katalog-onboarding.md`: model `MentorProfile` i `MentorApplication`, maszyna stanów profilu (`draft → submitted → changes_requested/approved/rejected/suspended`), porty `StorageProvider` (R2) i KYC, read model wyszukiwarki (widok SQL, `pg_trgm`, `unaccent`), pola DAC7. *2026-11-22: szkic w [`2026-11-22-f2-katalog-onboarding.md`](2026-11-22-f2-katalog-onboarding.md) — T1 gotowe; plan 15 kroków przypisanych do E2-S2…E2-S8.* T2 Odpowiedzi właściciela (m.in. dostawca KYC przed F4, szyfrowanie danych DAC7), `status: approved`. *2026-11-22: Q1–Q14 rozstrzygnięte zgodnie z rekomendacjami, spec `approved` — E2-S1 gotowe.*
 - **E2-S2** — T1 Domena profilu i polityki walidacji (headline 20–80, opis 300–2000, 1–5 kategorii, 3–15 tagów, stawka 40–1000 zł jako `Money`). T2 Port `StorageProvider` + adapter R2 + fake, upload zdjęcia przez presigned URL (JPG/PNG ≥ 400×400, ≤ 5 MB). T3 UI: stepper, kroki 1–4, wideo jako link YouTube/Vimeo, podgląd zarobku, zapis szkicu po każdym kroku. T4 E2E.
-- **E2-S3** — T1 Krok 5: edytor dostępności z E3-S2 osadzony w onboardingu (≥ 3 h tygodniowo). T2 Krok 6: LinkedIn, dane DAC7 (adres, TIN + kraj, data urodzenia, NIP/REGON, IBAN), KYC wg decyzji z E2-S1. T3 Wysłanie → zdarzenie `MentorApplicationSubmitted` → wniosek w `trust`; status weryfikacji i przekierowanie M2–M5 do M1. T4 E2E.
+- **E2-S3** — T1 Krok 5: edytor dostępności z E3-S2 osadzony w onboardingu (≥ 3 h tygodniowo). T2 Krok 6: LinkedIn, dane DAC7 (adres, TIN + kraj, data urodzenia, NIP/REGON, IBAN); KYC dokumentowy w F4 (spec F2 Q2) — w F2 tylko port i fake. T3 Wysłanie → zdarzenie `MentorApplicationSubmitted` → wniosek w `trust`; status weryfikacji i przekierowanie M2–M5 do M1. T4 E2E.
 - **E2-S4** — T1 `trust`: `MentorApplication`, decyzje (zatwierdź / poproś o zmiany z listą pól / odrzuć z powodem), wpis w audycie, tylko `admin_trust`. T2 UI A1: kolejka z wiekiem i SLA, szczegóły, checklista, dialog decyzji. T3 Zdarzenie decyzji → `catalog` publikuje lub cofa do poprawek. T4 E2E.
-- **E2-S5** — T1 Read model wyszukiwarki (tylko zatwierdzeni). T2 Filtry (temat, cena 0–1000 zł, język, doświadczenie, „tylko zweryfikowani”) w URL, sortowanie, paginacja kursorem. T3 UI z bottom sheet na mobile, stany L/E/Er/S, „Wyczyść filtr X” dla filtra najbardziej zawężającego. T4 Filtr dostępności (pora dnia, dni) po E3-S3. T5 E2E.
+- **E2-S5** — T1 Read model wyszukiwarki (tylko zatwierdzeni). T2 Filtry (temat, cena 0–1000 zł, język, doświadczenie; „tylko zweryfikowani” dopiero w F4 — spec F2 Q11) w URL, sortowanie, paginacja kursorem. T3 UI z bottom sheet na mobile, stany L/E/Er/S, „Wyczyść filtr X” dla filtra najbardziej zawężającego. T4 Filtr dostępności (pora dnia, dni) po E3-S3. T5 E2E.
 - **E2-S6** — T1 Hero, wideo, kompetencje, doświadczenie, statystyki; „Nowy mentor” bez opinii; 404 dla profilu niedostępnego + podobni. T2 Tydzień dostępności w strefie ucznia (po E3-S3). T3 Sticky CTA „Zarezerwuj sesję próbną — X zł” (prowadzi do U1 z E3-S4), nieaktywne przy wstrzymanym przyjmowaniu. T4 E2E.
 - **E2-S7** — T1 Autocomplete tematów (2–80 znaków, błąd → zwykłe pole). T2 Kategorie, „jak to działa”, wyróżnieni mentorzy (pusta lista → sekcja ukryta), CTA „Zostań mentorem”. T3 E2E.
 - **E2-S8** — T1 Dodaj/usuń z ulubionych (zalogowany uczeń; gość → logowanie z `returnTo`). T2 Lista ulubionych. T3 E2E.

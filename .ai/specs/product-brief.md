@@ -2,7 +2,7 @@
 title: Product brief — Kompas, portal mentoringu 1:1
 status: approved          # dokument żyjący — aktualizowany przy każdej zmianie zakresu Now/Later
 created: 2026-11-11
-updated: 2026-11-11
+updated: 2026-11-22
 implemented:
 related:
   - .ai/specs/backlog.md
@@ -55,7 +55,7 @@ Reguły produktu (wiążące dla specyfikacji faz; wartości liczbowe są w KONC
 5. **Blokada terminu (hold)** 10 min przy wejściu do checkoutu; rezerwacja potwierdzana dopiero po webhooku płatności (idempotentnie).
 6. **Rozliczenie z mentorem** dopiero po zamknięciu okna zgłoszeń (72 h po sesji) i gdy nie ma otwartego sporu (W10).
 7. **Opinie** tylko od ucznia po ukończonej i opłaconej sesji, z oznaczeniem „zweryfikowana sesja” (Omnibus).
-8. **Mentor jest widoczny publicznie** dopiero po zatwierdzeniu wniosku przez zespół zaufania (KYC, LinkedIn, dane do wypłat i DAC7).
+8. **Mentor jest widoczny publicznie** dopiero po zatwierdzeniu wniosku przez zespół zaufania (LinkedIn, zdjęcie, dane do wypłat i DAC7). KYC dokumentowy (Stripe) dochodzi w F4 — bez niego mentor nie przyjmuje płatności ani wypłat (spec F2, Q2).
 9. **Komunikacja w platformie:** wykrywamy próby przekazania kontaktu lub płatności poza platformą; limit 5 nowych wątków ucznia na dobę.
 10. **Czas:** przechowywany w UTC, wyświetlany w strefie użytkownika wszędzie; reguły dostępności w czasie lokalnym mentora.
 11. **Prywatność:** brak nagrań sesji w MVP; notatki widoczne tylko dla stron sesji; eksport i usunięcie danych (RODO).
@@ -132,4 +132,5 @@ Techniczne, prawne i finansowe — otwarte w spec stacku i blokujące Later: **Q
 ## Decyzje i zmiany
 
 - 2026-11-11 — Pierwsza wersja na podstawie KONCEPCJA, spec stacku i stanu repozytorium po F1. Now = E1–E4 (domknięcie F1, F2, F3, preview i decyzje); Later = F4–F8 i pomysły po MVP. Plik ma stałą nazwę `product-brief.md` (dokument żyjący, na życzenie właściciela) — wyjątek od konwencji `YYYY-MM-DD-slug.md` opisany w `AGENTS.md`.
+- 2026-11-22 — Właściciel (spec F2, Q2): publikacja mentora bez KYC dokumentowego; KYC przez Stripe w F4 jako warunek płatności i wypłat. Reguła 8 poprawiona.
 - 2026-11-11 — Właściciel: Now = F1–F3 bez płatności (Q-B2, A8 przyjęte). Zgłoszenia Now utworzone w GitHub Issues: epiki #22–#25, historie #26–#47 (numery w backlogu).
