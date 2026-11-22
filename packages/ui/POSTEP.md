@@ -88,7 +88,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 | Dialog | nowy | A1 decyzja, M3 wyjątek |
 | AlertDialog (potwierdzenie) | nowy | U5 anulowanie < 12 h, S3 usunięcie konta, E2-S8 usuń z ulubionych |
 | Sheet (panel boczny / dolny) | nowy | P2 filtry na mobile, U5 przełożenie |
-| Menu | nowy | nagłówek: menu awatara (Konto, Zmień rolę, Wyloguj), akcje wiersza A1 |
+| Menu | nowy | nagłówek: menu awatara (Konto, Wyloguj), akcje wiersza A1 |
 | Popover | nowy | U1 wybór tygodnia, P2 filtr pory dnia (desktop) |
 | Tooltip | nowy | przyciski z samą ikoną (M3, U1 nawigacja tygodnia) |
 | Tabs | nowy | U4 Nadchodzące/Minione, P4 Logowanie/Rejestracja |

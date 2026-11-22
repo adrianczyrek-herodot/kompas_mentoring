@@ -1,0 +1,22 @@
+{
+  "format": "discovery-prototype-v1",
+  "skill": "om-mockup-prototype",
+  "slug": "konta-i-role",
+  "revision": 1,
+  "revisionPath": "prototypes/discovery/konta-i-role/revision-001",
+  "previousRevision": null,
+  "brief": ".ai/specs/product-brief.md",
+  "flow": "F1 Tożsamość (logowanie, rejestracja, role, weryfikacja maila, strony startowe ról, brak dostępu)",
+  "panelReport": null,
+  "verification": "browser-walk-2026-11-22-fixed (44/44 stany, 24/24 scenariusze, 0 błędów JS)",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "5a6515692fef653246e930360fbd01fca4a5c449d183ee9854f28df4ab448739"
+    },
+    {
+      "path": "README.md",
+      "sha256": "2dde7716e8880b30adfad032f373e634f69b8e59506f3bbe44bf9a8d4bc18b71"
+    }
+  ]
+}

@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kompas — Prototyp F1: Tożsamość (Logowanie, Rejestracja, Role, Weryfikacja, Konto)</title>
+<style>
+/* ===== Neutralny styl prototypu ===== */
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-hover: #f5f5f5;
+  --border: #e0e0e0;
+  --border-focus: #333;
+  --text: #1a1a1a;
+  --text-muted: #666;
+  --text-link: #0066cc;
+  --primary: #1a1a1a;
+  --primary-hover: #333;
+  --primary-text: #fff;
+  --danger: #c00;
+  --danger-hover: #a00;
+  --success: #080;
+  --warning: #b80;
+  --focus-ring: 0 0 0 2px #fff, 0 0 0 4px var(--border-focus);
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
+  --radius: 8px;
+  --radius-sm: 4px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  margin: 0; font-family: var(--font); background: var(--bg); color: var(--text);
+  line-height: 1.5; min-height: 100vh;
+}
+a { color: var(--text-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button {
+  font: inherit; cursor: pointer; border: none; background: none;
+  padding: 0; color: inherit;
+}
+button:disabled { opacity: .5; cursor: not-allowed; }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ===== Layout ===== */
+.app { max-width: 640px; margin: 0 auto; padding: var(--space-lg) var(--space-md); }
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn .15s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ===== Typography ===== */
+h1 { font-size: 1.5rem; font-weight: 600; margin: 0 0 var(--space-sm); }
+h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 var(--space-sm); }
+h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
+.lead { color: var(--text-muted); margin: 0 0 var(--space-lg); }
+.eyebrow { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-bottom: var(--space-xs); display: block; }
+.small { font-size: .875rem; }
+.muted { color: var(--text-muted); }
+.center { text-align: center; }
+.stack { display: flex; flex-direction: column; gap: var(--space-md); }
+.stack-sm { gap: var(--space-sm); }
+.row { display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; }
+.row.between { justify-content: space-between; }
+.row.end { justify-content: flex-end; }
+
+/* ===== Components ===== */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-lg); box-shadow: var(--shadow);
+}
+.card-header { margin-bottom: var(--space-lg); }
+.card-title { font-size: 1.125rem; font-weight: 600; margin: 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-sm);
+  padding: 10px 16px; border-radius: var(--radius); font-weight: 500;
+  min-height: 44px; min-width: 44px; transition: background .15s, color .15s;
+}
+.btn-primary { background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); border-color: var(--primary-hover); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { background: var(--surface-hover); }
+.btn-danger { background: var(--danger); color: #fff; border: 1px solid var(--danger); }
+.btn-danger:hover:not(:disabled) { background: var(--danger-hover); border-color: var(--danger-hover); }
+.btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.btn-danger-ghost:hover:not(:disabled) { background: #fff0f0; }
+.btn-block { width: 100%; }
+.btn-sm { padding: 6px 12px; font-size: .875rem; min-height: 36px; }
+.btn .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.field { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
+.field-label { font-size: .875rem; font-weight: 500; }
+.field-hint { font-size: .75rem; color: var(--text-muted); }
+.field-error { font-size: .75rem; color: var(--danger); min-height: 1.25em; }
+.field-input, .field-select, .field-textarea {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+  font: inherit; background: var(--surface); color: var(--text); min-height: 44px;
+  width: 100%; max-width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--border-focus); box-shadow: var(--focus-ring); }
+.field-input:invalid:not(:placeholder-shown), .field-input.error { border-color: var(--danger); }
+.field-textarea { min-height: 100px; resize: vertical; }
+.field-row { display: flex; gap: var(--space-md); flex-wrap: wrap; }
+.field-row > .field { flex: 1 1 12rem; min-width: 0; }
+
+.checkbox, .radio { display: flex; align-items: flex-start; gap: var(--space-sm); cursor: pointer; font-size: .875rem; }
+.checkbox input, .radio input { margin-top: 2px; accent-color: var(--primary); width: 18px; height: 18px; flex-shrink: 0; }
+.segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.segmented label { position: relative; flex: 1; padding: 10px 16px; text-align: center; cursor: pointer; background: var(--surface); border-right: 1px solid var(--border); transition: background .15s, color .15s; }
+.segmented label:last-child { border-right: none; }
+.segmented label:has(input:checked), .segmented label.is-checked { background: var(--primary); color: var(--primary-text); }
+.segmented input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
+.segmented span { position: relative; z-index: 1; display: block; }
+
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: var(--space-md); gap: 4px; }
+.tab { padding: var(--space-sm) var(--space-md); border: none; background: transparent; color: var(--text-muted); font-weight: 500; border-radius: var(--radius) var(--radius) 0 0; margin-bottom: -1px; position: relative; }
+.tab:hover { color: var(--text); }
+.tab.is-active { color: var(--primary); }
+.tab.is-active::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--primary); }
+
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 500; gap: 4px; }
+.badge-scheduled { background: #e8f5e9; color: #2e7d32; }
+.badge-requested { background: #fff3e0; color: #ef6c00; }
+.badge-cancelled { background: #fce4ec; color: #c62828; }
+.badge-completed { background: #e3f2fd; color: #1565c0; }
+.badge-accent { background: #f3e5f5; color: #7b1fa2; }
+.badge-danger { background: #fdeaea; color: var(--danger); }
+
+.alert { padding: var(--space-md); border-radius: var(--radius); border-left: 4px solid; display: flex; gap: var(--space-md); align-items: flex-start; }
+.alert-info { background: #e3f2fd; border-color: #1976d2; color: #0d47a1; }
+.alert-warn { background: #fff8e1; border-color: #fbc02d; color: #f57f17; }
+.alert-error { background: #fdeaea; border-color: var(--danger); color: #b71c1c; }
+.alert-success { background: #e8f5e9; border-color: var(--success); color: #1b5e20; }
+.alert-icon { flex-shrink: 0; margin-top: 2px; }
+
+.empty-state { text-align: center; padding: var(--space-xl); }
+.empty-state-icon { font-size: 3rem; margin-bottom: var(--space-md); opacity: .5; }
+.empty-state-title { font-weight: 600; margin-bottom: var(--space-xs); }
+.empty-state-desc { color: var(--text-muted); margin-bottom: var(--space-lg); }
+
+.skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+.skeleton-line { height: 1rem; margin-bottom: var(--space-sm); }
+.skeleton-block { height: 3rem; margin-bottom: var(--space-md); }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.toast-container { position: fixed; bottom: var(--space-lg); right: var(--space-lg); z-index: 1000; display: flex; flex-direction: column; gap: var(--space-sm); }
+@media (max-width: 560px) {
+  .toast-container { left: var(--space-md); right: var(--space-md); bottom: calc(var(--space-md) + 44px); }
+  .toast { max-width: none; }
+}
+.toast { padding: var(--space-md) var(--space-lg); border-radius: var(--radius); box-shadow: var(--shadow); background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-md); animation: slideIn .2s ease; max-width: 360px; }
+.toast-success { border-left: 4px solid var(--success); }
+.toast-error { border-left: 4px solid var(--danger); }
+.toast-info { border-left: 4px solid #1976d2; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: none; } }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: var(--space-md); z-index: 100; opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: var(--space-lg); max-width: 480px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,.12); transform: scale(.95); transition: transform .2s; }
+.modal-overlay.open .modal { transform: scale(1); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg); }
+.modal-close { background: transparent; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--text-muted); padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { color: var(--text); }
+
+.progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--primary); transition: width .3s ease; }
+
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+.avatar-lg { width: 64px; height: 64px; font-size: 1.5rem; }
+.avatar-xl { width: 96px; height: 96px; font-size: 2rem; }
+
+/* ===== Specific UI ===== */
+.back-link { display: inline-flex; align-items: center; gap: var(--space-xs); margin-bottom: var(--space-lg); color: var(--text-link); font-size: .875rem; }
+.back-link:hover { text-decoration: underline; }
+.steps-bar { display: flex; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+.step { flex: 1; padding: var(--space-sm); text-align: center; font-size: .75rem; font-weight: 500; color: var(--text-muted); background: var(--border); border-radius: var(--radius); }
+.step.is-active { background: var(--primary); color: var(--primary-text); }
+.step.is-done { background: var(--success); color: #fff; }
+
+.layout-checkout { display: grid; gap: var(--space-lg); }
+@media (min-width: 768px) { .layout-checkout { grid-template-columns: 1fr 320px; } }
+
+.hold-banner { background: #fff3e0; border: 1px solid #ffb300; border-radius: var(--radius); padding: var(--space-md); display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); font-size: .875rem; }
+.hold-countdown { font-family: var(--font-mono); font-weight: 600; font-size: 1.125rem; color: #f57f17; }
+
+.dl { display: grid; grid-template-columns: auto 1fr; gap: var(--space-xs) var(--space-md); font-size: .875rem; margin: var(--space-md) 0; }
+.dl dt { color: var(--text-muted); }
+.dl dd { margin: 0; font-weight: 500; }
+.dl .total { font-size: 1rem; font-weight: 700; color: var(--primary); }
+
+.notice { padding: var(--space-sm) var(--space-md); border-radius: var(--radius); font-size: .875rem; display: flex; align-items: center; gap: var(--space-sm); }
+.notice-info { background: #e3f2fd; color: #0d47a1; }
+.notice-warn { background: #fff8e1; color: #f57f17; }
+.notice-error { background: #fdeaea; color: var(--danger); }
+
+.success-head { text-align: center; padding: var(--space-lg) 0; }
+.success-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--success); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: var(--space-md); }
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.chip { padding: 4px 12px; border: 1px solid var(--border); border-radius: 999px; font-size: .75rem; background: var(--surface); }
+.chip:hover { border-color: var(--text); }
+.chip.is-active { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+
+.table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.table th, .table td { padding: var(--space-sm) var(--space-md); text-align: left; border-bottom: 1px solid var(--border); }
+.table th { font-weight: 600; color: var(--text-muted); font-size: .75rem; text-transform: uppercase; }
+.table tbody tr:hover { background: var(--surface-hover); }
+.table .right { text-align: right; }
+.table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap .table { min-width: 26rem; }
+@media (max-width: 480px) {
+  .field-row { flex-direction: column; gap: var(--space-sm); }
+}
+.screen.state-return-to > .card::before {
+  content: "Wariant s03 — wejście z returnTo";
+  display: block; margin-bottom: var(--space-md);
+  font-size: .75rem; font-weight: 600; letter-spacing: .02em;
+  color: var(--text-muted); text-transform: uppercase;
+}
+
+.list { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.list-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text); }
+.list-item:last-child { border-bottom: none; }
+.list-item:hover { background: var(--surface-hover); }
+.list-item.is-active { background: #f3e8ff; border-left: 3px solid #7b1fa2; }
+
+.date-tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-sm) var(--space-md); text-align: center; min-width: 56px; }
+.date-tile b { display: block; font-size: 1.25rem; line-height: 1.2; }
+.date-tile span { font-size: .7rem; text-transform: uppercase; color: var(--text-muted); }
+
+.rating-break { display: flex; flex-direction: column; gap: 4px; font-size: .875rem; }
+.rating-break .row { align-items: center; }
+.rating-break .bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.rating-break .bar span { display: block; height: 100%; background: var(--primary); }
+
+/* ===== Test Controls ===== */
+.test-controls { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; color: #fff; padding: var(--space-md); z-index: 2000; font-size: .75rem; font-family: var(--font-mono); max-height: 50vh; overflow-y: auto; transform: translateY(100%); transition: transform .3s ease; }
+.test-controls.open { transform: translateY(0); }
+.test-controls-toggle { position: fixed; bottom: var(--space-md); left: var(--space-md); z-index: 2001; background: #1a1a1a; color: #fff; padding: var(--space-sm) var(--space-md); border-radius: var(--radius); font-size: .75rem; cursor: pointer; }
+.test-controls-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); }
+.test-controls-title { font-weight: 600; }
+.test-controls-close { background: transparent; border: 1px solid #fff; color: #fff; padding: 2px 8px; border-radius: var(--radius-sm); font-size: .7rem; }
+.test-scenarios { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-sm); }
+.test-scenario-btn { background: #333; border: 1px solid #444; color: #fff; padding: var(--space-sm); border-radius: var(--radius); text-align: left; cursor: pointer; font: inherit; transition: background .15s; }
+.test-scenario-btn:hover { background: #444; }
+.test-scenario-btn.active { background: var(--primary); border-color: var(--primary); }
+.test-scenario-title { font-weight: 500; display: block; margin-bottom: 2px; }
+.test-scenario-desc { font-size: .7rem; opacity: .8; }
+.test-state-info { margin-top: var(--space-md); padding: var(--space-md); background: #333; border-radius: var(--radius); font-size: .7rem; white-space: pre-wrap; max-height: 200px; overflow: auto; }
+
+/* ===== Screen specific ===== */
+.auth-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: var(--space-lg); }
+.auth-tab { flex: 1; padding: var(--space-md); text-align: center; font-weight: 500; color: var(--text-muted); border: none; background: transparent; border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; transition: color .15s, border-color .15s; }
+.auth-tab:hover { color: var(--text); }
+.auth-tab.is-active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.social-btn { display: flex; align-items: center; justify-content: center; gap: var(--space-sm); width: 100%; padding: var(--space-md); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-weight: 500; margin-bottom: var(--space-sm); transition: background .15s, border-color .15s; }
+.social-btn:hover { background: var(--surface-hover); border-color: var(--text-muted); }
+.social-btn svg { width: 20px; height: 20px; }
+
+.divider { display: flex; align-items: center; gap: var(--space-md); margin: var(--space-lg) 0; color: var(--text-muted); font-size: .875rem; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+.password-strength { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: var(--space-xs); }
+.password-strength-bar { height: 100%; transition: width .2s, background .2s; border-radius: 2px; }
+.password-strength-weak { width: 33%; background: var(--danger); }
+.password-strength-medium { width: 66%; background: var(--warning); }
+.password-strength-strong { width: 100%; background: var(--success); }
+.password-strength-labels { display: flex; justify-content: space-between; font-size: .65rem; color: var(--text-muted); margin-top: 2px; }
+
+.booking-card { border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-md); margin: var(--space-md) 0; }
+.booking-card .row { gap: var(--space-md); }
+.checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-sm); }
+.checklist li { display: flex; align-items: flex-start; gap: var(--space-sm); padding-left: var(--space-sm); }
+.todo { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-xs); }
+.todo label { display: flex; align-items: center; gap: var(--space-sm); cursor: pointer; }
+.timeline { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--border); padding-left: var(--space-lg); }
+.timeline li { position: relative; padding-bottom: var(--space-lg); padding-left: var(--space-md); }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); border: 2px solid var(--surface); }
+.timeline li:last-child::before { background: var(--text-muted); }
+.timeline-mono { font-family: var(--font-mono); font-size: .8rem; }
+
+.quote { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-md); }
+.quote .eyebrow { color: var(--primary); font-weight: 600; }
+.quote p { margin: var(--space-sm) 0 0; }
+
+.grid-2 { display: grid; gap: var(--space-lg); }
+@media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+.grid-3 { display: grid; gap: var(--space-md); }
+@media (min-width: 768px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+.grid-4 { display: grid; gap: var(--space-md); }
+@media (min-width: 768px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-md); text-align: center; }
+.kpi span { display: block; font-size: .75rem; color: var(--text-muted); margin-bottom: var(--space-xs); }
+.kpi strong { font-size: 1.5rem; display: block; }
+.kpi em { font-size: .75rem; font-style: normal; color: var(--text-muted); }
+.kpi .up { color: var(--success); }
+
+.avail-grid { display: grid; grid-template-columns: 48px repeat(7, 1fr); gap: 2px; font-size: .75rem; }
+.avail-row { display: contents; }
+.avail-head { text-align: center; font-weight: 600; color: var(--text-muted); padding: var(--space-sm) 0; }
+.avail-hour { text-align: right; padding: var(--space-xs) var(--space-sm); color: var(--text-muted); }
+.avail-cell { aspect-ratio: 1; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s, border-color .15s; }
+.avail-cell:hover { background: var(--surface-hover); }
+.avail-cell.is-on { background: var(--primary); border-color: var(--primary); }
+.avail-cell.is-on::after { content: "✓"; color: var(--primary-text); font-weight: 600; }
+.avail-cell.is-booked { background: #f3e8ff; border-color: #7b1fa2; color: #7b1fa2; font-size: .65rem; cursor: default; }
+.avail-cell:empty { background: transparent; border-style: dashed; }
+
+.slot-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-sm); }
+.slot-col { display: flex; flex-direction: column; gap: var(--space-xs); }
+.slot-col-head { text-align: center; font-size: .75rem; font-weight: 600; color: var(--text-muted); padding-bottom: var(--space-xs); border-bottom: 1px solid var(--border); margin-bottom: var(--space-xs); }
+.slot-btn { padding: var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-size: .8125rem; cursor: pointer; transition: all .15s; min-height: 40px; }
+.slot-btn:hover:not(:disabled) { border-color: var(--primary); background: var(--surface-hover); }
+.slot-btn.is-selected { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+.slot-btn:disabled { opacity: .4; cursor: not-allowed; background: var(--surface-hover); }
+.slot-none { text-align: center; color: var(--text-muted); padding: var(--space-md); font-size: .875rem; }
+
+.room { height: 100vh; display: flex; flex-direction: column; background: #111; color: #fff; padding: var(--space-md); }
+.room-top { display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) var(--space-md); }
+.room-stage { flex: 1; display: flex; gap: var(--space-md); align-items: center; justify-content: center; }
+.tile { background: #222; border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tile-main { flex: 1; min-width: 0; }
+.tile-self { width: 120px; height: 90px; flex-shrink: 0; }
+.tile-name { margin-top: var(--space-sm); font-weight: 500; }
+.room-controls { display: flex; gap: var(--space-sm); padding: var(--space-md); background: #1a1a1a; border-radius: var(--radius); flex-wrap: wrap; justify-content: center; }
+.ctrl { width: 48px; height: 48px; border-radius: 50%; background: #333; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s; }
+.ctrl:hover { background: #444; }
+.ctrl.is-on { background: var(--success); }
+.ctrl-end { background: var(--danger); }
+.ctrl-end:hover { background: var(--danger-hover); }
+.room-panel { position: absolute; right: var(--space-md); bottom: 120px; width: 320px; background: #1a1a1a; border-radius: var(--radius); padding: var(--space-md); display: none; flex-direction: column; gap: var(--space-md); }
+.room-panel.open { display: flex; }
+.room-tabs { display: flex; gap: var(--space-xs); }
+.room-tab { flex: 1; padding: var(--space-sm); text-align: center; background: #333; border: none; color: #fff; border-radius: var(--radius-sm); cursor: pointer; }
+.room-tab.is-active { background: var(--primary); }
+.room-pane { display: none; }
+.room-pane.active { display: block; }
+.bubble { padding: var(--space-sm) var(--space-md); border-radius: var(--radius); background: #333; max-width: 80%; align-self: flex-start; }
+.bubble-me { align-self: flex-end; background: var(--primary); }
+.bubble-failed { background: var(--danger); }
+.room-chat-form { display: flex; gap: var(--space-sm); }
+.room-chat-form input { flex: 1; padding: var(--space-sm); border: 1px solid #444; border-radius: var(--radius); background: #222; color: #fff; }
+.room-chat-form button { background: var(--primary); color: #fff; }
+
+/* ===== State visibility helpers =====
+   Widocznością bloków stanów steruje setScreenState (JS): bloki są ukrywane klasą
+   .hidden, a pokazywany jest blok bieżącego stanu. Blok stanu bez formularza ani
+   pola (np. sam alert „konto już istnieje”) dokleja się do treści domyślnej. */
+
+/* ===== Prototype badge ===== */
+.prototype-badge { position: fixed; top: var(--space-md); right: var(--space-md); background: #1a1a1a; color: #fff; padding: var(--space-xs) var(--space-sm); border-radius: var(--radius); font-size: .7rem; z-index: 3000; font-family: var(--font-mono); }
+@media (max-width: 560px) { .prototype-badge { display: none; } }
+
+/* ===== Helper ===== */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="prototype-badge">Discovery Prototype — F1 Tożsamość</div>
+
+<div class="app" id="app">
+  <!-- ===== SCREEN s01: P4 Logowanie ===== -->
+  <section class="screen active" id="s01" data-screen="s01" data-title="Logowanie">
+    <div class="card">
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab is-active" role="tab" data-tab="login">Logowanie</button>
+        <button class="auth-tab" role="tab" data-tab="register">Rejestracja</button>
+      </div>
+
+      <div id="returnToBanner" class="alert alert-info hidden" role="status">
+        <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9.5 16.5v-6h5v6h-5z"/></svg>
+        <div>
+          <strong>Twój wybrany termin jest zachowany</strong><br>
+          Po zalogowaniu wrócisz do płatności.
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="state-default">
+          <div class="stack-sm">
+            <button type="button" class="social-btn" data-provider="google" aria-label="Kontynuuj z Google">
+              <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Kontynuuj z Google
+            </button>
+            <button type="button" class="social-btn" data-provider="linkedin" aria-label="Kontynuuj z LinkedIn">
+              <svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              Kontynuuj z LinkedIn
+            </button>
+          </div>
+          <div class="divider"><span>lub e-mailem</span></div>
+
+          <form id="loginForm" novalidate class="stack">
+            <div class="field">
+              <label class="field-label" for="loginEmail">E-mail</label>
+              <input type="email" class="field-input" id="loginEmail" name="email" autocomplete="email" placeholder="ty@firma.pl" required>
+              <div class="field-error" id="loginEmailError"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="loginPassword">Hasło</label>
+              <div style="position: relative;">
+                <input type="password" class="field-input" id="loginPassword" name="password" autocomplete="current-password" placeholder="••••••••" required>
+                <button type="button" class="btn btn-ghost btn-sm" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);" data-toggle-password data-target="loginPassword" aria-label="Pokaż/ukryj hasło">👁</button>
+              </div>
+              <div class="field-error" id="loginPasswordError"></div>
+            </div>
+            <a href="#" class="link small" data-action="forgotPassword">Nie pamiętasz hasła?</a>
+            <button type="submit" class="btn btn-primary btn-block" id="loginSubmit">Zaloguj się</button>
+          </form>
+
+          <p class="muted small center">Podpowiedź: e-mail <code>zajety@kompas.pl</code> symuluje błąd „konto już istnieje”.</p>
+        </div>
+
+        <div class="state-loading">
+          <div class="center stack-sm">
+            <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Logujemy…</button>
+          </div>
+        </div>
+
+        <div class="state-error">
+          <div class="alert alert-error" role="alert">
+            <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <div id="loginErrorMessage">Nieprawidłowy e-mail lub hasło.</div>
+          </div>
+          <form id="loginFormError" novalidate class="stack">
+            <div class="field">
+              <label class="field-label" for="loginEmailErr">E-mail</label>
+              <input type="email" class="field-input error" id="loginEmailErr" name="email" autocomplete="email" placeholder="ty@firma.pl" required>
+            </div>
+            <div class="field">
+              <label class="field-label" for="loginPasswordErr">Hasło</label>
+              <input type="password" class="field-input" id="loginPasswordErr" name="password" autocomplete="current-password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Spróbuj ponownie</button>
+          </form>
+        </div>
+
+        <div class="state-conflict">
+          <div class="alert alert-warn" role="alert">
+            <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            <div>To konto już istnieje. <a href="#" data-action="switchToLogin">Zaloguj się</a></div>
+          </div>
+        </div>
+
+        <div class="state-unavailable">
+          <div class="alert alert-info" role="status">
+            <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v10z"/></svg>
+            <div>Logowanie przez Google/LinkedIn niedostępne (brak kluczy w środowisku). Użyj logowania e-mailem.</div>
+          </div>
+          <form id="loginFormUnavail" novalidate class="stack">
+            <div class="field">
+              <label class="field-label" for="loginEmailUnavail">E-mail</label>
+              <input type="email" class="field-input" id="loginEmailUnavail" name="email" autocomplete="email" placeholder="ty@firma.pl" required>
+            </div>
+            <div class="field">
+              <label class="field-label" for="loginPasswordUnavail">Hasło</label>
+              <input type="password" class="field-input" id="loginPasswordUnavail" name="password" autocomplete="current-password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Zaloguj się e-mailem</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s02: P4 Rejestracja ===== -->
+  <section class="screen" id="s02" data-screen="s02" data-title="Rejestracja">
+    <div class="card">
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab" role="tab" data-tab="login">Logowanie</button>
+        <button class="auth-tab is-active" role="tab" data-tab="register">Rejestracja</button>
+      </div>
+
+      <div id="returnToBannerReg" class="alert alert-info hidden" role="status">
+        <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9.5 16.5v-6h5v6h-5z"/></svg>
+        <div>
+          <strong>Twój wybrany termin jest zachowany</strong><br>
+          Po założeniu konta wrócisz do płatności.
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="state-default">
+          <div class="stack-sm">
+            <button type="button" class="social-btn" data-provider="google" aria-label="Kontynuuj z Google">
+              <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Kontynuuj z Google
+            </button>
+            <button type="button" class="social-btn" data-provider="linkedin" aria-label="Kontynuuj z LinkedIn">
+              <svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              Kontynuuj z LinkedIn
+            </button>
+          </div>
+          <div class="divider"><span>lub e-mailem</span></div>
+
+          <form id="registerForm" novalidate class="stack">
+            <div class="field">
+              <label class="field-label" for="regName">Imię</label>
+              <input type="text" class="field-input" id="regName" name="name" placeholder="np. Adrian" required minlength="2" maxlength="50">
+              <div class="field-error" id="regNameError"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="regEmail">E-mail</label>
+              <input type="email" class="field-input" id="regEmail" name="email" placeholder="ty@firma.pl" autocomplete="email" required>
+              <div class="field-error" id="regEmailError"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="regPassword">Hasło <span class="muted">(min. 10 znaków)</span></label>
+              <div style="position: relative;">
+                <input type="password" class="field-input" id="regPassword" name="password" autocomplete="new-password" placeholder="••••••••" required minlength="10">
+                <button type="button" class="btn btn-ghost btn-sm" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);" data-toggle-password data-target="regPassword" aria-label="Pokaż/ukryj hasło">👁</button>
+              </div>
+              <div class="password-strength" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Siła hasła">
+                <div class="password-strength-bar" id="regPasswordStrength"></div>
+              </div>
+              <div class="password-strength-labels"><span>Słabe</span><span>Średnie</span><span>Mocne</span></div>
+              <div class="field-error" id="regPasswordError"></div>
+            </div>
+
+            <fieldset class="field">
+              <legend class="field-label">Chcę</legend>
+              <div class="segmented" role="radiogroup" aria-label="Rola">
+                <label><input type="radio" name="role" value="student" checked><span>się uczyć</span></label>
+                <label><input type="radio" name="role" value="mentor"><span>mentorować</span></label>
+              </div>
+            </fieldset>
+
+            <label class="checkbox">
+              <input type="checkbox" name="terms" required> Akceptuję regulamin i politykę prywatności <span aria-hidden="true">*</span>
+            </label>
+            <div class="field-error" id="regTermsError"></div>
+
+            <label class="checkbox">
+              <input type="checkbox" name="marketing"> Chcę dostawać wskazówki i oferty (opcjonalnie)
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-block" id="regSubmit">Załóż konto</button>
+          </form>
+
+          <p class="muted small center">Podpowiedź: e-mail <code>zajety@kompas.pl</code> symuluje błąd „konto już istnieje”. Hasło <code>Password123</code> symuluje HIBP.</p>
+        </div>
+
+        <div class="state-loading">
+          <div class="center stack-sm">
+            <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Tworzymy konto…</button>
+          </div>
+        </div>
+
+        <div class="state-error">
+          <div class="alert alert-error" role="alert">
+            <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <div id="regErrorMessage">Sprawdź błędy w formularzu.</div>
+          </div>
+          <form id="registerFormError" novalidate class="stack">
+            <div class="field">
+              <label class="field-label" for="regNameErr">Imię</label>
+              <input type="text" class="field-input" id="regNameErr" name="name" placeholder="np. Adrian" required minlength="2" maxlength="50">
+              <div class="field-error" id="regNameErrorErr"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="regEmailErr">E-mail</label>
+              <input type="email" class="field-input" id="regEmailErr" name="email" placeholder="ty@firma.pl" autocomplete="email" required>
+              <div class="field-error" id="regEmailErrorErr"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="regPasswordErr">Hasło</label>
+              <input type="password" class="field-input" id="regPasswordErr" name="password" autocomplete="new-password" placeholder="••••••••" required minlength="10">
+              <div class="field-error" id="regPasswordErrorErr"></div>
+            </div>
+            <fieldset class="field">
+              <legend class="field-label">Chcę</legend>
+              <div class="segmented" role="radiogroup">
+                <label><input type="radio" name="role" value="student" checked><span>się uczyć</span></label>
+                <label><input type="radio" name="role" value="mentor"><span>mentorować</span></label>
+              </div>
+            </fieldset>
+            <label class="checkbox"><input type="checkbox" name="terms" required> Akceptuję regulamin i politykę prywatności *</label>
+            <div class="field-error" id="regTermsErrorErr"></div>
+            <label class="checkbox"><input type="checkbox" name="marketing"> Chcę dostawać wskazówki i oferty (opcjonalnie)</label>
+            <button type="submit" class="btn btn-primary btn-block">Spróbuj ponownie</button>
+          </form>
+        </div>
+
+        <div class="state-conflict">
+          <div class="alert alert-warn" role="alert">
+            <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            <div>To konto już istnieje. <a href="#" data-action="switchToLoginFromReg">Zaloguj się</a></div>
+          </div>
+        </div>
+
+        <div class="state-unavailable">
+          <div class="alert alert-info" role="status">
+            <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v10z"/></svg>
+            <div>Logowanie przez Google/LinkedIn niedostępne (brak kluczy w środowisku). Użyj rejestracji e-mailem.</div>
+          </div>
+          <form id="registerFormUnavail" novalidate class="stack">
+            <div class="field"><label class="field-label" for="regNameUnavail">Imię</label><input type="text" class="field-input" id="regNameUnavail" name="name" placeholder="np. Adrian" required minlength="2" maxlength="50"></div>
+            <div class="field"><label class="field-label" for="regEmailUnavail">E-mail</label><input type="email" class="field-input" id="regEmailUnavail" name="email" placeholder="ty@firma.pl" autocomplete="email" required></div>
+            <div class="field"><label class="field-label" for="regPasswordUnavail">Hasło</label><input type="password" class="field-input" id="regPasswordUnavail" name="password" autocomplete="new-password" placeholder="••••••••" required minlength="10"></div>
+            <fieldset class="field"><legend class="field-label">Chcę</legend><div class="segmented" role="radiogroup"><label><input type="radio" name="role" value="student" checked><span>się uczyć</span></label><label><input type="radio" name="role" value="mentor"><span>mentorować</span></label></div></fieldset>
+            <label class="checkbox"><input type="checkbox" name="terms" required> Akceptuję regulamin i politykę prywatności *</label>
+            <label class="checkbox"><input type="checkbox" name="marketing"> Chcę dostawać wskazówki i oferty (opcjonalnie)</label>
+            <button type="submit" class="btn btn-primary btn-block">Załóż konto</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s04: Reset hasła ===== -->
+  <section class="screen" id="s04" data-screen="s04" data-title="Reset hasła">
+    <div class="card">
+      <a href="#" class="back-link" data-action="backToLogin">← Logowanie</a>
+      <h1>Nie pamiętasz hasła?</h1>
+      <p class="lead">Podaj e-mail, a wyślemy link do ustawienia nowego hasła.</p>
+
+      <div class="state-default">
+        <form id="resetForm" novalidate class="stack">
+          <div class="field">
+            <label class="field-label" for="resetEmail">E-mail</label>
+            <input type="email" class="field-input" id="resetEmail" name="email" autocomplete="email" placeholder="ty@firma.pl" required>
+            <div class="field-error" id="resetEmailError"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="resetSubmit">Wyślij link</button>
+        </form>
+      </div>
+
+      <div class="state-loading">
+        <div class="center stack-sm">
+          <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Wysyłamy…</button>
+        </div>
+      </div>
+
+      <div class="state-success">
+        <div class="success-head">
+          <div class="success-icon">✓</div>
+          <h1>Sprawdź skrzynkę</h1>
+          <p class="muted">Wysłaliśmy link do zmiany hasła (jeśli konto istnieje). Link waży 24 godziny.</p>
+        </div>
+        <a href="#" class="btn btn-ghost btn-block" data-action="backToLogin">Wróć do logowania</a>
+      </div>
+
+      <div class="state-error">
+        <div class="alert alert-error" role="alert">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div>Podaj poprawny adres e-mail.</div>
+        </div>
+        <form id="resetFormError" novalidate class="stack">
+          <div class="field">
+            <label class="field-label" for="resetEmailErr">E-mail</label>
+            <input type="email" class="field-input error" id="resetEmailErr" name="email" autocomplete="email" placeholder="ty@firma.pl" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Spróbuj ponownie</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s05: Ustawienie nowego hasła ===== -->
+  <section class="screen" id="s05" data-screen="s05" data-title="Nowe hasło">
+    <div class="card">
+      <h1>Ustaw nowe hasło</h1>
+      <p class="lead">Token z linku e-mailowego. Min. 10 znaków.</p>
+
+      <div class="state-default">
+        <form id="newPasswordForm" novalidate class="stack">
+          <div class="field">
+            <label class="field-label" for="npPassword">Nowe hasło</label>
+            <input type="password" class="field-input" id="npPassword" name="password" autocomplete="new-password" placeholder="••••••••" required minlength="10">
+            <div class="password-strength" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="password-strength-bar" id="npPasswordStrength"></div>
+            </div>
+            <div class="password-strength-labels"><span>Słabe</span><span>Średnie</span><span>Mocne</span></div>
+            <div class="field-error" id="npPasswordError"></div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="npPasswordConfirm">Powtórz hasło</label>
+            <input type="password" class="field-input" id="npPasswordConfirm" name="passwordConfirm" autocomplete="new-password" placeholder="••••••••" required>
+            <div class="field-error" id="npPasswordConfirmError"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="npSubmit">Zapisz hasło</button>
+        </form>
+      </div>
+
+      <div class="state-loading">
+        <div class="center stack-sm">
+          <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Zapisujemy…</button>
+        </div>
+      </div>
+
+      <div class="state-success">
+        <div class="success-head">
+          <div class="success-icon">✓</div>
+          <h1>Hasło zaktualizowane</h1>
+          <p class="muted">Możesz się teraz zalogować nowym hasłem.</p>
+        </div>
+        <a href="#" class="btn btn-primary btn-block" data-action="goToLogin">Zaloguj się</a>
+      </div>
+
+      <div class="state-error">
+        <div class="alert alert-error" role="alert">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div id="npErrorMessage">Link wygasł lub jest nieprawidłowy.</div>
+        </div>
+        <div class="center stack-sm">
+          <a href="#" class="btn btn-primary" data-action="goToReset">Wyślij nowy link</a>
+          <a href="#" class="btn btn-ghost" data-action="goToLogin">Wróć do logowania</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s06: S3 Konto i ustawienia ===== -->
+  <section class="screen" id="s06" data-screen="s06" data-title="Konto i ustawienia">
+    <div class="card">
+      <div class="card-header row between">
+        <div>
+          <h1 class="card-title">Konto i ustawienia</h1>
+          <p class="muted small" id="accountRoleBadge"></p>
+        </div>
+        <div class="row gap-sm">
+          <button class="btn btn-ghost btn-sm" data-action="openTestControls">Panel testowy</button>
+        </div>
+      </div>
+
+      <div class="state-default">
+        <!-- Profil -->
+        <form id="profileForm" novalidate class="card stack">
+          <h2 class="h3">Profil</h2>
+          <div class="field">
+            <label class="field-label" for="accName">Imię</label>
+            <input type="text" class="field-input" id="accName" name="name" value="Adrian" required minlength="2" maxlength="50">
+          </div>
+          <div class="field">
+            <label class="field-label" for="accEmail">E-mail</label>
+            <input type="email" class="field-input" id="accEmail" name="email" value="student@demo.kompas.pl" required disabled>
+            <p class="field-hint">Zmiana e-maila wymaga weryfikacji (F8).</p>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="accTimezone">Strefa czasowa</label>
+              <select class="field-select" id="accTimezone" name="timezone">
+                <option value="Europe/Warsaw" selected>Europe/Warsaw (UTC+2)</option>
+                <option value="Europe/London">Europe/London (UTC+1)</option>
+                <option value="America/New_York">America/New_York (UTC−4)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="accCurrency">Waluta</label>
+              <select class="field-select" id="accCurrency" name="currency">
+                <option value="PLN" selected>PLN</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+          <div class="row end">
+            <button type="submit" class="btn btn-primary">Zapisz profil</button>
+          </div>
+        </form>
+
+        <!-- Metody płatności -->
+        <section class="card stack">
+          <h2 class="h3">Metody płatności</h2>
+          <div id="paymentMethodsList">
+            <div class="row between">
+              <span>Visa •••• 4242 · ważna do 10/26</span>
+              <span class="badge badge-danger">wygasa</span>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="addCard">Dodaj kartę</button>
+          </div>
+        </section>
+
+        <!-- Powiadomienia -->
+        <section class="card stack">
+          <h2 class="h3">Powiadomienia</h2><div class="table-wrap">
+
+          <table class="table">
+            <thead><tr><th></th><th>E-mail</th><th>Push</th></tr></thead>
+            <tbody>
+              <tr><td>Przypomnienia o sesjach</td><td><input type="checkbox" checked disabled></td><td><input type="checkbox" checked disabled></td></tr>
+              <tr><td>Wiadomości</td><td><input type="checkbox" checked disabled></td><td><input type="checkbox" checked disabled></td></tr>
+              <tr><td>Zmiany w rezerwacjach</td><td><input type="checkbox" checked disabled></td><td><input type="checkbox" disabled></td></tr>
+              <tr><td>Wskazówki i oferty</td><td><input type="checkbox" id="prefMarketingEmail" checked></td><td><input type="checkbox" id="prefMarketingPush" checked></td></tr>
+            </tbody>
+          </table>
+
+          </div>
+          <p class="muted small">Zmiana zgody marketingowej zapisuje nową decyzję z wersją dokumentu.</p>
+        </section>
+
+        <!-- Prywatność -->
+        <section class="card stack">
+          <h2 class="h3">Prywatność</h2>
+          <div class="row wrap gap-sm">
+            <button type="button" class="btn btn-ghost btn-sm" data-action="exportData">Pobierz moje dane</button>
+            <button type="button" class="btn btn-danger-ghost btn-sm" data-action="deleteAccount">Usuń konto</button>
+          </div>
+          <p class="muted small">Eksport i usunięcie to zapisane żądania (realizacja w F8). Usunięcie wymaga potwierdzenia e-mailem.</p>
+        </section>
+
+        <!-- Sekcja admina -->
+        <section id="adminSection" class="card stack hidden">
+          <h2 class="h3">Panel administratora</h2>
+          <p class="muted small">Masz rolę <strong id="adminRoleName"></strong>.</p>
+          <div class="row gap-sm">
+            <a href="#" class="btn btn-primary btn-sm" data-action="goToAdminTrust">Weryfikacja mentorów (A1)</a>
+            <a href="#" class="btn btn-primary btn-sm" data-action="goToAdminFinance">Spory i zwroty (A2)</a>
+          </div>
+        </section>
+      </div>
+
+      <div class="state-loading">
+        <div class="center stack-sm">
+          <div class="skeleton-block"></div>
+          <div class="skeleton-line" style="width: 60%;"></div>
+          <div class="skeleton-line" style="width: 40%;"></div>
+        </div>
+      </div>
+
+      <div class="state-error">
+        <div class="alert alert-error" role="alert">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div>Nie udało się wczytać ustawień konta.</div>
+        </div>
+        <button class="btn btn-primary btn-block" data-action="retryAccount">Spróbuj ponownie</button>
+      </div>
+
+      <div class="state-access-denied">
+        <div class="empty-state">
+          <div class="empty-state-icon">🔒</div>
+          <h2 class="empty-state-title">Wymagane logowanie</h2>
+          <p class="empty-state-desc">Aby zobaczyć ustawienia konta, musisz się zalogować.</p>
+          <a href="#" class="btn btn-primary" data-action="goToLoginFromAccount">Zaloguj się</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s07: Konfiguracja 2FA ===== -->
+  <section class="screen" id="s07" data-screen="s07" data-title="Konfiguracja 2FA">
+    <div class="card">
+      <h1>Konfiguracja 2FA (TOTP)</h1>
+      <p class="lead">Jako administrator musisz skonfigurować dwuskładnikowe uwierzytelnienie.</p>
+
+      <div class="state-default">
+        <div class="alert alert-info" role="status">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v10z"/></svg>
+          <div>
+            <strong>Zeskanuj kod QR</strong> aplikacją authenticator (Google Authenticator, Authy, 1Password).<br>
+            Kod QR (symulowany): <code>otpauth://totp/Kompas:admin@kompas.pl?secret=JBSWY3DPEHPK3PXP</code>
+          </div>
+        </div>
+        <div class="card stack" style="margin-top: var(--space-lg);">
+          <h3 class="h4">Wpisz 6-cyfrowy kod z aplikacji</h3>
+          <form id="totpForm" novalidate class="stack">
+            <div class="field">
+              <label class="field-label" for="totpCode">Kod jednorazowy</label>
+              <input type="text" class="field-input" id="totpCode" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required autocomplete="one-time-code" style="letter-spacing: 4px; text-align: center; font-family: var(--font-mono);">
+              <div class="field-error" id="totpError"></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="totpSubmit">Zweryfikuj i kontynuuj</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="state-loading">
+        <div class="center stack-sm">
+          <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Weryfikujemy…</button>
+        </div>
+      </div>
+
+      <div class="state-success">
+        <div class="success-head">
+          <div class="success-icon">✓</div>
+          <h1>2FA skonfigurowane</h1>
+          <p class="muted">Sesja administratora trwa 12 godzin bezwzględnie.</p>
+        </div>
+        <a href="#" class="btn btn-primary btn-block" data-action="goToAdminPanel">Przejdź do panelu admina</a>
+      </div>
+
+      <div class="state-error">
+        <div class="alert alert-error" role="alert">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div>Nieprawidłowy kod. Spróbuj ponownie.</div>
+        </div>
+        <form id="totpFormError" novalidate class="stack">
+          <div class="field">
+            <label class="field-label" for="totpCodeErr">Kod jednorazowy</label>
+            <input type="text" class="field-input error" id="totpCodeErr" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required autocomplete="one-time-code" style="letter-spacing: 4px; text-align: center; font-family: var(--font-mono);">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Spróbuj ponownie</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s08: 403 Brak uprawnień ===== -->
+  <section class="screen" id="s08" data-screen="s08" data-title="Brak uprawnień (403)">
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-state-icon">🔒</div>
+        <h2 class="empty-state-title">Nie masz uprawnień do tej strony</h2>
+        <p class="empty-state-desc">Twoja rola: <strong id="currentRole403"></strong>. Ta strona wymaga innej roli.</p>
+        <div class="stack-sm">
+          <a href="#" class="btn btn-primary" data-action="goHome403">Przejdź do swojej strony startowej</a>
+          <a href="#" class="btn btn-ghost" data-action="goToLogin403">Zaloguj się jako inna rola</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s09: 404 Nie znaleziono ===== -->
+  <section class="screen" id="s09" data-screen="s09" data-title="Nie znaleziono (404)">
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h2 class="empty-state-title">Ta strona nie istnieje</h2>
+        <p class="empty-state-desc">Albo nie masz do niej dostępu. Nie ujawnia istnienia zasobów.</p>
+        <div class="stack-sm">
+          <a href="#" class="btn btn-primary" data-action="goHome404">Przejdź do strony startowej</a>
+          <a href="#" class="btn btn-ghost" data-action="goToLogin404">Zaloguj się</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s10: Weryfikacja e-maila ===== -->
+  <section class="screen" id="s10" data-screen="s10" data-title="Weryfikacja e-maila">
+    <div class="card">
+      <div class="state-default">
+        <div class="center stack-sm">
+          <div class="spinner spinner--l" style="width: 48px; height: 48px; border-width: 4px; margin: 0 auto var(--space-lg);"></div>
+          <h1>Weryfikujemy Twój e-mail…</h1>
+          <p class="muted">To potrwa chwilę.</p>
+        </div>
+      </div>
+
+      <div class="state-loading">
+        <div class="center stack-sm">
+          <div class="spinner spinner--l" style="width: 48px; height: 48px; border-width: 4px; margin: 0 auto var(--space-lg);"></div>
+          <h1>Weryfikujemy…</h1>
+        </div>
+      </div>
+
+      <div class="state-success">
+        <div class="success-head">
+          <div class="success-icon">✓</div>
+          <h1>E-mail zweryfikowany</h1>
+          <p class="muted">Możesz teraz rezerwować sesje.</p>
+        </div>
+        <div class="stack-sm">
+          <a href="#" class="btn btn-primary btn-block" data-action="goToDashboard">Przejdź do panelu</a>
+          <a href="#" class="btn btn-ghost btn-block" data-action="resendVerification">Wyślij nowy link weryfikacyjny</a>
+        </div>
+      </div>
+
+      <div class="state-error">
+        <div class="alert alert-error" role="alert">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div>Link wygasł lub jest nieprawidłowy.</div>
+        </div>
+        <div class="stack-sm">
+          <a href="#" class="btn btn-primary btn-block" data-action="resendVerification">Wyślij nowy link weryfikacyjny</a>
+          <a href="#" class="btn btn-ghost btn-block" data-action="goToLogin10">Wróć do logowania</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN s11: Ponowna akceptacja regulaminu ===== -->
+  <section class="screen" id="s11" data-screen="s11" data-title="Ponowna akceptacja regulaminu">
+    <div class="card">
+      <h1>Zaktualizowaliśmy regulamin</h1>
+      <p class="lead">Wersja 2.1 — zmiany w §4 (przełożenia) i §7 (dane osobowe).</p>
+
+      <div class="state-default">
+        <div class="card stack" style="margin-bottom: var(--space-lg); max-height: 300px; overflow-y: auto; padding: var(--space-md); background: var(--surface-hover); border: 1px solid var(--border);">
+          <h3 class="h4">Główne zmiany:</h3>
+          <ul style="margin: var(--space-sm) 0; padding-left: var(--space-lg);">
+            <li>§4: Przełożenie/anulowanie bezpłatne do 12 h (było 24 h)</li>
+            <li>§7: Rozszerzony zakres eksportu danych (RODO Art. 20)</li>
+            <li>§9: Nowe zasady wykrywania kontaktu poza platformą</li>
+          </ul>
+          <p class="muted small">Pełny tekst: <a href="#">regulamin.kompas.pl</a></p>
+        </div>
+
+        <form id="termsAcceptForm" novalidate class="stack">
+          <label class="checkbox">
+            <input type="checkbox" name="accept" id="termsAccept" required>
+            Akceptuję nową wersję regulaminu i polityki prywatności <span aria-hidden="true">*</span>
+          </label>
+          <div class="field-error" id="termsAcceptError"></div>
+          <div class="row end">
+            <button type="submit" class="btn btn-primary" id="termsAcceptSubmit">Zapisz akceptację</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="state-error">
+        <div class="alert alert-error" role="alert">
+          <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div>Akceptacja regulaminu jest wymagana, by kontynuować.</div>
+        </div>
+        <form id="termsAcceptFormError" novalidate class="stack">
+          <label class="checkbox">
+            <input type="checkbox" name="accept" id="termsAcceptErr" required>
+            Akceptuję nową wersję regulaminu i polityki prywatności *
+          </label>
+          <div class="row end">
+            <button type="submit" class="btn btn-primary">Zapisz akceptację</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="state-success">
+        <div class="success-head">
+          <div class="success-icon">✓</div>
+          <h1>Akceptacja zapisana</h1>
+          <p class="muted">Wersja 2.1 zaakceptowana. Możesz kontynuować korzystanie z Kompasu.</p>
+        </div>
+        <a href="#" class="btn btn-primary btn-block" data-action="goToDashboard11">Przejdź do aplikacji</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MODALS ===== -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="h3"></h2>
+        <button type="button" class="modal-close" data-action="closeModal" aria-label="Zamknij">&times;</button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- ===== TOASTS ===== -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- ===== TEST CONTROLS ===== -->
+  <button class="test-controls-toggle" id="testControlsToggle" aria-label="Otwórz panel testowy">Panel testowy (F1)</button>
+  <div class="test-controls" id="testControls" role="region" aria-label="Panel testowy prototypu">
+    <div class="test-controls-header">
+      <span class="test-controls-title">Scenariusze testowe F1 (24)</span>
+      <button class="test-controls-close" data-action="closeTestControls">Zamknij</button>
+    </div>
+    <div class="test-scenarios" id="testScenarios"></div>
+    <div class="test-state-info" id="testStateInfo">Stan: —</div>
+  </div>
+</div>
+
+<script>
+// ===== Prototype State & Logic =====
+const DEMO_ACCOUNTS = {
+  student: { email: 'student@demo.kompas.pl', password: 'DemoPass123', name: 'Adrian', role: 'student', timezone: 'Europe/Warsaw', currency: 'PLN', verified: true, balances: { 'm1': 3 }, plan: { mentorId: 'm1', perWeek: 1, durationMin: 60, renewsOn: '2026-11-17', status: 'active' } },
+  mentor: { email: 'mentor@demo.kompas.pl', password: 'DemoPass123', name: 'Kasia', role: 'mentor', timezone: 'Europe/Warsaw', currency: 'PLN', verified: true, profileStatus: 'approved', rate: 180 },
+  mentorDraft: { email: 'mentor-draft@demo.kompas.pl', password: 'DemoPass123', name: 'Nowy Mentor', role: 'mentor', timezone: 'Europe/Warsaw', currency: 'PLN', verified: true, profileStatus: 'draft' },
+  adminTrust: { email: 'admin-trust@demo.kompas.pl', password: 'AdminPass123!', name: 'Admin Trust', role: 'admin_trust', timezone: 'Europe/Warsaw', currency: 'PLN', verified: true, totp: true },
+  adminFinance: { email: 'admin-finance@demo.kompas.pl', password: 'AdminPass123!', name: 'Admin Finance', role: 'admin_finance', timezone: 'Europe/Warsaw', currency: 'PLN', verified: true, totp: true },
+};
+
+const SCENARIOS = [
+  { id: 'SC-01', title: 'Logowanie poprawne (student)', desc: 'Email ≠ zajety@kompas.pl', screens: ['s01', 's06'], setup: () => setScenario('login', { email: 'student@demo.kompas.pl', password: 'DemoPass123', role: 'student' }) },
+  { id: 'SC-02', title: 'Rejestracja z rolą mentor', desc: 'Nowe konto, rola mentor', screens: ['s02', 's06'], setup: () => setScenario('register', { role: 'mentor' }) },
+  { id: 'SC-03', title: 'Logowanie admin + 2FA', desc: 'Konto admin, konfiguracja 2FA', screens: ['s01', 's07'], setup: () => setScenario('login', { email: 'admin-trust@demo.kompas.pl', password: 'AdminPass123!', role: 'admin_trust', totp: false }) },
+  { id: 'SC-04', title: 'Błędne hasło', desc: 'Email poprawny, hasło złe', screens: ['s01'], setup: () => setScenario('login', { email: 'student@demo.kompas.pl', password: 'zle', role: 'student', expectError: 'invalid_credentials' }) },
+  { id: 'SC-05', title: 'Limit prób (429)', desc: '3× błędne hasło w 10s', screens: ['s01'], setup: () => setScenario('login', { email: 'student@demo.kompas.pl', password: 'zle', role: 'student', expectError: 'rate_limit' }) },
+  { id: 'SC-06', title: 'Email zajęty przy rejestracji', desc: 'Email zajety@kompas.pl', screens: ['s02'], setup: () => setScenario('register', { email: 'zajety@kompas.pl', expectConflict: true }) },
+  { id: 'SC-07', title: 'HIBP: hasło na liście wycieków', desc: 'Hasło Password123', screens: ['s02', 's06'], setup: () => setScenario('register', { password: 'Password123', expectError: 'hibp' }) },
+  { id: 'SC-08', title: 'Google/LinkedIn niedostępne', desc: 'Brak kluczy w środowisku', screens: ['s01', 's02'], setup: () => setScenario('unavailable_social') },
+  { id: 'SC-09', title: 'returnTo z U1 (wybór terminu)', desc: 'Wejście na rezerwację bez logowania', screens: ['s03', 's01', 's02'], setup: () => setScenario('returnTo', { from: 'U1' }) },
+  { id: 'SC-10', title: 'returnTo z S3 (konto)', desc: 'Wejście na konto bez logowania', screens: ['s03', 's01', 's02'], setup: () => setScenario('returnTo', { from: 'S3' }) },
+  { id: 'SC-11', title: 'Reset hasła — link wygasły', desc: 'Token expired', screens: ['s05'], setup: () => setScenario('reset', { token: 'expired' }) },
+  { id: 'SC-12', title: 'Reset hasła — sukces', desc: 'Token poprawny', screens: ['s05', 's01'], setup: () => setScenario('reset', { token: 'valid' }) },
+  { id: 'SC-13', title: 'Admin bez 2FA loguje się', desc: 'Konto admin, brak 2FA', screens: ['s01', 's07'], setup: () => setScenario('login', { email: 'admin-trust@demo.kompas.pl', password: 'AdminPass123!', role: 'admin_trust', totp: false }) },
+  { id: 'SC-14', title: '2FA kod nieprawidłowy', desc: 'Wpisz 000000', screens: ['s07'], setup: () => setScenario('totp', { code: '000000', expectError: true }) },
+  { id: 'SC-15', title: '2FA kod poprawny', desc: 'Kod 123456', screens: ['s07'], setup: () => setScenario('totp', { code: '123456', expectSuccess: true }) },
+  { id: 'SC-16', title: 'Student → trasa mentora', desc: '403 dla studenta na /mentor', screens: ['s08'], setup: () => setScenario('accessDenied', { currentRole: 'student', target: 'mentor' }) },
+  { id: 'SC-17', title: 'Mentor → trasa admina', desc: '403 dla mentora na /admin', screens: ['s08'], setup: () => setScenario('accessDenied', { currentRole: 'mentor', target: 'admin' }) },
+  { id: 'SC-18', title: 'Cudze konto (404)', desc: 'Student A odczytuje konto B', screens: ['s09'], setup: () => setScenario('notFound', { reason: 'other_account' }) },
+  { id: 'SC-19', title: 'Weryfikacja email — sukces', desc: 'Token valid', screens: ['s10'], setup: () => setScenario('verifyEmail', { token: 'valid' }) },
+  { id: 'SC-20', title: 'Weryfikacja email — wygasły', desc: 'Token >24h', screens: ['s10'], setup: () => setScenario('verifyEmail', { token: 'expired' }) },
+  { id: 'SC-21', title: 'Zmiana wersji regulaminu', desc: 'Nowa wersja 2.1', screens: ['s11'], setup: () => setScenario('termsUpdate') },
+  { id: 'SC-22', title: 'Eksport/usunięcie konta', desc: 'Toasty z S3', screens: ['s06'], setup: () => setScenario('accountActions') },
+  { id: 'SC-23', title: 'Wyloguj ze wszystkich urządzeń', desc: 'Toast z S3', screens: ['s06'], setup: () => setScenario('signOutAll') },
+  { id: 'SC-24', title: 'Wycofanie zgody marketingowej', desc: 'Checkbox odznaczony = nowa decyzja', screens: ['s06'], setup: () => setScenario('marketingConsent') },
+];
+
+let currentScreen = 's01';
+let currentState = 'default';
+let currentScenario = null;
+let session = { user: null, returnTo: null, socialAvailable: true };
+// s03 nie ma własnej sekcji: to wariant s01 z banerem „Twój termin jest zachowany”.
+// Ekran logiczny (s03) steruje banerem i raportem stanu, fizycznie pokazujemy s01.
+const SCREEN_ALIASES = { s03: 's01' };
+/** Wpisane wartości per ekran — przeżywają przejścia między blokami stanów. */
+const typedByScreen = new Map();
+const physicalScreen = (id) => SCREEN_ALIASES[id] || id;
+/** Konto demo po roli (klucze DEMO_ACCOUNTS są nazwami własnymi, role są w polu `role`). */
+const accountByRole = (role) => Object.values(DEMO_ACCOUNTS).find((a) => a.role === role);
+let hibpEnabled = true;
+
+// ===== DOM Helpers =====
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+const showScreen = (logicalId) => {
+  const physical = physicalScreen(logicalId);
+  const screen = $('#' + physical);
+  if (!screen) return;
+  $$('.screen').forEach(s => { s.classList.remove('active'); s.classList.remove('state-return-to'); });
+  screen.classList.add('active');
+  // ekran startuje w stanie domyślnym; scenariusz ustawia wariant zaraz po showScreen
+  screen.classList.remove('state-loading', 'state-success', 'state-error', 'state-empty',
+    'state-conflict', 'state-unavailable', 'state-access-denied');
+  currentState = 'default';
+  applyState(screen, 'default');
+  if (physical !== logicalId) screen.classList.add('state-return-to');
+  currentScreen = logicalId;
+  window.location.hash = logicalId;
+  if (logicalId === 's03') showReturnToBanner(session.returnTo === '#/rezerwacja/m5/platnosc');
+  updateTestStateInfo();
+};
+/** Baner „termin zachowany” (s03): jeden tekst źródłowy dla scenariusza i deep linku. */
+function showReturnToBanner(fromU1) {
+  const banner = $('#returnToBanner');
+  if (!banner) return;
+  const text = banner.querySelector('div');
+  if (text) {
+    text.innerHTML = fromU1
+      ? '<strong>Twój wybrany termin jest zachowany</strong><br>Po zalogowaniu wrócisz do płatności (termin: wtorek 21.10.2026, 14:00).'
+      : '<strong>Zaloguj się, aby przejść do konta</strong><br>Po zalogowaniu wrócisz do ustawień konta.';
+  }
+  banner.classList.remove('hidden');
+}
+/** Pokazuje właściwy blok stanu: domyślny, wariant, albo domyślny + wariant (komunikat). */
+const applyState = (screenEl, state) => {
+  const blocks = $$('.state-default, .state-loading, .state-success, .state-error, .state-empty, .state-conflict, .state-unavailable, .state-access-denied', screenEl);
+  const defaultBlock = screenEl.querySelector('.state-default');
+  const target = state === 'default' ? null : screenEl.querySelector('.state-' + state);
+  // blok bez formularza/akcji to komunikat doklejany do treści domyślnej (np. alert „konto istnieje”)
+  const additive = target ? !target.querySelector('form, input, select, textarea, button') : false;
+  blocks.forEach(b => b.classList.add('hidden'));
+  if (additive && defaultBlock) defaultBlock.classList.remove('hidden');
+  if (target) target.classList.remove('hidden');
+  else if (defaultBlock) defaultBlock.classList.remove('hidden');
+};
+
+const setScreenState = (screenId, state) => {
+  const screen = $('#' + physicalScreen(screenId));
+  if (!screen) return;
+  // Każdy wariant ma własny blok z własnymi polami — zanim go pokażemy, przenosimy
+  // wpisane wartości po atrybucie `name`, żeby przejście w błąd nie kasowało formularza.
+  const typed = typedByScreen.get(screen.id) || new Map();
+  $$('input, select, textarea', screen).forEach(el => {
+    if (!el.name || el.value === '' || el.offsetParent === null) return;
+    typed.set(el.name, el.value);
+  });
+  typedByScreen.set(screen.id, typed);
+  screen.classList.remove('state-default', 'state-loading', 'state-success', 'state-error', 'state-empty', 'state-conflict', 'state-unavailable', 'state-access-denied');
+  screen.classList.add('state-' + state);
+  currentState = state;
+  applyState(screen, state);
+  $$('input, select, textarea', screen).forEach(el => {
+    if (!el.name || el.offsetParent === null || el.value !== '') return;
+    if (typed.has(el.name)) el.value = typed.get(el.name);   // ten sam `name` w bloku wariantu
+  });
+  updateTestStateInfo();
+};
+const showToast = (message, type = 'info') => {
+  const container = $('#toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.animation = 'slideIn .2s ease reverse'; setTimeout(() => toast.remove(), 200); }, 4000);
+};
+const openModal = (title, content) => {
+  $('#modalTitle').textContent = title;
+  $('#modalContent').innerHTML = content;
+  $('#modalOverlay').classList.add('open');
+  $('#modalOverlay').querySelector('button[data-action="closeModal"]').focus();
+};
+const closeModal = () => $('#modalOverlay').classList.remove('open');
+
+// ===== Password Strength =====
+const calcStrength = (pwd) => {
+  let score = 0;
+  if (pwd.length >= 10) score++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+  if (/\d/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
+  return score; // 0-4
+};
+const updateStrength = (inputId, barId) => {
+  const input = $(`#${inputId}`);
+  const bar = $(`#${barId}`);
+  if (!input || !bar) return;
+  const score = calcStrength(input.value);
+  bar.className = 'password-strength-bar';
+  if (score <= 1) bar.classList.add('password-strength-weak');
+  else if (score <= 2) bar.classList.add('password-strength-medium');
+  else bar.classList.add('password-strength-strong');
+};
+
+// ===== Form Validation =====
+const validateForm = (form) => {
+  let valid = true;
+  $$('input[required], select[required], textarea[required]', form).forEach(input => {
+    if (!input.value.trim() || (input.type === 'checkbox' && !input.checked)) {
+      input.classList.add('error');
+      const errId = input.id + 'Error';
+      const errEl = $(`#${errId}`);
+      if (errEl) errEl.textContent = input.type === 'checkbox' ? 'To pole jest wymagane.' : 'Wypełnij to pole.';
+      valid = false;
+    } else {
+      input.classList.remove('error');
+      const errId = input.id + 'Error';
+      const errEl = $(`#${errId}`);
+      if (errEl) errEl.textContent = '';
+    }
+    if (input.type === 'email' && input.value && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(input.value)) {
+      input.classList.add('error');
+      const errEl = $(`#${input.id}Error`);
+      if (errEl) errEl.textContent = 'Podaj poprawny adres e-mail.';
+      valid = false;
+    }
+    if (input.name === 'passwordConfirm') {
+      const pwd = form.querySelector('input[name="password"]');
+      if (pwd && input.value !== pwd.value) {
+        input.classList.add('error');
+        const errEl = $(`#${input.id}Error`);
+        if (errEl) errEl.textContent = 'Hasła nie są identyczne.';
+        valid = false;
+      }
+    }
+    if (input.name === 'password' && input.value.length < 10) {
+      input.classList.add('error');
+      const errEl = $(`#${input.id}Error`);
+      if (errEl) errEl.textContent = 'Hasło musi mieć min. 10 znaków.';
+      valid = false;
+    }
+  });
+  return valid;
+};
+
+// ===== Scenario Engine =====
+const setScenario = (type, params) => {
+  currentScenario = { type, params };
+  resetPrototype();
+  switch (type) {
+    case 'login':
+      session.returnTo = params.returnTo || null;
+      if (params.expectError === 'rate_limit') {
+        showScreen('s01');
+        setScreenState('s01', 'error');
+        $('#loginErrorMessage').textContent = 'Za dużo nieudanych prób. Spróbuj ponownie za 5 minut.';
+      } else if (params.expectError === 'invalid_credentials') {
+        showScreen('s01');
+        setScreenState('s01', 'error');
+      } else {
+        // Success path
+        const account = accountByRole(params.role) || DEMO_ACCOUNTS.student;
+        session.user = { ...account };
+        session.user.totp = params.totp !== false; // default true for admins
+        if (params.role === 'admin_trust' || params.role === 'admin_finance') {
+          if (!session.user.totp) {
+            showScreen('s07');
+            setScreenState('s07', 'default');
+          } else {
+            showScreen('s06');
+            setScreenState('s06', 'default');
+            updateAccountUI();
+          }
+        } else {
+          showScreen('s06');
+          setScreenState('s06', 'default');
+          updateAccountUI();
+        }
+        if (session.returnTo) {
+          showToast(`Przekierowanie do ${session.returnTo}`, 'success');
+          session.returnTo = null;
+        } else {
+          showToast('Zalogowano', 'success');
+        }
+      }
+      break;
+    case 'register':
+      if (params.expectConflict) {
+        showScreen('s02');
+        setScreenState('s02', 'conflict');
+      } else if (params.expectError === 'hibp') {
+        showScreen('s02');
+        setScreenState('s02', 'error');
+        $('#regErrorMessage').textContent = 'To hasło występuje w bazach wycieków. Wybierz inne.';
+        $('#regPasswordError').textContent = 'To hasło występuje w bazach wycieków. Wybierz inne.';
+      } else {
+        // Success - create demo account
+        const role = params.role || 'student';
+        session.user = { ...DEMO_ACCOUNTS[role], name: 'Nowy Użytkownik', verified: false };
+        showToast('Konto utworzone. Weryfikujemy Twój e-mail przed pierwszą rezerwacją.', 'info');
+        showScreen('s06');
+        setScreenState('s06', 'default');
+        updateAccountUI();
+      }
+      break;
+    case 'returnTo': {
+      const fromU1 = params.from === 'U1';
+      session.returnTo = fromU1 ? '#/rezerwacja/m5/platnosc' : '#/konto';
+      showScreen('s03');            // wariant s01 + baner „termin zachowany”
+      setScreenState('s03', 'default');
+      break;
+    }
+    case 'reset':
+      if (params.token === 'expired') {
+        showScreen('s05');
+        setScreenState('s05', 'error');
+      } else {
+        showScreen('s05');
+        setScreenState('s05', 'default');
+      }
+      break;
+    case 'verifyEmail':
+      showScreen('s10');
+      if (params.token === 'expired') {
+        setScreenState('s10', 'error');
+      } else {
+        setScreenState('s10', 'loading');
+        setTimeout(() => { setScreenState('s10', 'success'); }, 1500);
+      }
+      break;
+    case 'totp': {
+      // admin jest w trakcie logowania — bez obiektu użytkownika nie ma czego zaktualizować
+      session.user = { ...(accountByRole('admin_trust') || DEMO_ACCOUNTS.adminTrust), totp: false };
+      showScreen('s07');
+      if (params.expectError) {
+        setScreenState('s07', 'error');
+        const err = $('#totpError');
+        if (err) err.textContent = 'Nieprawidłowy kod. Sprawdź aplikację uwierzytelniającą i spróbuj ponownie.';
+      } else if (params.expectSuccess) {
+        session.user.totp = true;
+        updateAccountUI();
+        setScreenState('s07', 'success');
+        showToast('2FA skonfigurowane. Panel admina jest odblokowany.', 'success');
+      } else {
+        setScreenState('s07', 'default');
+      }
+      break;
+    }
+    case 'accessDenied':
+      showScreen('s08');
+      $('#currentRole403').textContent = params.currentRole;
+      break;
+    case 'notFound':
+      showScreen('s09');
+      break;
+    case 'termsUpdate':
+      showScreen('s11');
+      setScreenState('s11', 'default');
+      break;
+    case 'accountActions':
+      showScreen('s06');
+      setScreenState('s06', 'default');
+      updateAccountUI();
+      break;
+    case 'signOutAll':
+      showScreen('s06');
+      setScreenState('s06', 'default');
+      updateAccountUI();
+      break;
+    case 'marketingConsent':
+      showScreen('s06');
+      setScreenState('s06', 'default');
+      updateAccountUI();
+      break;
+    case 'unavailable_social':
+      hibpEnabled = false;
+      session.socialAvailable = false;
+      showScreen('s01');
+      setScreenState('s01', 'unavailable');
+      break;
+    default:
+      showScreen('s01');
+      setScreenState('s01', 'default');
+  }
+  updateTestStateInfo();
+};
+
+const resetPrototype = () => {
+  session = { user: null, returnTo: null, socialAvailable: true };
+  hibpEnabled = true;
+  currentScenario = null;
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $$('.screen').forEach(s => s.classList.remove('state-loading', 'state-success', 'state-error', 'state-empty', 'state-conflict', 'state-unavailable', 'state-access-denied'));
+  $$('.screen').forEach(s => s.classList.add('state-default'));
+  $$('.hidden').forEach(el => el.classList.add('hidden'));
+  $$('.screen').forEach(s => s.classList.remove('state-return-to'));
+  $$('.alert').forEach(el => el.classList.add('hidden'));
+  $('#toastContainer').innerHTML = '';
+  typedByScreen.clear();
+  $$('form').forEach(form => form.reset());   // scenariusz nie dziedziczy wpisanych danych
+  syncSegmented();
+  closeModal();
+};
+
+// ===== Account UI Update =====
+const updateAccountUI = () => {
+  if (!session.user) return;
+  $('#accName').value = session.user.name;
+  $('#accEmail').value = session.user.email;
+  $('#accTimezone').value = session.user.timezone || 'Europe/Warsaw';
+  $('#accCurrency').value = session.user.currency || 'PLN';
+  $('#prefMarketingEmail').checked = true;
+  $('#prefMarketingPush').checked = true;
+
+  const roleLabels = { student: 'Uczeń', mentor: 'Mentor', admin_trust: 'Admin Trust', admin_finance: 'Admin Finance' };
+  $('#accountRoleBadge').textContent = `Rola: ${roleLabels[session.user.role] || session.user.role}`;
+
+  if (session.user.role === 'admin_trust' || session.user.role === 'admin_finance') {
+    $('#adminSection').classList.remove('hidden');
+    $('#adminRoleName').textContent = session.user.role === 'admin_trust' ? 'admin_trust (weryfikacja mentorów)' : 'admin_finance (spory i zwroty)';
+  } else {
+    $('#adminSection').classList.add('hidden');
+  }
+};
+
+// ===== Test Controls =====
+const renderTestScenarios = () => {
+  const container = $('#testScenarios');
+  container.innerHTML = SCENARIOS.map(s => `
+    <button class="test-scenario-btn" data-scenario="${s.id}" aria-pressed="false">
+      <span class="test-scenario-title">${s.id}: ${s.title}</span>
+      <span class="test-scenario-desc">${s.desc} → ${s.screens.join(' → ')}</span>
+    </button>
+  `).join('');
+  $$('.test-scenario-btn', container).forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.test-scenario-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      const scenario = SCENARIOS.find(s => s.id === btn.dataset.scenario);
+      if (scenario) scenario.setup();
+    });
+  });
+};
+const updateTestStateInfo = () => {
+  const info = $('#testStateInfo');
+  let text = `Stan: Ekran=${currentScreen}, Stan=${currentState}`;
+  if (currentScenario) text += `, Scenariusz=${currentScenario.type}`;
+  if (session.user) text += `, Użytkownik=${session.user.email} (${session.user.role})`;
+  if (session.returnTo) text += `, returnTo=${session.returnTo}`;
+  info.textContent = text;
+};
+const toggleTestControls = (open) => {
+  $('#testControls').classList.toggle('open', open);
+  $('#testControlsToggle').textContent = open ? 'Zamknij panel testowy' : 'Panel testowy (F1)';
+};
+
+// ===== Event Handlers =====
+document.addEventListener('click', (e) => {
+  const action = e.target.closest('[data-action]');
+  if (!action) return;
+  const act = action.dataset.action;
+  e.preventDefault();
+
+  switch (act) {
+    case 'backToLogin':
+      showScreen('s01'); setScreenState('s01', 'default'); break;
+    case 'switchToLogin':
+    case 'switchToLoginFromReg':
+      showScreen('s01'); setScreenState('s01', 'default');
+      // Switch tab to login
+      $$('.auth-tab').forEach(t => t.classList.remove('is-active'));
+      $$('.auth-tab[data-tab="login"]').forEach(t => t.classList.add('is-active'));
+      break;
+    case 'goToLogin':
+    case 'goToLoginFromAccount':
+    case 'goToLogin403':
+    case 'goToLogin404':
+    case 'goToLogin10':
+      showScreen('s01'); setScreenState('s01', 'default'); break;
+    case 'forgotPassword':
+    case 'goToReset':
+      showScreen('s04'); setScreenState('s04', 'default'); break;
+    case 'goToDashboard':
+    case 'goToDashboard11':
+      showScreen('s06'); setScreenState('s06', 'default'); updateAccountUI(); break;
+    case 'goToAdminPanel':
+      showScreen('s06'); setScreenState('s06', 'default'); updateAccountUI(); break;
+    case 'goToAdminTrust':
+      openModal('Weryfikacja mentorów (A1)', '<p class="muted">Symulacja przejścia do panelu A1. W pełnym prototypie: nawigacja do /admin/weryfikacja.</p>'); break;
+    case 'goToAdminFinance':
+      openModal('Spory i zwroty (A2)', '<p class="muted">Symulacja przejścia do panelu A2. W pełnym prototypie: nawigacja do /admin/spory.</p>'); break;
+    case 'goHome403':
+    case 'goHome404':
+      if (session.user) { showScreen('s06'); setScreenState('s06', 'default'); updateAccountUI(); }
+      else { showScreen('s01'); setScreenState('s01', 'default'); }
+      break;
+    case 'resendVerification':
+      showToast('Wysłano nowy link weryfikacyjny', 'success');
+      if (currentScreen === 's10') setScreenState('s10', 'default');
+      break;
+    case 'addCard':
+      openModal('Dodaj kartę', '<p class="muted">Otwieramy bezpieczny formularz operatora płatności (Stripe Elements)…</p><p class="small">W prototypie: symulacja sukcesu po 1s.</p>');
+      setTimeout(() => { closeModal(); showToast('Karta dodana', 'success'); }, 1000);
+      break;
+    case 'exportData':
+      showToast('Przygotujemy eksport i wyślemy link e-mailem (do 24 h)', 'success');
+      break;
+    case 'deleteAccount':
+      openModal('Usuń konto', '<p class="muted">Usunięcie wymaga potwierdzenia e-mailem. Aktywny plan zostanie anulowany.</p><div class="row end"><button class="btn btn-danger" data-action="confirmDelete">Usuń konto</button><button class="btn btn-ghost" data-action="closeModal">Anuluj</button></div>'); break;
+    case 'confirmDelete':
+      closeModal();
+      showToast('Żądanie usunięcia zapisane. Link potwierdzający wysłany e-mailem.', 'success');
+      break;
+    case 'signOutAll':
+      showToast('Wylogowano ze wszystkich urządzeń', 'success');
+      break;
+    case 'openTestControls':
+      toggleTestControls(true);
+      break;
+    case 'closeTestControls':
+      toggleTestControls(false);
+      break;
+    case 'closeModal':
+      closeModal();
+      break;
+    case 'retryAccount':
+      if (session.user) { setScreenState('s06', 'default'); updateAccountUI(); } break;
+  }
+});
+
+// Form submissions
+document.addEventListener('submit', (e) => {
+  const form = e.target.closest('form');
+  if (!form) return;
+  e.preventDefault();
+
+  if (form.id === 'loginForm') {
+    if (!validateForm(form)) return;
+    const email = $('#loginEmail').value.trim();
+    const password = $('#loginPassword').value;
+    const btn = $('#loginSubmit');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Logujemy…';
+    setScreenState('s01', 'loading');
+    setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Zaloguj się';
+      if (email === 'zajety@kompas.pl') {
+        setScreenState('s01', 'conflict');
+        return;
+      }
+      const account = Object.values(DEMO_ACCOUNTS).find(a => a.email === email && a.password === password);
+      if (account) {
+        session.user = { ...account };
+        session.user.totp = account.totp !== false;
+        if (account.role === 'admin_trust' || account.role === 'admin_finance') {
+          if (!session.user.totp) { showScreen('s07'); setScreenState('s07', 'default'); }
+          else { showScreen('s06'); setScreenState('s06', 'default'); updateAccountUI(); }
+        } else {
+          showScreen('s06'); setScreenState('s06', 'default'); updateAccountUI();
+        }
+        if (session.returnTo) { showToast(`Przekierowanie do ${session.returnTo}`, 'success'); session.returnTo = null; }
+        else { showToast('Zalogowano', 'success'); }
+      } else {
+        setScreenState('s01', 'error');
+      }
+    }, 500);
+  }
+  else if (form.id === 'registerForm') {
+    if (!validateForm(form)) return;
+    const email = $('#regEmail').value.trim();
+    const password = $('#regPassword').value;
+    const btn = $('#regSubmit');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Tworzymy konto…';
+    setScreenState('s02', 'loading');
+    setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Załóż konto';
+      if (email === 'zajety@kompas.pl') { setScreenState('s02', 'conflict'); return; }
+      if (hibpEnabled && password === 'Password123') { setScreenState('s02', 'error'); $('#regErrorMessage').textContent = 'To hasło występuje w bazach wycieków. Wybierz inne.'; $('#regPasswordError').textContent = 'To hasło występuje w bazach wycieków. Wybierz inne.'; return; }
+      const role = form.querySelector('input[name="role"]:checked').value;
+      session.user = { ...DEMO_ACCOUNTS[role], name: $('#regName').value.trim(), verified: false };
+      showToast('Konto utworzone. Weryfikujemy Twój e-mail przed pierwszą rezerwacją.', 'info');
+      showScreen('s06'); setScreenState('s06', 'default'); updateAccountUI();
+    }, 500);
+  }
+  else if (form.id === 'resetForm') {
+    if (!validateForm(form)) return;
+    const btn = $('#resetSubmit');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Wysyłamy…';
+    setScreenState('s04', 'loading');
+    setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Wyślij link';
+      setScreenState('s04', 'success');
+    }, 800);
+  }
+  else if (form.id === 'newPasswordForm') {
+    if (!validateForm(form)) return;
+    const pwd = $('#npPassword').value;
+    if (hibpEnabled && pwd === 'Password123') {
+      $('#npPassword').classList.add('error');
+      $('#npPasswordError').textContent = 'To hasło występuje w bazach wycieków. Wybierz inne.';
+      return;
+    }
+    const btn = $('#npSubmit');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Zapisujemy…';
+    setScreenState('s05', 'loading');
+    setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Zapisz hasło';
+      setScreenState('s05', 'success');
+    }, 800);
+  }
+  else if (form.id === 'totpForm') {
+    if (!validateForm(form)) return;
+    const code = $('#totpCode').value;
+    const btn = $('#totpSubmit');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Weryfikujemy…';
+    setScreenState('s07', 'loading');
+    setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Zweryfikuj i kontynuuj';
+      if (code === '123456') { setScreenState('s07', 'success'); session.user.totp = true; }
+      else { setScreenState('s07', 'error'); }
+    }, 800);
+  }
+  else if (form.id === 'profileForm') {
+    if (!validateForm(form)) return;
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Zapisujemy…';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Zapisz profil'; showToast('Zapisano profil', 'success'); }, 600);
+  }
+  else if (form.id === 'termsAcceptForm') {
+    if (!validateForm(form)) return;
+    const btn = $('#termsAcceptSubmit');
+    btn.disabled = true; btn.textContent = 'Zapisujemy…';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Zapisz akceptację'; setScreenState('s11', 'success'); }, 600);
+  }
+});
+
+// Password toggle
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-toggle-password]');
+  if (!btn) return;
+  const target = $(`#${btn.dataset.target}`);
+  if (target) { target.type = target.type === 'password' ? 'text' : 'password'; }
+});
+
+// Password strength live update
+$$('input[type="password"][data-toggle-password]').forEach(input => {
+  input.addEventListener('input', () => updateStrength(input.id, input.id + 'Strength'));
+});
+
+// Zakładki Logowanie/Rejestracja prowadzą do właściwego ekranu (s01 / s02)
+const setAuthTab = (activeTab) => {
+  $$('.auth-tabs').forEach(list => {
+    $$('.auth-tab', list).forEach(tab => {
+      const isActive = tab.dataset.tab === activeTab;
+      tab.classList.toggle('is-active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+      tab.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+  });
+};
+document.addEventListener('click', (e) => {
+  const tab = e.target.closest('[data-tab]');
+  if (!tab) return;
+  e.preventDefault();
+  const target = tab.dataset.tab === 'register' ? 's02' : 's01';
+  showScreen(target);
+  setScreenState(target, 'default');
+  setAuthTab(tab.dataset.tab);
+});
+
+// Keyboard: Escape closes modal, F1 toggles test controls
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'F1') { e.preventDefault(); toggleTestControls(!$('#testControls').classList.contains('open')); }
+});
+
+// Initial hash routing
+const initialHash = window.location.hash.slice(1);
+if (initialHash && (SCREEN_ALIASES[initialHash] || $('#' + initialHash))) { showScreen(initialHash); }
+
+/** Zaznaczona opcja w kontrolce segmentowej ma wypełnione całe pole (fallback dla :has). */
+const syncSegmented = () => {
+  $$('.segmented label').forEach(label => {
+    const input = label.querySelector('input');
+    if (input) label.classList.toggle('is-checked', input.checked);
+  });
+};
+document.addEventListener('change', (e) => {
+  if (e.target.matches && e.target.matches('.segmented input')) syncSegmented();
+});
+
+// Init
+// Komunikaty stanów (bloki bez formularza i akcji) przenosimy na początek treści ekranu,
+// żeby po dołączeniu do stanu domyślnego pojawiały się NAD formularzem, a nie pod nim.
+$$('.screen').forEach(screen => {
+  $$('.state-loading, .state-success, .state-error, .state-empty, .state-conflict, .state-unavailable, .state-access-denied', screen).forEach(block => {
+    if (block.querySelector('form, input, select, textarea, button')) return;
+    block.dataset.stateMode = 'add';
+    const host = block.parentElement;
+    if (host && host.firstElementChild !== block) host.insertBefore(block, host.firstElementChild);
+  });
+});
+$$('.auth-tabs').forEach(list => {
+  $$('.auth-tab', list).forEach(tab => {
+    const isActive = tab.classList.contains('is-active');
+    tab.setAttribute('aria-selected', String(isActive));
+    tab.setAttribute('tabindex', isActive ? '0' : '-1');
+  });
+});
+renderTestScenarios();
+syncSegmented();
+updateTestStateInfo();
+console.log('[Prototype] F1 Tożsamość loaded. Press F1 for test panel.');
+</script>
+</body>
+</html>
