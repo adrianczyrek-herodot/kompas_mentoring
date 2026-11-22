@@ -5,9 +5,9 @@ Specyfikacja: [`.ai/specs/2026-11-21-prototyp-kompas-flow.md`](../../.ai/specs/2
 | Etap | Stan |
 |---|---|
 | 0 — plan (wersja 2, na `@kompas/ui`) | zaakceptowany 2026-11-21 |
-| 1 — szkielet i ścieżka F1 | zrobiony 2026-11-21, czeka na „dalej” |
-| 2 — stany, role, scenariusze | — |
-| 3 — uczciwość i sprawdzenie | — |
+| 1 — szkielet i ścieżka F1 | zrobiony 2026-11-21 |
+| 2 — stany, role, scenariusze | zrobiony 2026-11-21/22 (przebudowa), wszystkie 23 ekrany, CI zielone |
+| 3 — uczciwość i sprawdzenie | w toku |
 
 ## Etap 1 — szkielet i ścieżka F1 (2026-11-21)
 
@@ -160,3 +160,65 @@ Wspólne luki: **BottomNav** (dolna nawigacja < 768 px), **ReviewBar** (pasek pr
 1. **Ścieżka silnika przeglądu** — potrzebna przed etapem 1 (komentarze, mapa ekranów, prezentacja, „Back”, mostek kolorów).
 2. **Podgląd w Storybooku** — proponowane kopiowanie do `storybook-static/prototypes/kompas-flow/` (tylko zbudowany Storybook). Alternatywa wymaga `staticDirs` w `packages/ui/.storybook/main.ts`, czyli zmiany DS.
 3. Rozbieżność `packages/ui/POSTEP.md` (45 komponentów produktu) vs kod (16) — do zgłoszenia w backlogu, poza zakresem prototypu.
+
+## Etap 2 — stany, role, scenariusze (2026-11-21/22)
+
+Pierwsza próba (2026-11-21) zbudowała 14 ekranów, ale na klasach, których DS nie ma
+(`bg-surface-primary`, `text-text-primary`), z martwymi przyciskami i `number` dla kwot — jej raport
+„zrobione” był nieprawdziwy. Kod odrzucono i etap 2 zrobiono od nowa: najpierw warstwa wspólna,
+potem trzy równoległe zadania o rozłącznych plikach, na końcu scalenie i poprawki integracyjne.
+
+### Warstwa wspólna (przed zadaniami)
+
+- `src/data/` rozszerzone o dane z `store.ts` / `domain.ts` / `mocks.ts` szarego prototypu: cele,
+  plany, płatności, wiadomości, powiadomienia, praca mentora, wnioski mentora, spory.
+- `src/state/world.ts` — akcje przechodzą między rolami: spór z U5 trafia do A2; zatwierdzenie
+  mentora w A1 otwiera mu panel; zmiana dostępności w M3 zmienia sloty w U1.
+- Wspólny `useAction` + `FailureAlert` (błąd żądania, wygasła sesja → ponowne logowanie w oknie,
+  wpisane dane zostają na ekranie).
+- Nowe kontrolki scenariusza: wygaśnięcie sesji, presety zegara demo, „mentor nie dołącza”,
+  odpowiedź mentora na próbną. Dzwonek pokazuje liczbę nieprzeczytanych powiadomień.
+- `scripts/check-classes.mjs` — nowy strażnik: każda klasa z JSX musi mieć CSS w `dist`. Skanuje
+  całą treść pliku (także `cn(…)` i wartości wieloliniowe), a jako klasy liczy wyłącznie literały,
+  nie identyfikatory z warunków. Na kodzie odrzuconej wersji znalazł 48 klas bez CSS.
+
+### Ekrany (3 zadania równoległe, rozłączne pliki)
+
+| Zakres | Ekrany |
+|---|---|
+| Uczeń | U6 Pokój sesji, U7 Ocena, U8 Plany i saldo, U9 Postępy |
+| Wspólne | S1 Wiadomości, S2 Powiadomienia, S3 Konto i ustawienia |
+| Mentor | M1 Onboarding (6 kroków), M2 Panel, M3 Kalendarz, M4 Uczniowie, M5 Zarobki |
+| Zespół zaufania | A1 Weryfikacja mentorów, A2 Spory i zwroty |
+
+Po scaleniu poprawek integracyjnych: ponowiona wysyłka wiadomości trafia do odbiorcy; saldo wolno
+przenieść tylko do mentora po odbytej próbnej; sloty (P3/U1/U5) respektują ustawienia M3
+(minimalne wyprzedzenie, bufor, dni wolne).
+
+### Sprawdzone
+
+- `tsc --noEmit` — 0 błędów; `pnpm lint` — 0 błędów (knip, dependency-cruiser), tylko ostrzeżenia
+  `max-lines-per-function`; `pnpm build` — 2/2.
+- CI PR #57: `build`, `lint`, `typecheck`, `unit`, `integration`, `Storybook`, `e2e smoke` — zielone.
+- Playwright (Chromium, 1280 px): 7 kont × 23 trasy × 2 motywy = 322 przejścia bez `pageerror`
+  i bez błędów konsoli.
+- `check-classes` — 0 klas bez CSS (najpierw potwierdzone, że wykrywa naruszenia na pliku testowym).
+- `check-tokens` (DS) — 0 wartości spoza tokenów.
+- Pasek przeglądu zawija kontrolki przy 320 px: brak poziomego przewijania strony, brak uciętych
+  kontrolek (1440 px też bez przepełnienia).
+- axe (WCAG 2.2 AA): 9 ekranów ścieżki F1 × jasny/ciemny — 0 poważnych naruszeń.
+
+### Niesprawdzone w etapie 2
+
+- Pełny przegląd axe dla 14 nowych ekranów i U2.
+- Safari i Firefox.
+- Przepływ „poproś o zmiany” w M1 z realnym A1 — w zadaniu mentora sprawdzony na podmienionych
+  danych; do potwierdzenia end-to-end.
+
+### Pytania do specyfikacji (etap 2)
+
+1. Czy gość może wybrać termin przed zalogowaniem? (F1 — tak; KONCEPCJA §3.2 mówi, że U* wymaga
+   zalogowania) — prototyp idzie za F1.
+2. Opłata serwisowa 3 zł i kod `KOMPAS10` pochodzą z szarego prototypu; KONCEPCJA wymienia te
+   elementy bez wartości.
+3. Czy mentor może edytować wniosek, który czeka już na weryfikację?

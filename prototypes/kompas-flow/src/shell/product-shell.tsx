@@ -6,6 +6,7 @@ import {
   AppHeader,
   Avatar,
   AvatarFallback,
+  Badge,
   Button,
   initialsOf,
   Link,
@@ -21,6 +22,7 @@ import type { Account } from '../data/accounts';
 import { href, navigate } from '../lib/router';
 import type { ScreenDef } from '../screens/registry';
 import { useDemo } from '../state/demo-context';
+import { unreadCount } from '../state/world';
 
 function AccountMenu({ account }: { account: Account }) {
   const { dispatch } = useDemo();
@@ -54,19 +56,32 @@ function AccountMenu({ account }: { account: Account }) {
   );
 }
 
+function NotificationsButton({ account }: { account: Account }) {
+  const { state } = useDemo();
+  const unread = unreadCount(state.world, account.id);
+  return (
+    <Button
+      variant="ghost"
+      size={unread > 0 ? 'sm' : 'icon'}
+      aria-label={unread > 0 ? `Powiadomienia, nieprzeczytane: ${String(unread)}` : 'Powiadomienia'}
+      onClick={() => {
+        navigate('/powiadomienia');
+      }}
+    >
+      <Bell aria-hidden="true" />
+      {unread > 0 ? (
+        <Badge variant="warning" aria-hidden="true">
+          {unread}
+        </Badge>
+      ) : null}
+    </Button>
+  );
+}
+
 function HeaderActions({ account }: { account: Account }) {
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Powiadomienia"
-        onClick={() => {
-          navigate('/powiadomienia');
-        }}
-      >
-        <Bell aria-hidden="true" />
-      </Button>
+      <NotificationsButton account={account} />
       <AccountMenu account={account} />
     </>
   );
@@ -109,6 +124,7 @@ function AdminNav({ account }: { account: Account }) {
         <Link href={href('/admin/weryfikacja')}>Weryfikacja</Link>
         <Link href={href('/admin/spory')}>Spory</Link>
       </nav>
+      <NotificationsButton account={account} />
       <AccountMenu account={account} />
     </>
   );

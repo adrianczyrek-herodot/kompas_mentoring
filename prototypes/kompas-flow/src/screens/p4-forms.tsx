@@ -20,13 +20,13 @@ import {
 } from '@kompas/ui';
 import { CircleX } from 'lucide-react';
 import { type SyntheticEvent, useId, useState } from 'react';
-import { useFakeRequest } from '../state/demo-context';
+import { type RequestFailure, useFakeRequest } from '../state/demo-context';
 
 type Errors = Partial<Record<'name' | 'email' | 'password' | 'terms', string>>;
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function RequestError({ kind }: { kind: 'network' | 'server' | null }) {
+function RequestError({ kind }: { kind: RequestFailure | null }) {
   if (!kind) return null;
   return (
     <Alert variant="danger" role="alert">
@@ -91,7 +91,7 @@ export function LoginForm({ onSuccess, onForgot }: { onSuccess: () => void; onFo
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<'network' | 'server' | null>(null);
+  const [failure, setFailure] = useState<RequestFailure | null>(null);
 
   const submit = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -248,7 +248,7 @@ export function RegisterForm({
   });
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<'network' | 'server' | null>(null);
+  const [failure, setFailure] = useState<RequestFailure | null>(null);
   const set = (patch: Partial<RegisterValues>) => {
     setValues((current) => ({ ...current, ...patch }));
   };
