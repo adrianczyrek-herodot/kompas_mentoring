@@ -149,3 +149,34 @@ Pozycje bez zgłoszeń. Przeniesienie do Now: wpis w „Decyzje i zmiany” brie
 
 - 2026-11-11 — Pierwsza wersja. Zadania jako listy kontrolne w zgłoszeniach historii (bez osobnych zgłoszeń), Later bez zgłoszeń. Krok 5 onboardingu (E2-S3) korzysta z edytora dostępności z E3-S2 — jedyna zależność między epikami F2 i F3 w tę stronę.
 - 2026-11-22 — Uwagi z mapy ekranów F1 (`prototypes/konta-i-role/mapa-ekranow.md`) rozdzielone: kryteria ekranów F1 (s01–s03, s06–s10) w specyfikacji F1; stany dotyczące innych przepływów dopisane do zadań — E3-S4 T2 (nieweryfikowany e-mail w U1), E3-S5 T2 (mentor `suspended`), E3-S6 T1 (anulowanie próbnej < 12 h — pytanie do właściciela), E3-S9 T1/T2 (strona weryfikacji z linku, reset hasła), L1 (BLIK cykliczny), L2 (dołączanie mentora). Specyfikacje F3–F5 jeszcze nie istnieją — kryteria przeniesiemy do nich przy powstawaniu (E3-S1 i kolejne).
+
+### Pytania z notatek prototypu `kompas-flow` (PR #60, 2026-11-22)
+
+Prototyp kompas-flow ma przy każdym z 23 ekranów notatkę „Czego nie rozstrzyga” (`ScreenDef.notes` w `prototypes/kompas-flow/src/screens/registry.ts`). To pytania do specyfikacji, nie wymagania. Specyfikacje F2–F6 jeszcze nie istnieją — pytania czekają w zadaniach, do których należą; przy powstawaniu specyfikacji przenosimy je do jej „Open Questions”.
+
+| Ekran | Pytanie z prototypu | Trafia do |
+|---|---|---|
+| P1 | Dobór i kolejność wyróżnionych mentorów oraz kategorii nie wynikają ze specyfikacji | E2-S7 T2 |
+| P2 | Zestaw filtrów i wartości domyślne wykraczają poza mapę ekranów | E2-S5 T2 |
+| P3 | Oceny i opinie są fikcyjne (za zgodą) — nie pochodzą z realnych sesji | E2-S6 T1 |
+| P3 | Kiedy ocena pojawia się na profilu i czy mentor może na nią odpowiedzieć | L2 (F5) |
+| P4 | Polityka haseł i wymagane zgody do potwierdzenia w specyfikacji | F1 — pokryte kryteriami [s02] |
+| U1 | Strefa czasowa wybierana w pasku ma docelowo pochodzić z profilu | E3-S4 T2 |
+| U2 | Opłata serwisowa 3 zł i kod `KOMPAS10` (−10%) pochodzą z szarego prototypu — brak wartości w KONCEPCJI | L1 (F4) — decyzja właściciela |
+| U3 | Treść e-maila potwierdzającego i terminy przypomnień do ustalenia | E3-S8 T2 |
+| U4 | Kolejność i zakres minionych sesji oraz sald to tylko dane demo | E3-S5 T1 |
+| U5 | Reguły zwrotu i kary za późne anulowanie są poza mapą ekranów | E3-S6 T1 |
+| U6 | Dostawca wideo i zachowanie przy zerwaniu połączenia do ustalenia; „mentor nie dołącza” (uczeń vs zwrot sesji do salda) | L2 (F5) — dołączanie mentora |
+| U7 | Kiedy ocena pojawia się publicznie i czy mentor może odpowiedzieć | L2 (F5, OmniBus) |
+| U8 | Ceny i warunki planów oraz wygasanie salda poza zakresem mapy | L1 (F4) |
+| U9 | Zakres i autorstwo celów oraz zadań (mentor czy uczeń) | L3 (F6) |
+| S1 | Dopuszczalność rozmowy przed pierwszą sesją i okres przechowywania wiadomości | L3 (F6, DSA) |
+| S2 | Kanały i reguły wysyłki powiadomień do ustalenia | E3-S8 T2 |
+| S3 | Zakres eksportu danych (RODO) i retencja do potwierdzenia | F1 (tylko zapis żądania, [s06]) + L5 (F8, realizacja) |
+| M1 | Czy mentor może edytować wniosek, który czeka już na weryfikację | E2-S3 T3 |
+| M2 | SLA odpowiedzi mentora i zachowanie po jego przekroczeniu | E3-S7 T2 (auto-akceptacja 24 h) |
+| M3 | Jak bufory i wyjątki łączą się z planem ucznia (kolizje) | E3-S2 T3, E3-S10 |
+| M4 | Kto widzi notatki mentora (uczeń, zespół zaufania) i jak długo są przechowywane | L3 (F6) — widoczność notatek |
+| M5 | Minimalna kwota wypłaty, prowizja i czas realizacji pochodzą z szarego prototypu | L4 (F7) |
+| A1 | Kto poza zespołem zaufania widzi wniosek i jak długo trwa weryfikacja | E2-S4 T1 |
+| A2 | Reguły zwrotu (kto pokrywa koszt) i możliwość odwołania są poza mapą | L3 (F6) |

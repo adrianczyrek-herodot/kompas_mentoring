@@ -232,3 +232,10 @@ Do `.ai/lessons.md`: szablony zadań przekazywane z nieuzupełnionymi `{{…}}`
 (nie pierwszy raz — patrz `runs/2026-11-21-przeglad-prototypu-kompas-flow.md`)
 wymagają najpierw ustalenia materiałów po nazwach plików w repo, a brakujących
 nie wolno zastępować domysłem.
+## Uzupełnienie: uwagi z prototypu (PR #60)
+
+Właściciel wskazał, że uwagi z prototypu są w najnowszym PR (#60, `feat(prototype): kompas-flow etap 3`). Weryfikacja: PR nie ma komentarzy ani recenzji na GitHubie, a `public/review/comments.js` na `main` ma `operations: []` — więc feedback to **notatki „Czego nie rozstrzyga” przy 23 ekranach** (`ScreenDef.notes`), README prototypu i pytania w jego specyfikacji. Przetworzone:
+
+- 2 notatki dotyczą F1 (P4 polityka haseł/zgody → kryterium [s02]; S3 eksport/retencja → [s06] + F8), zapisane w „Decyzjach i zmianach” F1;
+- 22 notatki przypisane do zadań w `backlog.md` → nowa sekcja „Pytania z notatek prototypu `kompas-flow` (PR #60)”;
+- notatka o dołączaniu mentora (U6) i SLA odpowiedzi (M2) dopisane do L2 i E3-S7.
