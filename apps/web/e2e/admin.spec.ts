@@ -42,10 +42,11 @@ test('s07 — an admin without 2FA sets up TOTP and then reaches /admin', async 
   await expect(page.getByRole('heading', { level: 1, name: 'Panel administratora' })).toBeVisible();
 });
 
-test('a signed-in student does not reach /admin (no disclosure)', async ({ page }) => {
+test('a signed-in student does not reach /admin (403)', async ({ page }) => {
   await signUpViaApi(page.request);
   const response = await page.goto('/admin');
-  expect(response?.status()).toBe(404);
+  expect(response?.status()).toBe(403);
+  await expect(page.getByRole('heading', { level: 1, name: 'Brak dostępu' })).toBeVisible();
 });
 
 test('s01 — the 12 h admin session expiry has its own message', async ({ page }) => {

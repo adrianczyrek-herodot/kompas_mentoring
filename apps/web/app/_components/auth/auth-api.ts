@@ -59,6 +59,8 @@ export const signUpWithEmail = async (credentials: Credentials): Promise<AuthFai
       terms: credentials.terms,
       privacy: credentials.terms,
       marketing: credentials.marketing,
+      // The verification link returns to s10 (success or `?error=…`), spec [s10].
+      callbackURL: '/weryfikacja-email',
     }),
   );
 

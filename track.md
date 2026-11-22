@@ -86,14 +86,18 @@ test 4/4 (core 62), test:integration 11, build OK, test:e2e 46 zaliczone (360 i 
 Znane tymczasowe: nie-admin na `/admin` dostaje 404 — właściwa trasa 403 (s08) powstaje w fazie 8;
 E2E pełnego przekroczenia 12 h (podróż w czasie) zastąpione testem jednostkowym polityki i E2E komunikatu.
 
-## Faza 8 — Weryfikacja e-maila (s10) + strony błędów 403/404 (s08, s09) (feat(web)) — `[ ]` DO ZROBIENIA
+## Faza 8 — Weryfikacja e-maila (s10) + strony błędów 403/404 (s08, s09) (feat(web)) — `[x]` WYKONANE
 Zadania:
-- [ ] **Z8.1** Strona weryfikacji e-maila (s10): token ważny → `returnTo` albo strona startowa roli; token wygasły → „Link wygasł lub jest nieprawidłowy" + „Wyślij nowy link"; E2E oba warianty
-- [ ] **Z8.2** Trasa 403 (s08) z linkiem do strony startowej roli (student/mentor → `/konto`, admin → `/admin`)
-- [ ] **Z8.3** Trasa 404 (s09) bez ujawniania istnienia zasobu
-- [ ] **Z8.4** E2E: student → `/mentor` = 403, mentor → `/admin/*` = 403, cudze konto = 404; axe
+- [x] **Z8.1** Strona weryfikacji e-maila (s10): token ważny → sukces i link do strony startowej roli; token wygasły/błędny → „Link wygasł lub jest nieprawidłowy” + „Wyślij nowy link”; E2E oba warianty
+- [x] **Z8.2** Trasa 403 (s08) z linkiem do strony startowej roli (student/mentor → `/konto`, admin → `/admin`), realny status 403 przez `forbidden()` + `authInterrupts`
+- [x] **Z8.3** Trasa 404 (s09) bez ujawniania istnienia zasobu (`app/not-found.tsx`)
+- [x] **Z8.4** E2E: student → `/mentor` = 403, mentor → `/admin/*` = 403, nieznana trasa = 404; axe
+- [x] Dodatkowo: minimalna trasa `/mentor` (placeholder F2) z uprawnieniem `mentor.access`; `admin/layout.tsx`: nie-admin → 403 zamiast 404
 
-Kryteria: [s08], [s09], [s10] z sekcji „Kryteria akceptacji" specyfikacji.
+Dowody: `apps/web/app/{forbidden,not-found}.tsx`, `apps/web/app/weryfikacja-email/**`, `apps/web/app/mentor/page.tsx`,
+`packages/core/.../domain/role.ts` (`mentor.access`), `apps/web/next.config.ts` (`authInterrupts`),
+`apps/web/app/_components/auth/auth-api.ts` (callbackURL), `apps/web/e2e/{verification,errors,admin}.spec.ts`.
+Bramki: lint 0 błędów, typecheck 7/7, test 4/4 (core 62), test:integration 11, build OK, test:e2e **56 zaliczone** (360 i 1280 px).
 
 ---
 

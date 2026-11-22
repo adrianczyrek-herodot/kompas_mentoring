@@ -44,6 +44,8 @@ describe('roles, sessions and 2FA (F1 Q4–Q5)', () => {
     expect(isAdmin(['student', 'mentor'])).toBe(false);
     expect(hasPermission(['admin_trust'], 'admin.access')).toBe(true);
     expect(hasPermission(['mentor'], 'admin.access')).toBe(false);
+    expect(hasPermission(['mentor'], 'mentor.access')).toBe(true);
+    expect(hasPermission(['student'], 'mentor.access')).toBe(false);
     expect(hasPermission(['student'], 'account.manage.own')).toBe(true);
   });
 });

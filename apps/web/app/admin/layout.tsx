@@ -1,5 +1,5 @@
 import { hasPermission, mustSetUpTwoFactor } from '@kompas/core/identity';
-import { notFound, redirect } from 'next/navigation';
+import { forbidden, redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { getSessionState } from '../../server/session.ts';
 
@@ -15,7 +15,7 @@ const SET_UP_2FA = `/konto/2fa?reason=2fa&returnTo=${encodeURIComponent(ADMIN_HO
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const { user, expiredByAdminPolicy } = await getSessionState();
   if (user === null) redirect(expiredByAdminPolicy ? SESSION_EXPIRED : SIGN_IN);
-  if (!hasPermission(user.roles, 'admin.access')) notFound();
+  if (!hasPermission(user.roles, 'admin.access')) forbidden();
   if (mustSetUpTwoFactor(user.roles, user.twoFactorEnabled)) redirect(SET_UP_2FA);
   return <>{children}</>;
 }

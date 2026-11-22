@@ -34,16 +34,54 @@ export const uniqueEmail = () => `e2e-${crypto.randomUUID()}@example.com`;
  * Creates an account through the Better Auth API. With `page.request` the session cookie lands in
  * the page's browser context; with the `request` fixture the page stays signed out.
  */
+export const signUpUserViaApi = async (
+  request: APIRequestContext,
+  options: { email?: string; name?: string; as?: 'student' | 'mentor' } = {},
+): Promise<{ email: string; id: string }> => {
+  const email = options.email ?? uniqueEmail();
+  const response = await request.post('/api/auth/sign-up/email', {
+    data: {
+      name: options.name ?? 'Ola',
+      email,
+      password: PASSWORD,
+      terms: true,
+      privacy: true,
+      as: options.as ?? 'student',
+      // Mirrors the app form: the verification link returns to s10 (spec [s10]).
+      callbackURL: '/weryfikacja-email',
+    },
+  });
+  expect(response.ok()).toBe(true);
+  const body = (await response.json()) as { user?: { id?: string } };
+  return { email, id: body.user?.id ?? '' };
+};
+
 export const signUpViaApi = async (
   request: APIRequestContext,
   email = uniqueEmail(),
   name = 'Ola',
-) => {
-  const response = await request.post('/api/auth/sign-up/email', {
-    data: { name, email, password: PASSWORD, terms: true, privacy: true },
-  });
-  expect(response.ok()).toBe(true);
-  return email;
+  as: 'student' | 'mentor' = 'student',
+): Promise<string> => (await signUpUserViaApi(request, { email, name, as })).email;
+
+const e2eAuthSecret = (): string =>
+  process.env['BETTER_AUTH_SECRET'] ?? 'e2e-only-secret-not-for-real-use-000';
+
+/** HS256 token identical to the one Better Auth puts in the verification link (spec [s10]). */
+export const emailVerificationToken = (
+  email: string,
+  userId: string,
+  expiresInSeconds = 3600,
+): string => {
+  const encode = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const data = `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode({
+    email: email.toLowerCase(),
+    userId,
+    iat: now,
+    exp: now + expiresInSeconds,
+  })}`;
+  const signature = createHmac('sha256', e2eAuthSecret()).update(data).digest('base64url');
+  return `${data}.${signature}`;
 };
 
 /** WCAG 2.2 AA (spec §7): no serious or critical axe violations. */

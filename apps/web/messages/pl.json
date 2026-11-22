@@ -17,6 +17,33 @@
     "adminPanel": "Panel administratora",
     "signOut": "Wyloguj"
   },
+  "Errors": {
+    "forbiddenTitle": "Brak dostępu",
+    "forbiddenLead": "Nie masz uprawnień do tej strony.",
+    "notFoundTitle": "Nie znaleziono strony",
+    "notFoundLead": "Ta strona nie istnieje lub została przeniesiona.",
+    "home": "Wróć na stronę główną",
+    "homeAccount": "Przejdź do konta",
+    "homeAdmin": "Przejdź do panelu administratora"
+  },
+  "Verification": {
+    "title": "Weryfikacja e-maila — Kompas",
+    "successTitle": "E-mail zweryfikowany",
+    "successLead": "Twoje konto jest aktywne. Możesz korzystać z Kompasu.",
+    "goHome": "Przejdź dalej",
+    "expiredTitle": "Link wygasł lub jest nieprawidłowy",
+    "expiredLead": "Link wygasł lub jest nieprawidłowy. Wyślij nowy link weryfikacyjny.",
+    "email": "E-mail",
+    "resend": "Wyślij nowy link",
+    "busy": "Chwileczkę…",
+    "resent": "Wysłaliśmy nowy link weryfikacyjny.",
+    "resendFailed": "Nie udało się wysłać linku. Spróbuj ponownie."
+  },
+  "Mentor": {
+    "title": "Panel mentora",
+    "welcome": "Zalogowano jako {name}.",
+    "lead": "Panel mentora jest w budowie — pełne ekrany mentora powstaną w kolejnej fazie."
+  },
   "Auth": {
     "loginTitle": "Logowanie — Kompas",
     "registerTitle": "Rejestracja — Kompas",
