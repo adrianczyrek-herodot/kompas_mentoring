@@ -3,11 +3,14 @@ title: F1 — tożsamość (logowanie, rejestracja, role, zgody, konto)
 status: in-progress      # draft | approved | in-progress | implemented | archived
 created: 2026-11-10
 implemented:
+prototype: prototypes/konta-i-role/     # folder prototypu przepływu F1 (s01–s11)
 related:
   - .ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md
   - .ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md
   - kompas-mentoring/KONCEPCJA.md (P4, S3, UC3)
   - PR #7 (gałąź cez/d24e11ee) — materiał źródłowy ekranów P4/S3, strażnika dostępu i testów E2E
+  - prototypes/konta-i-role/mapa-ekranow.md — mapa ekranów F1 s01–s11 (gałąź cez/8a65024e)
+  - prototypes/kompas-flow/ — szary prototyp P1–P5 (dane demo, punkt wyjścia dla prototypu F1)
 ---
 
 # F1 — tożsamość (logowanie, rejestracja, role, zgody, konto)
@@ -18,13 +21,33 @@ Pierwsza faza funkcjonalna planu z `.ai/specs/2026-10-21-tech-stack-i-standardy-
 
 Ekrany P4 (logowanie/rejestracja) i S3 (konto) istnieją już jako klikalna implementacja w PR #7 (stan demo w przeglądarce). Przenosimy z niej **wygląd, teksty, walidacje i scenariusze E2E**, ale nie mechanizm demo — dane i logika idą przez moduł `identity`, RSC i Better Auth, zgodnie z zasadami szkieletu.
 
+## Mapa ekranów (s01–s11)
+
+Ekrany, stany, scenariusze do przełączania i konta demo: `prototypes/konta-i-role/mapa-ekranow.md` (folder prototypu `prototypes/konta-i-role/`). Identyfikatory **s01–s11 są stałe** — komentarze w prototypie przypinają się do nich, więc nie zmieniamy ich numeracji; nowy ekran dostaje kolejny numer.
+
+| ID | Ekran | Rola | Kryterium akceptacji |
+|---|---|---|---|
+| **s01** | P4 — logowanie | gość | logowanie i limit prób, stan ładowania, wygasła sesja admina |
+| **s02** | P4 — rejestracja | gość | walidacje i zgody, e-mail zajęty, HIBP fail-closed, Google/LinkedIn |
+| **s03** | P4 — logowanie/rejestracja z `returnTo` | gość przekierowany | `returnTo` i baner zachowanego terminu, wylogowanie |
+| **s04** | reset hasła („Nie pamiętasz hasła?”) | gość | **poza F1** — patrz „Decyzje i zmiany” 2026-11-22 |
+| **s05** | ustawienie nowego hasła z linku | gość z tokenem | **poza F1** — patrz „Decyzje i zmiany” 2026-11-22 |
+| **s06** | S3 — konto i ustawienia | student, mentor, admin | zakres Q7, zgody, żądania eksportu/usunięcia |
+| **s07** | konfiguracja 2FA (TOTP) | admin bez 2FA | wymuszenie 2FA i przekierowanie, nie wylogowanie |
+| **s08** | strona 403 — brak uprawnień | każda rola | trasa 403, link do strony startowej roli |
+| **s09** | strona 404 — nie znaleziono / cudzy zasób | każda rola | trasa 404 bez ujawniania istnienia zasobu |
+| **s10** | weryfikacja e-maila z linku | gość z tokenem | token ważny i wygasły, „Wyślij nowy link” |
+| **s11** | ponowna akceptacja regulaminu | zalogowany | **poza F1** — patrz „Decyzje i zmiany” 2026-11-22 |
+
+Stany z mapy, które dotyczą innych przepływów (blokada „nieweryfikowany e-mail” w U1/U2, zmiana e-maila, mentor `suspended` w U4/U5, anulowanie sesji próbnej < 12 h, BLIK cykliczny, dołączanie mentora w pokoju sesji), są przypisane do zadań w `.ai/specs/backlog.md` — F1 ich nie implementuje.
+
 ## Zakres
 
 - W zakresie:
   - **Fundament UI** (pierwsza faza z ekranami): tokeny identyfikacji Kompasu z PR #7 (kolory, typografia, promienie) jako zmienne CSS w motywie shadcn/ui (wariant Base UI), `cn()`, komponenty potrzebne w F1 w `packages/ui` (Button, Input, Label, Checkbox, Card, Alert, Field z błędem), układ strony z nagłówkiem i stopką (bez paska MOCKUP).
   - **Moduł `identity`** w `packages/core/src/modules/identity/`: role, zgody (wersjonowane), polityka haseł, zapytania „bieżący użytkownik” i „czy ma uprawnienie”, rejestracja w DI.
   - **Better Auth** (e-mail + hasło, Google, LinkedIn przez OIDC) z adapterem Kysely na wspólnej puli `pg`, tabele w schemacie `identity` (migracja z SQL wygenerowanego przez CLI Better Auth), MikroORM mapuje `User` tylko do odczytu.
-  - **Trasy:** `/api/auth/*` (Better Auth), `/logowanie`, `/rejestracja` (P4), `/konto` (S3 — zakres w Q7), `proxy.ts` jako strażnik tras zalogowanych z `returnTo`.
+  - **Trasy:** `/api/auth/*` (Better Auth), `/logowanie`, `/rejestracja` (P4), `/konto` (S3 — zakres w Q7), weryfikacja e-maila (s10), strony błędów 403 i 404 (s08, s09), `proxy.ts` jako strażnik tras zalogowanych z `returnTo`.
   - **Role:** `student`, `mentor`, `admin_trust`, `admin_finance` (§8 spec stosu); uprawnienia w stylu `booking.cancel.own` przygotowane jako mechanizm, lista uprawnień rośnie z kolejnymi fazami.
   - **2FA (TOTP)** obowiązkowe dla ról administracyjnych.
   - **Testy:** Vitest dla polityk domeny `identity`; integracyjne (Testcontainers) dla rejestracji/logowania/sesji; E2E Playwright (360 i 1280 px, axe) przeniesione i dostosowane z PR #7: rejestracja, logowanie, błędne dane, `returnTo`, wylogowanie, 2FA admina.
@@ -44,14 +67,35 @@ Ekrany P4 (logowanie/rejestracja) i S3 (konto) istnieją już jako klikalna impl
 ## Kryteria akceptacji
 
 - [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` zielone; testy integracyjne i E2E w CI zielone.
-- [ ] Rejestracja → zalogowany użytkownik z rolą `student` albo kandydat na mentora (Q3); wylogowanie kończy sesję w bazie.
-- [ ] Logowanie e-mailem: poprawne, błędne hasło (komunikat bez wskazania pola), limit prób.
-- [ ] Google i LinkedIn działają z kluczami w środowisku; bez kluczy przyciski są ukryte, a aplikacja startuje (Q1).
-- [ ] `returnTo`: wejście na trasę chronioną → logowanie → powrót; zewnętrzny `returnTo` ignorowany.
-- [ ] Testy „brak roli → 403” i „cudzy zasób → 404” dla zapytań modułu `identity`.
-- [ ] Admin bez 2FA nie wejdzie na trasę admina; po konfiguracji TOTP — wchodzi.
-- [ ] E2E 360 i 1280 px z axe (0 naruszeń serious/critical) dla P4 i S3; zrzuty wzorcowe.
+- [ ] **[s02, s06]** Rejestracja → zalogowany użytkownik z rolą `student` albo kandydat na mentora (Q3); wylogowanie kończy sesję w bazie.
+- [ ] **[s01]** Logowanie e-mailem: poprawne, błędne hasło (komunikat bez wskazania pola), limit prób.
+- [ ] **[s01, s02]** Google i LinkedIn działają z kluczami w środowisku; bez kluczy przyciski są ukryte, a aplikacja startuje (Q1).
+- [ ] **[s03]** `returnTo`: wejście na trasę chronioną → logowanie → powrót; zewnętrzny `returnTo` ignorowany.
+- [ ] **[s08, s09]** Testy „brak roli → 403” i „cudzy zasób → 404” dla zapytań modułu `identity`.
+- [ ] **[s07]** Admin bez 2FA nie wejdzie na trasę admina; po konfiguracji TOTP — wchodzi.
+- [ ] **[s01, s02, s06]** E2E 360 i 1280 px z axe (0 naruszeń serious/critical) dla P4 i S3; zrzuty wzorcowe.
 - [ ] Przegląd człowieka (moduł `identity`, migracje — wymóg §10.2).
+
+Kryteria z mapy ekranów (2026-11-22), każde ze stałym identyfikatorem ekranu:
+
+- [ ] **[s01]** Przekroczenie limitu prób logowania → formularz pokazuje „Za dużo prób. Spróbuj ponownie za N min” (N z okna limitu) i nie wysyła żądań do końca okna; E2E: kolejne błędne żądania → 429 → komunikat.
+- [ ] **[s01, s02, s05]** Przycisk wysyłki ma stan ładowania i blokuje ponowne wysłanie; E2E: dwa kliknięcia dają jedno żądanie.
+- [ ] **[s01, s03]** Wylogowanie przekierowuje na P1 z toastem; „Wyloguj wszędzie” w S3 kończy wszystkie sesje łącznie z bieżącą.
+- [ ] **[s02]** Schematy zod w `packages/contracts` odrzucają: imię krótsze niż 2 lub dłuższe niż 50 znaków, e-mail niezgodny z RFC, hasło krótsze niż 10 znaków, brak zgody na regulamin i politykę prywatności; zgoda marketingowa jest opcjonalna — testy jednostkowe i E2E s02.
+- [ ] **[s02]** Rejestracja e-mailem istniejącym w bazie → komunikat i link „Zaloguj się” (stan konflikt).
+- [ ] **[s02, s06]** HIBP niedostępne (timeout, 5xx) → fail-closed: rejestracja i zmiana hasła kończą się komunikatem „Nie możemy teraz sprawdzić hasła — spróbuj ponownie”, a zdarzenie trafia do logu (Q8).
+- [ ] **[s03]** Baner „Twój wybrany termin jest zachowany — po zalogowaniu wrócisz do płatności” pojawia się tylko wtedy, gdy `returnTo` wskazuje trasę rezerwacji; E2E: U1 → logowanie → powrót z zachowanym slotem.
+- [ ] **[s06]** S3 w zakresie Q7: zmiana imienia i hasła (HIBP, unieważnienie innych sesji), zgoda marketingowa, „Wyloguj wszędzie” oraz eksport i usunięcie konta jako zapisane żądania — testy integracyjne i E2E s06.
+- [ ] **[s06]** Odznaczenie zgody marketingowej zapisuje od razu nową decyzję `granted: false` z wersją dokumentu (bez przycisku „Zapisz”); test: dwie decyzje, najnowsza z `granted: false`.
+- [ ] **[s06]** Drugie oczekujące żądanie tego samego rodzaju (eksport, usunięcie) jest odrzucane komunikatem „Masz już oczekujące żądanie”.
+- [ ] **[s07]** Admin z ważną sesją, ale bez skonfigurowanego 2FA, wchodzi na dowolną trasę `/admin/*` → przekierowanie na s07 z komunikatem „Skonfiguruj 2FA, aby kontynuować” (nie wylogowanie); po konfiguracji TOTP — wchodzi; E2E.
+- [ ] **[s01, s07]** Sesja admina po 12 h od zalogowania daje `null`, a następne żądanie przekierowuje na s01 z komunikatem „Sesja administratora wygasła (12 h) — zaloguj się ponownie”, odróżnialnym od komunikatu dla sesji użytkownika (30 dni).
+- [ ] **[s08, s09]** s08 (403) i s09 (404) istnieją jako trasy w layoucie produktu: s08 linkuje do strony startowej roli (w F1 student i mentor → `/konto`, admin → `/admin`), s09 nie ujawnia istnienia zasobu; E2E: student → `/mentor`, mentor → `/admin/*`, cudze konto.
+- [ ] **[s10]** Rejestracja wysyła link weryfikacyjny (adapter logujący; poza produkcją link trafia do logu), a s10 obsługuje token: sukces → `returnTo` albo strona startowa roli, token wygasły → „Link wygasł lub jest nieprawidłowy” i „Wyślij nowy link”; E2E oba warianty (Q2).
+
+## Pytania do sprawdzenia (hipotezy)
+
+Miejsce na hipotezy z badań (persony, uwagi z prototypu) — **nie są wymaganiami**, rozstrzyga je test albo decyzja właściciela. Stan na 2026-11-22: brak raportu person i brak eksportu uwag z prototypu (`prototype-feedback.md`); sekcję uzupełniamy po ich dostarczeniu.
 
 ## Projekt rozwiązania
 
@@ -72,6 +116,7 @@ Każdy krok to osobny PR (≤ ~400 linii poza migracjami i zrzutami), w tej kole
 5. `feat(web)`: P4 `/logowanie`, `/rejestracja` (przeniesione z PR #7: wygląd, teksty, walidacje) + E2E.
 6. `feat(web)`: S3 `/konto` w zakresie z Q7 + E2E.
 7. `feat(identity)`: 2FA TOTP dla adminów (konfiguracja, wymuszenie w `proxy.ts`) + seed kont admina + E2E.
+8. `feat(web)`: strona weryfikacji e-maila (s10) — token, stany sukcesu i wygaśnięcia, „Wyślij nowy link”; strony 403/404 (s08, s09) z linkiem do strony startowej roli; E2E.
 
 ## Open Questions
 
@@ -93,3 +138,10 @@ Każdy krok to osobny PR (≤ ~400 linii poza migracjami i zrzutami), w tej kole
 - 2026-11-10 — Krok 4: `getCurrentUser` (port `SessionReader`, adapter Better Auth) stosuje `sessionExpiresAt` — sesja admina po 12 h od zalogowania daje `null`. `proxy.ts` sprawdza tylko obecność cookie (`hasSessionCookie`, zalecenie Next.js) dla `/konto` i `/admin`; strony weryfikują sesję. `apps/web` zależy od `better-auth` wyłącznie dla `nextCookies()` (przekazywany do kontenera jako `authPlugins`). HIBP przełączane `AUTH_BREACHED_PASSWORD_CHECK` (domyślnie `on`; `off` w testach integracyjnych i e2e, żeby nie zależały od zewnętrznego API). Link do panelu admina w nagłówku dochodzi w kroku 7 (razem z trasą).
 - 2026-11-10 — Krok 5: formularze P4 wysyłają żądania z przeglądarki do `/api/auth/*` (nie server actions) — limit prób i kontrola Origin Better Auth działają tylko w jego handlerze HTTP, a nie w `auth.api` wołanym z serwera. Wybór „uczyć się / mentorować” i zgody idą w ciele `sign-up/email`; hook `user.create.before` wymaga regulaminu i polityki prywatności oraz ustawia rolę, `after` (po commicie transakcji) zapisuje zgody; rejestracja przez Google/LinkedIn zapisuje regulamin i politykę (tekst przy przyciskach: „Kontynuując, akceptujesz…”). `BETTER_AUTH_URL` wymagany w produkcji (inaczej origin wyliczany z żądania nie zgadza się z przeglądarką → 403). Link weryfikacyjny w logu tylko poza produkcją. Poza zakresem F1: „Nie pamiętasz hasła?” (wymaga wysyłki e-maili — F3); zrzuty wzorcowe Playwright odłożone (wzorce z macOS nie pasują do Linuksa w CI — do zrobienia przy pierwszym przebiegu w CI). **Ryzyko na wdrożenie:** Better Auth bierze IP do limitu prób z `x-forwarded-for`; za load balancerem Cloud Run trzeba wskazać zaufany nagłówek/pozycję (`advanced.ipAddress`), inaczej limit da się obejść podmianą nagłówka; magazyn limitu jest w pamięci procesu (przy wielu instancjach — `storage: 'database'` i migracja).
 - 2026-11-10 — Krok 6 (S3): zgody to decyzje dopisywane (append-only) z polem `granted` — wycofanie zgody marketingowej to nowa decyzja z wersją dokumentu; nowa migracja `AccountRequests` (kolumna `granted`, `given_at` → `decided_at`, tabela `data_request` z unikalnym indeksem „jedno oczekujące żądanie danego rodzaju”). Eksport i usunięcie konta zapisywane jako żądania (realizacja w F8), usunięcie wymaga potwierdzenia w UI. Imię, hasło (z `revokeOtherSessions`) i „wyloguj wszędzie” idą przez API Better Auth z przeglądarki (limit prób, HIBP przy zmianie hasła); zgoda marketingowa i żądania — server actions → komendy modułu z `requirePermission`. Kryterium „403/404” spełniają testy `requirePermission` i `getAccountOverview` (cudze konto → `identity.not_found`). Zmiana e-maila poza F1 (wymaga wysyłki e-maili — F3).
+- 2026-11-22 — Mapa ekranów F1 (`prototypes/konta-i-role/mapa-ekranow.md`, gałąź `cez/8a65024e`) przyjęta jako materiał: 11 ekranów s01–s11 ze stałymi identyfikatorami, folder prototypu `prototypes/konta-i-role/` w frontmatterze. Kryteria akceptacji dostają identyfikatory ekranów, a kryteria wynikające z mapy są dopisane w sekcji „Kryteria akceptacji”. Konta demo i scenariusze SC-01…SC-24 są **artefaktem prototypu, nie wymaganiem produktu** — nie przenosimy ich do specyfikacji.
+- 2026-11-22 — **s10 (weryfikacja e-maila) wchodzi do F1** jako krok 8 planu: rejestracja już wysyła link (decyzje krok 3g i 5), a bez strony z tokenem link prowadzi donikąd. Zakres wysyłki bez zmian — port `EmailVerificationSender` z adapterem logującym, SES w E3-S8. Strony błędów 403/404 (s08, s09) też powstają w F1; w F1 link ze s08 prowadzi do `/konto` (student, mentor) albo `/admin`.
+- 2026-11-22 — **s04 i s05 (reset hasła, ustawienie nowego hasła) poza F1** — wymagają wysyłki e-maili (decyzja z 2026-11-10, krok 5), `EmailSender` z SES powstaje w E3-S8, a kryteria tych ekranów są w `backlog.md` E3-S9 T2. Mapa ekranów opisywała je jako zakres F1 — to sprostowanie mapy, nie zmiana decyzji.
+- 2026-11-22 — **s11 (ponowna akceptacja regulaminu) i stan „wersja regulaminu zmieniona” przy logowaniu poza F1** (Q6): w F1 zapisujemy tylko wersję dokumentu przy rejestracji. Ekran powstaje przy pierwszej realnej zmianie dokumentu — wtedy też wchodzi stan na logowaniu, bez osobnego modalu.
+- 2026-11-22 — **S3 ograniczone do Q7**: sekcje „Metody płatności”, „Powiadomienia”, „Prywatność” i przycisk „Dodaj kartę” **nie wchodzą do F1** — metody płatności to F4 (L1), powiadomienia w aplikacji E3-S8, push L9. W prototypie mogą istnieć jako atrapa z dopiskiem „w prototypie nie działa”. Status żądania eksportu/usunięcia (oczekujące/gotowe/wygasłe) też poza F1 — realizacja w F8 (L5); w F1 tylko zapis żądania i toast.
+- 2026-11-22 — **Konto ma jedną rolę w MVP** (`student` | `mentor` | `admin_*`). Przełączanie ról w nagłówku i konto z dwiema rolami są poza MVP (GAP-06 mapy); użytkownik, który chce się uczyć i mentorować, zakłada drugie konto. Wpis do poprawy w KONCEPCJI (opisuje przełączanie ról) i w briefie.
+- 2026-11-22 — Stany z mapy dotyczące innych przepływów są przypisane do zadań w `backlog.md`, bo specyfikacje F3–F5 jeszcze nie istnieją (powstaną w E3-S1 i kolejnych): blokada „nieweryfikowany e-mail” w U1/U2 → E3-S4 T2 i E3-S9 T1; zmiana e-maila → E3-S9 T3 (już była); mentor `suspended` w U4/U5 → E3-S5 T2 i E3-S6; anulowanie sesji próbnej < 12 h → E3-S6 T1 (pytanie do właściciela); BLIK cykliczny → L1; dołączanie mentora w pokoju sesji → L2 i specyfikacja stacku (§flows F5).
