@@ -6,7 +6,7 @@ import type { AccountId } from './accounts';
 
 const zl = (value: number) => BigInt(value) * 100n;
 
-export type ApplicationStatus = 'submitted' | 'changes_requested' | 'approved' | 'rejected';
+type ApplicationStatus = 'submitted' | 'changes_requested' | 'approved' | 'rejected';
 export type Kyc = 'verified' | 'pending' | 'mismatch';
 
 export type Application = {
