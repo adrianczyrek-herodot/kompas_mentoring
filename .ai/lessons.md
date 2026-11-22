@@ -1,6 +1,6 @@
 # Lekcje — pamięć długoterminowa agentów
 
-Czytaj ten plik na początku każdego zadania. Zasady prowadzenia: `AGENTS.md` → sekcja „`.ai/lessons.md` i `.ai/lessons/`”.
+Czytaj ten plik na początku każdego zadania. Zasady prowadzenia: `AGENTS.md` → sekcja „Lekcje”.
 
 Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/YYYY-MM-DD-slug.md](lessons/YYYY-MM-DD-slug.md)`
 
@@ -42,6 +42,10 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-22** — Subagenci cezar na runnerze `claude` padają na limicie wydatków organizacji Anthropic (`You've hit your org's monthly spend limit`, reset po godzinach) — wszystkie równoległe dzieci w jednym przebiegu padły naraz. Gdy to zobaczysz, nie powtarzaj dispatchu: wykonaj zadanie bezpośrednio i odnotuj to w raporcie. Dziecko, które mimo to wystartowało (po odnowieniu limitu), dostarczyło wartościowy audyt — waliduj jego gałąź i scal, zamiast duplikować pracę.
 - **2026-11-22** — Hardening agenta w Claude Code robimy w `.claude/settings.json`: `permissions.deny` (sekrety + komendy destrukcyjne), `sandbox` (filesystem/network, `failIfUnavailable`), oraz hook `PreToolUse`. Uwaga: blok `sandbox.credentials` jest honorowany **tylko** w user/managed settings — w projektowym `.claude/settings.json` ignorowany, więc pliki z sekretami blokuj przez `sandbox.filesystem.denyRead` i `permissions.deny` `Read(...)`. Szczegóły i schemat: [lessons/2026-11-22-hardening-agenta-claude-code.md](lessons/2026-11-22-hardening-agenta-claude-code.md)
 - **2026-11-22** — Subagenci cezar bywają zawodni, a porażka wygląda jak brak pracy: runner `claude` padł na limicie organizacji Anthropic (0 commitów), a `pi` z modelami rozumującymi (`openai/gpt-5.2-codex`, `x-ai/grok-4.7`) powtarzalnie wpadł w „5 consecutive turns produced no output” i zaparkował run bez implementacji. To awaria runnera, nie modelu — nie powtarzaj kolejnych prób w tym samym środowisku. Po nieudanym subagencie wykonaj zadanie bezpośrednio i zapisz to w raporcie. Sprawdzenie gotowości modelu (`pi auth check --provider openrouter --model <id>`) nie wystarcza — `ready` nie znaczy „ten runner działa”.
+
+- **2026-11-22** — Tokeny instrukcji licz z `usage` API, nie „znaki/4”: dla polskiego markdownu to ~1,95 znaku/token (`AGENTS.md` 12 682 zn. = ~6 490 tok), dla angielskiego ~2,9 — „znaki/4” zaniża 1,4–2×. Metoda: wypisz plik w osobnym wywołaniu narzędzia i odczytaj przyrost `input+cache_creation+cache_read` minus `output_tokens` poprzedniej tury w transkrypcie `~/.claude/projects/<projekt>/<sesja>.jsonl`. Szczegóły: `docs/context-audit/REPORT.md` §1.
+- **2026-11-22** — Claude Code w podkatalogach wczytuje tylko `CLAUDE.md`, nie `AGENTS.md` — `AGENTS.md` modułów `identity`/`scheduling` przez miesiąc nie trafiały do kontekstu Claude'a. Obok każdego `AGENTS.md` musi leżeć `CLAUDE.md` z `@AGENTS.md`; pilnuje tego `pnpm agents:check-router`.
+- **2026-11-22** — `Bash(git commit*)` jest w `permissions.ask` w `.claude/settings.json`, a w headless cezar „ask” = odmowa: agent nie zrobi commita, dopóki człowiek nie przeniesie reguły do `allow` albo nie zatwierdzi go w sesji interaktywnej (`claude --resume`). Przy zadaniach wymagających wielu commitów przygotuj migawki i sekwencję komend dla człowieka, zamiast mieszać etapy w indeksie.
 
 ## Domena i produkt
 
