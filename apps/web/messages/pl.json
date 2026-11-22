@@ -14,7 +14,35 @@
     "signIn": "Zaloguj się",
     "signUp": "Załóż konto",
     "account": "Konto: {name}",
+    "adminPanel": "Panel administratora",
     "signOut": "Wyloguj"
+  },
+  "Errors": {
+    "forbiddenTitle": "Brak dostępu",
+    "forbiddenLead": "Nie masz uprawnień do tej strony.",
+    "notFoundTitle": "Nie znaleziono strony",
+    "notFoundLead": "Ta strona nie istnieje lub została przeniesiona.",
+    "home": "Wróć na stronę główną",
+    "homeAccount": "Przejdź do konta",
+    "homeAdmin": "Przejdź do panelu administratora"
+  },
+  "Verification": {
+    "title": "Weryfikacja e-maila — Kompas",
+    "successTitle": "E-mail zweryfikowany",
+    "successLead": "Twoje konto jest aktywne. Możesz korzystać z Kompasu.",
+    "goHome": "Przejdź dalej",
+    "expiredTitle": "Link wygasł lub jest nieprawidłowy",
+    "expiredLead": "Link wygasł lub jest nieprawidłowy. Wyślij nowy link weryfikacyjny.",
+    "email": "E-mail",
+    "resend": "Wyślij nowy link",
+    "busy": "Chwileczkę…",
+    "resent": "Wysłaliśmy nowy link weryfikacyjny.",
+    "resendFailed": "Nie udało się wysłać linku. Spróbuj ponownie."
+  },
+  "Mentor": {
+    "title": "Panel mentora",
+    "welcome": "Zalogowano jako {name}.",
+    "lead": "Panel mentora jest w budowie — pełne ekrany mentora powstaną w kolejnej fazie."
   },
   "Auth": {
     "loginTitle": "Logowanie — Kompas",
@@ -24,6 +52,9 @@
     "tabRegister": "Rejestracja",
     "continueWith": "Kontynuuj z {provider}",
     "socialConsent": "Kontynuując, akceptujesz regulamin i politykę prywatności.",
+    "notice": {
+      "adminSessionExpired": "Sesja administratora wygasła (12 h) — zaloguj się ponownie."
+    },
     "orEmail": "lub e-mailem",
     "name": "Imię",
     "email": "E-mail",
@@ -52,6 +83,36 @@
       "tooManyAttempts": "Za dużo nieudanych prób. Spróbuj ponownie za kilka minut.",
       "unexpected": "Coś poszło nie tak. Spróbuj ponownie.",
       "invalidPassword": "Obecne hasło jest nieprawidłowe."
+    }
+  },
+  "Admin": {
+    "title": "Panel administratora",
+    "welcome": "Zalogowano jako {name}.",
+    "lead": "Panel administracyjny jest w budowie. Wkrótce pojawią się tu narzędzia do weryfikacji mentorów i finansów."
+  },
+  "TwoFactor": {
+    "title": "Konfiguracja 2FA — Kompas",
+    "heading": "Weryfikacja dwuetapowa (2FA)",
+    "required": "Skonfiguruj 2FA, aby kontynuować.",
+    "intro": "Konta administratorów wymagają weryfikacji dwuetapowej. Wpisz sekret w aplikacji uwierzytelniającej (np. Google Authenticator), a potem przepisz wygenerowany kod.",
+    "password": "Obecne hasło",
+    "passwordHint": "Potwierdź hasłem, że to Ty.",
+    "start": "Włącz 2FA",
+    "secretLabel": "Sekret",
+    "secretHint": "Wpisz ten sekret w aplikacji uwierzytelniającej dla konta {email}.",
+    "code": "Kod z aplikacji",
+    "codeHint": "6 cyfr wygenerowanych przez aplikację uwierzytelniającą.",
+    "verify": "Zweryfikuj i włącz",
+    "busy": "Chwileczkę…",
+    "enabled": "2FA jest aktywne.",
+    "enabledHint": "Twoje konto administratora jest chronione kodem z aplikacji.",
+    "backupCodes": "Kody zapasowe",
+    "backupCodesHint": "Zapisz je w bezpiecznym miejscu — każdy działa jednorazowo, gdy stracisz dostęp do aplikacji.",
+    "goToAdmin": "Przejdź do panelu administratora",
+    "errors": {
+      "invalidPassword": "Obecne hasło jest nieprawidłowe.",
+      "invalidCode": "Nieprawidłowy kod. Spróbuj ponownie.",
+      "unexpected": "Coś poszło nie tak. Spróbuj ponownie."
     }
   },
   "Account": {

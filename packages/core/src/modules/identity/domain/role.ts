@@ -7,11 +7,12 @@ const ADMIN_ROLES = ['admin_trust', 'admin_finance'] as const satisfies readonly
 
 export type Permission =
   | 'account.manage.own' // S3: own profile, password, consents, sessions
+  | 'mentor.access' // mentor home (F2 fills it in)
   | 'admin.access'; // any /admin route (2FA enforced separately)
 
 const PERMISSIONS: Record<Role, readonly Permission[]> = {
   student: ['account.manage.own'],
-  mentor: ['account.manage.own'],
+  mentor: ['account.manage.own', 'mentor.access'],
   admin_trust: ['account.manage.own', 'admin.access'],
   admin_finance: ['account.manage.own', 'admin.access'],
 };

@@ -1,7 +1,11 @@
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, it } from 'vitest';
 import { hasPermission, isAdmin } from '../role.ts';
-import { mustSetUpTwoFactor, sessionExpiresAt } from './session.policy.ts';
+import {
+  mustSetUpTwoFactor,
+  sessionEndedByAdminPolicy,
+  sessionExpiresAt,
+} from './session.policy.ts';
 
 describe('roles, sessions and 2FA (F1 Q4–Q5)', () => {
   const createdAt = Temporal.Instant.from('2026-11-10T08:00:00Z');
@@ -19,6 +23,17 @@ describe('roles, sessions and 2FA (F1 Q4–Q5)', () => {
     expect(sessionExpiresAt(['admin_finance'], early)).toEqual(early.expiresAt);
   });
 
+  it('flags only the 12 h admin cap, never the session own expiry or a user session', () => {
+    const beforeCap = Temporal.Instant.from('2026-11-10T19:59:59Z');
+    const afterCap = Temporal.Instant.from('2026-11-10T20:00:01Z');
+    expect(sessionEndedByAdminPolicy(['admin_trust'], renewed, beforeCap)).toBe(false);
+    expect(sessionEndedByAdminPolicy(['admin_trust'], renewed, afterCap)).toBe(true);
+    expect(sessionEndedByAdminPolicy(['student'], renewed, afterCap)).toBe(false);
+    // The session's own expiry is not the admin policy — the generic message applies.
+    const short = { createdAt, expiresAt: Temporal.Instant.from('2026-11-10T09:00:00Z') };
+    expect(sessionEndedByAdminPolicy(['admin_finance'], short, afterCap)).toBe(false);
+  });
+
   it('requires 2FA only for admins without it', () => {
     expect(mustSetUpTwoFactor(['admin_finance'], false)).toBe(true);
     expect(mustSetUpTwoFactor(['admin_finance'], true)).toBe(false);
@@ -29,6 +44,8 @@ describe('roles, sessions and 2FA (F1 Q4–Q5)', () => {
     expect(isAdmin(['student', 'mentor'])).toBe(false);
     expect(hasPermission(['admin_trust'], 'admin.access')).toBe(true);
     expect(hasPermission(['mentor'], 'admin.access')).toBe(false);
+    expect(hasPermission(['mentor'], 'mentor.access')).toBe(true);
+    expect(hasPermission(['student'], 'mentor.access')).toBe(false);
     expect(hasPermission(['student'], 'account.manage.own')).toBe(true);
   });
 });

@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   ...(process.env['NEXT_OUTPUT'] === 'standalone' ? { output: 'standalone' as const } : {}),
   // Workspace packages ship TypeScript sources.
   transpilePackages: ['@kompas/contracts', '@kompas/core', '@kompas/ui'],
+  // Enables `forbidden()` → real 403 with `app/forbidden.tsx` (s08).
+  experimental: { authInterrupts: true },
   // Server-only libraries with dynamic requires / native drivers stay outside the bundle.
   serverExternalPackages: [
     '@mikro-orm/core',

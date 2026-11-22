@@ -9,6 +9,7 @@ export default defineConfig({
   retries: process.env['CI'] === 'true' ? 1 : 0,
   reporter: process.env['CI'] === 'true' ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: { baseURL: `http://127.0.0.1:${PORT}`, trace: 'retain-on-failure' },
+  globalSetup: './e2e/global-setup.ts',
   // Spec §7: every screen at 360 px and 1280 px.
   projects: [
     {

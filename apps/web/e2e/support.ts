@@ -1,5 +1,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { type APIRequestContext, test as base, expect, type Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
+
+const DEFAULT_DATABASE_URL = 'postgres://kompas:kompas@localhost:5432/kompas';
 
 const octet = () => Math.floor(Math.random() * 254) + 1;
 
@@ -30,16 +34,54 @@ export const uniqueEmail = () => `e2e-${crypto.randomUUID()}@example.com`;
  * Creates an account through the Better Auth API. With `page.request` the session cookie lands in
  * the page's browser context; with the `request` fixture the page stays signed out.
  */
+export const signUpUserViaApi = async (
+  request: APIRequestContext,
+  options: { email?: string; name?: string; as?: 'student' | 'mentor' } = {},
+): Promise<{ email: string; id: string }> => {
+  const email = options.email ?? uniqueEmail();
+  const response = await request.post('/api/auth/sign-up/email', {
+    data: {
+      name: options.name ?? 'Ola',
+      email,
+      password: PASSWORD,
+      terms: true,
+      privacy: true,
+      as: options.as ?? 'student',
+      // Mirrors the app form: the verification link returns to s10 (spec [s10]).
+      callbackURL: '/weryfikacja-email',
+    },
+  });
+  expect(response.ok()).toBe(true);
+  const body = (await response.json()) as { user?: { id?: string } };
+  return { email, id: body.user?.id ?? '' };
+};
+
 export const signUpViaApi = async (
   request: APIRequestContext,
   email = uniqueEmail(),
   name = 'Ola',
-) => {
-  const response = await request.post('/api/auth/sign-up/email', {
-    data: { name, email, password: PASSWORD, terms: true, privacy: true },
-  });
-  expect(response.ok()).toBe(true);
-  return email;
+  as: 'student' | 'mentor' = 'student',
+): Promise<string> => (await signUpUserViaApi(request, { email, name, as })).email;
+
+const e2eAuthSecret = (): string =>
+  process.env['BETTER_AUTH_SECRET'] ?? 'e2e-only-secret-not-for-real-use-000';
+
+/** HS256 token identical to the one Better Auth puts in the verification link (spec [s10]). */
+export const emailVerificationToken = (
+  email: string,
+  userId: string,
+  expiresInSeconds = 3600,
+): string => {
+  const encode = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const data = `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode({
+    email: email.toLowerCase(),
+    userId,
+    iat: now,
+    exp: now + expiresInSeconds,
+  })}`;
+  const signature = createHmac('sha256', e2eAuthSecret()).update(data).digest('base64url');
+  return `${data}.${signature}`;
 };
 
 /** WCAG 2.2 AA (spec §7): no serious or critical axe violations. */
@@ -51,4 +93,69 @@ export const expectNoSeriousA11yViolations = async (page: Page) => {
   expect(
     serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
   ).toEqual([]);
+};
+
+/** Seeded admins (see `db:seed`); each Playwright project resets its own account, so runs don't race. */
+export const SEEDED_ADMINS = {
+  'mobile-360': { email: 'admin.trust@kompas.local', password: 'kompas-admin-dev' },
+  'desktop-1280': { email: 'admin.finance@kompas.local', password: 'kompas-admin-dev' },
+} as const;
+
+/** Resets one seeded admin (role, verified e-mail, no 2FA) so the s07 flow starts clean. */
+export const resetSeededAdmin = (email: string) => {
+  execFileSync('pnpm', ['--filter', '@kompas/core', 'run', 'db:seed'], {
+    stdio: 'ignore',
+    env: {
+      ...process.env,
+      DATABASE_URL: process.env['DATABASE_URL'] ?? DEFAULT_DATABASE_URL,
+      AUTH_BREACHED_PASSWORD_CHECK: 'off',
+      SEED_ADMIN_EMAIL: email,
+    },
+  });
+};
+
+/** Signs an admin in through the API with `page.request`, so the cookie lands in the page context. */
+export const signInAdminViaApi = async (
+  request: APIRequestContext,
+  admin: { email: string; password: string },
+) => {
+  const response = await request.post('/api/auth/sign-in/email', {
+    data: { email: admin.email, password: admin.password, rememberMe: true },
+  });
+  expect(response.ok()).toBe(true);
+};
+
+const BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+/** RFC 4648 base32 (no padding), matching the secret Better Auth puts in the `otpauth://` URI. */
+const base32Decode = (value: string): Buffer => {
+  const bytes: number[] = [];
+  let bits = 0;
+  let buffer = 0;
+  for (const character of value.replace(/=+$/, '').toUpperCase()) {
+    const index = BASE32.indexOf(character);
+    if (index < 0) continue;
+    buffer = (buffer << 5) | index;
+    bits += 5;
+    if (bits >= 8) {
+      bytes.push((buffer >>> (bits - 8)) & 0xff);
+      bits -= 8;
+    }
+  }
+  return Buffer.from(bytes);
+};
+
+/** TOTP code (SHA-1, 6 digits, 30 s) from the base32 secret shown on s07. */
+export const totpCode = (secret: string): string => {
+  const counter = Math.floor(Date.now() / 1000 / 30);
+  const buffer = Buffer.alloc(8);
+  buffer.writeBigUInt64BE(BigInt(counter));
+  const digest = createHmac('sha1', base32Decode(secret)).update(buffer).digest();
+  const offset = (digest[digest.length - 1] ?? 0) & 0x0f;
+  const binary =
+    (((digest[offset] ?? 0) & 0x7f) << 24) |
+    ((digest[offset + 1] ?? 0) << 16) |
+    ((digest[offset + 2] ?? 0) << 8) |
+    (digest[offset + 3] ?? 0);
+  return (binary % 1_000_000).toString().padStart(6, '0');
 };
