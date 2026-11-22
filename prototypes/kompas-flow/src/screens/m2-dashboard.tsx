@@ -184,8 +184,8 @@ function WeekStats() {
     <section aria-labelledby="m2-week" className="flex flex-col gap-inline">
       <h2 id="m2-week" className="text-section-title font-semibold text-text-default">Ten tydzień</h2>
       <dl className="grid grid-cols-2 gap-group md:grid-cols-4">
-        <Stat label="Przeprowadzone godziny">{String(done)} h</Stat>
-        <Stat label="Zaplanowane godziny">{String(planned)} h</Stat>
+        <Stat label="Przeprowadzone godziny">{String(done).replace('.', ',')} h</Stat>
+        <Stat label="Zaplanowane godziny">{String(planned).replace('.', ',')} h</Stat>
         <Stat label="Netto z sesji w tygodniu" hint="po prowizji platformy"><Money amount={net} /></Stat>
         <Stat label="Ocena" hint={`${String(mentor?.reviewsCount ?? 0)} opinii`}>{mentor ? mentor.rating.toFixed(1).replace('.', ',') : '—'}</Stat>
       </dl>

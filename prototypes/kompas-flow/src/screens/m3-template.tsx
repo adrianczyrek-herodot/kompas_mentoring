@@ -98,12 +98,13 @@ export function AvailabilityGrid({ value, onChange }: { value: Availability; onC
               <ToggleGroup
                 key={part.label}
                 multiple
+                className="max-w-full"
                 aria-label={`${name}, ${part.label}`}
                 value={part.hours.filter((h) => (value[weekday] ?? []).includes(h)).map(String)}
                 onValueChange={(picked) => { setPart(weekday, part.hours, picked.map(Number)); }}
               >
                 {part.hours.map((h) => (
-                  <ToggleGroupItem key={h} value={String(h)} aria-label={`${name} ${String(h)}:00`}>
+                  <ToggleGroupItem key={h} value={String(h)} className="px-tight" aria-label={`${name} ${String(h)}:00`}>
                     {h}:00
                   </ToggleGroupItem>
                 ))}
