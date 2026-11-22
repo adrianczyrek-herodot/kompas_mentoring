@@ -1,6 +1,6 @@
 # Track — implementacja F1 „tożsamość" (konta i role)
 
-**Specyfikacja:** `.ai/specs/2026-11-10-f1-tozsamosc.md`
+**Specyfikacja:** `.ai/specs/implemented/2026-11-10-f1-tozsamosc.md`
 (Użytkownik wskazał `.ai/specs/2026-09-04-accounts-and-roles.md` — plik o tej nazwie nie istnieje w repo; F1 to jedyny dokument opisujący konta, role, logowanie i rejestrację.)
 **Gałąź:** `cez/5df27579` · **Data:** 2026-11-22
 **Legenda:** `[x]` wykonane · `[~]` w toku · `[ ]` do zrobienia
