@@ -2,7 +2,7 @@
 title: Uwagi z mapy ekranów F1 do specyfikacji (propozycja zmian, bez edycji)
 date: 2026-11-22
 agent: pi (cezar, quick-task, gałąź cez/5041d937)
-status: in-progress
+status: partial
 spec: .ai/specs/2026-11-10-f1-tozsamosc.md
 branch: cez/5041d937
 ---
@@ -23,7 +23,8 @@ Bez zgody właściciela nie zmieniać plików.
 
 | Wejście | Ścieżka | Stan |
 |---|---|---|
-| Mapa ekranów | `prototypes/konta-i-role/mapa-ekranow.md` — **istnieje tylko na gałęzi `cez/8a65024e`** (worktree `.ai/cezar/worktrees/8a65024e-…`), nie ma jej na `cez/5041d937` ani na `main` | odczytana (11 ekranów s01–s11, 24 scenariusze, 15 GAP, 20 luk DS) |
+| Mapa ekranów | `prototypes/konta-i-role/mapa-ekranow.md` — była tylko na gałęzi `cez/8a65024e`; scalona do `cez/5041d937` | odczytana (11 ekranów s01–s11, 24 scenariusze, 15 GAP, 20 luk DS) |
+| Prototyp | `prototypes/discovery/konta-i-role/revision-001/` (`index.html`, `README.md`, `prototype.json`) — scalony razem z mapą; README podaje założenia A-01–A-10 i 24 scenariusze | odczytany; **folder prototypu poprawiony w specyfikacji** (wcześniej wpisany `prototypes/konta-i-role/`, gdzie leży tylko mapa) |
 | Uwagi z prototypu (`prototype-feedback.md`) | brak w repo — plik produkuje dopiero eksport z silnika przeglądu („Export for repository”, `public/review/comments.js` ma `operations: []` we wszystkich gałęziach) | **brak** |
 | Raport person (`report.md`) | brak (brak `personas.md` z lekcji 4, brak raportu `om-synthetic-users`) | **brak** |
 | Specyfikacja docelowa | `.ai/specs/2026-11-10-f1-tozsamosc.md` (mapa dotyczy przepływu F1) | przeczytana, 95 linii |
@@ -40,6 +41,13 @@ w `backlog.md`) — dlatego uwagi o innych przepływach nie mają dokąd trafić
   `report.md` na gałęzi zadania; mapa znaleziona w worktree `8a65024e`.
 - 12:20 — odczyt mapy, specyfikacji F1, DS, backlogu (E1–E4, Later), specyfikacji stacku.
 - 12:22 — propozycja zmian (poniżej), bez edycji plików — czekam na zgodę.
+- 12:40 — zgoda właściciela („wprowadź wszystkie”); uwagi z prototypu zapowiedziane
+  w czacie. Wprowadzone zmiany w trzech specyfikacjach + ten log, commit `8693985`.
+- 12:55 — dalsza praca: scalona gałąź `cez/8a65024e` (mapa + prototyp rewizji 001),
+  `prototype:` poprawiony na `prototypes/discovery/konta-i-role/revision-001/`,
+  rozbieżności prototypu (A-05, DS-15, link 403 → U4/M2) zapisane w „Decyzjach
+  i zmianach”, dodane 4 pytania do sprawdzenia, poprawiony tag [s05] w kryterium
+  stanu ładowania.
 
 ## Propozycja zmian
 
@@ -179,8 +187,22 @@ w `backlog.md`) — dlatego uwagi o innych przepływach nie mają dokąd trafić
 
 ## Wynik
 
-Propozycja pokazana właścicielowi w rozmowie; pliki specyfikacji **niezmienione**
-(zgodnie z poleceniem „poczekaj na zgodę”). Ten log jest jedynym nowym plikiem.
+Zmiany wprowadzone po zgodzie właściciela (commit `8693985`, następnie commit
+z poprawką ścieżki prototypu i rozbieżności):
+
+- `.ai/specs/2026-11-10-f1-tozsamosc.md` — `prototype: prototypes/discovery/konta-i-role/revision-001/`,
+  sekcja „Mapa ekranów (s01–s11)”, 9 istniejących kryteriów z tagami ekranów,
+  15 nowych kryteriów z ID, sekcja „Pytania do sprawdzenia (hipotezy)” z 4 pytaniami,
+  krok 8 planu (s10 + s08/s09), 9 wpisów w „Decyzjach i zmianach”.
+- `.ai/specs/2026-11-11-design-system-storybook.md` — 3 kryteria (Tabs auth,
+  Button social, PasswordField), decyzja o partii 4 i braku komponentu `Notice`.
+- `.ai/specs/backlog.md` — E3-S4 T2, E3-S5 T2, E3-S6 T1, E3-S9 T1/T2, L1, L2 + wpis
+  w Decyzjach.
+- `.ai/lessons.md` — dwie lekcje (placeholdery `{{…}}`; mapa vs folder prototypu).
+- Scalenie `cez/8a65024e` (4 pliki: mapa + prototyp rewizji 001).
+
+Ekrany bez kryterium: **s04, s05** (poza F1 → `backlog.md` E3-S9 T2) i **s11**
+(poza F1 — decyzja Q6). Pozostałe osiem ma kryteria w specyfikacji F1.
 
 ## Weryfikacja
 
@@ -191,9 +213,14 @@ odczytem: `.ai/specs/2026-11-10-f1-tozsamosc.md` (kryteria 1–9), `backlog.md`
 
 ## Problemy i otwarte kwestie
 
-- Brak `prototype-feedback.md` i raportu person — nie da się przetworzyć uwag
-  z prototypu ani hipotez person; czekam na decyzję właściciela.
-- Mapa ekranów nie jest na gałęzi zadania (leży na `cez/8a65024e`).
+- Brak `prototype-feedback.md` — właściciel zapowiedział wklejenie uwag w czacie;
+  po ich otrzymaniu dopisujemy kryteria (z ID ekranu) albo pytania do sprawdzenia.
+- Brak raportu person; prototyp rewizji 001 powstał bez panelu syntetycznego, więc
+  hipotezy w specyfikacji są wyprowadzone z mapy, nie z badań — oznaczone jako pytania.
+- Rozbieżności do poprawy **w prototypie, nie w specyfikacji**: A-05 (dwie role vs
+  decyzja o jednej roli na konto), `Notice`/DS-15 (decyzja: `Alert`), link 403 →
+  U4/M2 (w F1 `/konto` i `/admin`). README prototypu i mapa nadal mówią inaczej.
+- Weryfikacja prototypu w przeglądarce nie została wykonana (`verification: not-run`).
 - Sprzeczność mapa ↔ specyfikacja: reset hasła i weryfikacja e-maila (mapa: F1;
   specyfikacja: F3/E3-S9, decyzja z 2026-11-10 krok 5).
 - Sprzeczność mapa ↔ specyfikacja: S3 z sekcjami płatności i powiadomień

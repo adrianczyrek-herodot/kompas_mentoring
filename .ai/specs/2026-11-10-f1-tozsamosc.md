@@ -3,13 +3,14 @@ title: F1 — tożsamość (logowanie, rejestracja, role, zgody, konto)
 status: in-progress      # draft | approved | in-progress | implemented | archived
 created: 2026-11-10
 implemented:
-prototype: prototypes/konta-i-role/     # folder prototypu przepływu F1 (s01–s11)
+prototype: prototypes/discovery/konta-i-role/revision-001/   # prototyp przepływu F1 (s01–s11), rewizja 001
 related:
   - .ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md
   - .ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md
   - kompas-mentoring/KONCEPCJA.md (P4, S3, UC3)
   - PR #7 (gałąź cez/d24e11ee) — materiał źródłowy ekranów P4/S3, strażnika dostępu i testów E2E
-  - prototypes/konta-i-role/mapa-ekranow.md — mapa ekranów F1 s01–s11 (gałąź cez/8a65024e)
+  - prototypes/konta-i-role/mapa-ekranow.md — mapa ekranów F1 s01–s11
+  - prototypes/discovery/konta-i-role/revision-001/README.md — prototyp F1 (założenia A-01–A-10, scenariusze SC-01–SC-24)
   - prototypes/kompas-flow/ — szary prototyp P1–P5 (dane demo, punkt wyjścia dla prototypu F1)
 ---
 
@@ -23,7 +24,7 @@ Ekrany P4 (logowanie/rejestracja) i S3 (konto) istnieją już jako klikalna impl
 
 ## Mapa ekranów (s01–s11)
 
-Ekrany, stany, scenariusze do przełączania i konta demo: `prototypes/konta-i-role/mapa-ekranow.md` (folder prototypu `prototypes/konta-i-role/`). Identyfikatory **s01–s11 są stałe** — komentarze w prototypie przypinają się do nich, więc nie zmieniamy ich numeracji; nowy ekran dostaje kolejny numer.
+Ekrany, stany, scenariusze do przełączania i konta demo: `prototypes/konta-i-role/mapa-ekranow.md`; klikalny prototyp: `prototypes/discovery/konta-i-role/revision-001/` (otwiera się plik `index.html`, panel scenariuszy pod F1). Identyfikatory **s01–s11 są stałe** — komentarze w prototypie przypinają się do nich, więc nie zmieniamy ich numeracji; nowy ekran dostaje kolejny numer.
 
 | ID | Ekran | Rola | Kryterium akceptacji |
 |---|---|---|---|
@@ -79,7 +80,7 @@ Stany z mapy, które dotyczą innych przepływów (blokada „nieweryfikowany e-
 Kryteria z mapy ekranów (2026-11-22), każde ze stałym identyfikatorem ekranu:
 
 - [ ] **[s01]** Przekroczenie limitu prób logowania → formularz pokazuje „Za dużo prób. Spróbuj ponownie za N min” (N z okna limitu) i nie wysyła żądań do końca okna; E2E: kolejne błędne żądania → 429 → komunikat.
-- [ ] **[s01, s02, s05]** Przycisk wysyłki ma stan ładowania i blokuje ponowne wysłanie; E2E: dwa kliknięcia dają jedno żądanie.
+- [ ] **[s01, s02]** Przycisk wysyłki ma stan ładowania i blokuje ponowne wysłanie; E2E: dwa kliknięcia dają jedno żądanie (ten sam wzorzec obowiązuje na s05 i s11, gdy powstaną poza F1).
 - [ ] **[s01, s03]** Wylogowanie przekierowuje na P1 z toastem; „Wyloguj wszędzie” w S3 kończy wszystkie sesje łącznie z bieżącą.
 - [ ] **[s02]** Schematy zod w `packages/contracts` odrzucają: imię krótsze niż 2 lub dłuższe niż 50 znaków, e-mail niezgodny z RFC, hasło krótsze niż 10 znaków, brak zgody na regulamin i politykę prywatności; zgoda marketingowa jest opcjonalna — testy jednostkowe i E2E s02.
 - [ ] **[s02]** Rejestracja e-mailem istniejącym w bazie → komunikat i link „Zaloguj się” (stan konflikt).
@@ -90,12 +91,19 @@ Kryteria z mapy ekranów (2026-11-22), każde ze stałym identyfikatorem ekranu:
 - [ ] **[s06]** Drugie oczekujące żądanie tego samego rodzaju (eksport, usunięcie) jest odrzucane komunikatem „Masz już oczekujące żądanie”.
 - [ ] **[s07]** Admin z ważną sesją, ale bez skonfigurowanego 2FA, wchodzi na dowolną trasę `/admin/*` → przekierowanie na s07 z komunikatem „Skonfiguruj 2FA, aby kontynuować” (nie wylogowanie); po konfiguracji TOTP — wchodzi; E2E.
 - [ ] **[s01, s07]** Sesja admina po 12 h od zalogowania daje `null`, a następne żądanie przekierowuje na s01 z komunikatem „Sesja administratora wygasła (12 h) — zaloguj się ponownie”, odróżnialnym od komunikatu dla sesji użytkownika (30 dni).
-- [ ] **[s08, s09]** s08 (403) i s09 (404) istnieją jako trasy w layoucie produktu: s08 linkuje do strony startowej roli (w F1 student i mentor → `/konto`, admin → `/admin`), s09 nie ujawnia istnienia zasobu; E2E: student → `/mentor`, mentor → `/admin/*`, cudze konto.
+- [ ] **[s08, s09]** s08 (403) i s09 (404) istnieją jako trasy w layoucie produktu: s08 linkuje do strony startowej roli (w F1 student i mentor → `/konto`, admin → `/admin`; po E3-S5 i F2 → U4 i M2), s09 nie ujawnia istnienia zasobu; E2E: student → `/mentor`, mentor → `/admin/*`, cudze konto.
 - [ ] **[s10]** Rejestracja wysyła link weryfikacyjny (adapter logujący; poza produkcją link trafia do logu), a s10 obsługuje token: sukces → `returnTo` albo strona startowa roli, token wygasły → „Link wygasł lub jest nieprawidłowy” i „Wyślij nowy link”; E2E oba warianty (Q2).
 
 ## Pytania do sprawdzenia (hipotezy)
 
-Miejsce na hipotezy z badań (persony, uwagi z prototypu) — **nie są wymaganiami**, rozstrzyga je test albo decyzja właściciela. Stan na 2026-11-22: brak raportu person i brak eksportu uwag z prototypu (`prototype-feedback.md`); sekcję uzupełniamy po ich dostarczeniu.
+Miejsce na hipotezy z badań (persony, uwagi z prototypu) — **nie są wymaganiami**, rozstrzyga je test albo decyzja właściciela. Stan na 2026-11-22: prototyp rewizji 001 powstał **bez panelu syntetycznego** (README: „Panel syntetyczny: nie używano”), brak raportu person, a eksport uwag z prototypu (`prototype-feedback.md`) nie trafił do repozytorium — sekcję uzupełniamy po ich dostarczeniu.
+
+Pytania, które mapa i prototyp zostawiają do sprawdzenia w badaniu (hipotezy, nie wymagania):
+
+- Czy baner „Twój termin jest zachowany” na s03 wystarcza, żeby użytkownik wrócił do rezerwacji po zalogowaniu (SC-09), czy potrzebuje dodatkowego potwierdzenia terminu?
+- Czy przy 403 (s08) użytkownik rozumie, dokąd prowadzi link „strona startowa roli”, gdy trafi tam pierwszy raz?
+- Czy miernik siły hasła na s02 pomaga, czy tylko wydłuża rejestrację (SC-07 pokazuje błąd HIBP dopiero po wysłaniu)?
+- Czy komunikat „Sesja administratora wygasła (12 h)” jest zrozumiały bez wyjaśnienia różnicy 12 h / 30 dni?
 
 ## Projekt rozwiązania
 
@@ -145,3 +153,5 @@ Każdy krok to osobny PR (≤ ~400 linii poza migracjami i zrzutami), w tej kole
 - 2026-11-22 — **S3 ograniczone do Q7**: sekcje „Metody płatności”, „Powiadomienia”, „Prywatność” i przycisk „Dodaj kartę” **nie wchodzą do F1** — metody płatności to F4 (L1), powiadomienia w aplikacji E3-S8, push L9. W prototypie mogą istnieć jako atrapa z dopiskiem „w prototypie nie działa”. Status żądania eksportu/usunięcia (oczekujące/gotowe/wygasłe) też poza F1 — realizacja w F8 (L5); w F1 tylko zapis żądania i toast.
 - 2026-11-22 — **Konto ma jedną rolę w MVP** (`student` | `mentor` | `admin_*`). Przełączanie ról w nagłówku i konto z dwiema rolami są poza MVP (GAP-06 mapy); użytkownik, który chce się uczyć i mentorować, zakłada drugie konto. Wpis do poprawy w KONCEPCJI (opisuje przełączanie ról) i w briefie.
 - 2026-11-22 — Stany z mapy dotyczące innych przepływów są przypisane do zadań w `backlog.md`, bo specyfikacje F3–F5 jeszcze nie istnieją (powstaną w E3-S1 i kolejnych): blokada „nieweryfikowany e-mail” w U1/U2 → E3-S4 T2 i E3-S9 T1; zmiana e-maila → E3-S9 T3 (już była); mentor `suspended` w U4/U5 → E3-S5 T2 i E3-S6; anulowanie sesji próbnej < 12 h → E3-S6 T1 (pytanie do właściciela); BLIK cykliczny → L1; dołączanie mentora w pokoju sesji → L2 i specyfikacja stacku (§flows F5).
+- 2026-11-22 — Prototyp rewizji 001 (`prototypes/discovery/konta-i-role/revision-001/`, gałąź `cez/8a65024e`) dołączony razem z mapą i przejrzany. Jego założenia A-01, A-02, A-03, A-06, A-07, A-08, A-09, A-10 są zgodne z decyzjami wyżej i z kryteriami s01–s10. **Dwie rozbieżności do poprawy w prototypie, nie w specyfikacji:** (a) założenie **A-05** („użytkownik może mieć rolę student I mentor — przełącznik w nagłówku”) jest **odrzucone** decyzją z 2026-11-22 o jednej roli na konto — prototyp i README trzeba do tego dostosować; (b) README i mapa wpisują `Notice` (DS-15) jako brakujący komponent, a decyzja z 2026-11-22 mówi, że banery robimy `Alert`. Dodatkowo prototyp zakłada link 403 → U4/M2 (SC-16, SC-17), a w F1 te ekrany nie istnieją — kryterium [s08] mówi, że w F1 link prowadzi do `/konto` i `/admin`, a po E3-S5 i F2 do U4 i M2.
+- 2026-11-22 — Weryfikacja prototypu: README deklaruje `not-run` (przejście przeglądarki i panelu 24 scenariuszy nie zostało wykonane), a `prototype.json` ma `verification: not-run`. Prototyp nie jest dowodem działania przepływu, dopóki ten krok nie zostanie wykonany — nie traktujemy go jako spełnienia kryteriów E2E z tej specyfikacji.
