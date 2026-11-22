@@ -1,13 +1,14 @@
 ---
 title: Klikalny prototyp kompas-flow na @kompas/ui
-status: in-progress
+status: implemented
 created: 2026-11-21
-implemented:
+implemented: 2026-11-22
 related:
   - kompas-mentoring/KONCEPCJA.md
   - .ai/specs/product-brief.md
   - docs/design-system.md
   - .ai/runs/2026-11-21-przeglad-prototypu-kompas-flow.md
+  - .ai/runs/2026-11-22-prototyp-kompas-flow-etap-3.md
   - prototypes/kompas-flow/POSTEP.md
 ---
 
@@ -30,11 +31,11 @@ Klikalny prototyp przepływów z mapy ekranów (KONCEPCJA §3.1) dla właścicie
 7. Stan (wpisane dane, wybrany slot) przetrwa błąd żądania i nieudaną płatność.
 
 ## Kryteria akceptacji
-- [ ] `tsc --noEmit` z kodem 0; build bez błędów; repozytorium: `pnpm lint`, `pnpm typecheck`, `pnpm build` przechodzą z prototypem w workspace.
-- [ ] Testy nawigacji (Playwright): każda trasa w każdej roli renderuje się bez `pageerror`; bramki „zaloguj się” i „inna rola”; ścieżka F1 od P1 do U3.
-- [ ] Zero kolorów hex / wartości arbitralnych w `src/` (sprawdzenie skryptem jak `check:tokens`).
-- [ ] 320 i 1440 px, jasny i ciemny motyw, obsługa klawiaturą — sprawdzone w przeglądarce.
-- [ ] README z kontami demo, scenariuszami i „Ograniczeniami symulacji”; notatka przy każdym ekranie.
+- [x] `tsc --noEmit` z kodem 0; build bez błędów; repozytorium: `pnpm lint`, `pnpm typecheck`, `pnpm build` przechodzą z prototypem w workspace.
+- [x] Testy nawigacji (Playwright): każda trasa w każdej roli renderuje się bez `pageerror`; bramki „zaloguj się” i „inna rola”; ścieżka F1 od P1 do U3 (`e2e/navigation.spec.ts`).
+- [x] Zero kolorów hex / wartości arbitralnych w `src/` (`check:tokens` oraz `check:classes`).
+- [x] 320 i 1440 px, jasny i ciemny motyw, obsługa klawiaturą — testy Playwright (`test:e2e`).
+- [x] README z kontami demo, scenariuszami i „Ograniczeniami symulacji”; notatka przy każdym ekranie.
 
 ## Projekt rozwiązania
 Szczegółowy plan (stack, kolejność, kontrolki, konta, komponenty na ekran, luki): `prototypes/kompas-flow/POSTEP.md` → „Etap 0 — plan”.
@@ -53,3 +54,8 @@ Szczegółowy plan (stack, kolejność, kontrolki, konta, komponenty na ekran, l
 - 2026-11-21 — Rejestracja w P4 tworzy konto „Nowe konto” (uczeń bez danych) — F1 od zera; rejestracja mentora otwiera konto demo Adam Górski.
 - 2026-11-21 — Konfiguracja repo (nie kod aplikacji ani DS): `eslint.config.js` ignoruje `prototypes/*/public/review/**`, `knip.json` dostał wpis workspace prototypu (skrypty silnika ładowane z `index.html`). `pnpm-workspace.yaml` z `prototypes/*` zostaje (potrzebne do `workspace:*`).
 - 2026-11-21 — Bez `@vitejs/plugin-react`: Vite 8 kompiluje JSX przez oxc; jedna zależność mniej, brak Fast Refresh.
+- 2026-11-21/22 — Pierwszą wersję etapu 2 odrzucono (klasy spoza DS, martwe przyciski, `number` dla kwot, czerwony lint). Etap 2 przebudowano od nowa: wspólna warstwa stanu, potem 3 równoległe zadania na rozłącznych plikach (uczeń, mentor, zespół zaufania), scalone po kolei.
+- 2026-11-22 — Użytkownik potwierdził: gość wybiera termin przed logowaniem (F1), a silnik przeglądu z `.agents/skills/om-ux-design/references/assets/` jest właściwy.
+- 2026-11-22 — Notatki przy ekranach trzymamy w rejestrze (`ScreenDef.notes`), renderowane w `ScreenFrame`; dzięki temu są częścią `section.screen` (wchodzą w axe) i nie wymagają zmian w 23 ekranach.
+- 2026-11-22 — Testy prototypu to Playwright (`@playwright/test` + `@axe-core/playwright`), wpięte jako `test:e2e` w workspace — turbo dociąga `build`, więc CI uruchamia je w jobie e2e.
+- 2026-11-22 — PR #59 (ekrany mentora) zamknięty jako duplikat: jego gałąź jest ściśle starsza od `cez/2c93155b`, a całość M1–M5 jest w PR #57.

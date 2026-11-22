@@ -3,7 +3,7 @@ title: kompas-flow etap 2 — ekrany zespołu zaufania A1–A2
 date: 2026-11-22
 agent: cezar (pi)
 status: done
-spec: .ai/specs/2026-11-21-prototyp-kompas-flow.md
+spec: .ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md
 branch: cez/cd8b5349 (fork od cez/2c93155b)
 ---
 

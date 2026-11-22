@@ -3,7 +3,7 @@ title: Prototyp kompas-flow na @kompas/ui — etapy 0–1
 date: 2026-11-21
 agent: Claude Code (Opus 5.5) w cezar
 status: done
-spec: .ai/specs/2026-11-21-prototyp-kompas-flow.md
+spec: .ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md
 branch: cez/2c93155b
 ---
 
