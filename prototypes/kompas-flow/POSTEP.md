@@ -5,9 +5,9 @@ Specyfikacja: [`.ai/specs/2026-11-21-prototyp-kompas-flow.md`](../../.ai/specs/2
 | Etap | Stan |
 |---|---|
 | 0 — plan (wersja 2, na `@kompas/ui`) | zaakceptowany 2026-11-21 |
-| 1 — szkielet i ścieżka F1 | zrobiony 2026-11-21, czeka na „dalej” |
-| 2 — stany, role, scenariusze | — |
-| 3 — uczciwość i sprawdzenie | — |
+| 1 — szkielet i ścieżka F1 | zrobiony 2026-11-21 |
+| 2 — stany, role, scenariusze | zrobiony 2026-11-21, wszystkie 23 ekrany + luki DS |
+| 3 — uczciwość i sprawdzenie | w toku |
 
 ## Etap 1 — szkielet i ścieżka F1 (2026-11-21)
 
@@ -160,3 +160,43 @@ Wspólne luki: **BottomNav** (dolna nawigacja < 768 px), **ReviewBar** (pasek pr
 1. **Ścieżka silnika przeglądu** — potrzebna przed etapem 1 (komentarze, mapa ekranów, prezentacja, „Back”, mostek kolorów).
 2. **Podgląd w Storybooku** — proponowane kopiowanie do `storybook-static/prototypes/kompas-flow/` (tylko zbudowany Storybook). Alternatywa wymaga `staticDirs` w `packages/ui/.storybook/main.ts`, czyli zmiany DS.
 3. Rozbieżność `packages/ui/POSTEP.md` (45 komponentów produktu) vs kod (16) — do zgłoszenia w backlogu, poza zakresem prototypu.
+
+## Etap 2 — wszystkie ekrany (2026-11-21)
+
+### Co powstało
+
+Zbudowano pozostałe 14 ekranów:
+
+| Ekran | ID | Opis |
+|---|---|---|
+| Pokój sesji | U6 | Symulacja wideo, mic/cam toggle, no-show, leave dialog |
+| Ocena sesji | U7 | Star rating (Button), feedback textarea, kontynuacja checkbox |
+| Plany i saldo | U8 | Balance card, transfer dialog, plan picker (RadioGroup) |
+| Postępy | U9 | Progress overview, goals/actions/notes tabs |
+| Wiadomości | S1 | Thread list + detail view z message bubbles |
+| Powiadomienia | S2 | Notification list z unread count |
+| Konto i ustawienia | S3 | Profile, notifications/security/data tabs, RODO export |
+| Onboarding mentora | M1 | 6-krokowy stepper z formularzami |
+| Panel mentora | M2 | TodayAgenda, trial requests, stats |
+| Kalendarz | M3 | Week availability editor, exceptions, calendar sync |
+| Uczniowie | M4 | Student list + detail z celami/notatkami |
+| Zarobki | M5 | Earnings summary, pending/completed tables, payout button |
+| Weryfikacja | A1 | Application queue table, decision dialog |
+| Spory | A2 | Disputes table, resolution dialog |
+
+### Naprawione błędy
+
+- `BUILT[screen.id]` nie jest poprawnym JSX → rozdzielone na const Screen = BUILT[screen.id]; <Comp route={route} />
+- `AlertDialogAction` / `AlertDialogCancel` nie eksportowane z @kompas/ui → zamienione na Button z AlertDialogClose
+- `Money` używa `amount` zamiast `value`
+- `TodayAgenda` wymaga `items: AgendaItem[]` z `withName`, nie `studentName`
+- Badge varianty: `"default"` → `"neutral"`, `"destructive"` → `"danger"`
+- Index signature TS4111: `route.params.id` → `(route.params as Record<string, string>)['id']`
+- Unused vars/imports usunięte lub oznaczone
+- Duplicate import w s1-messages.tsx usunięty
+
+### Sprawdzone
+
+- `tsc --noEmit` — 0 błędów
+- `pnpm build` całego repo — 2/2 successful
+- Wszystkie 23 ekrany dostępne przez screen picker w ProtoBar

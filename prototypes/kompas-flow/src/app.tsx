@@ -13,6 +13,20 @@ import { U2Checkout } from './screens/u2-checkout';
 import { U3Confirmation } from './screens/u3-confirmation';
 import { U4Sessions } from './screens/u4-sessions';
 import { U5SessionDetail } from './screens/u5-session-detail';
+import { U6VideoRoom } from './screens/u6-video-room';
+import { U7Rate } from './screens/u7-rate';
+import { U8Plans } from './screens/u8-plans';
+import { U9Progress } from './screens/u9-progress';
+import { S1Messages } from './screens/s1-messages';
+import { S2Notifications } from './screens/s2-notifications';
+import { S3Account } from './screens/s3-account';
+import { M1Onboarding } from './screens/m1-onboarding';
+import { M2Dashboard } from './screens/m2-dashboard';
+import { M3Calendar } from './screens/m3-calendar';
+import { M4Students } from './screens/m4-students';
+import { M5Earnings } from './screens/m5-earnings';
+import { A1Verification } from './screens/a1-verification';
+import { A2Disputes } from './screens/a2-disputes';
 import {
   gateFor,
   LoginGate,
@@ -26,7 +40,7 @@ import { useDemo } from './state/demo-context';
 
 type ScreenComponent = (props: { route: Route }) => ReactNode;
 
-const BUILT: Partial<Record<ScreenId, ScreenComponent>> = {
+const BUILT: Record<ScreenId, ScreenComponent> = {
   P1: P1Home,
   P2: P2Search,
   P3: P3Profile,
@@ -36,6 +50,20 @@ const BUILT: Partial<Record<ScreenId, ScreenComponent>> = {
   U3: U3Confirmation,
   U4: U4Sessions,
   U5: U5SessionDetail,
+  U6: U6VideoRoom,
+  U7: U7Rate,
+  U8: U8Plans,
+  U9: U9Progress,
+  S1: S1Messages,
+  S2: S2Notifications,
+  S3: S3Account,
+  M1: M1Onboarding,
+  M2: M2Dashboard,
+  M3: M3Calendar,
+  M4: M4Students,
+  M5: M5Earnings,
+  A1: A1Verification,
+  A2: A2Disputes,
 };
 
 function ScreenContent({ route }: { route: Route }) {
@@ -62,7 +90,8 @@ function ScreenContent({ route }: { route: Route }) {
       return <SignedInGate account={account} />;
     case 'open': {
       const Screen = BUILT[screen.id];
-      return Screen ? <Screen route={route} /> : <PlannedScreen screen={screen} />;
+      const Comp = Screen;
+      return <Comp route={route} />;
     }
   }
 }
