@@ -59,6 +59,11 @@ export function canReportProblem(booking: Booking, now: string): boolean {
 }
 
 /** Max one trial per student–mentor pair (brief rule 1); cancelled trials do not count. */
+/** KONCEPCJA §U8: prepaid sessions move only to a mentor the student already had a trial with. */
+export function completedTrialWith(bookings: readonly Booking[], mentorId: string): boolean {
+  return bookings.some((b) => b.mentorId === mentorId && b.type === 'trial' && b.status === 'completed');
+}
+
 export function hadTrialWith(bookings: readonly Booking[], mentorId: string): boolean {
   return bookings.some(
     (b) => b.mentorId === mentorId && b.type === 'trial' && b.status !== 'cancelled',

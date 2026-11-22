@@ -419,6 +419,18 @@ export function findThreadId(world: World, studentId: StudentId, mentorId: strin
   return threadIdFor(studentId, mentorId, world.threads);
 }
 
+/** A message reached the other side: their unread count and a notification. */
+function delivered(world: World, core: Core, thread: Thread, from: 'student' | 'mentor', now: string): World {
+  const other = from === 'student' ? 'mentor' : 'student';
+  const bumped: World = {
+    ...world,
+    threads: world.threads.map((t) => (t.id === thread.id ? { ...t, unread: { ...t.unread, [other]: t.unread[other] + 1 } } : t)),
+  };
+  const sender = from === 'student' ? studentNameOf(core, thread.studentId) : (mentorById(thread.mentorId)?.name ?? 'Mentor');
+  const to = from === 'student' ? mentorAccountOf(thread.mentorId) : STUDENT_ACCOUNTS[thread.studentId];
+  return notify(bumped, to, `Nowa wiadomość od: ${sender}`, `/wiadomosci/${thread.id}`, now);
+}
+
 function inboxStep(step: Step, action: InboxAction, now: string): Step {
   const { world, core } = step;
   const mapThread = (id: string, fn: (t: Thread) => Thread): World => ({
@@ -436,32 +448,24 @@ function inboxStep(step: Step, action: InboxAction, now: string): Step {
       const thread = world.threads.find((t) => t.id === action.threadId);
       if (!thread) return step;
       const message = { id: `${thread.id}-${String(thread.messages.length + 1)}`, from: action.from, text: action.text, at: now, ...(action.failed ? { failed: true } : {}) };
-      const other = action.from === 'student' ? 'mentor' : 'student';
-      let next = mapThread(thread.id, (t) => ({
-        ...t,
-        messages: [...t.messages, message],
-        unread: action.failed ? t.unread : { ...t.unread, [other]: t.unread[other] + 1 },
-      }));
-      if (!action.failed) {
-        const sender = action.from === 'student' ? studentNameOf(core, thread.studentId) : (mentorById(thread.mentorId)?.name ?? 'Mentor');
-        const to = action.from === 'student' ? mentorAccountOf(thread.mentorId) : STUDENT_ACCOUNTS[thread.studentId];
-        next = notify(next, to, `Nowa wiadomość od: ${sender}`, `/wiadomosci/${thread.id}`, now);
-      }
-      return { core, world: next };
+      const added = mapThread(thread.id, (t) => ({ ...t, messages: [...t.messages, message] }));
+      return { core, world: action.failed ? added : delivered(added, core, thread, action.from, now) };
     }
-    case 'retry-message':
-      return {
-        core,
-        world: mapThread(action.threadId, (t) => ({
-          ...t,
-          messages: t.messages.map((m) => {
-            if (m.id !== action.messageId) return m;
-            const sent = { ...m, at: now };
-            delete sent.failed;
-            return sent;
-          }),
-        })),
-      };
+    case 'retry-message': {
+      const thread = world.threads.find((t) => t.id === action.threadId);
+      const message = thread?.messages.find((m) => m.id === action.messageId);
+      if (!thread || !message?.failed) return step;
+      const resent = mapThread(thread.id, (t) => ({
+        ...t,
+        messages: t.messages.map((m) => {
+          if (m.id !== message.id) return m;
+          const sent = { ...m, at: now };
+          delete sent.failed;
+          return sent;
+        }),
+      }));
+      return { core, world: delivered(resent, core, thread, message.from, now) };
+    }
     case 'read-thread':
       return { core, world: mapThread(action.threadId, (t) => ({ ...t, unread: { ...t.unread, [action.side]: 0 } })) };
     case 'read-notification':

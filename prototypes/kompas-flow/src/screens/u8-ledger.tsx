@@ -28,7 +28,7 @@ import { type Payment, planPrice, type PlanStatus, type Subscription } from '../
 import { TZ } from '../lib/clock';
 import { href } from '../lib/router';
 import { FailureAlert, useAction } from '../shell/request-feedback';
-import { hadTrialWith } from '../state/booking-rules';
+import { completedTrialWith } from '../state/booking-rules';
 import { useDemo } from '../state/demo-context';
 import { CancelPlanDialog, ChangePlanDialog, TransferBalanceDialog } from './u8-dialogs';
 import { calendarDate, planLabel, SESSION_FORMS } from './u8-parts';
@@ -107,7 +107,7 @@ export function BalanceTable({ studentId }: { studentId: StudentId }) {
   const [from, setFrom] = useState<Mentor | null>(null);
   const rows = Object.entries(state.balances[studentId]).filter(([, count]) => count > 0);
   const targetsFor = (mentorId: string) =>
-    PUBLIC_MENTORS.filter((m) => m.id !== mentorId && m.acceptingNew && hadTrialWith(myBookings, m.id));
+    PUBLIC_MENTORS.filter((m) => m.id !== mentorId && m.acceptingNew && completedTrialWith(myBookings, m.id));
   const fromSessions = from ? (state.balances[studentId][from.id] ?? 0) : 0;
   return (
     <section aria-labelledby="u8-balance" className="flex flex-col gap-group">
@@ -151,12 +151,12 @@ export function BalanceTable({ studentId }: { studentId: StudentId }) {
               );
             })}
           </TableBody>
-          <TableCaption>Saldo możesz przenieść tylko do mentora, z którym masz sesję próbną.</TableCaption>
+          <TableCaption>Saldo możesz przenieść tylko do mentora, z którym odbyła się sesja próbna.</TableCaption>
         </Table>
       )}
       {rows.some(([mentorId]) => targetsFor(mentorId).length === 0) ? (
         <p id="u8-transfer-hint" className="text-body-dense text-text-muted">
-          Przeniesienie jest niedostępne: nie masz sesji próbnej z żadnym innym mentorem.
+          Przeniesienie jest niedostępne: nie ma innego mentora, z którym odbyła się sesja próbna.
         </p>
       ) : null}
       {from ? (
