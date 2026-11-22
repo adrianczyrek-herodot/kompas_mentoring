@@ -3,12 +3,15 @@ title: Mapa ekranów — F1 Tożsamość (logowanie, rejestracja, role, weryfika
 status: approved
 created: 2026-11-22
 approved: 2026-11-22
+prototype: prototypes/discovery/konta-i-role/revision-001/
 related:
   - .ai/specs/product-brief.md
   - .ai/specs/backlog.md
   - .ai/specs/2026-11-10-f1-tozsamosc.md
   - kompas-mentoring/KONCEPCJA.md
   - docs/design-system.md
+  - prototypes/discovery/konta-i-role/revision-001/ — klikalny prototyp tej mapy (rewizja 001)
+  - .ai/specs/2026-11-10-f1-tozsamosc.md — specyfikacja, do której trafiły kryteria z tej mapy
   - kompas-mentoring/mockupy/src/screens/public.ts
   - kompas-mentoring/mockupy/src/screens/shared.ts
 ---
@@ -127,10 +130,10 @@ Zakres: ekrany P4 (Logowanie/Rejestracja) i S3 (Konto) oraz стани przekiero
 | **DS-09** | Brak **`KycEmbed`** (weryfikacja tożsamości operatorem) | M1 krok 6: przycisk otwierający iframe operatora KYC. DS nie ma. | Nowy komponent `KycEmbed` (iframe z `postMessage` dla statusu) |
 | **DS-10** | Brak **`ProfilePreview`** (podgląd karty w wynikach wyszukiwania) | M1 krok 3: przycisk „Podgląd profilu” otwiera modal z `MentorCard`. DS ma `MentorCard` (produkt), ale nie modal podglądu. | Użycie `Dialog` z `MentorCard` wewnątrz — brak luky, ale trzeba zademonstrować w Storybook |
 | **DS-11** | Brak **`EarningsPreview`** (podgląd zarobku po prowizji) | M1 krok 4: dynamiczny podgląd „Zarobisz za 60 min (prowizja 33%)”. DS ma `Money`, ale nie komponent podglądu z prowizją. | Nowy komponent `EarningsPreview` (przyjmuje stawkę, zwraca kwotę netto per tier) |
-| **DS-12** | Brak **`HoldCountdown`** (licznik 10 min blokady terminu) | U1/U2: `HoldCountdown` w mockupach. DS ma w `packages/ui/src/product/hold-countdown.tsx` — **już istnieje** ✓ |
-| **DS-13** | Brak **`PolicyNotice`** (baner reguły 12 h) | U5: `PolicyNotice` w mockupach. DS ma w `packages/ui/src/product/policy-notice.tsx` — **już istnieje** ✓ |
+| ~~DS-12~~ | **`HoldCountdown`** (licznik 10 min blokady terminu) | **Nie luka** — istnieje w `packages/ui/src/product/hold-countdown.tsx` (poprawka 2026-11-22; wpis wcześniej błędnie zaczynał się od „Brak”) |
+| ~~DS-13~~ | **`PolicyNotice`** (baner reguły 12 h) | **Nie luka** — istnieje w `packages/ui/src/product/policy-notice.tsx` (poprawka 2026-11-22) |
 | **DS-14** | Brak **`EmptyState` z akcją „Wyczyść filtr X”** | P2: empty state z przyciskiem czyszczącym najbardziej zawężający filtr. DS ma `EmptyState`, ale nie ten wariant. | Rozszerzenie `EmptyState` o `primaryAction` z dynamicznym tekstem |
-| **DS-15** | Brak **`Notice` / `Alert` wariant `warn` z ikoną** | P4: baner „Twój termin jest zachowany” (info), baner 429 (error). DS ma `Alert` z variantami, ale nie `notice` (nieblokujący baner w treści). | Nowy komponent `Notice` (variant: info/warn/error) lub wariant `Alert variant="notice"` |
+| ~~DS-15~~ | `Notice` / `Alert` wariant `warn` z ikoną | **Decyzja 2026-11-22: nie tworzymy osobnego komponentu** — banery („termin zachowany”, 429) robimy `Alert` z wariantami info/warn/error; spec design systemu ma wpis w „Czego brakuje”, żeby nie powstał drugi baner | — |
 | **DS-16** | Brak **`Badge` wariant `accent`** (dla „Oceń”, „najczęściej wybierany”) | U4: `badge--accent` dla „Oceń”; U8: plan „najczęściej wybierany”. DS ma `Badge` z variantami `success/warning/danger/cancelled/scheduled/requested`, brak `accent`. | Dodanie `variant="accent"` do `Badge` |
 | **DS-17** | Brak **`Table` z kolumną akcji (przyciski w wierszu)** | S3: tabela powiadomień z checkboxami; M5: tabela zarobków z przyciskami. DS `Table` ma tylko dane, brak slotu na akcje. | Rozszerzenie `Table` o `renderRowActions` / `actions` column |
 | **DS-18** | Brak **`Modal` / `Dialog` z formularzem i walidacją inline** | Wiele modali w mockupach (odrzucenie prośby, anulowanie, przełożenie, zgłoszenie problemu). DS ma `Dialog`, `AlertDialog`, `Form` pattern, ale nie gotowy pattern „Dialog z formularzem + walidacja + toast po sukcesie”. | Dodanie patternu `DialogForm` w `packages/ui/src/patterns/` |
@@ -160,3 +163,20 @@ Zakres: ekrany P4 (Logowanie/Rejestracja) i S3 (Konto) oraz стани przekiero
 4. **Tworzenie prototypu** — po zatwierdzeniu mapy, budowa klikalnego prototypu w `prototypes/konta-i-role/` z użyciem Storybook + `om-mockup-prototype` skill.
 
 ---
+
+---
+
+## 7. Decyzje i zmiany po zatwierdzeniu mapy (2026-11-22)
+
+Mapa została zatwierdzona 2026-11-22 i przeniesiona do kryteriów akceptacji specyfikacji F1 (`.ai/specs/2026-11-10-f1-tozsamosc.md`, sekcja „Kryteria akceptacji” z identyfikatorami s01–s11). Cztery pozycje mapy zostały rozstrzygnięte inaczej, niż zakładała:
+
+| Pozycja | Rozstrzygnięcie | Źródło |
+|---|---|---|
+| **GAP-01 / GAP-02** — ponowna akceptacja regulaminu (s11) i stan „wersja zmieniona” na logowaniu | **Poza F1** — w F1 tylko zapis wersji dokumentu; ekran powstaje przy pierwszej realnej zmianie dokumentu, wtedy też stan na logowaniu (bez osobnego modalu) | F1 Q6, decyzja 2026-11-22 |
+| **GAP-06** — konflikt ról (student + mentor) | **Odrzucone** — konto ma **jedną rolę** w MVP; kto chce się uczyć i mentorować, zakłada drugie konto. Przełącznika ról w nagłówku nie ma | F1, decyzja 2026-11-22 |
+| **s06** — sekcje „Metody płatności”, „Powiadomienia”, „Prywatność”, „Dodaj kartę” | **Poza F1** — płatności to F4 (L1), powiadomienia w aplikacji E3-S8, push L9; w prototypie mogą zostać jako atrapa z dopiskiem | F1 Q7, decyzja 2026-11-22 |
+| **DS-12, DS-13, DS-15** | DS-12 i DS-13 **nie są lukami** (komponenty istnieją), DS-15 **nie powstaje** — banery robimy `Alert` | spec design systemu, decyzja 2026-11-22 |
+
+Pozostałe luki z sekcji 4 mapy (GAP-03, GAP-04, GAP-05, GAP-09, GAP-14, GAP-15) dotyczą innych przepływów i są przypisane do zadań w `.ai/specs/backlog.md` (E3-S4, E3-S5, E3-S6, E3-S9, L1, L2) — specyfikacje F3–F5 jeszcze nie istnieją. Luki DS-01, DS-02 i DS-03 weszły do partii 4 etapu 2 design systemu, a DS-04…DS-11, DS-14 i DS-16…DS-20 do zadań F2/F3.
+
+**Weryfikacja prototypu:** przejście przeglądarki (Chromium, 1440 i 320 px, 24 scenariusze) wykonane 2026-11-22 — 22 scenariusze działają, 7 usterek otwartych; lista w `prototypes/discovery/konta-i-role/revision-001/README.md` §9.

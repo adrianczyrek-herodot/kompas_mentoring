@@ -2,7 +2,7 @@
 title: Uwagi z mapy ekranów F1 do specyfikacji (propozycja zmian, bez edycji)
 date: 2026-11-22
 agent: pi (cezar, quick-task, gałąź cez/5041d937)
-status: partial
+status: done
 spec: .ai/specs/2026-11-10-f1-tozsamosc.md
 branch: cez/5041d937
 ---
@@ -206,10 +206,31 @@ Ekrany bez kryterium: **s04, s05** (poza F1 → `backlog.md` E3-S9 T2) i **s11**
 
 ## Weryfikacja
 
-Brak zmian w kodzie i specyfikacjach — nie ma czego uruchamiać. Sprawdzone
-odczytem: `.ai/specs/2026-11-10-f1-tozsamosc.md` (kryteria 1–9), `backlog.md`
-(E1-S1/S2, E3-S4/S5/S6/S9, L1, L2), `2026-11-11-design-system-storybook.md`
-(kryteria DS), `2026-10-21-tech-stack-i-standardy-inzynieryjne.md` (§flows, F5).
+**Dokumentacja.** Sprawdzone odczytem: `.ai/specs/2026-11-10-f1-tozsamosc.md`
+(9 kryteriów z tagami + 15 nowych, tabela s01–s11), `backlog.md` (E1–E4, Later,
+nowa sekcja pytań z prototypu), `2026-11-11-design-system-storybook.md`,
+`2026-10-21-tech-stack-i-standardy-inzynieryjne.md` (§flows F5).
+
+**Prototyp F1 — przejście przeglądarki** (Chromium przez Playwright z
+`.ai/cezar/worktrees/2c93155b/node_modules`, skrypt `/tmp/f1check/check3.cjs`,
+`file://` + `index.html`, 1440×900 i 320×900, świeża karta na każdy krok):
+
+- 24 scenariusze panelu: **22 przechodzą**, SC-09 i SC-10 zostawiają puste tło
+  (`showScreen('s03')`, a sekcji `#s03` nie ma — s03 jest wariantem s01/s02),
+- logowanie formularzem: student → s06 „Rola: Uczeń”, admin z 2FA → s06
+  „Rola: Admin Trust”, złe hasło (≥ 10 znaków) → s01 `state-error`,
+- `pageerror` przy SC-15 (`Cannot set properties of null (setting 'totp')`),
+  błąd konsoli na każdym ekranie (niepoprawna ścieżka SVG),
+- zakładka „Rejestracja” nie prowadzi do s02, link „Nie pamiętasz hasła?”
+  nie ma obsługi (s04 nieosiągalny z UI),
+- poziomy overflow tylko na s06 przy 320 px (88 px: `select.field-select`
+  408 px, `table.table` 322 px); pozostałe 8 mierzonych ekranów bez przewijania
+  w obu szerokościach,
+- F1 otwiera panel z 24 pozycjami, Escape zamyka modal (instrukcja tego dotyczy).
+
+Pełna lista 7 usterek w `prototypes/discovery/konta-i-role/revision-001/README.md`
+§9; `prototype.json` → `verification: browser-walk-2026-11-22`, sumy SHA-256
+pliku README i `index.html` przeliczone.
 
 ## Problemy i otwarte kwestie
 
@@ -217,10 +238,15 @@ odczytem: `.ai/specs/2026-11-10-f1-tozsamosc.md` (kryteria 1–9), `backlog.md`
   po ich otrzymaniu dopisujemy kryteria (z ID ekranu) albo pytania do sprawdzenia.
 - Brak raportu person; prototyp rewizji 001 powstał bez panelu syntetycznego, więc
   hipotezy w specyfikacji są wyprowadzone z mapy, nie z badań — oznaczone jako pytania.
-- Rozbieżności do poprawy **w prototypie, nie w specyfikacji**: A-05 (dwie role vs
-  decyzja o jednej roli na konto), `Notice`/DS-15 (decyzja: `Alert`), link 403 →
-  U4/M2 (w F1 `/konto` i `/admin`). README prototypu i mapa nadal mówią inaczej.
-- Weryfikacja prototypu w przeglądarce nie została wykonana (`verification: not-run`).
+- Rozbieżności prototypu **poprawione 2026-11-22** w README i mapie: A-05 →
+  „odrzucone” (jedna rola na konto), DS-15 → „nie robimy” (`Alert`), DS-12/DS-13 →
+  „nie luka”, s03 → wariant s01/s02, link 403 → w F1 `/konto` i `/admin`.
+- Weryfikacja prototypu wykonana 2026-11-22 — **7 usterek otwartych** (SC-09/SC-10
+  pusty ekran, SC-03/SC-13 nie testują admina, `pageerror` w SC-15, martwa zakładka
+  rejestracji, martwy link resetu hasła, overflow s06 na 320 px, zła ścieżka SVG).
+  Prototyp nie jest dowodem działania przepływu F1, dopóki nie zostaną naprawione.
+- Decyzja o **jednej roli na konto** (D8) wymaga poprawy także w KONCEPCJI i briefie
+  — opisują przełączanie ról; nie zmieniałem tych dokumentów.
 - Sprzeczność mapa ↔ specyfikacja: reset hasła i weryfikacja e-maila (mapa: F1;
   specyfikacja: F3/E3-S9, decyzja z 2026-11-10 krok 5).
 - Sprzeczność mapa ↔ specyfikacja: S3 z sekcjami płatności i powiadomień

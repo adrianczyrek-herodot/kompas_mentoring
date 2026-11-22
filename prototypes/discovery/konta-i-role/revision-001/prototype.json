@@ -8,7 +8,7 @@
   "brief": ".ai/specs/product-brief.md",
   "flow": "F1 Tożsamość (logowanie, rejestracja, role, weryfikacja maila, strony startowe ról, brak dostępu)",
   "panelReport": null,
-  "verification": "not-run",
+  "verification": "browser-walk-2026-11-22 (7 known issues open, see README §9)",
   "files": [
     {
       "path": "index.html",
@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "5ab6b9bbc520a5858f436c951af3835de5ec03424b5d8f454088fb661199a2ba"
+      "sha256": "23c129b8d4333f5b31367adccc9b922235146982edd300572eb56a66467a9a3e"
     }
   ]
 }

@@ -22,7 +22,7 @@
 |---|---|---|
 | s01 | P4 — Logowanie | Formularz e-mail/hasło, przyciski Google/LinkedIn, link do resetu, `returnTo` banner |
 | s02 | P4 — Rejestracja | Imię, e-mail, hasło z miernikiem, wybór roli (student/mentor), zgody (regulamin wymagany, marketing opcjonalny) |
-| s03 | P4 — Logowanie/Rejestracja z `returnTo` | Wariant s01/s02 z banerem „Twój termin jest zachowany” |
+| s03 | P4 — Logowanie/Rejestracja z `returnTo` | Wariant s01/s02 z banerem „Twój termin jest zachowany” (osobna sekcja `#s03` nie istnieje — patrz usterka 1) |
 | s04 | Reset hasła — żądanie linku | Pole e-mail, wysyłka linku (fake) |
 | s05 | Reset hasła — nowe hasło | Dwa pola hasła z miernikiem, token z maila (valid/expired) |
 | s06 | S3 — Konto i ustawienia | Profil, metody płatności, powiadomienia, prywatność (eksport/usunięcie), sekcja admina |
@@ -100,7 +100,7 @@ Każdy ekran ma stany: **domyślny**, **ładowanie**, **sukces**, **błąd**, **
 | A-02 | HIBP fail-closed blokuje rejestrację/zmianę hasła przy niedostępnym API | Q8 Spec F1 | Test z wyłączonym HIBP / timeout API |
 | A-03 | Weryfikacja e-maila blokuje U1/U2 do potwierdzenia | Q2 Spec F1, GAP-03 mapy | Próba wejścia na U1 z nieweryfikowanym kontem |
 | A-04 | Zmiana e-maila w S3 trafia do F8 (nie F1) | Q7 Spec F1, GAP-04 mapy | Decyzja właściciela produktu |
-| A-05 | Użytkownik może mieć rolę student I mentor — przełącznik w nagłówku | GAP-06 mapy | Decyzja UX: dropdown / modal / osobny ekran |
+| A-05 | Użytkownik może mieć rolę student I mentor — przełącznik w nagłówku | GAP-06 mapy | **Odrzucone 2026-11-22** — konto ma jedną rolę w MVP; drugą rolę zakłada się osobnym kontem (spec F1, „Decyzje i zmiany”) |
 | A-06 | Admin bez 2FA widzi ekran s07 (konfiguracja) z komunikatem, nie jest wylogowywany | GAP-07 mapy | Decyzja właściciela produktu |
 | A-07 | Sesja admina 12h → toast „Sesja administratora wygasła” po wygaśnięciu | GAP-08 mapy | Decyzja UX |
 | A-08 | Profil mentora `suspended` → uczeń widzi 404 + podobni mentorzy; sesja anulowana? | GAP-09 mapy | Decyzja F3 |
@@ -149,7 +149,7 @@ Każdy ekran ma stany: **domyślny**, **ładowanie**, **sukces**, **błąd**, **
 | DS-12 | `HoldCountdown` | ✅ Zaimplementowane (`packages/ui/src/product/hold-countdown.tsx`) |
 | DS-13 | `PolicyNotice` | ✅ Zaimplementowane (`packages/ui/src/product/policy-notice.tsx`) |
 | DS-14 | `EmptyState` z akcją „Wyczyść filtr X” | Rozszerzenie |
-| DS-15 | `Notice` / `Alert` variant `notice` (nieblokujący baner) | Do zrobienia |
+| DS-15 | `Notice` / `Alert` variant `notice` (nieblokujący baner) | **Nie robimy** (2026-11-22) — banery robimy `Alert` z wariantami info/warn/error |
 | DS-16 | `Badge` variant `accent` | Do zrobienia |
 | DS-17 | `Table` z kolumną akcji | Rozszerzenie |
 | DS-18 | `DialogForm` pattern | Do zrobienia |
@@ -217,22 +217,41 @@ Panel testowy (F1) pozwala przełączać między scenariuszami. Każdy scenarius
 - [x] Semantyczne nagłówki, labeli, przyciski, widoczny focus, kontrast, responsywność
 - [x] Ścieżka outputu: `prototypes/discovery/konta-i-role/revision-001/` — bezpieczna, poza `.git/`, `.ai/skills/`, kodem aplikacji
 
-### Browser walk (Playwright) — do uruchomienia
+### Browser walk (Playwright) — wykonany 2026-11-22
 
-```bash
-cd /Users/adrianczyrek/cezar/projects/kompas_mentoring/.ai/cezar/worktrees/8a65024e-4b55-4213-b775-a0ec7e65d5d1
-# Uruchomienie testów Playwright na prototypie (wymaga zainstalowanego Playwright)
-npx playwright install chromium 2>/dev/null || true
-# Testy manualne przez panel testowy (F1) — 24 scenariusze
-```
+Chromium (Playwright) na `index.html`, 1440×900 i 320×900, świeża karta na każdy krok.
+Skrypt poza repozytorium (`/tmp/f1check/check3.cjs`), wynik:
 
-**Status weryfikacji:** `not-run` (static review passed, browser walk not executed yet)
+| Sprawdzenie | Wynik |
+|---|---|
+| 24 scenariusze z panelu (F1) | **22 przechodzą**, 2 psują ekran: SC-09 i SC-10 → puste tło (patrz usterki) |
+| Panel testowy: F1 otwiera/zamyka, 24 pozycje | OK |
+| Logowanie formularzem (`student@demo.kompas.pl`) | OK → s06, badge „Rola: Uczeń” |
+| Logowanie admina (`admin-trust@demo.kompas.pl`, 2FA skonfigurowane) | OK → s06, badge „Rola: Admin Trust” |
+| Błędne hasło ≥ 10 znaków | OK → s01 w stanie `state-error` |
+| Zakładka „Rejestracja” na s01 | **nie działa** — tylko przełącza podkreślenie, nie pokazuje s02 |
+| Link „Nie pamiętasz hasła?” | **nie działa** (akcja `forgotPassword` bez obsługi) → s04 nieosiągalny z UI |
+| Poziomy przewijanie: 9 ekranów × 320 i 1440 px | OK, poza **s06 przy 320 px** (overflow 88 px: `select.field-select` sięga 408 px, `table.table` 322 px) |
+| Błędy JS | `pageerror` przy SC-15 (`Cannot set properties of null (setting 'totp')`), błąd konsoli przy każdym ekranie: niepoprawna ścieżka SVG (`<path d>`) |
+| Escape | zamyka modal (jak w instrukcji); panel testowy zamyka się tylko F1 / przyciskiem „Zamknij” |
+
+**Znane usterki prototypu (2026-11-22, do naprawy):**
+
+1. **SC-09 / SC-10 → pusty ekran.** `setScenario('returnTo')` woła `showScreen('s03')`, a sekcji `#s03` nie ma — s03 jest wariantem s01/s02 z banerem. Skutek: po kliknięciu scenariusza żaden ekran nie jest aktywny.
+2. **SC-03 / SC-13 nie testują admina.** `DEMO_ACCOUNTS` ma klucze `adminTrust` / `adminFinance`, a scenariusz podaje `role: 'admin_trust'`, więc następuje ciche podstawienie konta studenta i scenariusz kończy na s06 zamiast s07.
+3. **SC-15 → `pageerror`.** `case 'totp'` ustawia `session.user.totp`, a po `resetPrototype()` `session.user` jest `null`.
+4. **Zakładka „Rejestracja” nie prowadzi do rejestracji.** Handler `[data-tab]` tylko dodaje klasę `is-active`; nie ma przejścia na s02 ani podmiany formularza.
+5. **„Nie pamiętasz hasła?” nie działa.** Link ma `data-action="forgotPassword"`, którego nie ma w obsłudze kliknięć (jest `goToReset`, ale podpięty tylko pod inny przycisk).
+6. **s06 przy 320 px przewija się poziomo** (88 px) — `select.field-select` i `table.table` nie mieszczą się w kolumnie.
+7. **Niepoprawna ścieżka SVG** w ikonie (błąd konsoli na każdym ekranie).
+
+**Status weryfikacji:** `browser-walk-2026-11-22` — statyczny przegląd i przejście przeglądarki wykonane; usterki 1–7 powyżej są otwarte, więc prototyp **nie jest jeszcze dowodem** działania przepływu F1.
 
 ---
 
 ## 10. Jak otworzyć i zresetować
 
-- **Otwórz:** `file:///Users/adrianczyrek/cezar/projects/kompas_mentoring/.ai/cezar/worktrees/8a65024e-4b55-4213-b775-a0ec7e65d5d1/prototypes/discovery/konta-i-role/revision-001/index.html`
+- **Otwórz:** `prototypes/discovery/konta-i-role/revision-001/index.html` (dwuklik albo `open`/`xdg-open` na tym pliku w swoim checkoucie)
 - **Reset:** Odśwież stronę (F5 / Ctrl+R) — czysci `sessionStorage`, `localStorage`, stan w pamięci, wraca do s01.
 
 > **Uwaga:** Ten prototyp zawiera wyłącznie fikcyjne dane symulacyjne. Nie stanowi dowodu zapotrzebowania użytkowników, nie spełnia Definition of Ready i nie może służyć jako podstawa do wdrożenia produkcyjnego. Wszystkie decyzje biznesowe wymagają potwierdzenia właściciela produktu przez proces SDLC.
