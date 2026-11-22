@@ -62,9 +62,29 @@ export const NEW_STUDENT: Account = {
   purpose: 'założone w P4 — bez sesji i salda',
 };
 
-export type StudentId = 'adrian' | 'julia' | 'pawel' | 'new';
+/**
+ * Students. `iga` and `monika` have no demo account: they exist only on the mentor's side
+ * (mockups' REQUESTS r2 and STUDENTS st4).
+ */
+export type StudentId = 'adrian' | 'julia' | 'pawel' | 'new' | 'iga' | 'monika';
 
-type ActionItem = { text: string; done: boolean };
+export const STUDENT_NAMES: Record<Exclude<StudentId, 'new'>, string> = {
+  adrian: 'Adrian C.',
+  julia: 'Julia M.',
+  pawel: 'Paweł R.',
+  iga: 'Iga T.',
+  monika: 'Monika K.',
+};
+
+export type ActionItem = { text: string; done: boolean; dueAt?: string };
+
+/** U7 review (KONCEPCJA §U7). */
+export type Review = {
+  rating: number;
+  tags: string[];
+  publicText: string;
+  privateText: string;
+};
 
 export type Booking = {
   id: string;
@@ -78,6 +98,11 @@ export type Booking = {
   note?: string;
   actionItems?: ActionItem[];
   reviewed?: boolean;
+  review?: Review;
+  /** Trial declined by the mentor (M2): the reason the student sees. */
+  declineReason?: string;
+  /** U7 after a trial: „Spróbuj z innym mentorem” (free replacement, Z2). */
+  replacementRequested?: boolean;
 };
 
 export const INITIAL_BOOKINGS: Booking[] = [
@@ -196,6 +221,40 @@ export const INITIAL_BOOKINGS: Booking[] = [
     status: 'requested',
     goal: 'Mam rozmowę techniczną za 2 tygodnie w scale-upie, chcę przećwiczyć zadanie live coding w React.',
   },
+  // Mentor side only — REQUESTS r2 and the EARNINGS rows of Kasia (Monika K. 14.10, Julia M. 8.10).
+  // EARNINGS have dates only; the hour follows Julia's usual 17:00 and Adrian's 18:00.
+  {
+    id: 'r2',
+    mentorId: 'm1',
+    studentId: 'iga',
+    startsAt: '2026-10-24T10:00:00+02:00',
+    durationMin: 30,
+    type: 'trial',
+    status: 'requested',
+    goal: 'Uczę się sama od pół roku, nie wiem, czy mój kod jest „produkcyjny”.',
+  },
+  {
+    id: 'k1',
+    mentorId: 'm1',
+    studentId: 'monika',
+    startsAt: '2026-10-14T18:00:00+02:00',
+    durationMin: 60,
+    type: 'plan',
+    status: 'completed',
+    goal: 'Nauka TypeScript',
+    reviewed: true,
+  },
+  {
+    id: 'j4',
+    mentorId: 'm1',
+    studentId: 'julia',
+    startsAt: '2026-10-08T17:00:00+02:00',
+    durationMin: 60,
+    type: 'plan',
+    status: 'completed',
+    goal: 'Awans na mid w obecnej firmie',
+    reviewed: true,
+  },
 ];
 
 /** Prepaid session credits per student and mentor (STUDENTS: Adrian 3, Julia 5). */
@@ -204,5 +263,7 @@ export const INITIAL_BALANCES: Record<StudentId, Record<string, number>> = {
   julia: { m1: 5 },
   pawel: {},
   new: {},
+  iga: {},
+  monika: {},
 };
 

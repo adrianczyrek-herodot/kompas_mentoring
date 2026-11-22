@@ -12,7 +12,19 @@ import {
   NEW_STUDENT,
   type StudentId,
 } from '../data/accounts';
-import { addMinutes, DEMO_NOW, TZ } from '../lib/clock';
+import { mentorById } from '../data/mentors';
+import { addMinutes, DEMO_NOW, formatShort, TZ } from '../lib/clock';
+import {
+  applicationOf,
+  INITIAL_WORLD,
+  isWorldAction,
+  mentorAccountOf,
+  notify,
+  studentNameOf,
+  type World,
+  type WorldAction,
+  worldReducer,
+} from './world';
 
 const HOLD_SECONDS = 600;
 
@@ -43,14 +55,14 @@ export type Scenarios = {
   slotConflict: boolean;
   /** The next request (form submit or action) fails once. */
   failNext: FailNext;
-  /** The next action of a signed-in user finds the session expired → P4 with returnTo. */
+  /** The next request of a signed-in user finds the session expired → re-login dialog, data kept. */
   sessionExpired: boolean;
   /** Forces the data state of the current screen. */
   dataState: DataState;
   /** Minutes added to the fixed demo „now”. */
   clockOffset: number;
+  /** U6: the mentor does not join the room. */
   mentorNoShow: boolean;
-  trialAnswer: 'accept' | 'decline';
 };
 
 export const DEFAULT_SCENARIOS: Scenarios = {
@@ -61,7 +73,6 @@ export const DEFAULT_SCENARIOS: Scenarios = {
   dataState: 'default',
   clockOffset: 0,
   mentorNoShow: false,
-  trialAnswer: 'accept',
 };
 
 export type DemoState = {
@@ -75,6 +86,7 @@ export type DemoState = {
   draft: Draft | null;
   seq: number;
   scenarios: Scenarios;
+  world: World;
 };
 
 export const INITIAL_STATE: DemoState = {
@@ -87,6 +99,7 @@ export const INITIAL_STATE: DemoState = {
   draft: null,
   seq: 0,
   scenarios: DEFAULT_SCENARIOS,
+  world: INITIAL_WORLD,
 };
 
 export type Action =
@@ -99,12 +112,14 @@ export type Action =
   | { type: 'tick-hold' }
   | { type: 'expire-hold' }
   | { type: 'release-hold' }
-  | { type: 'confirm-booking'; id: string; studentId: StudentId }
+  /** `amount` — what a paid trial cost (U2), recorded in the payment history (U8). */
+  | { type: 'confirm-booking'; id: string; studentId: StudentId; amount?: bigint }
   | { type: 'cancel-booking'; id: string; refundToBalance: boolean }
   | { type: 'reschedule-booking'; id: string; startsAt: string }
-  | { type: 'report-problem'; id: string }
+  | { type: 'delete-account' }
   | { type: 'remove-slot'; slotId: string }
-  | { type: 'set-scenarios'; patch: Partial<Scenarios> };
+  | { type: 'set-scenarios'; patch: Partial<Scenarios> }
+  | WorldAction;
 
 function emptyDraft(base: Pick<Draft, 'mentorId' | 'type' | 'durationMin'>): Draft {
   return { ...base, week: 0, timeZone: TZ, goal: '', method: 'card', promoApplied: false };
@@ -122,9 +137,30 @@ function updateBooking(state: DemoState, id: string, patch: Partial<Booking>): B
   return state.bookings.map((booking) => (booking.id === id ? { ...booking, ...patch } : booking));
 }
 
-function confirm(state: DemoState, id: string, studentId: StudentId): DemoState {
+function confirm(state: DemoState, id: string, studentId: StudentId, amount?: bigint): DemoState {
   const draft = state.draft;
   if (!draft?.startsAt) return state;
+  const now = nowOf(state);
+  const mentorName = mentorById(draft.mentorId)?.name ?? '';
+  const student = studentNameOf(state, studentId);
+  let world = notify(
+    state.world,
+    mentorAccountOf(draft.mentorId),
+    draft.type === 'trial'
+      ? `Prośba o sesję próbną: ${student}, ${formatShort(draft.startsAt)}`
+      : `Nowa sesja: ${student}, ${formatShort(draft.startsAt)}`,
+    '/mentor',
+    now,
+  );
+  if (amount !== undefined) {
+    world = {
+      ...world,
+      payments: [
+        ...world.payments,
+        { id: `pay-${String(world.payments.length + 1)}`, studentId, at: now, description: `Sesja próbna · ${mentorName}`, amount, kind: 'payment' },
+      ],
+    };
+  }
   const booking: Booking = {
     id,
     mentorId: draft.mentorId,
@@ -143,6 +179,7 @@ function confirm(state: DemoState, id: string, studentId: StudentId): DemoState 
       draft.type === 'plan' ? changeBalance(state, studentId, draft.mentorId, -1) : state.balances,
     draft: null,
     seq: state.seq + 1,
+    world,
   };
 }
 
@@ -156,7 +193,39 @@ function cancel(state: DemoState, id: string, refundToBalance: boolean): DemoSta
     balances: refund
       ? changeBalance(state, booking.studentId, booking.mentorId, 1)
       : state.balances,
+    world: notify(
+      state.world,
+      mentorAccountOf(booking.mentorId),
+      `${studentNameOf(state, booking.studentId)} anuluje sesję ${formatShort(booking.startsAt)}`,
+      '/mentor/kalendarz',
+      nowOf(state),
+    ),
   };
+}
+
+function reschedule(state: DemoState, id: string, startsAt: string): DemoState {
+  const booking = state.bookings.find((b) => b.id === id);
+  if (!booking) return state;
+  return {
+    ...state,
+    bookings: updateBooking(state, id, { startsAt }),
+    world: notify(
+      state.world,
+      mentorAccountOf(booking.mentorId),
+      `${studentNameOf(state, booking.studentId)} przekłada sesję na ${formatShort(startsAt)}`,
+      '/mentor/kalendarz',
+      nowOf(state),
+    ),
+  };
+}
+
+function applyWorld(state: DemoState, action: WorldAction): DemoState {
+  const step = worldReducer(
+    { world: state.world, core: { bookings: state.bookings, balances: state.balances, newStudentName: state.newStudentName } },
+    action,
+    nowOf(state),
+  );
+  return { ...state, world: step.world, bookings: step.core.bookings, balances: step.core.balances };
 }
 
 type DraftAction = Extract<
@@ -211,6 +280,7 @@ function draftReducer(state: DemoState, action: DraftAction): DemoState {
 }
 
 export function reducer(state: DemoState, action: Action): DemoState {
+  if (isWorldAction(action)) return applyWorld(state, action);
   switch (action.type) {
     case 'start-draft':
     case 'update-draft':
@@ -231,13 +301,14 @@ export function reducer(state: DemoState, action: Action): DemoState {
           : [...state.favorites, action.mentorId],
       };
     case 'confirm-booking':
-      return confirm(state, action.id, action.studentId);
+      return confirm(state, action.id, action.studentId, action.amount);
     case 'cancel-booking':
       return cancel(state, action.id, action.refundToBalance);
     case 'reschedule-booking':
-      return { ...state, bookings: updateBooking(state, action.id, { startsAt: action.startsAt }) };
-    case 'report-problem':
-      return { ...state, bookings: updateBooking(state, action.id, { status: 'disputed' }) };
+      return reschedule(state, action.id, action.startsAt);
+    case 'delete-account':
+      // S3 (RODO): the demo signs out; the account stays available in the review bar.
+      return { ...state, accountId: 'guest', draft: null };
     case 'remove-slot':
       // 409: someone else took the slot; the grid refreshes without it (KONCEPCJA §U1 Er).
       return { ...state, takenSlots: [...state.takenSlots, action.slotId] };
@@ -249,8 +320,18 @@ export function reducer(state: DemoState, action: Action): DemoState {
 const GUEST: Account = { id: 'guest', role: 'guest', name: 'Gość', purpose: '' };
 
 export function accountOf(state: DemoState): Account {
-  if (state.accountId === 'new') return { ...NEW_STUDENT, name: state.newStudentName };
-  return ACCOUNTS.find((account) => account.id === state.accountId) ?? GUEST;
+  const base =
+    state.accountId === 'new'
+      ? { ...NEW_STUDENT, name: state.newStudentName }
+      : (ACCOUNTS.find((account) => account.id === state.accountId) ?? GUEST);
+  const name = state.world.profiles[base.id]?.name;
+  const application = applicationOf(state.world, base.id);
+  return {
+    ...base,
+    ...(name ? { name } : {}),
+    // A mentor candidate is approved by the trust team in A1 (KONCEPCJA §3.2, F4).
+    ...(application ? { approved: application.status === 'approved' } : {}),
+  };
 }
 
 export function nowOf(state: DemoState): string {

@@ -21,7 +21,7 @@ import { type SyntheticEvent, useEffect, useId, useRef, useState } from 'react';
 import { type Mentor, publicMentorById } from '../data/mentors';
 import type { StudentId } from '../data/accounts';
 import { href, navigate, type Route } from '../lib/router';
-import { useDemo, useFakeRequest } from '../state/demo-context';
+import { type RequestFailure, useDemo, useFakeRequest } from '../state/demo-context';
 import type { Draft } from '../state/demo-state';
 import { type HoldResult, useCreateHold } from '../state/use-create-hold';
 import { MentorNotFound, MentorSummaryBar } from './booking-parts';
@@ -40,7 +40,7 @@ const PAYMENT_FAILURES: Record<'declined' | '3ds-cancelled', Failure> = {
   },
 };
 
-const REQUEST_FAILURES: Record<'network' | 'server', Failure> = {
+const REQUEST_FAILURES: Record<RequestFailure, Failure> = {
   network: {
     title: 'Brak połączenia',
     text: 'Nie udało się wysłać płatności. Wpisane dane i termin zostały — spróbuj ponownie.',
@@ -48,6 +48,10 @@ const REQUEST_FAILURES: Record<'network' | 'server', Failure> = {
   server: {
     title: 'Błąd po naszej stronie',
     text: 'Nie pobraliśmy pieniędzy. Wpisane dane i termin zostały — spróbuj ponownie za chwilę.',
+  },
+  expired: {
+    title: 'Sesja logowania wygasła',
+    text: 'Nie pobraliśmy pieniędzy. Zaloguj się ponownie — wpisane dane i termin zostały.',
   },
 };
 
@@ -138,7 +142,7 @@ function Checkout({ mentor, draft, studentId }: { mentor: Mentor; draft: Draft; 
       return;
     }
     const id = `b${String(state.seq + 1)}`;
-    dispatch({ type: 'confirm-booking', id, studentId });
+    dispatch({ type: 'confirm-booking', id, studentId, ...(trial ? { amount: priceOf(mentor, draft).total } : {}) });
     navigate(`/rezerwacja/${id}/potwierdzenie${trial && outcome === 'webhook-delayed' ? '?platnosc=przetwarzanie' : ''}`);
   };
 
@@ -203,7 +207,7 @@ export function U2Checkout({ route }: { route: Route }) {
     );
   }
   if (!draft.hold) {
-    return entry.result === 'network' || entry.result === 'server' ? (
+    return entry.result === 'network' || entry.result === 'server' || entry.result === 'expired' ? (
       <Alert variant="danger" role="alert">
         <CircleX aria-hidden="true" />
         <AlertTitle>Nie udało się zablokować terminu</AlertTitle>

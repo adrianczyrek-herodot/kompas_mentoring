@@ -76,11 +76,20 @@ export function useDemo(): DemoContextValue {
  * Simulated request: waits like a network call and applies the one-shot „błąd następnego żądania”
  * scenario. Resolves `{ ok: false, kind }` instead of throwing, like the app's Result type.
  */
+export type RequestFailure = 'network' | 'server' | 'expired';
+
 export function useFakeRequest() {
-  const { state, dispatch } = useDemo();
-  return async (delayMs = 600): Promise<{ ok: true } | { ok: false; kind: 'network' | 'server' }> => {
+  const { state, dispatch, account } = useDemo();
+  return async (delayMs = 600): Promise<{ ok: true } | { ok: false; kind: RequestFailure }> => {
     const fail = state.scenarios.failNext;
+    const expired = state.scenarios.sessionExpired && account.role !== 'guest';
     await new Promise((resolve) => window.setTimeout(resolve, delayMs));
+    if (expired) {
+      // One-shot, like „błąd następnego żądania”: the re-login dialog opens over the screen.
+      dispatch({ type: 'set-scenarios', patch: { sessionExpired: false } });
+      dispatch({ type: 'set-reauth', value: true });
+      return { ok: false, kind: 'expired' };
+    }
     if (fail !== 'none') {
       dispatch({ type: 'set-scenarios', patch: { failNext: 'none' } });
       return { ok: false, kind: fail };

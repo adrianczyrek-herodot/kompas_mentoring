@@ -3,15 +3,12 @@
  * Patterns „Zmiana z regułą 12 h” and „Decyzja z powodem” from the design system.
  */
 import {
-  Alert,
-  AlertDescription,
   AlertDialog,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertTitle,
   Button,
   DateTime,
   Dialog,
@@ -37,47 +34,15 @@ import {
   Textarea,
   useToast,
 } from '@kompas/ui';
-import { CircleX } from 'lucide-react';
 import { useId, useState } from 'react';
 import type { Booking } from '../data/accounts';
 import type { Mentor } from '../data/mentors';
 import { WEEKS_AHEAD, weekDays, weekLabel } from '../data/slots';
 import { formatDateTime } from '@kompas/ui';
 import { timeZoneLabel, TZ } from '../lib/clock';
-import { useDemo, useFakeRequest } from '../state/demo-context';
-
-type Kind = 'network' | 'server';
-
-function FailureAlert({ kind, what }: { kind: Kind | null; what: string }) {
-  if (!kind) return null;
-  return (
-    <Alert variant="danger" role="alert">
-      <CircleX aria-hidden="true" />
-      <AlertTitle>{what}</AlertTitle>
-      <AlertDescription>
-        {kind === 'network'
-          ? 'Brak połączenia z internetem. Nic się nie zmieniło — spróbuj ponownie.'
-          : 'To błąd po naszej stronie. Nic się nie zmieniło — spróbuj ponownie za chwilę.'}
-      </AlertDescription>
-    </Alert>
-  );
-}
-
-function useAction() {
-  const request = useFakeRequest();
-  const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<Kind | null>(null);
-  const run = async (onOk: () => void) => {
-    if (busy) return;
-    setBusy(true);
-    setFailure(null);
-    const answer = await request();
-    setBusy(false);
-    if (answer.ok) onOk();
-    else setFailure(answer.kind);
-  };
-  return { busy, failure, run, reset: () => { setFailure(null); } };
-}
+import { FailureAlert, useAction } from '../shell/request-feedback';
+import { useDemo } from '../state/demo-context';
+import { liveMentor } from '../state/world';
 
 export function CancelDialog({
   booking,
@@ -155,7 +120,7 @@ export function RescheduleSheet({
   const action = useAction();
   const [week, setWeek] = useState(0);
   const [slot, setSlot] = useState<{ id: string; startsAt: string } | null>(null);
-  const days = weekDays(mentor, week, now, state.bookings, state.takenSlots);
+  const days = weekDays(liveMentor(state.world, mentor), week, now, state.bookings, state.takenSlots);
   return (
     <Sheet open={open} onOpenChange={(next) => { action.reset(); onOpenChange(next); }}>
       <SheetContent side="right" closeLabel="Zamknij przekładanie">
@@ -223,7 +188,7 @@ export function ProblemDialog({
     }
     setError(null);
     void action.run(() => {
-      dispatch({ type: 'report-problem', id: booking.id });
+      dispatch({ type: 'report-problem', id: booking.id, reason, description: text.trim() });
       onOpenChange(false);
       toast.add({ title: 'Zgłoszenie wysłane', description: 'Druga strona ma 48 h na odpowiedź. Decyzję podejmie zespół Kompasu.' });
     });

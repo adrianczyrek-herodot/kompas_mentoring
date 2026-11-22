@@ -39,3 +39,16 @@ export function warsawIso(year: number, month: number, day: number, hour: number
   const pad = (value: number) => String(value).padStart(2, '0');
   return `${String(year)}-${pad(month)}-${pad(day)}T${pad(hour)}:00:00${summer ? '+02:00' : '+01:00'}`;
 }
+
+const shortFormat = new Intl.DateTimeFormat('pl-PL', {
+  day: 'numeric',
+  month: 'long',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZone: TZ,
+});
+
+/** „22 października, 9:00” — for notification texts built in the reducer. */
+export function formatShort(iso: string): string {
+  return shortFormat.format(toMs(iso));
+}

@@ -6,7 +6,6 @@ import { P1Home } from './screens/p1-home';
 import { P2Search } from './screens/p2-search';
 import { P3Profile } from './screens/p3-profile';
 import { P4Auth } from './screens/p4-auth';
-import { PlannedScreen } from './screens/planned-screen';
 import type { ScreenId } from './screens/registry';
 import { U1PickSlot } from './screens/u1-pick-slot';
 import { U2Checkout } from './screens/u2-checkout';
@@ -35,6 +34,7 @@ import {
   SignedInGate,
 } from './shell/gates';
 import { ProductShell } from './shell/product-shell';
+import { ReauthDialog } from './shell/reauth-dialog';
 import { ScreenFrame } from './shell/screen-frame';
 import { useDemo } from './state/demo-context';
 
@@ -90,8 +90,7 @@ function ScreenContent({ route }: { route: Route }) {
       return <SignedInGate account={account} />;
     case 'open': {
       const Screen = BUILT[screen.id];
-      const Comp = Screen;
-      return <Comp route={route} />;
+      return <Screen route={route} />;
     }
   }
 }
@@ -107,6 +106,7 @@ export function App() {
           <ScreenContent key={route.path} route={route} />
         </ProductShell>
       </ScreenFrame>
+      <ReauthDialog returnTo={route.path} />
     </>
   );
 }
