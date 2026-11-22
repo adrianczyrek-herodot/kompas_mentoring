@@ -28,7 +28,7 @@ import { useDemo } from '../state/demo-context';
 import { studentNameOf } from '../state/world';
 import { weekdayOf } from './m2-parts';
 
-export const DAY_NAMES = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
+const DAY_NAMES = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 export const DAY_SHORT = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
 export const HOURS = Array.from({ length: 15 }, (_, i) => i + 7);
 
@@ -55,7 +55,7 @@ export function totalHours(template: Availability): number {
 }
 
 /** Upcoming sessions of the mentor that start inside the given (weekday, hour) cells. */
-export function sessionsOn(bookings: Booking[], mentorId: string, cells: Set<string>, now: string): Booking[] {
+function sessionsOn(bookings: Booking[], mentorId: string, cells: Set<string>, now: string): Booking[] {
   return bookings
     .filter((b) => b.mentorId === mentorId && isUpcoming(b, now) && cells.has(`${String(weekdayOf(b.startsAt))}-${String(hourOf(b.startsAt))}`))
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));

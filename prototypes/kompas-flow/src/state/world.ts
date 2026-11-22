@@ -48,7 +48,7 @@ import {
 import type { SlotRules } from '../data/slots';
 import { addMinutes, toMs } from '../lib/clock';
 
-export type Profile = {
+type Profile = {
   name?: string;
   timeZone?: string;
   /** S3 notification preferences: key → on/off. */
@@ -182,7 +182,7 @@ export function studentNameOf(core: Pick<Core, 'newStudentName'>, studentId: Stu
 }
 
 /** Value of one session: the trial price, or the 60-minute rate (half for 30 min). */
-export function sessionValue(booking: Booking): bigint {
+function sessionValue(booking: Booking): bigint {
   const mentor = mentorById(booking.mentorId);
   if (!mentor) return 0n;
   if (booking.type === 'trial') return mentor.trialPrice;

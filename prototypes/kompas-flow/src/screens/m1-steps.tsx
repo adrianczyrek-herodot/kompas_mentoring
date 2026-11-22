@@ -48,10 +48,10 @@ const COUNTRIES = ['Polska', 'Niemcy', 'Wielka Brytania', 'Irlandia', 'Holandia'
 const LANGUAGES = ['polski', 'angielski', 'niemiecki', 'ukraiński'];
 const VIDEO_LINK = /^https:\/\/(www\.)?(youtube\.com|youtu\.be|vimeo\.com)\//;
 
-export const list = (text: string | undefined): string[] =>
+const list = (text: string | undefined): string[] =>
   (text ?? '').split(',').map((x) => x.trim()).filter(Boolean);
 
-export function parseAvailability(text: string | undefined): Availability {
+function parseAvailability(text: string | undefined): Availability {
   const result: Availability = {};
   for (const part of (text ?? '').split(';').filter(Boolean)) {
     const [day = '', hours = ''] = part.split(':');
@@ -60,7 +60,7 @@ export function parseAvailability(text: string | undefined): Availability {
   return result;
 }
 
-export function serializeAvailability(value: Availability): string {
+function serializeAvailability(value: Availability): string {
   return Object.entries(value).map(([day, hours]) => `${day}:${hours.join('.')}`).join(';');
 }
 

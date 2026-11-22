@@ -6,7 +6,7 @@
 import type { StudentId } from './accounts';
 import { mentorById } from './mentors';
 
-export type Milestone = { text: string; done: boolean };
+type Milestone = { text: string; done: boolean };
 
 export type Goal = {
   text: string;

@@ -14,7 +14,7 @@ import type { Mentor } from '../data/mentors';
 import { PLAN_PER_WEEK, PLAN_WEEKS, planPrice } from '../data/progress';
 import { TZ } from '../lib/clock';
 
-export type Duration = 30 | 60;
+type Duration = 30 | 60;
 export type PlanChoice = { perWeek: number; durationMin: Duration };
 
 export const SESSION_FORMS = { one: 'sesja', few: 'sesje', many: 'sesji' };
