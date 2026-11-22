@@ -101,6 +101,22 @@ Przejrzano łącznie **126 plików `SKILL.md`**:
   - `om-auto-qa-pr` / `om-prepare-test-env` — wczytują plik z credentialami do
     powłoki (`set -a; . "$CREDENTIALS_FILE"`); sourcing pliku z sekretami
     pozostaje wektorem.
+- **Największe ryzyka w skillach synced/plugin/Cursor** (szczegółowa tabela 26
+  skilli: [`security-notes.d/skills-synced.md`](security-notes.d/skills-synced.md)):
+  - Skille Cursor `update-cli-config`, `create-hook`, `create-subagent`,
+    `update-cursor-settings` piszą do plików konfiguracyjnych w `$HOME`
+    (`~/.cursor/*`, `~/Library/Application Support/Cursor/...`) — naturalny
+    cel reguł deny (blokuje je m.in. `Edit(~/.config)`).
+  - `xlsx`/`docx`/`pptx` (`soffice.py`) kompilują shim C (`gcc -shared`) do
+    `/tmp` i uruchamiają go przez `LD_PRELOAD` — tworzenie i wykonanie kodu
+    natywnego poza repozytorium.
+  - `skill-creator` uruchamia zagnieżdżone `claude -p` z usuniętym `CLAUDECODE`.
+  - `cowork-plugin-customizer` pisze `.mcp.json` z `Bearer ${GITHUB_TOKEN}` —
+    gotowa ścieżka wpięcia sekretów środowiskowych do serwerów MCP (dlatego
+    `.mcp.json` jest w CODEOWNERS).
+  - Skille `chrome-browser`, `built-in-browser`, `computer-use` mają poprawne
+    mitygacje w treści; ryzyko wynika z **uprawnień** (prawdziwe sesje
+    użytkownika, sterowanie pulpitem), nie z jakości instrukcji.
 
 ## 4. Serwery MCP
 
@@ -206,7 +222,12 @@ powtórzyć w Claude Code po odnowieniu budżetu.
 - `.env.example` — instrukcja menedżera sekretów; usunięty `BETTER_AUTH_SECRET`.
 - `.gitignore` — `.claude/settings.local.json`, `*.plaintext-backup-*`.
 - `security-tests/prompt-injection/` — pułapka i protokół testu.
-- `.ai/specs/implemented/2026-11-22-hardening-agenta.md`, `.ai/runs/…`, ten plik.
+- `security-notes.d/skills-om.md`, `security-notes.d/skills-synced.md` —
+  szczegółowe audyty skilli (scalone z gałęzi subagentów `cez/7affcdd5`
+  i `cez/14af939f`).
+- `.ai/specs/implemented/2026-11-22-hardening-agenta.md`, `.ai/runs/…`,
+  `.ai/lessons.md`, `.ai/lessons/2026-11-22-hardening-agenta-claude-code.md`,
+  ten plik.
 
 ### Migracja `.env` → menedżer sekretów
 

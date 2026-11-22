@@ -21,8 +21,10 @@ Wynik: `security-notes.md`.
 - 15:05 — repo bez `.claude/`, bez `.mcp.json`, bez realnego `.env` (tylko `.env.example`), bez CODEOWNERS.
 - 15:06 — próba rozdzielenia na 3 subagentów cezar (runner claude): wszystkie padły/trybieły
   `You've hit your org's monthly spend limit` (znany wzorzec z `.ai/lessons.md`).
-  Część 1 (skille om-*) ostatecznie ukończona po odnowieniu limitu → scalona jako
-  `security-notes.d/skills-om.md`. Resztę audytu wykonano bezpośrednio.
+  Po odnowieniu limitu dwa z trzech dzieci ukończyły się i zostały zwalidowane
+  oraz scalone: `cez/7affcdd5` → `security-notes.d/skills-om.md`,
+  `cez/14af939f` → `security-notes.d/skills-synced.md` (trzecie, audyt repo,
+  anulowane). Resztę audytu wykonano bezpośrednio.
 - 15:10 — skan 126 `SKILL.md`, 67 skryptów skilli; grep wzorców ryzykownych i wartości sekretów (0).
 - 15:11 — skan 93 logów sesji (~114 MB); znaleziony klucz AWS w 3 plikach; rotacja
   in-place (`AKIA[REDACTED]`), manifest w `~/.claude/security-rotation-2026-11-22/`.
