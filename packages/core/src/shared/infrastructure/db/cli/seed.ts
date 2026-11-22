@@ -5,18 +5,32 @@ import { parseEnv } from '../../env.ts';
 import { createLogger } from '../../logger.ts';
 import { checkDatabase } from '../orm.ts';
 
-process.env['AUTH_BREACHED_PASSWORD_CHECK'] = 'off';
-
-/** Development-only password of the seeded admin accounts (see README for local testing). */
-const ADMIN_SEED_PASSWORD = 'kompas-admin-dev';
+/** Fallback password for local dev and tests only — never used when `NODE_ENV=production`. */
+const DEV_ADMIN_SEED_PASSWORD = 'kompas-admin-dev';
 
 const ADMINS = [
   { email: 'admin.trust@kompas.local', name: 'Admin Trust (seed)', role: 'admin_trust' },
   { email: 'admin.finance@kompas.local', name: 'Admin Finance (seed)', role: 'admin_finance' },
 ] as const;
 
-const env = parseEnv();
+// Force HIBP off for the script sign-up without mutating the process environment globally.
+const env = parseEnv({ ...process.env, AUTH_BREACHED_PASSWORD_CHECK: 'off' });
 const logger = createLogger({ level: env.LOG_LEVEL, module: 'db' });
+
+/**
+ * Seeding admin accounts is a local/test convenience. In production (incl. shared preview) the
+ * password must be supplied explicitly (`ADMIN_SEED_PASSWORD`), so the repo-known dev default can
+ * never create an admin account on a shared database (F1 Q4: admins come from the seed/CLI only).
+ */
+const adminSeedPassword =
+  process.env['ADMIN_SEED_PASSWORD'] ??
+  (env.NODE_ENV === 'production' ? undefined : DEV_ADMIN_SEED_PASSWORD);
+if (adminSeedPassword === undefined) {
+  throw new Error(
+    'ADMIN_SEED_PASSWORD is required outside development/test — refusing to seed admin accounts.',
+  );
+}
+
 const container = createAppContainer({ env, logger });
 const { auth, orm } = container.cradle;
 const db = orm.em.getConnection();
@@ -32,7 +46,7 @@ const upsertAdmin = async (admin: (typeof ADMINS)[number]): Promise<void> => {
     const body = {
       name: admin.name,
       email: admin.email,
-      password: ADMIN_SEED_PASSWORD,
+      password: adminSeedPassword,
       terms: true,
       privacy: true,
     };

@@ -1,6 +1,6 @@
 # Moduł `identity` — konta, role, sesje, zgody
 
-Odpowiada za: konta i sesje logowania (Better Auth), role i uprawnienia, `returnTo` po zalogowaniu, zgody z wersjami dokumentów, 2FA dla adminów, podstawy S3 (spec stacku §2.3, faza F1 — `.ai/specs/2026-11-10-f1-tozsamosc.md`).
+Odpowiada za: konta i sesje logowania (Better Auth), role i uprawnienia, `returnTo` po zalogowaniu, zgody z wersjami dokumentów, 2FA dla adminów, podstawy S3 (spec stacku §2.3, faza F1 — `.ai/specs/implemented/2026-11-10-f1-tozsamosc.md`).
 
 ## Język domeny
 - `role` — `student`, `mentor`, `admin_trust`, `admin_finance`; `permission` — np. `account.manage.own`, `admin.access` (lista rośnie w kolejnych fazach).

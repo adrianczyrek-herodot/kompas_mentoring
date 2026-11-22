@@ -1,6 +1,9 @@
 import type { SocialProvider } from '@kompas/core/identity';
 import type { Credentials } from './auth-validation.ts';
 
+/** s10 route: where Better Auth returns after verifying an e-mail link (also used for resends). */
+export const VERIFICATION_CALLBACK_PATH = '/weryfikacja-email';
+
 /** Failures shown above the form; keys of `Auth.failure` in messages/pl.json. */
 export type AuthFailure =
   | 'invalidCredentials'
@@ -60,7 +63,7 @@ export const signUpWithEmail = async (credentials: Credentials): Promise<AuthFai
       privacy: credentials.terms,
       marketing: credentials.marketing,
       // The verification link returns to s10 (success or `?error=…`), spec [s10].
-      callbackURL: '/weryfikacja-email',
+      callbackURL: VERIFICATION_CALLBACK_PATH,
     }),
   );
 

@@ -19,7 +19,7 @@ Plik prowadzi agent budujący design system (prompt: zadanie cezar „Zbuduj des
 |---|---|---|
 | Produkt i użytkownicy | Kompas: marketplace mentoringu 1:1 online (IT, kariera, biznes, design) — gość szuka i porównuje mentorów, uczeń rezerwuje sesję próbną i plan, mentor prowadzi dostępność, sesje i notatki, zespół zaufania weryfikuje mentorów | z `.ai/specs/product-brief.md` §1–2 |
 | Brief i badania | `.ai/specs/product-brief.md`, `kompas-mentoring/KONCEPCJA.md` | wywiadów brak (brief, referencje) |
-| Backlog i specyfikacje | `.ai/specs/backlog.md`, `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md`, `.ai/specs/2026-11-10-f1-tozsamosc.md`, mockupy `kompas-mentoring/mockupy/` | |
+| Backlog i specyfikacje | `.ai/specs/backlog.md`, `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md`, `.ai/specs/implemented/2026-11-10-f1-tozsamosc.md`, mockupy `kompas-mentoring/mockupy/` | |
 | Referencje | `lekcja-06/referencje.md` (R01–R06, A01–A04, K1–K6) | |
 | Tokeny | brak `lekcja-06/tokeny.md` — agent proponuje tabelę w etapie 1, po zatwierdzeniu zapis do `lekcja-06/tokeny.md` (Q1) | punkt wyjścia: `packages/ui/src/styles/globals.css` |
 | Audyt z ćwiczenia 1 | brak (`lekcja-06/audyt.md` nie istnieje) | |

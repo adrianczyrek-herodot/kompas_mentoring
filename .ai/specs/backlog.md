@@ -35,7 +35,7 @@ E1-S1 ─▶ E2-S4 (admin z 2FA)        E4-S1, E4-S2 — równolegle, bez zależ
 
 ### E1 — Domknięcie tożsamości (F1)
 
-Zgłoszenie epiku: [#22](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/22)  ·  P: high  ·  Spec: [F1](2026-11-10-f1-tozsamosc.md)
+Zgłoszenie epiku: [#22](https://github.com/adrianczyrek-herodot/kompas_mentoring/issues/22)  ·  P: high  ·  Spec: [F1](implemented/2026-11-10-f1-tozsamosc.md)
 
 | ID | Historia | P | Zależy od | Zgłoszenie |
 |---|---|---|---|---|
