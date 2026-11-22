@@ -14,6 +14,7 @@ Zastąpić zaślepki M1–M5 w `prototypes/kompas-flow` pełnymi ekranami wg KON
 
 ## Przebieg
 - Start: przeczytano lessons, shared-rules, area-mentor, world.ts, mentor-work.ts, wzorce U4/U5/P4, szary mentor.ts.
+- Koniec: commit `ade7ab9`, gałąź wypchnięta, PR [#59](https://github.com/adrianczyrek-herodot/kompas_mentoring/pull/59) do `main`.
 
 ## Wynik
 M1–M5 zastąpione pełnymi ekranami: `m1-onboarding.tsx` + `m1-steps.tsx` (stepper, 6 kroków, draft w `onboardingDraft`, widoki statusów wniosku), `m2-dashboard.tsx` + `m2-parts.tsx` (agenda, prośby, dialog odrzucenia, zadania, statystyki wyliczone), `m3-calendar.tsx` + `m3-template.tsx` + `m3-settings.tsx` (tydzień, szablon, wyjątki, ustawienia, Google Calendar jako symulacja), `m4-students.tsx` + `m4-detail.tsx` (lista, szczegóły, edytor notatki, notatka prywatna), `m5-earnings.tsx` (zarobki, wypłata, historia).
