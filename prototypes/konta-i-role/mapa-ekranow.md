@@ -179,4 +179,4 @@ Mapa została zatwierdzona 2026-11-22 i przeniesiona do kryteriów akceptacji sp
 
 Pozostałe luki z sekcji 4 mapy (GAP-03, GAP-04, GAP-05, GAP-09, GAP-14, GAP-15) dotyczą innych przepływów i są przypisane do zadań w `.ai/specs/backlog.md` (E3-S4, E3-S5, E3-S6, E3-S9, L1, L2) — specyfikacje F3–F5 jeszcze nie istnieją. Luki DS-01, DS-02 i DS-03 weszły do partii 4 etapu 2 design systemu, a DS-04…DS-11, DS-14 i DS-16…DS-20 do zadań F2/F3.
 
-**Weryfikacja prototypu:** przejście przeglądarki (Chromium, 1440 i 320 px, 24 scenariusze) wykonane 2026-11-22 — 22 scenariusze działają, 7 usterek otwartych; lista w `prototypes/discovery/konta-i-role/revision-001/README.md` §9.
+**Weryfikacja prototypu:** przejście przeglądarki (Chromium, 1440 i 320 px) wykonane 2026-11-22, a usterki naprawione tego samego dnia — 44/44 sprawdzenia stanów, 24/24 scenariusze, 0 błędów JS, 0 przekroczeń szerokości. Prototyp pokazuje wszystkie 47 stanów z tej mapy; raport i lista 12 napraw w `prototypes/discovery/konta-i-role/revision-001/README.md` §9.

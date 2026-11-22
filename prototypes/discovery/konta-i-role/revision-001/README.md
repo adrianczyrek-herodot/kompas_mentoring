@@ -217,35 +217,42 @@ Panel testowy (F1) pozwala przełączać między scenariuszami. Każdy scenarius
 - [x] Semantyczne nagłówki, labeli, przyciski, widoczny focus, kontrast, responsywność
 - [x] Ścieżka outputu: `prototypes/discovery/konta-i-role/revision-001/` — bezpieczna, poza `.git/`, `.ai/skills/`, kodem aplikacji
 
-### Browser walk (Playwright) — wykonany 2026-11-22
+### Browser walk (Playwright) — wykonany 2026-11-22, po naprawach
 
-Chromium (Playwright) na `index.html`, 1440×900 i 320×900, świeża karta na każdy krok.
-Skrypt poza repozytorium (`/tmp/f1check/check3.cjs`), wynik:
+Chromium (Playwright) na `index.html`, 1440×900 i 320×900, świeża karta na każdy krok
+(skrypt poza repozytorium: `/tmp/f1check/check5.cjs`). Wynik ostatniego przebiegu:
 
 | Sprawdzenie | Wynik |
 |---|---|
-| 24 scenariusze z panelu (F1) | **22 przechodzą**, 2 psują ekran: SC-09 i SC-10 → puste tło (patrz usterki) |
-| Panel testowy: F1 otwiera/zamyka, 24 pozycje | OK |
-| Logowanie formularzem (`student@demo.kompas.pl`) | OK → s06, badge „Rola: Uczeń” |
-| Logowanie admina (`admin-trust@demo.kompas.pl`, 2FA skonfigurowane) | OK → s06, badge „Rola: Admin Trust” |
-| Błędne hasło ≥ 10 znaków | OK → s01 w stanie `state-error` |
-| Zakładka „Rejestracja” na s01 | **nie działa** — tylko przełącza podkreślenie, nie pokazuje s02 |
-| Link „Nie pamiętasz hasła?” | **nie działa** (akcja `forgotPassword` bez obsługi) → s04 nieosiągalny z UI |
-| Poziomy przewijanie: 9 ekranów × 320 i 1440 px | OK, poza **s06 przy 320 px** (overflow 88 px: `select.field-select` sięga 408 px, `table.table` 322 px) |
-| Błędy JS | `pageerror` przy SC-15 (`Cannot set properties of null (setting 'totp')`), błąd konsoli przy każdym ekranie: niepoprawna ścieżka SVG (`<path d>`) |
-| Escape | zamyka modal (jak w instrukcji); panel testowy zamyka się tylko F1 / przyciskiem „Zamknij” |
+| Błędy JS i konsoli na starcie | **0** (`pageerror`, `console.error`) |
+| Macierz stanów: 11 ekranów × dostępne warianty (44 sprawdzenia) | **44/44 OK** — widoczny jest właściwy blok stanu, treść niepusta, brak nakładania się bloków |
+| 24 scenariusze z panelu (F1) | **24/24 OK** — właściwy ekran, brak błędów JS |
+| s03 (wariant `returnTo`) | ekran logiczny s03 → sekcja s01 + klasa `state-return-to` + baner; deep link `#s03` działa |
+| Zakładki Logowanie ⇄ Rejestracja | prowadzą do s01 / s02, `aria-selected` i `tabindex` zgodne z aktywną |
+| „Nie pamiętasz hasła?” → s04, wysyłka resetu → stan sukcesu | OK |
+| Logowanie formularzem: student / admin z 2FA / złe hasło | s06 „Rola: Uczeń” / s06 „Rola: Admin Trust” + sekcja admina / s01 `state-error` |
+| Wpisane wartości przy przejściu w błąd | zachowane (E-mail i hasło przenoszone po `name`) |
+| SC-13 → s07, kod „123456” → stan sukcesu | OK, toast „2FA skonfigurowane” |
+| Poziome przewijanie: 11 ekranów × 320 i 1440 px | **0/22 przekroczeń** (tabela powiadomień przewija się we własnym kontenerze) |
+| Chrome prototypu na 320 px | badge „Discovery Prototype” ukryty, nie zasłania nagłówka; toast nad przyciskiem panelu |
+| Klawiatura | pierwszy Tab wchodzi w przycisk, F1 otwiera i zamyka panel |
 
-**Znane usterki prototypu (2026-11-22, do naprawy):**
+#### Naprawione usterki (2026-11-22)
 
-1. **SC-09 / SC-10 → pusty ekran.** `setScenario('returnTo')` woła `showScreen('s03')`, a sekcji `#s03` nie ma — s03 jest wariantem s01/s02 z banerem. Skutek: po kliknięciu scenariusza żaden ekran nie jest aktywny.
-2. **SC-03 / SC-13 nie testują admina.** `DEMO_ACCOUNTS` ma klucze `adminTrust` / `adminFinance`, a scenariusz podaje `role: 'admin_trust'`, więc następuje ciche podstawienie konta studenta i scenariusz kończy na s06 zamiast s07.
-3. **SC-15 → `pageerror`.** `case 'totp'` ustawia `session.user.totp`, a po `resetPrototype()` `session.user` jest `null`.
-4. **Zakładka „Rejestracja” nie prowadzi do rejestracji.** Handler `[data-tab]` tylko dodaje klasę `is-active`; nie ma przejścia na s02 ani podmiany formularza.
-5. **„Nie pamiętasz hasła?” nie działa.** Link ma `data-action="forgotPassword"`, którego nie ma w obsłudze kliknięć (jest `goToReset`, ale podpięty tylko pod inny przycisk).
-6. **s06 przy 320 px przewija się poziomo** (88 px) — `select.field-select` i `table.table` nie mieszczą się w kolumnie.
-7. **Niepoprawna ścieżka SVG** w ikonie (błąd konsoli na każdym ekranie).
+1. **Martwe stany ekranów** (przyczyna źródłowa): bloki wariantów miały klasę `hidden` (`display:none !important`), a reguły CSS ukrywały nawet właściwy blok — żaden wariant stanu nie był osiągalny. Widocznością steruje teraz `setScreenState` → `applyState` (jedno źródło prawdy), a bloki stanów nie mają już klasy `hidden` w treści.
+2. **s03 bez sekcji** → `SCREEN_ALIASES = { s03: 's01' }`: s03 to ekran logiczny (wariant s01 z banerem), widoczny chip „Wariant s03 — wejście z returnTo”, działający deep link `#s03`.
+3. **SC-03/SC-13 nie testowały admina** → konta wyszukiwane po polu `role` (`accountByRole`), bez cichego podstawiania studenta; obiekty kont kopiowane (koniec mutowania `DEMO_ACCOUNTS`).
+4. **`pageerror` w SC-15** → `case 'totp'` tworzy sesję admina przed ustawieniem `totp`, kod poprawny daje stan sukcesu i toast.
+5. **Martwa zakładka „Rejestracja”** → zakładki nawigują do s01/s02 i ustawiają `aria-selected`/`tabindex`.
+6. **Martwy link resetu hasła** → akcja `forgotPassword` prowadzi do s04.
+7. **Overflow s06 na 320 px** → `min-width: 0` w polach, jednokolumnowy `.field-row` poniżej 480 px, tabela w `.table-wrap` z własnym przewijaniem.
+8. **Błędna ścieżka SVG** (zduplikowany fragment `d` w ikonie LinkedIn) — poprawiona.
+9. **Gubione wartości formularza** przy przejściu w stan błędu — pamięć `typedByScreen` + przenoszenie po `name`.
+10. **Komunikaty stanów pod formularzem** — bloki bez formularza (`data-state-mode="add"`, np. „To konto już istnieje”) są przenoszone nad treść i doklejają się do stanu domyślnego.
+11. **Kontrolka segmentowa** („Chcę: się uczyć / mentorować”) — wypełniona jest cała etykieta aktywnej opcji (`:has` + klasa `is-checked`), nie sam napis.
+12. **Chrome prototypu** na wąskim ekranie: badge ukryty poniżej 560 px, toast nad przyciskiem panelu testowego.
 
-**Status weryfikacji:** `browser-walk-2026-11-22` — statyczny przegląd i przejście przeglądarki wykonane; usterki 1–7 powyżej są otwarte, więc prototyp **nie jest jeszcze dowodem** działania przepływu F1.
+**Status weryfikacji:** `browser-walk-2026-11-22-fixed` — statyczny przegląd i przejście przeglądarki wykonane po naprawach: 44/44 sprawdzenia stanów, 24/24 scenariusze, 0 błędów JS, 0 przekroczeń szerokości. Prototyp pokazuje wszystkie stany z mapy; nadal **nie jest** dowodem zapotrzebowania ani gotowym produktem (dane i integracje są symulowane).
 
 ---
 

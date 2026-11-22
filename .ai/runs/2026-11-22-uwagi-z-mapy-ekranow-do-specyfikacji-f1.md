@@ -43,6 +43,10 @@ w `backlog.md`) — dlatego uwagi o innych przepływach nie mają dokąd trafić
 - 12:22 — propozycja zmian (poniżej), bez edycji plików — czekam na zgodę.
 - 12:40 — zgoda właściciela („wprowadź wszystkie”); uwagi z prototypu zapowiedziane
   w czacie. Wprowadzone zmiany w trzech specyfikacjach + ten log, commit `8693985`.
+- 13:05–14:10 — naprawa 7 usterek prototypu F1; w trakcie wyszła usterka źródłowa
+  (bloki stanów miały klasę `hidden`, więc **żaden wariant stanu nie działał**) —
+  mechanizm stanów przebudowany na jedno źródło prawdy w JS (`applyState`),
+  12 poprawek łącznie, ponowny przebieg: 44/44 stany, 24/24 scenariusze, 0 błędów.
 - 12:55 — dalsza praca: scalona gałąź `cez/8a65024e` (mapa + prototyp rewizji 001),
   `prototype:` poprawiony na `prototypes/discovery/konta-i-role/revision-001/`,
   rozbieżności prototypu (A-05, DS-15, link 403 → U4/M2) zapisane w „Decyzjach
@@ -241,10 +245,10 @@ pliku README i `index.html` przeliczone.
 - Rozbieżności prototypu **poprawione 2026-11-22** w README i mapie: A-05 →
   „odrzucone” (jedna rola na konto), DS-15 → „nie robimy” (`Alert`), DS-12/DS-13 →
   „nie luka”, s03 → wariant s01/s02, link 403 → w F1 `/konto` i `/admin`.
-- Weryfikacja prototypu wykonana 2026-11-22 — **7 usterek otwartych** (SC-09/SC-10
-  pusty ekran, SC-03/SC-13 nie testują admina, `pageerror` w SC-15, martwa zakładka
-  rejestracji, martwy link resetu hasła, overflow s06 na 320 px, zła ścieżka SVG).
-  Prototyp nie jest dowodem działania przepływu F1, dopóki nie zostaną naprawione.
+- Weryfikacja prototypu 2026-11-22: 7 zgłoszonych usterek **naprawionych**, a przy
+  naprawie ujawniona usterka źródłowa — bloki stanów miały `hidden`, więc żaden
+  wariant stanu nie był osiągalny. Mechanizm stanów przebudowany (`applyState`),
+  12 poprawek, ponowny przebieg w pełni zielony (44/44 stany, 24/24 scenariusze).
 - Decyzja o **jednej roli na konto** (D8) wymaga poprawy także w KONCEPCJI i briefie
   — opisują przełączanie ról; nie zmieniałem tych dokumentów.
 - Sprzeczność mapa ↔ specyfikacja: reset hasła i weryfikacja e-maila (mapa: F1;

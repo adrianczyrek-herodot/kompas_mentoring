@@ -97,29 +97,30 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
 .btn .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.field { display: flex; flex-direction: column; gap: var(--space-xs); }
+.field { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
 .field-label { font-size: .875rem; font-weight: 500; }
 .field-hint { font-size: .75rem; color: var(--text-muted); }
 .field-error { font-size: .75rem; color: var(--danger); min-height: 1.25em; }
 .field-input, .field-select, .field-textarea {
   padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
   font: inherit; background: var(--surface); color: var(--text); min-height: 44px;
+  width: 100%; max-width: 100%;
   transition: border-color .15s, box-shadow .15s;
 }
 .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--border-focus); box-shadow: var(--focus-ring); }
 .field-input:invalid:not(:placeholder-shown), .field-input.error { border-color: var(--danger); }
 .field-textarea { min-height: 100px; resize: vertical; }
-.field-row { display: flex; gap: var(--space-md); }
-.field-row > .field { flex: 1; }
+.field-row { display: flex; gap: var(--space-md); flex-wrap: wrap; }
+.field-row > .field { flex: 1 1 12rem; min-width: 0; }
 
 .checkbox, .radio { display: flex; align-items: flex-start; gap: var(--space-sm); cursor: pointer; font-size: .875rem; }
 .checkbox input, .radio input { margin-top: 2px; accent-color: var(--primary); width: 18px; height: 18px; flex-shrink: 0; }
 .segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.segmented label { flex: 1; padding: 10px 16px; text-align: center; cursor: pointer; background: var(--surface); border-right: 1px solid var(--border); transition: background .15s; }
+.segmented label { position: relative; flex: 1; padding: 10px 16px; text-align: center; cursor: pointer; background: var(--surface); border-right: 1px solid var(--border); transition: background .15s, color .15s; }
 .segmented label:last-child { border-right: none; }
-.segmented input { position: absolute; opacity: 0; pointer-events: none; }
-.segmented input:checked + span { background: var(--primary); color: var(--primary-text); }
-.segmented span { display: block; }
+.segmented label:has(input:checked), .segmented label.is-checked { background: var(--primary); color: var(--primary-text); }
+.segmented input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
+.segmented span { position: relative; z-index: 1; display: block; }
 
 .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: var(--space-md); gap: 4px; }
 .tab { padding: var(--space-sm) var(--space-md); border: none; background: transparent; color: var(--text-muted); font-weight: 500; border-radius: var(--radius) var(--radius) 0 0; margin-bottom: -1px; position: relative; }
@@ -153,6 +154,10 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
 .toast-container { position: fixed; bottom: var(--space-lg); right: var(--space-lg); z-index: 1000; display: flex; flex-direction: column; gap: var(--space-sm); }
+@media (max-width: 560px) {
+  .toast-container { left: var(--space-md); right: var(--space-md); bottom: calc(var(--space-md) + 44px); }
+  .toast { max-width: none; }
+}
 .toast { padding: var(--space-md) var(--space-lg); border-radius: var(--radius); box-shadow: var(--shadow); background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-md); animation: slideIn .2s ease; max-width: 360px; }
 .toast-success { border-left: 4px solid var(--success); }
 .toast-error { border-left: 4px solid var(--danger); }
@@ -211,6 +216,17 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
 .table th { font-weight: 600; color: var(--text-muted); font-size: .75rem; text-transform: uppercase; }
 .table tbody tr:hover { background: var(--surface-hover); }
 .table .right { text-align: right; }
+.table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap .table { min-width: 26rem; }
+@media (max-width: 480px) {
+  .field-row { flex-direction: column; gap: var(--space-sm); }
+}
+.screen.state-return-to > .card::before {
+  content: "Wariant s03 — wejście z returnTo";
+  display: block; margin-bottom: var(--space-md);
+  font-size: .75rem; font-weight: 600; letter-spacing: .02em;
+  color: var(--text-muted); text-transform: uppercase;
+}
 
 .list { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .list-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text); }
@@ -338,17 +354,14 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
 .room-chat-form input { flex: 1; padding: var(--space-sm); border: 1px solid #444; border-radius: var(--radius); background: #222; color: #fff; }
 .room-chat-form button { background: var(--primary); color: #fff; }
 
-/* ===== State visibility helpers ===== */
-.state-loading .state-default, .state-loading .state-success, .state-loading .state-error, .state-loading .state-empty, .state-loading .state-conflict, .state-loading .state-unavailable { display: none; }
-.state-success .state-default, .state-success .state-loading, .state-success .state-error, .state-success .state-empty, .state-success .state-conflict, .state-success .state-unavailable { display: none; }
-.state-error .state-default, .state-error .state-loading, .state-error .state-success, .state-error .state-empty, .state-error .state-conflict, .state-error .state-unavailable { display: none; }
-.state-empty .state-default, .state-empty .state-loading, .state-empty .state-success, .state-empty .state-error, .state-empty .state-conflict, .state-empty .state-unavailable { display: none; }
-.state-conflict .state-default, .state-conflict .state-loading, .state-conflict .state-success, .state-conflict .state-error, .state-conflict .state-empty, .state-conflict .state-unavailable { display: none; }
-.state-unavailable .state-default, .state-unavailable .state-loading, .state-unavailable .state-success, .state-unavailable .state-empty, .state-unavailable .state-conflict, .state-unavailable .state-error { display: none; }
-.state-access-denied .state-default, .state-access-denied .state-loading, .state-access-denied .state-success, .state-access-denied .state-error, .state-access-denied .state-empty, .state-access-denied .state-conflict, .state-access-denied .state-unavailable { display: none; }
+/* ===== State visibility helpers =====
+   Widocznością bloków stanów steruje setScreenState (JS): bloki są ukrywane klasą
+   .hidden, a pokazywany jest blok bieżącego stanu. Blok stanu bez formularza ani
+   pola (np. sam alert „konto już istnieje”) dokleja się do treści domyślnej. */
 
 /* ===== Prototype badge ===== */
-.prototype-badge { position: fixed; top: var(--space-md); right: var(--space-md); background: #1a1a1a; color: #fff; padding: var(--space-xs) var(--space-sm); border-radius: var(--radius); font-size: .7rem; z-index: 100; font-family: var(--font-mono); }
+.prototype-badge { position: fixed; top: var(--space-md); right: var(--space-md); background: #1a1a1a; color: #fff; padding: var(--space-xs) var(--space-sm); border-radius: var(--radius); font-size: .7rem; z-index: 3000; font-family: var(--font-mono); }
+@media (max-width: 560px) { .prototype-badge { display: none; } }
 
 /* ===== Helper ===== */
 .hidden { display: none !important; }
@@ -375,7 +388,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
       </div>
 
       <div class="stack">
-        <div class="state-default state-loading state-error state-conflict state-unavailable">
+        <div class="state-default">
           <div class="stack-sm">
             <button type="button" class="social-btn" data-provider="google" aria-label="Kontynuuj z Google">
               <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -409,13 +422,13 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
           <p class="muted small center">Podpowiedź: e-mail <code>zajety@kompas.pl</code> symuluje błąd „konto już istnieje”.</p>
         </div>
 
-        <div class="state-loading hidden">
+        <div class="state-loading">
           <div class="center stack-sm">
             <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Logujemy…</button>
           </div>
         </div>
 
-        <div class="state-error hidden">
+        <div class="state-error">
           <div class="alert alert-error" role="alert">
             <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
             <div id="loginErrorMessage">Nieprawidłowy e-mail lub hasło.</div>
@@ -433,14 +446,14 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
           </form>
         </div>
 
-        <div class="state-conflict hidden">
+        <div class="state-conflict">
           <div class="alert alert-warn" role="alert">
             <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             <div>To konto już istnieje. <a href="#" data-action="switchToLogin">Zaloguj się</a></div>
           </div>
         </div>
 
-        <div class="state-unavailable hidden">
+        <div class="state-unavailable">
           <div class="alert alert-info" role="status">
             <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v10z"/></svg>
             <div>Logowanie przez Google/LinkedIn niedostępne (brak kluczy w środowisku). Użyj logowania e-mailem.</div>
@@ -478,14 +491,14 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
       </div>
 
       <div class="stack">
-        <div class="state-default state-loading state-error state-conflict state-unavailable">
+        <div class="state-default">
           <div class="stack-sm">
             <button type="button" class="social-btn" data-provider="google" aria-label="Kontynuuj z Google">
               <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
               Kontynuuj z Google
             </button>
             <button type="button" class="social-btn" data-provider="linkedin" aria-label="Kontynuuj z LinkedIn">
-              <svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227.792 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               Kontynuuj z LinkedIn
             </button>
           </div>
@@ -538,13 +551,13 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
           <p class="muted small center">Podpowiedź: e-mail <code>zajety@kompas.pl</code> symuluje błąd „konto już istnieje”. Hasło <code>Password123</code> symuluje HIBP.</p>
         </div>
 
-        <div class="state-loading hidden">
+        <div class="state-loading">
           <div class="center stack-sm">
             <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Tworzymy konto…</button>
           </div>
         </div>
 
-        <div class="state-error hidden">
+        <div class="state-error">
           <div class="alert alert-error" role="alert">
             <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
             <div id="regErrorMessage">Sprawdź błędy w formularzu.</div>
@@ -579,14 +592,14 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
           </form>
         </div>
 
-        <div class="state-conflict hidden">
+        <div class="state-conflict">
           <div class="alert alert-warn" role="alert">
             <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
             <div>To konto już istnieje. <a href="#" data-action="switchToLoginFromReg">Zaloguj się</a></div>
           </div>
         </div>
 
-        <div class="state-unavailable hidden">
+        <div class="state-unavailable">
           <div class="alert alert-info" role="status">
             <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v10z"/></svg>
             <div>Logowanie przez Google/LinkedIn niedostępne (brak kluczy w środowisku). Użyj rejestracji e-mailem.</div>
@@ -612,7 +625,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
       <h1>Nie pamiętasz hasła?</h1>
       <p class="lead">Podaj e-mail, a wyślemy link do ustawienia nowego hasła.</p>
 
-      <div class="state-default state-loading state-success state-error">
+      <div class="state-default">
         <form id="resetForm" novalidate class="stack">
           <div class="field">
             <label class="field-label" for="resetEmail">E-mail</label>
@@ -623,13 +636,13 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </form>
       </div>
 
-      <div class="state-loading hidden">
+      <div class="state-loading">
         <div class="center stack-sm">
           <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Wysyłamy…</button>
         </div>
       </div>
 
-      <div class="state-success hidden">
+      <div class="state-success">
         <div class="success-head">
           <div class="success-icon">✓</div>
           <h1>Sprawdź skrzynkę</h1>
@@ -638,7 +651,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         <a href="#" class="btn btn-ghost btn-block" data-action="backToLogin">Wróć do logowania</a>
       </div>
 
-      <div class="state-error hidden">
+      <div class="state-error">
         <div class="alert alert-error" role="alert">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           <div>Podaj poprawny adres e-mail.</div>
@@ -660,7 +673,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
       <h1>Ustaw nowe hasło</h1>
       <p class="lead">Token z linku e-mailowego. Min. 10 znaków.</p>
 
-      <div class="state-default state-loading state-success state-error">
+      <div class="state-default">
         <form id="newPasswordForm" novalidate class="stack">
           <div class="field">
             <label class="field-label" for="npPassword">Nowe hasło</label>
@@ -680,13 +693,13 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </form>
       </div>
 
-      <div class="state-loading hidden">
+      <div class="state-loading">
         <div class="center stack-sm">
           <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Zapisujemy…</button>
         </div>
       </div>
 
-      <div class="state-success hidden">
+      <div class="state-success">
         <div class="success-head">
           <div class="success-icon">✓</div>
           <h1>Hasło zaktualizowane</h1>
@@ -695,7 +708,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         <a href="#" class="btn btn-primary btn-block" data-action="goToLogin">Zaloguj się</a>
       </div>
 
-      <div class="state-error hidden">
+      <div class="state-error">
         <div class="alert alert-error" role="alert">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           <div id="npErrorMessage">Link wygasł lub jest nieprawidłowy.</div>
@@ -721,7 +734,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </div>
       </div>
 
-      <div class="state-default state-loading state-error state-access-denied">
+      <div class="state-default">
         <!-- Profil -->
         <form id="profileForm" novalidate class="card stack">
           <h2 class="h3">Profil</h2>
@@ -770,7 +783,8 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
 
         <!-- Powiadomienia -->
         <section class="card stack">
-          <h2 class="h3">Powiadomienia</h2>
+          <h2 class="h3">Powiadomienia</h2><div class="table-wrap">
+
           <table class="table">
             <thead><tr><th></th><th>E-mail</th><th>Push</th></tr></thead>
             <tbody>
@@ -780,6 +794,8 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
               <tr><td>Wskazówki i oferty</td><td><input type="checkbox" id="prefMarketingEmail" checked></td><td><input type="checkbox" id="prefMarketingPush" checked></td></tr>
             </tbody>
           </table>
+
+          </div>
           <p class="muted small">Zmiana zgody marketingowej zapisuje nową decyzję z wersją dokumentu.</p>
         </section>
 
@@ -804,7 +820,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </section>
       </div>
 
-      <div class="state-loading hidden">
+      <div class="state-loading">
         <div class="center stack-sm">
           <div class="skeleton-block"></div>
           <div class="skeleton-line" style="width: 60%;"></div>
@@ -812,7 +828,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </div>
       </div>
 
-      <div class="state-error hidden">
+      <div class="state-error">
         <div class="alert alert-error" role="alert">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           <div>Nie udało się wczytać ustawień konta.</div>
@@ -820,7 +836,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         <button class="btn btn-primary btn-block" data-action="retryAccount">Spróbuj ponownie</button>
       </div>
 
-      <div class="state-access-denied hidden">
+      <div class="state-access-denied">
         <div class="empty-state">
           <div class="empty-state-icon">🔒</div>
           <h2 class="empty-state-title">Wymagane logowanie</h2>
@@ -837,7 +853,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
       <h1>Konfiguracja 2FA (TOTP)</h1>
       <p class="lead">Jako administrator musisz skonfigurować dwuskładnikowe uwierzytelnienie.</p>
 
-      <div class="state-default state-loading state-success state-error">
+      <div class="state-default">
         <div class="alert alert-info" role="status">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v10z"/></svg>
           <div>
@@ -858,13 +874,13 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </div>
       </div>
 
-      <div class="state-loading hidden">
+      <div class="state-loading">
         <div class="center stack-sm">
           <button class="btn btn-primary btn-block" disabled><span class="spinner"></span> Weryfikujemy…</button>
         </div>
       </div>
 
-      <div class="state-success hidden">
+      <div class="state-success">
         <div class="success-head">
           <div class="success-icon">✓</div>
           <h1>2FA skonfigurowane</h1>
@@ -873,7 +889,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         <a href="#" class="btn btn-primary btn-block" data-action="goToAdminPanel">Przejdź do panelu admina</a>
       </div>
 
-      <div class="state-error hidden">
+      <div class="state-error">
         <div class="alert alert-error" role="alert">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           <div>Nieprawidłowy kod. Spróbuj ponownie.</div>
@@ -922,7 +938,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
   <!-- ===== SCREEN s10: Weryfikacja e-maila ===== -->
   <section class="screen" id="s10" data-screen="s10" data-title="Weryfikacja e-maila">
     <div class="card">
-      <div class="state-default state-loading state-success state-error">
+      <div class="state-default">
         <div class="center stack-sm">
           <div class="spinner spinner--l" style="width: 48px; height: 48px; border-width: 4px; margin: 0 auto var(--space-lg);"></div>
           <h1>Weryfikujemy Twój e-mail…</h1>
@@ -930,14 +946,14 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </div>
       </div>
 
-      <div class="state-loading hidden">
+      <div class="state-loading">
         <div class="center stack-sm">
           <div class="spinner spinner--l" style="width: 48px; height: 48px; border-width: 4px; margin: 0 auto var(--space-lg);"></div>
           <h1>Weryfikujemy…</h1>
         </div>
       </div>
 
-      <div class="state-success hidden">
+      <div class="state-success">
         <div class="success-head">
           <div class="success-icon">✓</div>
           <h1>E-mail zweryfikowany</h1>
@@ -949,7 +965,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </div>
       </div>
 
-      <div class="state-error hidden">
+      <div class="state-error">
         <div class="alert alert-error" role="alert">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           <div>Link wygasł lub jest nieprawidłowy.</div>
@@ -968,7 +984,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
       <h1>Zaktualizowaliśmy regulamin</h1>
       <p class="lead">Wersja 2.1 — zmiany w §4 (przełożenia) i §7 (dane osobowe).</p>
 
-      <div class="state-default state-error state-success">
+      <div class="state-default">
         <div class="card stack" style="margin-bottom: var(--space-lg); max-height: 300px; overflow-y: auto; padding: var(--space-md); background: var(--surface-hover); border: 1px solid var(--border);">
           <h3 class="h4">Główne zmiany:</h3>
           <ul style="margin: var(--space-sm) 0; padding-left: var(--space-lg);">
@@ -991,7 +1007,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </form>
       </div>
 
-      <div class="state-error hidden">
+      <div class="state-error">
         <div class="alert alert-error" role="alert">
           <svg class="alert-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           <div>Akceptacja regulaminu jest wymagana, by kontynuować.</div>
@@ -1007,7 +1023,7 @@ h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-xs); }
         </form>
       </div>
 
-      <div class="state-success hidden">
+      <div class="state-success">
         <div class="success-head">
           <div class="success-icon">✓</div>
           <h1>Akceptacja zapisana</h1>
@@ -1085,27 +1101,80 @@ let currentScreen = 's01';
 let currentState = 'default';
 let currentScenario = null;
 let session = { user: null, returnTo: null, socialAvailable: true };
+// s03 nie ma własnej sekcji: to wariant s01 z banerem „Twój termin jest zachowany”.
+// Ekran logiczny (s03) steruje banerem i raportem stanu, fizycznie pokazujemy s01.
+const SCREEN_ALIASES = { s03: 's01' };
+/** Wpisane wartości per ekran — przeżywają przejścia między blokami stanów. */
+const typedByScreen = new Map();
+const physicalScreen = (id) => SCREEN_ALIASES[id] || id;
+/** Konto demo po roli (klucze DEMO_ACCOUNTS są nazwami własnymi, role są w polu `role`). */
+const accountByRole = (role) => Object.values(DEMO_ACCOUNTS).find((a) => a.role === role);
 let hibpEnabled = true;
 
 // ===== DOM Helpers =====
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
-const showScreen = (id) => {
-  $$('.screen').forEach(s => s.classList.remove('active'));
-  const screen = $('#' + id);
-  if (screen) {
-    screen.classList.add('active');
-    currentScreen = id;
-    window.location.hash = id;
-    updateTestStateInfo();
-  }
-};
-const setScreenState = (screenId, state) => {
-  const screen = $('#' + screenId);
+const showScreen = (logicalId) => {
+  const physical = physicalScreen(logicalId);
+  const screen = $('#' + physical);
   if (!screen) return;
+  $$('.screen').forEach(s => { s.classList.remove('active'); s.classList.remove('state-return-to'); });
+  screen.classList.add('active');
+  // ekran startuje w stanie domyślnym; scenariusz ustawia wariant zaraz po showScreen
+  screen.classList.remove('state-loading', 'state-success', 'state-error', 'state-empty',
+    'state-conflict', 'state-unavailable', 'state-access-denied');
+  currentState = 'default';
+  applyState(screen, 'default');
+  if (physical !== logicalId) screen.classList.add('state-return-to');
+  currentScreen = logicalId;
+  window.location.hash = logicalId;
+  if (logicalId === 's03') showReturnToBanner(session.returnTo === '#/rezerwacja/m5/platnosc');
+  updateTestStateInfo();
+};
+/** Baner „termin zachowany” (s03): jeden tekst źródłowy dla scenariusza i deep linku. */
+function showReturnToBanner(fromU1) {
+  const banner = $('#returnToBanner');
+  if (!banner) return;
+  const text = banner.querySelector('div');
+  if (text) {
+    text.innerHTML = fromU1
+      ? '<strong>Twój wybrany termin jest zachowany</strong><br>Po zalogowaniu wrócisz do płatności (termin: wtorek 21.10.2026, 14:00).'
+      : '<strong>Zaloguj się, aby przejść do konta</strong><br>Po zalogowaniu wrócisz do ustawień konta.';
+  }
+  banner.classList.remove('hidden');
+}
+/** Pokazuje właściwy blok stanu: domyślny, wariant, albo domyślny + wariant (komunikat). */
+const applyState = (screenEl, state) => {
+  const blocks = $$('.state-default, .state-loading, .state-success, .state-error, .state-empty, .state-conflict, .state-unavailable, .state-access-denied', screenEl);
+  const defaultBlock = screenEl.querySelector('.state-default');
+  const target = state === 'default' ? null : screenEl.querySelector('.state-' + state);
+  // blok bez formularza/akcji to komunikat doklejany do treści domyślnej (np. alert „konto istnieje”)
+  const additive = target ? !target.querySelector('form, input, select, textarea, button') : false;
+  blocks.forEach(b => b.classList.add('hidden'));
+  if (additive && defaultBlock) defaultBlock.classList.remove('hidden');
+  if (target) target.classList.remove('hidden');
+  else if (defaultBlock) defaultBlock.classList.remove('hidden');
+};
+
+const setScreenState = (screenId, state) => {
+  const screen = $('#' + physicalScreen(screenId));
+  if (!screen) return;
+  // Każdy wariant ma własny blok z własnymi polami — zanim go pokażemy, przenosimy
+  // wpisane wartości po atrybucie `name`, żeby przejście w błąd nie kasowało formularza.
+  const typed = typedByScreen.get(screen.id) || new Map();
+  $$('input, select, textarea', screen).forEach(el => {
+    if (!el.name || el.value === '' || el.offsetParent === null) return;
+    typed.set(el.name, el.value);
+  });
+  typedByScreen.set(screen.id, typed);
   screen.classList.remove('state-default', 'state-loading', 'state-success', 'state-error', 'state-empty', 'state-conflict', 'state-unavailable', 'state-access-denied');
   screen.classList.add('state-' + state);
   currentState = state;
+  applyState(screen, state);
+  $$('input, select, textarea', screen).forEach(el => {
+    if (!el.name || el.offsetParent === null || el.value !== '') return;
+    if (typed.has(el.name)) el.value = typed.get(el.name);   // ten sam `name` w bloku wariantu
+  });
   updateTestStateInfo();
 };
 const showToast = (message, type = 'info') => {
@@ -1201,7 +1270,8 @@ const setScenario = (type, params) => {
         setScreenState('s01', 'error');
       } else {
         // Success path
-        session.user = DEMO_ACCOUNTS[params.role] || DEMO_ACCOUNTS.student;
+        const account = accountByRole(params.role) || DEMO_ACCOUNTS.student;
+        session.user = { ...account };
         session.user.totp = params.totp !== false; // default true for admins
         if (params.role === 'admin_trust' || params.role === 'admin_finance') {
           if (!session.user.totp) {
@@ -1244,13 +1314,13 @@ const setScenario = (type, params) => {
         updateAccountUI();
       }
       break;
-    case 'returnTo':
-      session.returnTo = params.from === 'U1' ? '#/rezerwacja/m5/platnosc' : '#/konto';
-      const banner = params.from === 'U1' ? $('#returnToBanner') : $('#returnToBannerReg');
-      if (banner) banner.classList.remove('hidden');
-      showScreen('s03');
+    case 'returnTo': {
+      const fromU1 = params.from === 'U1';
+      session.returnTo = fromU1 ? '#/rezerwacja/m5/platnosc' : '#/konto';
+      showScreen('s03');            // wariant s01 + baner „termin zachowany”
       setScreenState('s03', 'default');
       break;
+    }
     case 'reset':
       if (params.token === 'expired') {
         showScreen('s05');
@@ -1269,17 +1339,24 @@ const setScenario = (type, params) => {
         setTimeout(() => { setScreenState('s10', 'success'); }, 1500);
       }
       break;
-    case 'totp':
+    case 'totp': {
+      // admin jest w trakcie logowania — bez obiektu użytkownika nie ma czego zaktualizować
+      session.user = { ...(accountByRole('admin_trust') || DEMO_ACCOUNTS.adminTrust), totp: false };
       showScreen('s07');
       if (params.expectError) {
         setScreenState('s07', 'error');
+        const err = $('#totpError');
+        if (err) err.textContent = 'Nieprawidłowy kod. Sprawdź aplikację uwierzytelniającą i spróbuj ponownie.';
       } else if (params.expectSuccess) {
-        setScreenState('s07', 'success');
         session.user.totp = true;
+        updateAccountUI();
+        setScreenState('s07', 'success');
+        showToast('2FA skonfigurowane. Panel admina jest odblokowany.', 'success');
       } else {
         setScreenState('s07', 'default');
       }
       break;
+    }
     case 'accessDenied':
       showScreen('s08');
       $('#currentRole403').textContent = params.currentRole;
@@ -1327,8 +1404,12 @@ const resetPrototype = () => {
   $$('.screen').forEach(s => s.classList.remove('state-loading', 'state-success', 'state-error', 'state-empty', 'state-conflict', 'state-unavailable', 'state-access-denied'));
   $$('.screen').forEach(s => s.classList.add('state-default'));
   $$('.hidden').forEach(el => el.classList.add('hidden'));
+  $$('.screen').forEach(s => s.classList.remove('state-return-to'));
   $$('.alert').forEach(el => el.classList.add('hidden'));
   $('#toastContainer').innerHTML = '';
+  typedByScreen.clear();
+  $$('form').forEach(form => form.reset());   // scenariusz nie dziedziczy wpisanych danych
+  syncSegmented();
   closeModal();
 };
 
@@ -1408,6 +1489,7 @@ document.addEventListener('click', (e) => {
     case 'goToLogin404':
     case 'goToLogin10':
       showScreen('s01'); setScreenState('s01', 'default'); break;
+    case 'forgotPassword':
     case 'goToReset':
       showScreen('s04'); setScreenState('s04', 'default'); break;
     case 'goToDashboard':
@@ -1576,14 +1658,25 @@ $$('input[type="password"][data-toggle-password]').forEach(input => {
   input.addEventListener('input', () => updateStrength(input.id, input.id + 'Strength'));
 });
 
-// Tab switching
+// Zakładki Logowanie/Rejestracja prowadzą do właściwego ekranu (s01 / s02)
+const setAuthTab = (activeTab) => {
+  $$('.auth-tabs').forEach(list => {
+    $$('.auth-tab', list).forEach(tab => {
+      const isActive = tab.dataset.tab === activeTab;
+      tab.classList.toggle('is-active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+      tab.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+  });
+};
 document.addEventListener('click', (e) => {
   const tab = e.target.closest('[data-tab]');
   if (!tab) return;
-  const screen = tab.closest('.screen');
-  if (!screen) return;
-  $$('.auth-tab', screen).forEach(t => t.classList.remove('is-active'));
-  tab.classList.add('is-active');
+  e.preventDefault();
+  const target = tab.dataset.tab === 'register' ? 's02' : 's01';
+  showScreen(target);
+  setScreenState(target, 'default');
+  setAuthTab(tab.dataset.tab);
 });
 
 // Keyboard: Escape closes modal, F1 toggles test controls
@@ -1594,10 +1687,39 @@ document.addEventListener('keydown', (e) => {
 
 // Initial hash routing
 const initialHash = window.location.hash.slice(1);
-if (initialHash && $('#' + initialHash)) { showScreen(initialHash); }
+if (initialHash && (SCREEN_ALIASES[initialHash] || $('#' + initialHash))) { showScreen(initialHash); }
+
+/** Zaznaczona opcja w kontrolce segmentowej ma wypełnione całe pole (fallback dla :has). */
+const syncSegmented = () => {
+  $$('.segmented label').forEach(label => {
+    const input = label.querySelector('input');
+    if (input) label.classList.toggle('is-checked', input.checked);
+  });
+};
+document.addEventListener('change', (e) => {
+  if (e.target.matches && e.target.matches('.segmented input')) syncSegmented();
+});
 
 // Init
+// Komunikaty stanów (bloki bez formularza i akcji) przenosimy na początek treści ekranu,
+// żeby po dołączeniu do stanu domyślnego pojawiały się NAD formularzem, a nie pod nim.
+$$('.screen').forEach(screen => {
+  $$('.state-loading, .state-success, .state-error, .state-empty, .state-conflict, .state-unavailable, .state-access-denied', screen).forEach(block => {
+    if (block.querySelector('form, input, select, textarea, button')) return;
+    block.dataset.stateMode = 'add';
+    const host = block.parentElement;
+    if (host && host.firstElementChild !== block) host.insertBefore(block, host.firstElementChild);
+  });
+});
+$$('.auth-tabs').forEach(list => {
+  $$('.auth-tab', list).forEach(tab => {
+    const isActive = tab.classList.contains('is-active');
+    tab.setAttribute('aria-selected', String(isActive));
+    tab.setAttribute('tabindex', isActive ? '0' : '-1');
+  });
+});
 renderTestScenarios();
+syncSegmented();
 updateTestStateInfo();
 console.log('[Prototype] F1 Tożsamość loaded. Press F1 for test panel.');
 </script>
