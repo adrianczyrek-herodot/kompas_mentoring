@@ -3,6 +3,7 @@
 import { Alert, AlertDescription, Button, Field, FieldLabel, Input } from '@kompas/ui';
 import { useTranslations } from 'next-intl';
 import { type SubmitEvent, useState } from 'react';
+import { VERIFICATION_CALLBACK_PATH } from '../../_components/auth/auth-api.ts';
 
 /** s10 "Wyślij nowy link": asks Better Auth to resend the verification e-mail to a given address. */
 export function ResendVerificationLink() {
@@ -21,7 +22,7 @@ export function ResendVerificationLink() {
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email, callbackURL: '/weryfikacja-email' }),
+        body: JSON.stringify({ email, callbackURL: VERIFICATION_CALLBACK_PATH }),
       });
       if (!response.ok) {
         setFailed(true);

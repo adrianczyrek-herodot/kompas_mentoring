@@ -36,7 +36,9 @@ const post = async (path: string, body: object) => {
 };
 
 const codesOf = (payload: Record<string, unknown>): readonly string[] =>
-  Array.isArray(payload['backupCodes']) ? (payload['backupCodes'] as string[]) : [];
+  Array.isArray(payload['backupCodes'])
+    ? payload['backupCodes'].filter((code): code is string => typeof code === 'string')
+    : [];
 
 /**
  * s07 setup: enable TOTP with the current password (`/two-factor/enable`), confirm a code from the

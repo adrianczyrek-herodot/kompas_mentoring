@@ -7,11 +7,11 @@ prototype: prototypes/discovery/konta-i-role/revision-001/
 related:
   - .ai/specs/product-brief.md
   - .ai/specs/backlog.md
-  - .ai/specs/2026-11-10-f1-tozsamosc.md
+  - .ai/specs/implemented/2026-11-10-f1-tozsamosc.md
   - kompas-mentoring/KONCEPCJA.md
   - docs/design-system.md
   - prototypes/discovery/konta-i-role/revision-001/ — klikalny prototyp tej mapy (rewizja 001)
-  - .ai/specs/2026-11-10-f1-tozsamosc.md — specyfikacja, do której trafiły kryteria z tej mapy
+  - .ai/specs/implemented/2026-11-10-f1-tozsamosc.md — specyfikacja, do której trafiły kryteria z tej mapy
   - kompas-mentoring/mockupy/src/screens/public.ts
   - kompas-mentoring/mockupy/src/screens/shared.ts
 ---
@@ -168,7 +168,7 @@ Zakres: ekrany P4 (Logowanie/Rejestracja) i S3 (Konto) oraz стани przekiero
 
 ## 7. Decyzje i zmiany po zatwierdzeniu mapy (2026-11-22)
 
-Mapa została zatwierdzona 2026-11-22 i przeniesiona do kryteriów akceptacji specyfikacji F1 (`.ai/specs/2026-11-10-f1-tozsamosc.md`, sekcja „Kryteria akceptacji” z identyfikatorami s01–s11). Cztery pozycje mapy zostały rozstrzygnięte inaczej, niż zakładała:
+Mapa została zatwierdzona 2026-11-22 i przeniesiona do kryteriów akceptacji specyfikacji F1 (`.ai/specs/implemented/2026-11-10-f1-tozsamosc.md`, sekcja „Kryteria akceptacji” z identyfikatorami s01–s11). Cztery pozycje mapy zostały rozstrzygnięte inaczej, niż zakładała:
 
 | Pozycja | Rozstrzygnięcie | Źródło |
 |---|---|---|

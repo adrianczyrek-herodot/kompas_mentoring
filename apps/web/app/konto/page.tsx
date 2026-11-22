@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getContainer } from '../../server/runtime.ts';
-import { getCurrentUser } from '../../server/session.ts';
+import { getSessionState } from '../../server/session.ts';
 import { DataRequests } from './_components/data-requests.tsx';
 import { MarketingConsent } from './_components/marketing-consent.tsx';
 import { PasswordForm } from './_components/password-form.tsx';
@@ -32,8 +32,14 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 /** S3 — account and settings in the scope of Q7. */
 export default async function AccountPage() {
-  const user = await getCurrentUser();
-  if (user === null) redirect('/logowanie?returnTo=%2Fkonto');
+  const { user, expiredByAdminPolicy } = await getSessionState();
+  if (user === null) {
+    redirect(
+      expiredByAdminPolicy
+        ? '/logowanie?reason=admin-session-expired'
+        : '/logowanie?returnTo=%2Fkonto',
+    );
+  }
   const scope = createRequestScope(getContainer(), { requestId: crypto.randomUUID() });
   const overview = await scope.cradle.getAccountOverview(user, user.id);
   if (overview.isErr()) notFound();

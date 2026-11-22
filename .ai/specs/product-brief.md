@@ -8,7 +8,7 @@ related:
   - .ai/specs/backlog.md
   - kompas-mentoring/KONCEPCJA.md
   - .ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md
-  - .ai/specs/2026-11-10-f1-tozsamosc.md
+  - .ai/specs/implemented/2026-11-10-f1-tozsamosc.md
   - docs/decisions/
 ---
 
@@ -95,7 +95,7 @@ Szczegóły, kolejność i zależności — [backlog.md](backlog.md).
 | [`kompas-mentoring/KONCEPCJA.md`](../../kompas-mentoring/KONCEPCJA.md) | Użytkownicy, UC1–UC18, przepływy F1–F6 z błędami, mapa i specyfikacja 22 ekranów, model danych, ryzyka |
 | `kompas-mentoring/mockupy/` | Klikalne mockupy wszystkich ekranów ze stanami L/E/Er/S; reguły w `src/domain.ts` |
 | [Spec stacku](2026-10-21-tech-stack-i-standardy-inzynieryjne.md) | Stack, moduły, wzorce, implikacje regulacyjne (§13), plan faz F0–F8, Q1–Q12, wnioski z researchu W1–W11 |
-| [Spec F1](2026-11-10-f1-tozsamosc.md) | Tożsamość — decyzje Q1–Q8 i ustalenia z wdrożenia |
+| [Spec F1](implemented/2026-11-10-f1-tozsamosc.md) | Tożsamość — decyzje Q1–Q8 i ustalenia z wdrożenia |
 | [`docs/decisions/`](../../docs/decisions/README.md) | ADR 0001–0005 |
 | [`SDLC.md`](../../SDLC.md), [`CODE_REVIEW.md`](../../CODE_REVIEW.md) | Proces, priorytety zgłoszeń, przegląd |
 | `.ai/runs/`, `.ai/lessons.md` | Przebieg dotychczasowych prac i wnioski |
