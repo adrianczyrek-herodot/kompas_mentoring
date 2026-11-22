@@ -1,0 +1,26 @@
+# CODEOWNERS — who must review a change (GitHub uses the last matching pattern).
+#
+# Anything that can widen what an AI agent is allowed to do is owned explicitly:
+# a change to the agent configuration, to MCP servers or to CI needs the owner's
+# review before it can be merged.
+
+# Repository default owner.
+*                                   @adrianczyrek-herodot
+
+# Agent configuration, hooks and permissions.
+/.claude/                           @adrianczyrek-herodot
+/.claude/settings.json              @adrianczyrek-herodot
+/.claude/settings.local.json        @adrianczyrek-herodot
+/.claude/hooks/                     @adrianczyrek-herodot
+/.claude/skills/                    @adrianczyrek-herodot
+
+# MCP servers (project scope). None are enabled today; keep it that way
+# deliberately.
+/.mcp.json                          @adrianczyrek-herodot
+
+# CI, CODEOWNERS itself and environment documentation.
+/.github/                           @adrianczyrek-herodot
+/.github/workflows/                 @adrianczyrek-herodot
+/.github/CODEOWNERS                 @adrianczyrek-herodot
+/.env.example                       @adrianczyrek-herodot
+/scripts/secrets.sh                 @adrianczyrek-herodot

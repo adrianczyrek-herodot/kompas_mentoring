@@ -26,3 +26,7 @@ blob-report/
 .env.*
 !.env.example
 .DS_Store
+
+# Claude Code: per-developer local settings and secret plaintext backups
+.claude/settings.local.json
+*.plaintext-backup-*

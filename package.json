@@ -20,6 +20,10 @@
     "db:migrate": "pnpm --filter @kompas/core run db:migrate",
     "db:seed": "pnpm --filter @kompas/core run db:seed",
     "hooks:install": "lefthook install",
+    "secrets:list": "scripts/secrets.sh list",
+    "secrets:put": "scripts/secrets.sh put",
+    "secrets:import": "scripts/secrets.sh import",
+    "secrets:run": "scripts/secrets.sh run --",
     "storybook": "pnpm --filter @kompas/ui storybook",
     "build-storybook": "pnpm --filter @kompas/ui build-storybook"
   },
