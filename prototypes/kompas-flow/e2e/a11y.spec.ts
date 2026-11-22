@@ -16,6 +16,8 @@ const ACCOUNT_BY_ACCESS: Record<ScreenDef['access'], RegExp> = {
 test('każdy ekran, jasny i ciemny motyw: brak poważnych naruszeń WCAG 2.2 AA', async ({
   page,
 }, testInfo) => {
+  // 23 screens × 2 themes, each followed by an axe run: longer than the default 30 s.
+  test.setTimeout(180_000);
   // One viewport is enough for axe; the narrow one is covered by the overflow test.
   test.skip(testInfo.project.name !== 'desktop-1440', 'axe runs once, on the wide viewport');
 
