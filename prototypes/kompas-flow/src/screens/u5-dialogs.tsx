@@ -42,7 +42,7 @@ import { formatDateTime } from '@kompas/ui';
 import { timeZoneLabel, TZ } from '../lib/clock';
 import { FailureAlert, useAction } from '../shell/request-feedback';
 import { useDemo } from '../state/demo-context';
-import { liveMentor } from '../state/world';
+import { liveMentor, slotRulesOf } from '../state/world';
 
 export function CancelDialog({
   booking,
@@ -120,7 +120,7 @@ export function RescheduleSheet({
   const action = useAction();
   const [week, setWeek] = useState(0);
   const [slot, setSlot] = useState<{ id: string; startsAt: string } | null>(null);
-  const days = weekDays(liveMentor(state.world, mentor), week, now, state.bookings, state.takenSlots);
+  const days = weekDays(liveMentor(state.world, mentor), week, now, state.bookings, state.takenSlots, slotRulesOf(state.world, mentor.id));
   return (
     <Sheet open={open} onOpenChange={(next) => { action.reset(); onOpenChange(next); }}>
       <SheetContent side="right" closeLabel="Zamknij przekładanie">

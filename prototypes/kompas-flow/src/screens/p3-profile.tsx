@@ -26,7 +26,7 @@ import { timeZoneLabel, TZ } from '../lib/clock';
 import { href, navigate, type Route, withQuery } from '../lib/router';
 import { bookingIntent } from '../state/booking-intent';
 import { useDemo, useRetry } from '../state/demo-context';
-import { liveMentor } from '../state/world';
+import { liveMentor, slotRulesOf } from '../state/world';
 
 const SESSION_FORMS = { one: 'sesję', few: 'sesje', many: 'sesji' };
 
@@ -221,7 +221,7 @@ export function P3Profile({ route }: { route: Route }) {
   const empty = status === 'empty';
   const days = empty
     ? weekDays(mentor, 0, now, []).map((d) => ({ ...d, slots: [] }))
-    : weekDays(liveMentor(state.world, mentor), 0, now, state.bookings, state.takenSlots);
+    : weekDays(liveMentor(state.world, mentor), 0, now, state.bookings, state.takenSlots, slotRulesOf(state.world, mentor.id));
   const noSlots = empty || !hasSlotsIn14Days(mentor, now, state.bookings);
   return (
     <>

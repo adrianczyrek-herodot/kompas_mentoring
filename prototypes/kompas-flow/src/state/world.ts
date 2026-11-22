@@ -45,6 +45,7 @@ import {
   INITIAL_APPLICATIONS,
   INITIAL_DISPUTES,
 } from '../data/trust';
+import type { SlotRules } from '../data/slots';
 import { addMinutes, toMs } from '../lib/clock';
 
 export type Profile = {
@@ -608,6 +609,17 @@ export function applicationOf(world: World, accountId: AccountId): Application |
 export function liveMentor(world: World, mentor: Mentor): Mentor {
   const template = world.mentorSettings[mentor.id]?.template;
   return template ? { ...mentor, availability: template } : mentor;
+}
+
+/** M3 booking settings as slot rules for P3, U1 and U5. */
+export function slotRulesOf(world: World, mentorId: string): SlotRules {
+  const settings = world.mentorSettings[mentorId];
+  if (!settings) return { minNoticeHours: 6, bufferMin: 0, daysOff: [] };
+  return {
+    minNoticeHours: settings.minNoticeHours,
+    bufferMin: settings.bufferMin,
+    daysOff: settings.exceptions.filter((e) => e.type === 'off').map(({ from, to }) => ({ from, to })),
+  };
 }
 
 /** Unread notifications of an account (header bell). */

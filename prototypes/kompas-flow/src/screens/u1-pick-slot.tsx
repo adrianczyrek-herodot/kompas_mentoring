@@ -27,7 +27,7 @@ import { TIME_ZONES, timeZoneLabel } from '../lib/clock';
 import { href, navigate, type Route, withQuery } from '../lib/router';
 import { type BookingIntent, bookingIntent } from '../state/booking-intent';
 import { type RequestFailure, useDemo, useRetry } from '../state/demo-context';
-import { liveMentor } from '../state/world';
+import { liveMentor, slotRulesOf } from '../state/world';
 import type { Draft } from '../state/demo-state';
 import { useCreateHold } from '../state/use-create-hold';
 import { MentorNotFound, MentorSummaryBar } from './booking-parts';
@@ -176,7 +176,7 @@ function Picker({ mentor, draft }: { mentor: Mentor; draft: Draft }) {
   const days =
     status === 'empty'
       ? weekDays(mentor, draft.week, now, []).map((d) => ({ ...d, slots: [] }))
-      : weekDays(liveMentor(state.world, mentor), draft.week, now, state.bookings, state.takenSlots);
+      : weekDays(liveMentor(state.world, mentor), draft.week, now, state.bookings, state.takenSlots, slotRulesOf(state.world, mentor.id));
   const next =
     status === 'empty' ? undefined : nextAvailableAfter(mentor, draft.week, now, state.bookings, state.takenSlots);
   const setWeek = (week: number) => {
