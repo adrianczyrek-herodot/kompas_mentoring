@@ -1,5 +1,5 @@
 import { enabledSocialProviders, safeReturnTo } from '@kompas/core/identity';
-import { Card, CardContent, cn } from '@kompas/ui';
+import { Alert, AlertDescription, Card, CardContent, cn } from '@kompas/ui';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -57,6 +57,7 @@ export async function AuthPage({
   const params = await searchParams;
   const returnTo = safeReturnTo(first(params['returnTo']));
   if ((await getCurrentUser()) !== null) redirect(returnTo);
+  const sessionExpired = first(params['reason']) === 'admin-session-expired';
 
   const t = await getTranslations('Auth');
   const asMentor = first(params['jako']) === 'mentor';
@@ -68,6 +69,11 @@ export async function AuthPage({
   return (
     <main className="mx-auto w-full max-w-xl px-4 py-8">
       <h1 className="sr-only">{mode === 'login' ? labels.login : labels.register}</h1>
+      {sessionExpired && (
+        <Alert role="alert" className="mb-4">
+          <AlertDescription>{t('notice.adminSessionExpired')}</AlertDescription>
+        </Alert>
+      )}
       <Card>
         <CardContent className="flex flex-col gap-4">
           <AuthTabs mode={mode} suffix={query.size > 0 ? `?${query}` : ''} labels={labels} />

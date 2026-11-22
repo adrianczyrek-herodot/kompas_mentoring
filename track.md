@@ -70,15 +70,21 @@ Dowody: `apps/web/app/konto/**`, `packages/core/src/modules/identity/application
 
 ---
 
-## Faza 7 — 2FA TOTP dla adminów (feat(identity)) — `[ ]` DO ZROBIENIA
+## Faza 7 — 2FA TOTP dla adminów (feat(identity)) — `[x]` WYKONANE
 Zadania:
-- [ ] **Z7.1** Seed kont admina (`admin_trust`, `admin_finance`) + minimalna trasa `/admin` + link „Panel administratora" w nagłówku dla roli admin
-- [ ] **Z7.2** Strona konfiguracji 2FA (s07): włączenie TOTP (QR/sekret), weryfikacja kodu, kody zapasowe — przez plugin `twoFactor` Better Auth
-- [ ] **Z7.3** Wymuszenie 2FA: admin z ważną sesją, ale bez 2FA, na `/admin/*` → przekierowanie na s07 z komunikatem „Skonfiguruj 2FA, aby kontynuować" (nie wylogowanie)
-- [ ] **Z7.4** Komunikat wygaśnięcia sesji admina (12 h) na s01, odróżnialny od sesji użytkownika (30 dni)
-- [ ] **Z7.5** Testy: jednostkowe polityki + E2E (s07, admin bez 2FA, 12 h)
+- [x] **Z7.1** Seed kont admina (`admin_trust`, `admin_finance`) + minimalna trasa `/admin` + link „Panel administratora” w nagłówku dla roli admin
+- [x] **Z7.2** Strona konfiguracji 2FA (s07): włączenie TOTP (sekret), weryfikacja kodu, kody zapasowe — przez plugin `twoFactor` Better Auth
+- [x] **Z7.3** Wymuszenie 2FA: admin z ważną sesją, ale bez 2FA, na `/admin/*` → przekierowanie na s07 z komunikatem „Skonfiguruj 2FA, aby kontynuować” (nie wylogowanie)
+- [x] **Z7.4** Komunikat wygaśnięcia sesji admina (12 h) na s01, odróżnialny od sesji użytkownika (30 dni)
+- [x] **Z7.5** Testy: jednostkowe polityki + E2E (s07, admin bez 2FA, 12 h)
 
-Kryteria: [s07] z sekcji „Kryteria akceptacji" specyfikacji; wymagania 7 i 8.
+Dowody: seed adminów w `packages/core/src/shared/infrastructure/db/cli/seed.ts`; `apps/web/app/admin/{layout,page}.tsx`,
+`apps/web/app/konto/2fa/**`, `packages/core/.../domain/policies/session.policy.ts` (12 h), `apps/web/server/session.ts`,
+`apps/web/e2e/admin.spec.ts`, `apps/web/e2e/global-setup.ts`. Bramki: lint 0 błędów, typecheck 7/7,
+test 4/4 (core 62), test:integration 11, build OK, test:e2e 46 zaliczone (360 i 1280 px).
+
+Znane tymczasowe: nie-admin na `/admin` dostaje 404 — właściwa trasa 403 (s08) powstaje w fazie 8;
+E2E pełnego przekroczenia 12 h (podróż w czasie) zastąpione testem jednostkowym polityki i E2E komunikatu.
 
 ## Faza 8 — Weryfikacja e-maila (s10) + strony błędów 403/404 (s08, s09) (feat(web)) — `[ ]` DO ZROBIENIA
 Zadania:

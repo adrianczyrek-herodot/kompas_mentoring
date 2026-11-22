@@ -1,3 +1,4 @@
+import { isAdmin } from '@kompas/core/identity';
 import { Button, buttonVariants } from '@kompas/ui';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
@@ -27,6 +28,11 @@ export async function SiteHeader() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
+            {isAdmin(user.roles) && (
+              <Link href="/admin" className={buttonVariants({ variant: 'ghost' })}>
+                {t('adminPanel')}
+              </Link>
+            )}
             <Link href="/konto" className={buttonVariants({ variant: 'ghost' })}>
               {t('account', { name: user.name })}
             </Link>

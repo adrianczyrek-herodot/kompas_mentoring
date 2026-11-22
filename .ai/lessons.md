@@ -39,6 +39,8 @@ Format punktu: `- **YYYY-MM-DD** — <wniosek i powód>. Szczegóły: [lessons/Y
 - **2026-11-22** — Lista usterek z przejścia przeglądarki jest warta naprawy u źródła: przy 7 zgłoszonych objawach ósma, ukryta przyczyna (mechanizm stanów) tłumaczyła kilka z nich naraz. Zanim naprawisz objaw, sprawdź, czy jeden wspólny mechanizm nie jest odpowiedzialny za kilka wpisów.
 - **2026-11-22** — Prototyp z discovery leży w `prototypes/discovery/<slug>/revision-NNN/` (z `prototype.json` i `README.md`), a mapa ekranów w `prototypes/<slug>/mapa-ekranow.md` — to dwa różne artefakty. Do frontmattera specyfikacji wchodzi ścieżka **folderu prototypu z rewizją**, nie katalog mapy. README prototypu zawiera założenia `A-*` i bywa sprzeczny z późniejszymi decyzjami właściciela — rozbieżności zapisujemy w specyfikacji („Decyzje i zmiany”), a prototyp poprawiamy osobno, zamiast po cichu zmieniać artefakt innego zadania.
 
+- **2026-11-22** — Subagenci cezar bywają zawodni, a porażka wygląda jak brak pracy: runner `claude` padł na limicie organizacji Anthropic (0 commitów), a `pi` z modelem rozumującym `openai/gpt-5.2-codex` wpadł w pętlę pustych tur rozumowania i został zaparkowany bez implementacji („5 consecutive turns produced no output, so the run parks”). Przed dispatch sprawdź gotowość modelu (`pi auth check --provider openrouter --model <id>`); po nieudanym subagencie nie powtarzaj tego samego runnera/modelu — zmień go albo wykonaj zadanie bezpośrednio. Model/runner, który wcześniej kończył runy statusem `done`, jest bezpieczniejszym wyborem.
+
 ## Domena i produkt
 
 ## Kod i mockupy

@@ -12,7 +12,11 @@ export type { DataRequestKind } from './domain/data-request.entity.ts';
 export type { Forbidden, IdentityError, NotFound } from './domain/identity.errors.ts';
 export { checkPasswordLength } from './domain/policies/password.policy.ts';
 export { safeReturnTo } from './domain/policies/return-to.policy.ts';
-export { mustSetUpTwoFactor, sessionExpiresAt } from './domain/policies/session.policy.ts';
+export {
+  mustSetUpTwoFactor,
+  sessionEndedByAdminPolicy,
+  sessionExpiresAt,
+} from './domain/policies/session.policy.ts';
 export { hasPermission, isAdmin, type Permission, ROLES, type Role } from './domain/role.ts';
 export type { Auth } from './infrastructure/auth/create-auth.ts';
 export { hasSessionCookie } from './infrastructure/auth/session-cookie.ts';
