@@ -29,8 +29,8 @@
 
 - [ ] Wyłączyć na koncie claude.ai skille nieużywane w projekcie (docx, pptx, xlsx, pdf, google-workspace, docs, morning, hr-bot, computer-use, built-in-browser, chrome-browser, import-memory, cowork-*) — ~3 700 tok/sesję, nakład S (5.1).
 - [ ] Odłączyć konektory MCP claude.ai nieużywane w pracy z kodem (Meetings, Claude Docs, Claude Data, Atlassian Rovo v1, 29 nieautoryzowanych) albo uruchamiać sesje projektu bez nich — ~2 650 tok/sesję, nakład S (5.2).
-- [ ] Podzielić `.ai/lessons.md` na część „Proces” (zawsze) i pliki obszarowe podpięte w routerze — ~4 000–5 000 tok/zadanie, nakład S–M (5.3).
-- [ ] Dodać do `AGENTS.md` regułę czytania dużych specyfikacji fragmentami (`Grep` po nagłówku → `Read` z `offset/limit`) i spis treści na górze spec > 500 linii — 20 000–60 000 tok w sesjach na specyfikacjach, nakład S (5.4).
+- [x] Podzielić `.ai/lessons.md` na część „Proces” (zawsze) i pliki obszarowe podpięte w routerze — ~4 000–5 000 tok/zadanie, nakład S–M (5.3). **Wdrożone 2026-11-22:** `.ai/lessons/areas/{ui,e2e,backend,prototypes}.md`; `lessons.md` 16 937 → 8 253 zn. (~8 700 → ~4 230 tok).
+- [x] Dodać do `AGENTS.md` regułę czytania dużych specyfikacji fragmentami (`Grep` po nagłówku → `Read` z `offset/limit`) i spis treści na górze spec > 500 linii — 20 000–60 000 tok w sesjach na specyfikacjach, nakład S (5.4). **Wdrożone 2026-11-22** (reguła w „Sposób pracy” pkt 5; spis treści w spec — nie wdrożony).
 
 ## 1. Baseline
 

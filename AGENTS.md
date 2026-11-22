@@ -21,18 +21,18 @@ Wczytuj tylko wiersze pasujące do zadania. Plik `AGENTS.md` w katalogu, w któr
 
 | Zadanie | Przeczytaj |
 |---|---|
-| Naprawa błędu | `.ai/lessons.md` (sekcja „Błędy i ich przyczyny”), `SDLC.md` |
+| Naprawa błędu | `SDLC.md`; lekcje obszaru z wiersza poniżej (np. `.ai/lessons/areas/backend.md`) |
 | Nowa funkcja / ekran | `.ai/specs/product-brief.md`, `.ai/specs/backlog.md`, `.ai/templates/spec.md`, `.ai/specs/2026-10-21-tech-stack-i-standardy-inzynieryjne.md` |
 | Refaktor | `packages/core/AGENTS.md`, `BACKWARD_COMPATIBILITY.md` |
 | Przegląd kodu / PR | `CODE_REVIEW.md`, `.ai/agentic.config.json` (ścieżki wymagające przeglądu człowieka) |
-| Kod w `packages/core` lub importy z `apps/web`, `apps/worker` | `packages/core/AGENTS.md` |
+| Kod w `packages/core` lub importy z `apps/web`, `apps/worker` | `packages/core/AGENTS.md`, `.ai/lessons/areas/backend.md` |
 | Moduł `identity` | `packages/core/src/modules/identity/AGENTS.md` |
 | Moduł `scheduling` (i wzorzec nowego modułu) | `packages/core/src/modules/scheduling/AGENTS.md` |
 | Nazwy domenowe, teksty UI, specyfikacja | `docs/domain-glossary.md`, `apps/web/messages/pl.json` |
-| UI, nowy ekran, design system (`packages/ui`) | `docs/design-system.md` |
+| UI, nowy ekran, design system (`packages/ui`) | `docs/design-system.md`, `.ai/lessons/areas/ui.md` |
 | Decyzja architektoniczna / odejście od stacku | `docs/decisions/README.md` |
-| Testy e2e (`apps/web/e2e`) | `apps/web/e2e/support.ts`, `.ai/lessons.md` (sekcja „Kod i mockupy”) |
-| Prototyp (`prototypes/`) | `prototypes/kompas-flow/README.md` |
+| Testy e2e (`apps/web/e2e`) | `apps/web/e2e/support.ts`, `.ai/lessons/areas/e2e.md` |
+| Prototyp (`prototypes/`) | `prototypes/kompas-flow/README.md`, `.ai/lessons/areas/prototypes.md` |
 | Stare mockupy | `kompas-mentoring/mockupy/AGENTS.md` |
 | Sekrety, uprawnienia agenta | `security-notes.md` |
 
@@ -45,16 +45,16 @@ Wczytuj tylko wiersze pasujące do zadania. Plik `AGENTS.md` w katalogu, w któr
 - `YYYY-MM-DD` — data utworzenia pliku (bieżąca, nie z treści zadania).
 - `slug` — kebab-case: małe litery ASCII, cyfry i myślniki, bez polskich znaków, maks. ~6 słów.
 - Nazwa zajęta → sufiks `-2`. Przy przenoszeniu (np. do `implemented/`) nazwa się nie zmienia — `git mv`.
-- Wyjątek: dokumenty żyjące `.ai/specs/product-brief.md` i `.ai/specs/backlog.md` mają stałe nazwy i nie są przenoszone (zasady backlogu: `SDLC.md` §2a).
+- Wyjątki: dokumenty żyjące `.ai/specs/product-brief.md` i `.ai/specs/backlog.md` (zasady backlogu: `SDLC.md` §2a) oraz pliki obszarowe lekcji `.ai/lessons/areas/*.md` mają stałe nazwy i nie są przenoszone.
 
 ## Zasady obowiązkowe
 
-1. **Na początku każdego zadania MUSISZ przeczytać `.ai/lessons.md`** i otworzyć pliki z `.ai/lessons/`, które dotyczą Twojego zadania. Stosuj zapisane tam wnioski.
+1. **Na początku każdego zadania MUSISZ przeczytać `.ai/lessons.md`** oraz pliki obszarowe `.ai/lessons/areas/*.md` wskazane w routerze dla Twojego zadania, i otworzyć pliki z `.ai/lessons/`, które go dotyczą. Stosuj zapisane tam wnioski.
 2. **Przed implementacją nietrywialnej zmiany MUSISZ mieć specyfikację w `.ai/specs/`.** Sprawdź, czy pasująca już istnieje; jeśli nie — utwórz ją (szablon `.ai/templates/spec.md`) i dopiero potem pisz kod. Nietrywialna zmiana to nowa funkcja, nowy ekran, zmiana reguł domenowych, modelu danych lub przepływu, refaktor obejmujący kilka plików. Literówki, drobne poprawki stylów i jednolinijkowe fixy specyfikacji nie wymagają.
 3. **Implementuj zgodnie ze specyfikacją.** Jeśli trzeba od niej odejść, najpierw zaktualizuj specyfikację („Decyzje i zmiany”), potem kod.
 4. **Po pełnym wdrożeniu specyfikacji MUSISZ** ustawić `status: implemented`, uzupełnić `implemented:` (data) i przenieść plik przez `git mv` do `.ai/specs/implemented/`. Specyfikację porzuconą lub zastąpioną ustaw na `status: archived` (podaj powód / następcę) i przenieś do `.ai/specs/archive/`.
 5. **Każdy autonomiczny przebieg MUSI mieć log w `.ai/runs/`** (szablon `.ai/templates/run.md`). Przebieg autonomiczny to praca bez bieżącego nadzoru człowieka: zadanie w tle, przez orkiestrator (np. cezar), automatyzację, CI, sub-agenta lub pętlę. Utwórz log **na początku**, uzupełniaj na bieżąco i zamknij podsumowaniem — także gdy przebieg się nie powiódł.
-6. **Po naprawieniu błędu MUSISZ zapisać wniosek** w `.ai/lessons.md` (i ewentualnie w `.ai/lessons/`), jeśli przyczyna nie była oczywista, mogłaby się powtórzyć albo kosztowała dużo czasu. To samo dotyczy ustaleń wartych pamięci: decyzji i korekt użytkownika, pułapek narzędzi, konwencji niewynikających z kodu. Korekta dotycząca procesu wszystkich agentów → zaproponuj zmianę w `AGENTS.md`.
+6. **Po naprawieniu błędu MUSISZ zapisać wniosek** w `.ai/lessons.md` (proces, narzędzia) albo w pliku obszarowym `.ai/lessons/areas/*.md` (i ewentualnie w `.ai/lessons/`), jeśli przyczyna nie była oczywista, mogłaby się powtórzyć albo kosztowała dużo czasu. To samo dotyczy ustaleń wartych pamięci: decyzji i korekt użytkownika, pułapek narzędzi, konwencji niewynikających z kodu. Korekta dotycząca procesu wszystkich agentów → zaproponuj zmianę w `AGENTS.md`.
 7. **Nie zapisuj sekretów** (tokenów, haseł, danych osobowych) w żadnym pliku w `.ai/`.
 8. Pliki w `.ai/` commituj razem ze zmianą, której dotyczą.
 
@@ -64,6 +64,7 @@ Wczytuj tylko wiersze pasujące do zadania. Plik `AGENTS.md` w katalogu, w któr
 2. **Weryfikuj, zanim ogłosisz koniec.** Uruchom sprawdzenie z sekcji „Projekt”, przejdź zmieniony przepływ w przeglądarce i odhacz kryteria akceptacji specyfikacji. Nie raportuj sukcesu bez wyniku komend — jeśli czegoś nie dało się sprawdzić, napisz to wprost.
 3. **Błędy naprawiaj samodzielnie, od przyczyny.** Zgłoszony błąd albo czerwony typecheck/build to wystarczające polecenie: odtwórz, znajdź przyczynę, napraw, zweryfikuj — nie dopytuj o to, co da się ustalić z kodu. Fix, który wyszedł obejściem lub przypadkiem specjalnym, zastąp rozwiązaniem u źródła.
 4. **Praca równoległa.** Szerokie przeszukiwanie i przeglądy zlecaj sub-agentom. Równoległe sesje (osobne worktree, np. cezar) tylko dla zadań niezależnych, o rozłącznym zakresie plików.
+5. **Duże pliki czytaj fragmentami.** Specyfikację lub dokument dłuższy niż ~300 linii zacznij od nagłówków (`grep -n "^#"`) i czytaj tylko potrzebne sekcje (`offset`/`limit`); nie wczytuj ponownie pliku, który jest już w kontekście i się nie zmienił.
 
 ## Specyfikacje
 
@@ -75,7 +76,7 @@ Jeden plik na przebieg; log ma pozwolić człowiekowi lub kolejnemu agentowi zro
 
 ## Lekcje
 
-- `.ai/lessons.md` — jedyne miejsce czytane przez każdego agenta na starcie. Jedna lekcja = jeden punkt (1–3 zdania), pogrupowane tematycznie, z datą. Dłuższy opis → `.ai/lessons/YYYY-MM-DD-slug.md` (szablon `.ai/templates/lesson.md`) i punkt z linkiem.
+- `.ai/lessons.md` — czytany przez każdego agenta na starcie: lekcje ogólne (proces, narzędzia, CI) i spis plików obszarowych. Lekcja dotycząca jednego obszaru → `.ai/lessons/areas/<obszar>.md` (nowy obszar dopisz do spisu i routera). Jedna lekcja = jeden punkt (1–3 zdania), pogrupowane tematycznie, z datą. Dłuższy opis → `.ai/lessons/YYYY-MM-DD-slug.md` (szablon `.ai/templates/lesson.md`) i punkt z linkiem.
 - Przed dopisaniem sprawdź, czy podobna lekcja istnieje — aktualizuj zamiast dublować; błędne lub nieaktualne usuń albo popraw.
 - Zapisuj to, czego **nie da się** łatwo odczytać z kodu ani historii gita. Nie zapisuj streszczeń wykonanej pracy — od tego są runy.
 

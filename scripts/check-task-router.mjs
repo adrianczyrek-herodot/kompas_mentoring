@@ -1,5 +1,5 @@
-// Fails when a path routed from the root AGENTS.md does not exist, when an
-// AGENTS.md exceeds its line budget, or when a nested AGENTS.md has no CLAUDE.md
+// Fails when a path routed from the root AGENTS.md does not exist, when a lesson
+// area file (.ai/lessons/areas/*.md) is not routed, when an AGENTS.md exceeds its line budget, or when a nested AGENTS.md has no CLAUDE.md
 // importing it (Claude Code reads only CLAUDE.md in subdirectories).
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -43,6 +43,16 @@ for (const line of (routerSection ?? '').split('\n')) {
   for (const [, path] of cells[2].matchAll(/`([^`]+)`/g)) {
     routes += 1;
     if (!existsSync(join(root, path))) errors.push(`AGENTS.md router: "${path}" does not exist`);
+  }
+}
+
+const lessonAreasDir = join(root, '.ai/lessons/areas');
+if (existsSync(lessonAreasDir)) {
+  for (const name of readdirSync(lessonAreasDir).filter((entry) => entry.endsWith('.md'))) {
+    const path = `.ai/lessons/areas/${name}`;
+    if (!routerSection?.includes(`\`${path}\``)) {
+      errors.push(`AGENTS.md router: lesson area "${path}" is not routed`);
+    }
   }
 }
 

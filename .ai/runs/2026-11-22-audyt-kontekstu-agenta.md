@@ -41,3 +41,9 @@ Raport: `docs/context-audit/REPORT.md`. Zmienione: `AGENTS.md`, `CLAUDE.md`, `SD
 
 ## Wnioski
 Trzy wpisy w `.ai/lessons.md` (2026-11-22): pomiar tokenów z `usage`, `CLAUDE.md` obok zagnieżdżonych `AGENTS.md`, `git commit` w `ask` blokuje agenta headless.
+
+## Kontynuacja 2026-11-22 — wdrożenie szybkich wygranych 3 i 4
+- Na prośbę właściciela wdrożone tego samego dnia (diff zaakceptowany): podział `.ai/lessons.md` na `.ai/lessons/areas/*.md` (49 punktów przeniesionych dosłownie, sprawdzone skryptem; `lessons.md` 16 937 → 8 253 zn.) i reguła czytania dużych plików fragmentami w `AGENTS.md`. Spec: `.ai/specs/implemented/2026-11-22-podzial-lekcji-i-czytanie-spec.md`.
+- Weryfikacja: `node scripts/check-task-router.mjs` ✓ (25 ścieżek); test negatywny (niepodpięty plik obszarowy) → kod 1. Biome nie uruchomiony (brak w worktree).
+- Punkty 1–2 (skille, MCP) wymagają zmian w ustawieniach konta claude.ai — po stronie właściciela.
+- Commit i PR znów zablokowane (`git commit`, `gh` odrzucane w headless); zmiany w indeksie, komendy przekazane właścicielowi.
