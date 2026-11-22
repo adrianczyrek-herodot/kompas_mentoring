@@ -4,9 +4,9 @@
  * network/server error (selection kept), or success.
  */
 import { useToast } from '@kompas/ui';
-import { useDemo, useFakeRequest } from './demo-context';
+import { type RequestFailure, useDemo, useFakeRequest } from './demo-context';
 
-export type HoldResult = 'held' | 'conflict' | 'network' | 'server';
+export type HoldResult = 'held' | 'conflict' | RequestFailure;
 
 export function useCreateHold() {
   const { state, dispatch, now } = useDemo();

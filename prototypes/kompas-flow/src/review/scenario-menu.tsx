@@ -39,6 +39,15 @@ const FAIL: { value: FailNext; label: string }[] = [
   { value: 'server', label: 'Błąd serwera' },
 ];
 
+/** Minutes added to the fixed „now” (Tue 20 Oct 2026, 14:00). Adrian's session s1 starts 14:05. */
+const CLOCK: { value: string; label: string }[] = [
+  { value: '0', label: 'Wt 20.10, 14:00 — stały „teraz”' },
+  { value: '-10', label: '13:50 — pokój sesji 14:05 jeszcze zamknięty' },
+  { value: '20', label: '14:20 — sesja 14:05 trwa' },
+  { value: '70', label: '15:10 — sesja 14:05 zakończona' },
+  { value: '3960', label: 'Pt 23.10, 08:00 — mniej niż 12 h do sesji 18:00' },
+];
+
 const DATA: { value: DataState; label: string }[] = [
   { value: 'default', label: 'Dane' },
   { value: 'loading', label: 'Ładowanie' },
@@ -103,9 +112,78 @@ function DataStateToggle() {
   );
 }
 
+function SwitchRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  const id = useId();
+  return (
+    <div className="flex items-center justify-between gap-inline">
+      <label htmlFor={id} className="text-body-dense">
+        {label}
+      </label>
+      <Switch id={id} checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+}
+
+function TrialAnswer() {
+  const { dispatch, myBookings } = useDemo();
+  const pending = myBookings.filter((b) => b.status === 'requested');
+  const answer = (accept: boolean) => {
+    for (const booking of pending) {
+      dispatch({
+        type: 'answer-trial',
+        id: booking.id,
+        accept,
+        ...(accept ? {} : { reason: 'Termin koliduje z innym zobowiązaniem' }),
+      });
+    }
+  };
+  const disabled = pending.length === 0;
+  return (
+    <div className="flex flex-col gap-tight">
+      <FieldTitle>Mentor odpowiada na prośbę o sesję próbną</FieldTitle>
+      <div className="flex gap-inline">
+        <Button variant="outline" size="sm" disabled={disabled} focusableWhenDisabled onClick={() => { answer(true); }}>
+          Akceptuje
+        </Button>
+        <Button variant="outline" size="sm" disabled={disabled} focusableWhenDisabled onClick={() => { answer(false); }}>
+          Odrzuca
+        </Button>
+      </div>
+      <p className="text-meta text-text-muted">
+        {disabled
+          ? 'Działa dla ucznia z prośbą czekającą na mentora (np. Paweł R.). Mentor odpowiada też sam w M2.'
+          : `Próśb bieżącego konta czekających na mentora: ${String(pending.length)}.`}
+      </p>
+    </div>
+  );
+}
+
+function ClockChoice() {
+  const { state, dispatch } = useDemo();
+  const value = String(state.scenarios.clockOffset);
+  const options = CLOCK.some((o) => o.value === value) ? CLOCK : [...CLOCK, { value, label: `Przesunięty o ${value} min` }];
+  return (
+    <Choice
+      title="Zegar demo (U5, U6, M2)"
+      options={options}
+      value={value}
+      onChange={(next) => {
+        dispatch({ type: 'set-scenarios', patch: { clockOffset: Number(next) } });
+      }}
+    />
+  );
+}
+
 function ScenarioBody() {
   const { state, dispatch } = useDemo();
-  const conflictId = useId();
   const set = (patch: Partial<typeof state.scenarios>) => {
     dispatch({ type: 'set-scenarios', patch });
   };
@@ -130,18 +208,20 @@ function ScenarioBody() {
           set({ failNext });
         }}
       />
-      <div className="flex items-center justify-between gap-inline">
-        <label htmlFor={conflictId} className="text-body-dense">
-          Następna blokada terminu: konflikt 409
-        </label>
-        <Switch
-          id={conflictId}
-          checked={state.scenarios.slotConflict}
-          onCheckedChange={(slotConflict) => {
-            set({ slotConflict });
-          }}
-        />
-      </div>
+      <SwitchRow
+        label="Następna blokada terminu: konflikt 409"
+        checked={state.scenarios.slotConflict}
+        onChange={(slotConflict) => {
+          set({ slotConflict });
+        }}
+      />
+      <SwitchRow
+        label="Następne żądanie: sesja logowania wygasła"
+        checked={state.scenarios.sessionExpired}
+        onChange={(sessionExpired) => {
+          set({ sessionExpired });
+        }}
+      />
       <div className="flex flex-col gap-tight">
         <Button
           variant="outline"
@@ -158,6 +238,16 @@ function ScenarioBody() {
           <p className="text-meta text-text-muted">Działa, gdy w U2 trwa blokada terminu.</p>
         )}
       </div>
+      <Separator />
+      <ClockChoice />
+      <SwitchRow
+        label="Mentor nie dołącza do pokoju (U6)"
+        checked={state.scenarios.mentorNoShow}
+        onChange={(mentorNoShow) => {
+          set({ mentorNoShow });
+        }}
+      />
+      <TrialAnswer />
       <Separator />
       <Button
         variant="ghost"

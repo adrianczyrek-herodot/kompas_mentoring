@@ -8,7 +8,18 @@ import type { Booking } from './accounts';
 import type { Mentor } from './mentors';
 import { addMinutes, toMs, warsawIso } from '../lib/clock';
 
-const MIN_NOTICE_MINUTES = 6 * 60;
+/**
+ * Booking settings of the mentor (M3): minimum notice, buffer after a session and days off.
+ * Defaults are the grey mockups' values (`domain.ts` MIN_NOTICE_HOURS = 6).
+ */
+export type SlotRules = {
+  minNoticeHours: number;
+  bufferMin: number;
+  /** Inclusive ranges of calendar dates `YYYY-MM-DD`. */
+  daysOff: { from: string; to: string }[];
+};
+
+const DEFAULT_RULES: SlotRules = { minNoticeHours: 6, bufferMin: 0, daysOff: [] };
 /** Bookings at most 14 days ahead (KONCEPCJA §P3 „brak slotów w 14 dni”) → three calendar weeks. */
 const BOOKING_HORIZON_MINUTES = 14 * 24 * 60;
 export const WEEKS_AHEAD = 3;
@@ -33,20 +44,22 @@ export function weekDays(
   now: string,
   bookings: readonly Booking[],
   takenSlots: readonly string[] = [],
+  rules: SlotRules = DEFAULT_RULES,
 ): DaySlots[] {
-  const earliest = toMs(addMinutes(now, MIN_NOTICE_MINUTES));
+  const earliest = toMs(addMinutes(now, rules.minNoticeHours * 60));
   const latest = toMs(addMinutes(now, BOOKING_HORIZON_MINUTES));
-  const taken = new Set(
-    bookings
-      .filter((b) => b.mentorId === mentor.id && b.status !== 'cancelled')
-      .map((b) => toMs(b.startsAt)),
-  );
+  // A booked session blocks its own start and, with a buffer, the slot right after it.
+  const busy = bookings
+    .filter((b) => b.mentorId === mentor.id && b.status !== 'cancelled')
+    .map((b) => ({ from: toMs(b.startsAt), to: toMs(addMinutes(b.startsAt, b.durationMin + rules.bufferMin)) }));
+  const isBusy = (ms: number) => busy.some((b) => ms === b.from || (rules.bufferMin > 0 && ms >= b.from && ms < b.to));
+  const isDayOff = (iso: string) => rules.daysOff.some((r) => iso.slice(0, 10) >= r.from && iso.slice(0, 10) <= r.to);
   return Array.from({ length: 7 }, (_, weekday) => {
     const { year, month, day } = dateOf(week * 7 + weekday);
     const hours = mentor.availability[weekday] ?? [];
     const slots = hours
       .map((hour) => warsawIso(year, month, day, hour))
-      .filter((iso) => toMs(iso) >= earliest && toMs(iso) <= latest && !taken.has(toMs(iso)))
+      .filter((iso) => toMs(iso) >= earliest && toMs(iso) <= latest && !isBusy(toMs(iso)) && !isDayOff(iso))
       .map((iso) => ({ id: slotId(mentor.id, iso), startsAt: iso }))
       .filter((slot) => !takenSlots.includes(slot.id));
     return { date: warsawIso(year, month, day, 12), slots };

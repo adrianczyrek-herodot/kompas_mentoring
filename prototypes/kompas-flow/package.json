@@ -8,7 +8,9 @@
     "build": "vite build",
     "build:storybook": "node scripts/copy-to-storybook.mjs",
     "preview": "vite preview --port 4173",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:classes": "node scripts/check-classes.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@kompas/ui": "workspace:*",
@@ -17,8 +19,11 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@kompas/config": "workspace:*",
+    "@playwright/test": "1.64.1",
     "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "typescript": "6.0.3",

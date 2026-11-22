@@ -26,7 +26,8 @@ import { nextAvailableAfter, slotId, WEEKS_AHEAD, weekDays, weekLabel } from '..
 import { TIME_ZONES, timeZoneLabel } from '../lib/clock';
 import { href, navigate, type Route, withQuery } from '../lib/router';
 import { type BookingIntent, bookingIntent } from '../state/booking-intent';
-import { useDemo, useRetry } from '../state/demo-context';
+import { type RequestFailure, useDemo, useRetry } from '../state/demo-context';
+import { liveMentor, slotRulesOf } from '../state/world';
 import type { Draft } from '../state/demo-state';
 import { useCreateHold } from '../state/use-create-hold';
 import { MentorNotFound, MentorSummaryBar } from './booking-parts';
@@ -109,7 +110,7 @@ function ContinueBar({ draft, mentor }: { draft: Draft; mentor: Mentor }) {
   const { account } = useDemo();
   const createHold = useCreateHold();
   const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<'network' | 'server' | null>(null);
+  const [failure, setFailure] = useState<RequestFailure | null>(null);
   const reasonId = useId();
   const checkout = `/rezerwacja/${mentor.id}/platnosc`;
 
@@ -137,7 +138,9 @@ function ContinueBar({ draft, mentor }: { draft: Draft; mentor: Mentor }) {
           <AlertDescription>
             {failure === 'network'
               ? 'Brak połączenia z internetem. Wybrany termin zostaje zaznaczony — spróbuj ponownie.'
-              : 'To błąd po naszej stronie. Wybrany termin zostaje zaznaczony — spróbuj ponownie za chwilę.'}
+              : failure === 'expired'
+                ? 'Twoja sesja logowania wygasła. Zaloguj się ponownie — wybrany termin zostaje zaznaczony.'
+                : 'To błąd po naszej stronie. Wybrany termin zostaje zaznaczony — spróbuj ponownie za chwilę.'}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -173,7 +176,7 @@ function Picker({ mentor, draft }: { mentor: Mentor; draft: Draft }) {
   const days =
     status === 'empty'
       ? weekDays(mentor, draft.week, now, []).map((d) => ({ ...d, slots: [] }))
-      : weekDays(mentor, draft.week, now, state.bookings, state.takenSlots);
+      : weekDays(liveMentor(state.world, mentor), draft.week, now, state.bookings, state.takenSlots, slotRulesOf(state.world, mentor.id));
   const next =
     status === 'empty' ? undefined : nextAvailableAfter(mentor, draft.week, now, state.bookings, state.takenSlots);
   const setWeek = (week: number) => {
