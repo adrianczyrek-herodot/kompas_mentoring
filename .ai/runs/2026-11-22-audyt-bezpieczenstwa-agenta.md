@@ -33,7 +33,7 @@ Wynik: `security-notes.md`.
 - 15:13 — test prompt injection (`pi` + `claude-sonnet-4.5`): pułapka zatrzymana.
 
 ## Wynik
-Jedna zmiana na gałęzi `cez/5091a29b`: `.claude/settings.json`, `.claude/hooks/block-dangerous-commands.sh`,
+Jedna zmiana na gałęzi `cez/5091a29b` → PR #64 do `main`: https://github.com/adrianczyrek-herodot/kompas_mentoring/pull/64 (16 plików, +1281/−3, MERGEABLE, OPEN). Zmiana na gałęzi `cez/5091a29b`: `.claude/settings.json`, `.claude/hooks/block-dangerous-commands.sh`,
 `.github/CODEOWNERS`, `scripts/secrets.sh`, `security-tests/prompt-injection/`, `security-notes.md`,
 spec w `.ai/specs/implemented/`, ten log, oraz scalone znaleziska `security-notes.d/skills-om.md`.
 
