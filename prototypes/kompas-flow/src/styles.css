@@ -55,7 +55,7 @@
     @apply border-border-disabled bg-surface-disabled text-text-disabled;
   }
   .doc-toolbar .proto-toolbar {
-    @apply ml-0 shrink-0;
+    @apply ml-0 flex-wrap;
   }
   .doc-toolbar .segmented {
     @apply inline-flex shrink-0 overflow-hidden rounded-control border border-border-control;
