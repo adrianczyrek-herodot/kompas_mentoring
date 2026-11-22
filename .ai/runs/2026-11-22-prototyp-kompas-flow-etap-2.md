@@ -3,7 +3,7 @@ title: Prototyp kompas-flow — etap 2 od nowa (14 ekranów, stany, role, scenar
 date: 2026-11-22
 agent: Claude Code (claude-opus-5-5) + sub-zadania cezar (sonnet)
 status: done
-spec: .ai/specs/2026-11-21-prototyp-kompas-flow.md
+spec: .ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md
 branch: cez/2c93155b
 ---
 

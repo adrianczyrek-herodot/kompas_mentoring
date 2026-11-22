@@ -33,6 +33,14 @@ export type ScreenId =
  */
 export type Access = 'public' | 'booking' | 'guest' | 'auth' | 'student' | 'mentor' | 'admin';
 
+/** The honesty note shown under every frame: what is simulated and what the prototype leaves open. */
+type ScreenNotes = {
+  /** Things that pretend to be a real service (task rule 4). */
+  simulation?: string;
+  /** What the prototype does not decide — a question for the specification. */
+  open?: string;
+};
+
 export type ScreenDef = {
   id: ScreenId;
   name: string;
@@ -41,6 +49,7 @@ export type ScreenDef = {
   /** One sentence: the user's task (KONCEPCJA §4 „Cel”). */
   purpose: string;
   refs: string[];
+  notes: ScreenNotes;
   /** Hash path used when the screen is opened from the review bar or a comment thread. */
   sample: string;
   /** Item marked as current in the AppHeader navigation. */
@@ -56,6 +65,9 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'W kilka sekund przekierować gościa do wyszukiwarki z wstępnym filtrem.',
     refs: ['E2-S7', 'UC1'],
     sample: '/',
+    notes: {
+      open: 'Dobór i kolejność wyróżnionych mentorów oraz kategorii nie wynikają ze specyfikacji.',
+    },
   },
   {
     id: 'P2',
@@ -65,6 +77,9 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Porównać mentorów i wybrać 1–3 do obejrzenia.',
     refs: ['E2-S5', 'E2-S8', 'UC1'],
     sample: '/mentorzy',
+    notes: {
+      open: 'Zestaw filtrów i ich wartości domyślne wykraczają poza mapę ekranów.',
+    },
     nav: 'search',
   },
   {
@@ -75,6 +90,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Zbudować zaufanie i doprowadzić do rezerwacji sesji próbnej.',
     refs: ['E2-S6', 'UC2'],
     sample: '/mentorzy/m1',
+    notes: {
+      simulation: 'Wideo-wizytówka to atrapa — nie ma odtwarzacza ani transmisji.',
+      open: 'Oceny i opinie są fikcyjne (za zgodą) — nie pochodzą z realnych sesji.',
+    },
     nav: 'search',
   },
   {
@@ -85,6 +104,11 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Założyć konto lub zalogować się bez utraty kontekstu rezerwacji.',
     refs: ['E1 (F1)', 'E3-S9', 'UC3'],
     sample: '/logowanie',
+    notes: {
+      simulation:
+        'Logowanie przez Google/LinkedIn i reset hasła to symulacje — prototyp nie zbiera haseł ani danych dostawcy.',
+      open: 'Polityka haseł i wymagane zgody do potwierdzenia w specyfikacji.',
+    },
   },
   {
     id: 'U1',
@@ -94,6 +118,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Wybrać slot sesji próbnej lub kolejnej sesji z planu.',
     refs: ['E3-S3', 'E3-S4', 'UC4'],
     sample: '/rezerwacja/m1',
+    notes: {
+      simulation: 'Wolne terminy liczy się z danych demo, nie z kalendarza mentora.',
+      open: 'Strefa czasowa jest wybierana w pasku — docelowo ma pochodzić z profilu.',
+    },
     nav: 'search',
   },
   {
@@ -104,6 +132,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Opłacić rezerwację (albo potwierdzić z salda) i przekazać mentorowi kontekst.',
     refs: ['E3-S4', 'F4 Later (płatności)', 'UC4'],
     sample: '/rezerwacja/m1/platnosc',
+    notes: {
+      simulation: 'Płatność jest symulowana — nie ma pól karty, a wynik zależy od kontrolki scenariusza.',
+      open: 'Opłata 3 zł i kod KOMPAS10 pochodzą z szarego prototypu — brak wartości w KONCEPCJI.',
+    },
     nav: 'search',
   },
   {
@@ -114,6 +146,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Dać pewność, że sesja jest umówiona, i przygotować ucznia.',
     refs: ['E3-S4', 'E3-S8', 'UC4'],
     sample: '/rezerwacja/s2/potwierdzenie',
+    notes: {
+      simulation: 'Dodanie do kalendarza (.ics / Google / Outlook) to symulacja — plików nie generujemy.',
+      open: 'Treść e-maila potwierdzającego i terminy przypomnień do ustalenia.',
+    },
     nav: 'sessions',
   },
   {
@@ -124,6 +160,9 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Jedno miejsce z nadchodzącymi i minionymi sesjami.',
     refs: ['E3-S5', 'UC5'],
     sample: '/sesje',
+    notes: {
+      open: 'Kolejność i zakres minionych sesji oraz sald odzwierciedlają tylko dane demo.',
+    },
     nav: 'sessions',
   },
   {
@@ -134,6 +173,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Zarządzać pojedynczą sesją: dołączyć, przełożyć, anulować, zgłosić problem.',
     refs: ['E3-S5', 'E3-S6', 'UC10', 'UC17'],
     sample: '/sesje/s2',
+    notes: {
+      simulation: 'Przełożenie, anulowanie i zgłoszenie problemu zmieniają tylko stan demo.',
+      open: 'Reguły zwrotu i kary za późne anulowanie są poza mapą ekranów.',
+    },
     nav: 'sessions',
   },
   {
@@ -144,6 +187,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Odbyć sesję wideo z mentorem.',
     refs: ['F5 Later', 'UC6'],
     sample: '/sesje/s1/pokoj',
+    notes: {
+      simulation: 'Pokój sesji to symulacja — brak transmisji, mikrofonu i kamery; nic nie prosi o dostęp.',
+      open: 'Dostawca wideo i zachowanie przy zerwaniu połączenia do ustalenia.',
+    },
     nav: 'sessions',
   },
   {
@@ -154,6 +201,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Ocenić sesję i zdecydować o kontynuacji.',
     refs: ['F5 Later', 'UC7', 'UC8'],
     sample: '/sesje/s5/ocena',
+    notes: {
+      simulation: 'Ocena zapisuje się tylko w stanie demo; nie jest nigdzie publikowana.',
+      open: 'Kiedy ocena pojawia się na profilu i czy mentor może na nią odpowiedzieć.',
+    },
     nav: 'sessions',
   },
   {
@@ -164,6 +215,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Wybrać plan, zobaczyć saldo i odnowienia.',
     refs: ['F4 Later', 'UC9'],
     sample: '/plany',
+    notes: {
+      simulation: 'Zakup planu i przeniesienie salda to symulacje płatności.',
+      open: 'Ceny i warunki planów oraz wygasanie salda są poza zakresem mapy.',
+    },
     nav: 'sessions',
   },
   {
@@ -174,6 +229,9 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Widzieć cele, notatki i zadania z sesji.',
     refs: ['F5 Later', 'UC11'],
     sample: '/postepy',
+    notes: {
+      open: 'Zakres i autorstwo celów oraz zadań (mentor czy uczeń) do potwierdzenia.',
+    },
     nav: 'progress',
   },
   {
@@ -184,6 +242,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Rozmawiać z mentorem lub uczniem w platformie.',
     refs: ['F5 Later', 'UC5'],
     sample: '/wiadomosci',
+    notes: {
+      simulation: 'Wiadomości nie są nigdzie wysyłane — to wyłącznie stan demo.',
+      open: 'Dopuszczalność rozmowy przed pierwszą sesją i okres przechowywania wiadomości.',
+    },
     nav: 'messages',
   },
   {
@@ -194,6 +256,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Zobaczyć przypomnienia i zdarzenia dotyczące sesji.',
     refs: ['E3-S8'],
     sample: '/powiadomienia',
+    notes: {
+      simulation: 'Powiadomienia e-mail i push to symulacja — pokazujemy tylko listę w aplikacji.',
+      open: 'Kanały i reguły wysyłki powiadomień do ustalenia w specyfikacji.',
+    },
   },
   {
     id: 'S3',
@@ -203,6 +269,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Zarządzać profilem, powiadomieniami, bezpieczeństwem i danymi (RODO).',
     refs: ['E1 (F1)', 'E3-S9'],
     sample: '/konto',
+    notes: {
+      simulation: 'Eksport danych (RODO) i zmiany bezpieczeństwa to symulacje.',
+      open: 'Zakres eksportu i retencja danych do potwierdzenia w specyfikacji.',
+    },
     nav: 'account',
   },
   {
@@ -213,6 +283,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Przejść 6 kroków i wysłać wniosek do weryfikacji.',
     refs: ['E2-S2', 'E2-S3', 'UC12'],
     sample: '/mentor/onboarding/1',
+    notes: {
+      simulation: 'Weryfikacja tożsamości, wysyłka wniosku i dodanie zdjęcia to symulacje — pliki nigdzie nie trafiają.',
+      open: 'Czy mentor może edytować wniosek, który czeka już na weryfikację.',
+    },
   },
   {
     id: 'M2',
@@ -222,6 +296,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Zobaczyć dzisiejsze sesje i odpowiedzieć na prośby o sesję próbną.',
     refs: ['E3-S7', 'UC13'],
     sample: '/mentor',
+    notes: {
+      simulation: 'Dołączenie mentora i odpowiedź na prośbę o sesję próbną zmieniają tylko stan demo.',
+      open: 'SLA na odpowiedź mentora i zachowanie po jego przekroczeniu.',
+    },
     nav: 'dashboard',
   },
   {
@@ -232,6 +310,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Ustawić dostępność cykliczną, wyjątki i synchronizację kalendarza.',
     refs: ['E3-S2', 'E3-S10', 'UC14'],
     sample: '/mentor/kalendarz',
+    notes: {
+      simulation: 'Synchronizacja z Google Calendar to symulacja — brak realnego OAuth.',
+      open: 'Jak bufory i wyjątki łączą się z planem ucznia (kolizje) — do potwierdzenia.',
+    },
     nav: 'calendar',
   },
   {
@@ -242,6 +324,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Prowadzić cele, notatki i zadania uczniów.',
     refs: ['F5 Later', 'UC15'],
     sample: '/mentor/uczniowie',
+    notes: {
+      simulation: 'Cele, notatki i zadania ucznia żyją wyłącznie w stanie demo.',
+      open: 'Kto widzi notatki mentora (uczeń, zespół zaufania) i jak długo są przechowywane.',
+    },
     nav: 'students',
   },
   {
@@ -252,6 +338,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Widzieć rozliczone i oczekujące sesje oraz zlecić wypłatę.',
     refs: ['F6 Later', 'UC16'],
     sample: '/mentor/zarobki',
+    notes: {
+      simulation: 'Zlecenie wypłaty i eksport CSV to symulacje — żadne pieniądze nie są przelewane.',
+      open: 'Minimalna kwota wypłaty, prowizja i czas realizacji pochodzą z szarego prototypu.',
+    },
     nav: 'earnings',
   },
   {
@@ -262,6 +352,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Zatwierdzić, odesłać do poprawy albo odrzucić wniosek mentora.',
     refs: ['E2-S4', 'UC18'],
     sample: '/admin/weryfikacja',
+    notes: {
+      simulation: 'Decyzja o wniosku mentora zmienia tylko stan demo.',
+      open: 'Kto poza zespołem zaufania widzi wniosek i jak długo trwa weryfikacja.',
+    },
   },
   {
     id: 'A2',
@@ -271,6 +365,10 @@ export const SCREENS: ScreenDef[] = [
     purpose: 'Rozstrzygnąć zgłoszony problem z sesją.',
     refs: ['F6 Later', 'UC17'],
     sample: '/admin/spory',
+    notes: {
+      simulation: 'Rozstrzygnięcie sporu i zwrot zmieniają saldo tylko w stanie demo.',
+      open: 'Reguły zwrotu (kto pokrywa koszt) i możliwość odwołania są poza mapą.',
+    },
   },
 ];
 

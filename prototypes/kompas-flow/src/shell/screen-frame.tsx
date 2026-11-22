@@ -1,21 +1,22 @@
 /**
  * The review engine's screen anatomy: `section.screen#<ID>` with a meta line (hidden in
- * presentation mode), the product inside `.frame` (comments anchor there) and screen notes.
+ * presentation mode), the product inside `.frame` (comments anchor there) and the honesty note:
+ * backlog story numbers, what the prototype simulates and what it does not settle yet.
  */
 import { Badge } from '@kompas/ui';
 import { type ReactNode, useEffect } from 'react';
 import { refreshEngine } from '../review/engine-adapter';
 import type { ScreenDef } from '../screens/registry';
 
-export function ScreenFrame({
-  screen,
-  notes,
-  children,
-}: {
-  screen: ScreenDef | undefined;
-  notes?: ReactNode;
-  children: ReactNode;
-}) {
+function Note({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <p className="text-text-muted">
+      <strong className="font-semibold text-text-default">{label}</strong> {children}
+    </p>
+  );
+}
+
+export function ScreenFrame({ screen, children }: { screen: ScreenDef | undefined; children: ReactNode }) {
   const id = screen?.id ?? 'nieznany-adres';
   useEffect(() => {
     refreshEngine();
@@ -38,12 +39,16 @@ export function ScreenFrame({
         ) : null}
       </div>
       <div className="frame">{children}</div>
-      {notes ? (
+      {screen ? (
         <aside
           aria-label="Notatka do ekranu"
-          className="notes border-t border-border-divider bg-surface-sunken px-panel py-group text-body-dense"
+          className="notes flex flex-col gap-tight border-t border-border-divider bg-surface-sunken px-panel py-group text-body-dense"
         >
-          {notes}
+          <Note label="Historie:">{screen.refs.join(', ')}</Note>
+          {screen.notes.simulation ? (
+            <Note label="Symulacja:">{screen.notes.simulation}</Note>
+          ) : null}
+          {screen.notes.open ? <Note label="Czego nie rozstrzyga:">{screen.notes.open}</Note> : null}
         </aside>
       ) : null}
     </section>

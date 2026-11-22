@@ -1,13 +1,13 @@
 # POSTĘP — prototyp kompas-flow
 
-Specyfikacja: [`.ai/specs/2026-11-21-prototyp-kompas-flow.md`](../../.ai/specs/2026-11-21-prototyp-kompas-flow.md). Pierwsza wersja (bez design systemu, 156 błędów TS) — przegląd w [`.ai/runs/2026-11-21-przeglad-prototypu-kompas-flow.md`](../../.ai/runs/2026-11-21-przeglad-prototypu-kompas-flow.md); jej kod i stary plan są w historii gita (commit `ea4e3f4`).
+Specyfikacja: [`.ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md`](../../.ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md). Pierwsza wersja (bez design systemu, 156 błędów TS) — przegląd w [`.ai/runs/2026-11-21-przeglad-prototypu-kompas-flow.md`](../../.ai/runs/2026-11-21-przeglad-prototypu-kompas-flow.md); jej kod i stary plan są w historii gita (commit `ea4e3f4`).
 
 | Etap | Stan |
 |---|---|
 | 0 — plan (wersja 2, na `@kompas/ui`) | zaakceptowany 2026-11-21 |
 | 1 — szkielet i ścieżka F1 | zrobiony 2026-11-21 |
 | 2 — stany, role, scenariusze | zrobiony 2026-11-21/22 (przebudowa), wszystkie 23 ekrany, CI zielone |
-| 3 — uczciwość i sprawdzenie | w toku |
+| 3 — uczciwość i sprawdzenie | zrobiony 2026-11-22 |
 
 ## Etap 1 — szkielet i ścieżka F1 (2026-11-21)
 
@@ -222,3 +222,40 @@ przenieść tylko do mentora po odbytej próbnej; sloty (P3/U1/U5) respektują u
 2. Opłata serwisowa 3 zł i kod `KOMPAS10` pochodzą z szarego prototypu; KONCEPCJA wymienia te
    elementy bez wartości.
 3. Czy mentor może edytować wniosek, który czeka już na weryfikację?
+
+## Etap 3 — uczciwość i sprawdzenie (2026-11-22)
+
+### Notatki przy ekranach
+
+Każdy ekran ma pod ramką notatkę (`src/screens/registry.ts` → `notes`, render w
+`src/shell/screen-frame.tsx`): numery historii (`refs`), „Symulacja:” i „Czego nie rozstrzyga:”.
+Notatka jest częścią `section.screen`, więc wchodzi w przegląd axe i jest widoczna w trybie
+komentarzy; w trybie prezentacji silnik ją ukrywa.
+
+### README
+
+`prototypes/kompas-flow/README.md`: uruchomienie, testy, pasek przeglądu, konta demo, scenariusze,
+**Ograniczenia symulacji**, mapa ekranów, luki design systemu.
+
+### Testy nawigacji (`e2e/`, Playwright)
+
+- `playwright.config.ts`: `test:e2e`, `webServer` = `vite preview` (port 4173), projekty 320 i 1440 px.
+- `navigation.spec.ts`: render każdego ekranu na każdym z 7 kont; bramki (logowanie z powrotem,
+  rola, mentor przed weryfikacją); F1 (gość wybiera termin, loguje się w U2); każda kontrolka
+  scenariusza; tryby silnika i „← Back”; klawiatura (pierwszy Tab w pasku, slot Enterem, menu
+  scenariuszy Enterem/Escape); brak poziomego przewijania na 23 ekranach × 2 motywy × 2 szerokości.
+- `a11y.spec.ts`: axe WCAG 2.2 AA na każdym ekranie × jasny/ciemny (23 × 2), we właściwym koncie;
+  `include('section.screen')`.
+
+### Sprawdzone
+
+- `pnpm --filter @kompas/prototype-kompas-flow test:e2e` — 19 passed, 1 skipped (axe uruchamiamy
+  raz, na szerokim ekranie; wąski ekran pokrywa test przewijania).
+- `pnpm lint` 0 błędów, `pnpm typecheck` 7/7, `pnpm build` 2/2; `check:classes` 0; `check:tokens` 0.
+
+### Niesprawdzone
+
+- Safari i Firefox (tylko Chromium).
+- Pełny przegląd każdego pojedynczego przycisku produktu — testy pokrywają każdą kontrolkę
+  scenariusza, tryb silnika i kluczowe przepływy, nie każdy przycisk z osobna.
+- Na 320 px otwarty panel komentarzy zasłania pasek przeglądu; zamyka się Escape (silnik przeglądu).

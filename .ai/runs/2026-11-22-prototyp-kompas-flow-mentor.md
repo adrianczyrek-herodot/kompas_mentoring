@@ -3,7 +3,7 @@ title: Prototyp kompas-flow — ekrany mentora M1–M5
 date: 2026-11-22
 agent: Claude Code (Sonnet 5.5) w cezar
 status: done
-spec: .ai/specs/2026-11-21-prototyp-kompas-flow.md
+spec: .ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md
 branch: cez/e4c359fa
 ---
 

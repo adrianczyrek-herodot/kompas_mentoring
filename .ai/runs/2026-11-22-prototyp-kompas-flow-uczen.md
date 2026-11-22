@@ -3,7 +3,7 @@ title: Prototyp kompas-flow — ekrany ucznia i wspólne (U6–U9, S1–S3)
 date: 2026-11-22
 agent: Claude Code (Sonnet 5.5), cezar
 status: done
-spec: .ai/specs/2026-11-21-prototyp-kompas-flow.md
+spec: .ai/specs/implemented/2026-11-21-prototyp-kompas-flow.md
 branch: cez/eefe099f
 ---
 
