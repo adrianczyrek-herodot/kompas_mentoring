@@ -6,7 +6,7 @@ Proces dla ludzi i agentów AI (cezar + skille `open-mercato/skills`). Źródło
 
 | Etap | Co się dzieje | Narzędzie / właściciel | Wyjście |
 |---|---|---|---|
-| Specyfikacja | Jedna specyfikacja na fazę w `.ai/specs/` (szablon w `AGENTS.md`) z sekcją Open Questions. Implementacja startuje dopiero po odpowiedziach (bramka). Poprawka błędu nie wymaga specyfikacji. Decyzje trudne do odwrócenia → ADR w `docs/decisions/`. | `om-spec-writing`; człowiek akceptuje (`status: approved`) | Zaakceptowana spec |
+| Specyfikacja | Jedna specyfikacja na fazę w `.ai/specs/` (szablon w `.ai/templates/spec.md`) z sekcją Open Questions. Implementacja startuje dopiero po odpowiedziach (bramka). Poprawka błędu nie wymaga specyfikacji. Decyzje trudne do odwrócenia → ADR w `docs/decisions/`. | `om-spec-writing`; człowiek akceptuje (`status: approved`) | Zaakceptowana spec |
 | Backlog | Spec dzielona na zadania o rozłącznym zakresie modułów; pozycje w `.ai/specs/backlog.md` (§2a). | `om-backlog` | Zadania/issues |
 | Implementacja | Fazami, w osobnym worktree z własną gałęzią Neon; test w tym samym PR co kod; walidacja lokalna. Autonomiczny przebieg ma log w `.ai/runs/`. | `om-auto-implement-spec`, cezar; człowiek | PR (≤ ~400 linii) |
 | Review | Przegląd wg [CODE_REVIEW.md](CODE_REVIEW.md). Dla `billing`, `ledger`, `payouts`, `identity` i migracji — obowiązkowo człowiek, niezależnie od agentów. | `om-code-review`; człowiek | Zatwierdzenie |

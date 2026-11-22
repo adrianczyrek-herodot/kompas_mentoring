@@ -1,0 +1,10 @@
+# Lekcje — Testy e2e i integracyjne
+
+Plik obszarowy lekcji (zasady: `AGENTS.md` → „Lekcje”). Czytaj, gdy router w `AGENTS.md` wskazuje ten obszar: Playwright, axe, job e2e w CI, baza testowa, Testcontainers.
+
+- **2026-11-11** — E2E w CI padało w `playwright install --with-deps` (`Temporary failure resolving 'azure.archive.ubuntu.com'`, `apt` kod 100) — testy w ogóle nie startowały, a kod nie był winny. Przeglądarkę instalujemy z CDN Playwrighta (`playwright install chromium`), a `install-deps` przez `apt` jest osobnym krokiem z `continue-on-error` (obraz runnera ma biblioteki Chromium). Czerwony job e2e → najpierw sprawdź, który krok padł.
+- **2026-11-10** — Lokalne e2e używają bazy z docker-compose, której testy nie migrują — po dodaniu migracji uruchom `pnpm db:migrate`, inaczej rejestracja kończy się 500 (hook zapisu zgód) i padają niezwiązane testy.
+- **2026-11-22** — axe `color-contrast` uruchomiony **przed** wczytaniem webfontów daje fałszywe trafienia na małych przyciskach: próg kontrastu zależy od rozmiaru i wagi tekstu liczonych z fontu, a `transition-colors` w `.dark` zmienia kolory w trakcie pomiaru. Przed `analyze()` poczekaj na `document.fonts.ready` i na koniec przejścia (w `prototypes/kompas-flow/e2e/support.ts`: `setTheme`). Bez tego cały ciemny motyw „pada” losowo.
+- **2026-10-21** — Playwright: nie używaj `reuseExistingServer` domyślnie — w worktree port bywa zajęty przez serwer innej sesji i testy po cichu sprawdzają obcą aplikację. U nas reuse tylko przy `E2E_REUSE_SERVER=1`, port przez `E2E_PORT`.
+- **2026-10-21** — `pnpm test` to tylko testy jednostkowe; integracyjne (`pnpm test:integration`, Testcontainers) pomijają się bez Dockera z komunikatem, a w CI są obowiązkowe. Aplikacja web wymaga `DATABASE_URL` (walidacja env) — e2e dostaje domyślny URL z docker-compose.
+- **2026-11-10** — E2E w trybie produkcyjnym (`next start`) uruchamiają limit prób Better Auth (3/10 s per IP, IP z `x-forwarded-for`) — fixture `test` z `apps/web/e2e/support.ts` daje każdemu testowi własny adres. Next.js renderuje własny `role="alert"` (route announcer): komunikaty szukaj w `getByRole('main')`.
