@@ -1,7 +1,6 @@
 import { type AwilixContainer, asClass, asFunction } from 'awilix';
 import type { Clock } from '../../shared/domain/index.ts';
 import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
-import type { Orm } from '../../shared/infrastructure/db/orm.ts';
 import {
   type AddAvailabilityException,
   type DeleteAvailabilityException,
@@ -97,6 +96,6 @@ export const registerSchedulingModule = (container: AwilixContainer<SchedulingDe
 };
 
 /** Reactions of `scheduling` to other modules' events, started by the worker (spec §4.6). */
-export const schedulingEventSubscriptions = ({ orm }: { orm: Orm }) => [
+export const schedulingEventSubscriptions = ({ orm }: { orm: DatabaseCradle['orm'] }) => [
   makeMentorBookabilitySubscription({ orm }),
 ];

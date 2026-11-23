@@ -50,6 +50,7 @@ const toFailure = (error: BookingError): AvailabilityActionResult => {
     case 'scheduling.forbidden':
       return { ok: false, kind: 'forbidden' };
     case 'scheduling.not_found':
+    case 'scheduling.mentor_unavailable':
       return { ok: false, kind: 'not_found' };
     case 'booking.invalid_transition':
       return { ok: false, kind: 'conflict' };

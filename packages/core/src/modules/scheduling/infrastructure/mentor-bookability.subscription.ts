@@ -1,7 +1,7 @@
 import { DOMAIN_EVENTS } from '@kompas/contracts/events';
+import type { MikroORM } from '@mikro-orm/postgresql';
 import { Temporal } from 'temporal-polyfill';
 import { MentorId, money } from '../../../shared/domain/index.ts';
-import type { Orm } from '../../../shared/infrastructure/db/orm.ts';
 import { withInbox } from '../../../shared/infrastructure/events/inbox.ts';
 import type { EventSubscription } from '../../../shared/infrastructure/events/subscriptions.ts';
 import type { MentorBookability } from '../application/ports.ts';
@@ -30,7 +30,12 @@ const toBookability = (
  * `event_id` and runs the upsert in one transaction, so a redelivered job has no second effect and
  * a failing write leaves no marker behind (spec §4.6).
  */
-export const makeMentorBookabilitySubscription = ({ orm }: { orm: Orm }): EventSubscription => ({
+export const makeMentorBookabilitySubscription = ({
+  orm,
+}: {
+  /** Typed as MikroORM, not as `orm.ts`: that file imports module `di.ts` (no cycle). */
+  orm: MikroORM;
+}): EventSubscription => ({
   event: EVENT,
   consumer: 'scheduling',
   handle: async (data: unknown): Promise<void> => {
