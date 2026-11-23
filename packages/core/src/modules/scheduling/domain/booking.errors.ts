@@ -17,7 +17,8 @@ export type BookingError =
   | HoldExpired
   | EmailNotVerified
   | NotAcceptingNew
-  | HoldRateLimited;
+  | HoldRateLimited
+  | InsufficientCredit;
 
 /**
  * Why an availability payload is rejected (M3 acceptance: 29/30 min, overlap, grid,
@@ -86,6 +87,9 @@ export type NotAcceptingNew = DomainError<'scheduling.not_accepting_new'>;
 export interface HoldRateLimited extends DomainError<'scheduling.hold_rate_limited'> {
   readonly retryAfterSeconds: number;
 }
+
+/** F4 keeps the balance: the credit of a later session could not be reserved (→ 409). */
+export type InsufficientCredit = DomainError<'scheduling.insufficient_credit'>;
 
 /** The case of the goal field of a trial is outside 20–500 characters (→ 422). */
 export interface InvalidGoal extends DomainError<'scheduling.invalid_goal'> {

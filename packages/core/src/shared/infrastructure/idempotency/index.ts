@@ -9,4 +9,3 @@ export {
   PURGE_IDEMPOTENCY_CRON,
   PURGE_IDEMPOTENCY_QUEUE,
 } from './jobs/purge-idempotency.ts';
-export { Migration20261129000000PlatformIdempotency } from './migrations/Migration20261129000000PlatformIdempotency.ts';

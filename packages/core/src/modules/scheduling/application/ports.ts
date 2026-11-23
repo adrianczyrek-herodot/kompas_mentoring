@@ -7,11 +7,7 @@ import type {
   AvailabilityRule,
   MentorSchedule,
 } from '../domain/availability.entity.ts';
-import type {
-  Booking,
-  BookingPaymentMode,
-  BookingType,
-} from '../domain/booking.entity.ts';
+import type { Booking, BookingType } from '../domain/booking.entity.ts';
 import type { SchedulingForbidden } from '../domain/booking.errors.ts';
 import type { BookingStatus } from '../domain/booking.state.ts';
 import type { Interval } from '../domain/policies/slots-for.policy.ts';
@@ -106,7 +102,6 @@ export interface NewBooking {
   readonly holdExpiresAt: Temporal.Instant | null;
   readonly goal: string | null;
   readonly price: Money | null;
-  readonly paymentMode: BookingPaymentMode;
   readonly acceptDeadlineAt: Temporal.Instant | null;
   readonly now: Temporal.Instant;
 }
@@ -153,6 +148,49 @@ export interface BookingRepository {
     readonly acceptDeadlineAt?: Temporal.Instant;
     readonly now: Temporal.Instant;
   }): Promise<Booking | null>;
+  /**
+   * `checkout` in one transaction: flips the hold (only while it is still `hold` and unexpired),
+   * stores the goal and the deadline and publishes the booking events atomically (§4.6).
+   */
+  completeCheckout(input: CheckoutTransition): Promise<CheckoutOutcome>;
+}
+
+/** Q1: what `PaymentGate.start` decided about the money of a booking. */
+export type PaymentStart =
+  | { readonly kind: 'paid' }
+  | { readonly kind: 'pending'; readonly clientSecret: string };
+
+/** Port: the money step of `checkout` (spec "Booking — dane"). F3 adapter pays immediately. */
+export interface PaymentGate {
+  start(booking: Booking): Promise<PaymentStart>;
+}
+
+/** F4: whether the ledger could reserve the credit of a later session (no balance in F3). */
+export type CreditReservationOutcome =
+  | { readonly kind: 'ok' }
+  | { readonly kind: 'insufficient_credit' };
+
+/** Port: reservation of credit for a later session. F3 adapter is unmetered (no balance yet). */
+export interface CreditReservation {
+  reserve(booking: Booking): Promise<CreditReservationOutcome>;
+}
+
+/** Result of the single `checkout` transaction (§4.4). */
+export type CheckoutOutcome =
+  | { readonly kind: 'confirmed'; readonly booking: Booking }
+  | { readonly kind: 'expired' }
+  | { readonly kind: 'not_found' };
+
+/** Input of `BookingRepository.completeCheckout`: final state plus the events of the transaction. */
+export interface CheckoutTransition {
+  readonly bookingId: BookingId;
+  readonly studentId: StudentId;
+  /** `requested` for a paid trial, `scheduled` for a later session (Q-B2). */
+  readonly to: BookingStatus;
+  /** U2: the goal the student typed; required for a trial. */
+  readonly goal: string | null;
+  readonly acceptDeadlineAt: Temporal.Instant | null;
+  readonly now: Temporal.Instant;
 }
 
 /** Every command and query starts here (spec §8: checked server-side, not in the UI). */

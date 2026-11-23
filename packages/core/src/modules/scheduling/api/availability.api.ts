@@ -92,6 +92,7 @@ export const toSchedulingProblem = (error: BookingError): SchedulingProblem => {
     case 'scheduling.trial_already_used':
     case 'scheduling.hold_expired':
     case 'scheduling.not_accepting_new':
+    case 'scheduling.insufficient_credit':
     case 'booking.invalid_transition':
       return { status: 409, code: error.code };
     case 'scheduling.availability_conflicts':

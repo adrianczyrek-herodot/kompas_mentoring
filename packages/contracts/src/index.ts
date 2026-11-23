@@ -8,7 +8,12 @@ import {
 import { healthContract } from './health.contract.ts';
 import {
   addAvailabilityExceptionContract,
+  checkoutContract,
+  createHoldContract,
   deleteAvailabilityExceptionContract,
+  deleteHoldContract,
+  getBookingContract,
+  getHoldContract,
   getMentorAvailabilityContract,
   getMentorCalendarContract,
   saveAvailabilityTemplateContract,
@@ -31,6 +36,11 @@ export const contract = {
   addAvailabilityException: addAvailabilityExceptionContract,
   deleteAvailabilityException: deleteAvailabilityExceptionContract,
   updateMentorSettings: updateMentorSettingsContract,
+  createHold: createHoldContract,
+  getHold: getHoldContract,
+  deleteHold: deleteHoldContract,
+  checkout: checkoutContract,
+  getBooking: getBookingContract,
 };
 
 export type Contract = typeof contract;

@@ -1,5 +1,5 @@
 import { contract } from '@kompas/contracts';
-import { createRequestScope, type Result } from '@kompas/core';
+import { BookingId, createRequestScope, type Result } from '@kompas/core';
 import {
   type CatalogError,
   type MentorProfile,
@@ -10,6 +10,8 @@ import {
 import type { CurrentUser } from '@kompas/core/identity';
 import {
   type BookingError,
+  toBookingView,
+  toCheckoutView,
   toExceptionInput,
   toExceptionView,
   toMentorAvailabilityView,
@@ -20,6 +22,7 @@ import {
 } from '@kompas/core/scheduling';
 import { implement, ORPCError } from '@orpc/server';
 import { Temporal } from 'temporal-polyfill';
+import { runIdempotent } from './idempotency.ts';
 import { getContainer } from './runtime.ts';
 
 /** Request context given by the route handler: the browser's headers carry the session cookie. */
@@ -182,6 +185,49 @@ const deleteAvailabilityException = os.deleteAvailabilityException
     unwrapScheduling(await scope.cradle.deleteAvailabilityException(actor, input.id)),
   );
 
+/** U1 „Dalej”: takes the hold. `Idempotency-Key` makes a retry return the same hold (spec §4.6). */
+const createHold = os.createHold.use(authed).handler(async ({ input, context: { scope, actor, headers } }) =>
+  runIdempotent({ scope, actor, headers, path: ['bookings', 'holds'], body: input }, async () => {
+    const result = await scope.cradle.createHold(actor, {
+      mentorProfileId: input.mentorProfileId,
+      startsAt: Temporal.Instant.from(input.startsAt),
+      durationMinutes: input.durationMinutes ?? (input.type === 'trial' ? 30 : 60),
+      type: input.type,
+      goal: null,
+    });
+    return toBookingView(unwrapScheduling(result));
+  }),
+);
+
+/** U2 loads the hold it summarises; the owner comes from the session, never the URL. */
+const getHold = os.getHold.use(authed).handler(async ({ input, context: { scope, actor } }) =>
+  toBookingView(unwrapScheduling(await scope.cradle.getBooking(actor, BookingId.parse(input.id)))),
+);
+
+/** U2 „Zmień termin”: releases the student's own hold and returns to U1. */
+const deleteHold = os.deleteHold.use(authed).handler(async ({ input, context: { scope, actor } }) =>
+  toBookingView(unwrapScheduling(await scope.cradle.releaseHold(actor, BookingId.parse(input.id)))),
+);
+
+/** U2 „Potwierdź rezerwację”: confirms the hold (trial → requested, later session → scheduled). */
+const checkout = os.checkout.use(authed).handler(async ({ input, context: { scope, actor, headers } }) =>
+  runIdempotent({ scope, actor, headers, path: ['checkout'], body: input }, async () =>
+    toCheckoutView(
+      unwrapScheduling(
+        await scope.cradle.checkout(actor, {
+          holdId: BookingId.parse(input.holdId),
+          goal: input.goal ?? null,
+        }),
+      ),
+    ),
+  ),
+);
+
+/** U3 reads the booking by id; a foreign booking is one 404 (spec §8). */
+const getBooking = os.getBooking.use(authed).handler(async ({ input, context: { scope, actor } }) =>
+  toBookingView(unwrapScheduling(await scope.cradle.getBooking(actor, BookingId.parse(input.id)))),
+);
+
 const updateMentorSettings = os.updateMentorSettings
   .use(authed)
   .handler(async ({ input, context: { scope, actor } }) =>
@@ -210,4 +256,9 @@ export const router = os.router({
   addAvailabilityException,
   deleteAvailabilityException,
   updateMentorSettings,
+  createHold,
+  getHold,
+  deleteHold,
+  checkout,
+  getBooking,
 });

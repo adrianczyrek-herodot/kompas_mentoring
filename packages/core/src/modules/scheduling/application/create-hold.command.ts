@@ -1,4 +1,4 @@
-import { Temporal } from 'temporal-polyfill';
+import type { Temporal } from 'temporal-polyfill';
 import {
   BookingId,
   type Clock,
@@ -70,8 +70,9 @@ export const makeCreateHold =
       return err({ code: 'scheduling.not_accepting_new' });
     }
 
+    // U2 collects the goal at checkout; when it already arrives here it must still be valid.
     const goal = input.goal?.trim() ?? '';
-    if (input.type === 'trial') {
+    if (goal.length > 0) {
       const problem = goalProblem(goal);
       if (problem !== null) return err({ code: 'scheduling.invalid_goal', issue: problem });
     }
@@ -97,9 +98,8 @@ export const makeCreateHold =
       endsAt: input.startsAt.add({ minutes: durationMinutes }),
       bufferMinutes: schedule?.bufferMinutes ?? 0,
       holdExpiresAt: holdExpiresAt(now),
-      goal: input.type === 'trial' ? goal : goal.length > 0 ? goal : null,
+      goal: goal.length > 0 ? goal : null,
       price: priceFor(input.type, durationMinutes, mentor.rate60),
-      paymentMode: 'none',
       acceptDeadlineAt: null,
       now,
     });

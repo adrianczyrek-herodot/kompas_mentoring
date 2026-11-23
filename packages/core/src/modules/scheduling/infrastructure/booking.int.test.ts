@@ -1,4 +1,5 @@
-import { Temporal } from 'temporal-polyfill';
+import { FakeClock } from '@kompas/testing';
+import type { Temporal } from 'temporal-polyfill';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createRequestScope } from '../../../container.ts';
 import { BookingId, MentorId, newId, StudentId, UserId } from '../../../shared/domain/index.ts';
@@ -8,15 +9,13 @@ import type { GetMentorAvailabilityInput } from '../application/get-mentor-avail
 import {
   bookableMentor,
   readAvailability,
-  saveTemplate,
-  setSettings,
   startsAtOf,
   studentUser,
 } from './availability.int-support.ts';
 import {
   BOOKING_NOW,
   type BookingEnv,
-  MONDAY_TEMPLATE,
+  mondayMentor,
   SLOT_0900,
   SLOT_0930,
   SLOT_1000,
@@ -29,6 +28,7 @@ describe.skipIf(!dockerAvailable)(
   integrationSuite('scheduling: holds and the booking table (spec §4.4)'),
   () => {
     let env: BookingEnv;
+    const clock = new FakeClock(BOOKING_NOW);
     let counter = 0;
 
     const scope = () => {
@@ -57,26 +57,17 @@ describe.skipIf(!dockerAvailable)(
         goal: options.goal ?? null,
       });
 
-    const readyMentor = async () => {
-      const { mentor, profileId } = await bookableMentor(env.container);
-      await saveTemplate(env.container, mentor, MONDAY_TEMPLATE);
-      await setSettings(env.container, mentor, {
-        timeZone: 'Europe/Warsaw',
-        minNoticeMinutes: 120,
-        bufferMinutes: 0,
-      });
-      return { mentor, profileId };
-    };
+    const readyMentor = () => mondayMentor(env.container);
 
     const row = <T>(sql: string, params: unknown[] = []) =>
       env.container.cradle.orm.em.getConnection().execute<T[]>(sql, params);
 
     beforeAll(async () => {
-      env = await startBookingEnv();
+      env = await startBookingEnv(clock);
     });
 
     beforeEach(() => {
-      env.clock.set(BOOKING_NOW);
+      clock.set(BOOKING_NOW);
     });
 
     afterAll(async () => {
@@ -135,7 +126,6 @@ describe.skipIf(!dockerAvailable)(
         holdExpiresAt: null,
         goal: null,
         price: null,
-        paymentMode: 'none',
         acceptDeadlineAt: null,
         now: BOOKING_NOW,
       });
@@ -159,7 +149,6 @@ describe.skipIf(!dockerAvailable)(
         holdExpiresAt: null,
         goal: GOAL,
         price: null,
-        paymentMode: 'none',
         acceptDeadlineAt: null,
         now: BOOKING_NOW,
       });
@@ -181,7 +170,7 @@ describe.skipIf(!dockerAvailable)(
       const { profileId } = await readyMentor();
       const first = await studentUser(env.container);
       const stale = (await hold(first, profileId, SLOT_0900))._unsafeUnwrap();
-      env.clock.advance({ minutes: 11 });
+      clock.advance({ minutes: 11 });
 
       const second = await studentUser(env.container);
       expect((await hold(second, profileId, SLOT_0900)).isOk()).toBe(true);

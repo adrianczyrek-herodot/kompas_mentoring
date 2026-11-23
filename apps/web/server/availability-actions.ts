@@ -61,6 +61,7 @@ const toFailure = (error: BookingError): AvailabilityActionResult => {
     case 'scheduling.trial_already_used':
     case 'scheduling.hold_expired':
     case 'scheduling.not_accepting_new':
+    case 'scheduling.insufficient_credit':
     case 'scheduling.hold_rate_limited':
     case 'booking.invalid_transition':
       return { ok: false, kind: 'conflict' };

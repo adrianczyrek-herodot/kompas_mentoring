@@ -1,5 +1,6 @@
 // Public API of the scheduling module — the only file other modules and apps may import.
 
+export { toBookingView, toCheckoutView } from './api/booking.api.ts';
 export { toMentorAvailabilityView } from './api/mentor-availability.api.ts';
 export {
   type SchedulingProblem,
@@ -16,14 +17,30 @@ export type {
   AddAvailabilityExceptionInput,
   DeleteAvailabilityException,
 } from './application/availability-exceptions.commands.ts';
+export type {
+  Checkout,
+  CheckoutInput,
+  CheckoutResult,
+} from './application/checkout.command.ts';
 export type { CreateHold, CreateHoldInput } from './application/create-hold.command.ts';
 export type { ExpireHolds } from './application/expire-holds.handler.ts';
+export type { GetBooking } from './application/get-booking.query.ts';
 export type {
   AvailabilityBookingType,
   AvailabilityDuration,
   GetMentorAvailability,
   GetMentorAvailabilityInput,
 } from './application/get-mentor-availability.query.ts';
+export type {
+  CheckoutTransition,
+  CreditReservation,
+  CreditReservationOutcome,
+  InsertOutcome,
+  NewBooking,
+  PaymentGate,
+  PaymentStart,
+} from './application/ports.ts';
+export type { BookingRepository } from './application/ports.ts';
 export type { ReleaseHold } from './application/release-hold.command.ts';
 export type {
   AvailableSlot,
@@ -66,6 +83,7 @@ export type {
   EmailNotVerified,
   HoldExpired,
   HoldRateLimited,
+  InsufficientCredit,
   InvalidAvailability,
   InvalidGoal,
   NotAcceptingNew,
@@ -75,6 +93,8 @@ export type {
   VersionConflict,
 } from './domain/booking.errors.ts';
 export { autoAcceptDeadline } from './domain/policies/auto-accept-deadline.policy.ts';
+export type { BookingIcs } from './infrastructure/ics.ts';
+export { toIcs } from './infrastructure/ics.ts';
 export { type GoalProblem, goalProblem } from './domain/policies/goal.policy.ts';
 export {
   holdExpiresAt,

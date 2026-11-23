@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto';
 
 /** Recursively sorts object keys and drops `undefined`, so two equal bodies fingerprint alike. */
 const canonical = (value: unknown): string => {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null';
+  if (value === undefined) return 'null';
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
   const entries = Object.entries(value as Record<string, unknown>)
     .filter(([, entry]) => entry !== undefined)

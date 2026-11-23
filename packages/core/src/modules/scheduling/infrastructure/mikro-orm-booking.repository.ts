@@ -1,9 +1,22 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import type { Temporal } from 'temporal-polyfill';
 import type { BookingId, StudentId } from '../../../shared/domain/index.ts';
-import type { BookingRepository, InsertOutcome, NewBooking } from '../application/ports.ts';
+import type { Env } from '../../../shared/infrastructure/env.ts';
+import type { EventPublisher } from '../../../shared/infrastructure/events/outbox.ts';
+import type {
+  BookingRepository,
+  CheckoutOutcome,
+  CheckoutTransition,
+  InsertOutcome,
+  NewBooking,
+} from '../application/ports.ts';
 import type { Booking } from '../domain/booking.entity.ts';
 import type { BookingStatus } from '../domain/booking.state.ts';
+import {
+  bookingConfirmedEvent,
+  bookingExpiredEvent,
+  bookingRequestedEvent,
+} from './booking.events.ts';
 import { toBooking, toDate } from './booking.mapper.ts';
 import { BookingRecord } from './scheduling.records.ts';
 
@@ -24,7 +37,7 @@ const INSERT_BOOKING = `insert into "scheduling"."booking"
    "accept_deadline_at", "created_at", "updated_at", "reschedule_count", "version")
   values (?, ?, ?, ?, ?, ?, ?, ?, tstzrange(?, ?, '[)'), ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)`;
 
-/** The Postgres error codes of the §4.4 constraints: 23P01 = exclusion, 23505 = unique. */
+/** The Postgres constraint names of §4.4 map to the domain reasons of `createHold`. */
 const CONSTRAINT_OUTCOMES: Record<string, InsertOutcome['kind']> = {
   booking_mentor_no_overlap: 'slot_taken',
   booking_student_no_overlap: 'student_busy',
@@ -49,12 +62,24 @@ const constraintOf = (error: unknown): string | undefined => {
   return undefined;
 };
 
-/** Adapter: `scheduling.booking` (spec §4.4). Writes go through raw SQL — `during` is generated. */
+/** Adapter: `scheduling.booking` (spec §4.4). Writes go through raw SQL — `during` is a range. */
 export class MikroOrmBookingRepository implements BookingRepository {
   readonly #em: EntityManager;
+  readonly #eventPublisher: EventPublisher;
+  readonly #paymentMode: Env['BOOKING_PAYMENT_MODE'];
 
-  constructor({ em }: { em: EntityManager }) {
+  constructor({
+    em,
+    eventPublisher,
+    env,
+  }: {
+    em: EntityManager;
+    eventPublisher: EventPublisher;
+    env: Env;
+  }) {
     this.#em = em;
+    this.#eventPublisher = eventPublisher;
+    this.#paymentMode = env.BOOKING_PAYMENT_MODE;
   }
 
   async findById(id: BookingId): Promise<Booking | null> {
@@ -81,65 +106,65 @@ export class MikroOrmBookingRepository implements BookingRepository {
   }
 
   async createHold(booking: NewBooking): Promise<InsertOutcome> {
-    try {
-      return await this.#em.transactional((em) =>
-        // A savepoint keeps the release/expire work atomic with the insert: if the insert violates a
-        // constraint, the whole claim rolls back and the student keeps their previous hold.
-        em.transactional(async (tem) => {
-          const context = tem.getTransactionContext();
-          const connection = tem.getConnection();
-          await connection.execute(
-            RELEASE_PREVIOUS_HOLD,
-            [toDate(booking.now), booking.studentId],
-            'all',
-            context,
-          );
-          await connection.execute(
-            EXPIRE_OVERLAPPING_HOLDS,
-            [
-              toDate(booking.now),
-              toDate(booking.now),
-              toDate(booking.startsAt),
-              toDate(booking.endsAt.add({ minutes: booking.bufferMinutes })),
-            ],
-            'all',
-            context,
-          );
-          await connection.execute(
-            INSERT_BOOKING,
-            [
-              booking.id,
-              booking.mentorId,
-              booking.studentId,
-              booking.type,
-              booking.status,
-              toDate(booking.startsAt),
-              toDate(booking.endsAt),
-              booking.bufferMinutes,
-              toDate(booking.startsAt),
-              toDate(booking.endsAt.add({ minutes: booking.bufferMinutes })),
-              booking.holdExpiresAt === null ? null : toDate(booking.holdExpiresAt),
-              booking.goal,
-              booking.price?.amount ?? null,
-              booking.price?.currency ?? null,
-              booking.paymentMode,
-              booking.acceptDeadlineAt === null ? null : toDate(booking.acceptDeadlineAt),
-              toDate(booking.now),
-              toDate(booking.now),
-            ],
-            'all',
-            context,
-          );
-          const created = await this.#read(tem, booking.id);
-          if (created === null) throw new Error(`Booking ${booking.id} vanished right after insert`);
-          return { kind: 'created', booking: created } satisfies InsertOutcome;
-        }),
-      );
-    } catch (error) {
-      const outcome = CONSTRAINT_OUTCOMES[constraintOf(error) ?? ''];
-      if (outcome !== undefined && outcome !== 'created') return { kind: outcome };
-      throw error;
-    }
+    return this.#em.transactional(async (em) => {
+      const connection = em.getConnection();
+      // The savepoint keeps release/expire/insert atomic: a constraint violation rolls all three
+      // back, so a rejected hold never costs the student their previous one.
+      await connection.execute('savepoint booking_claim', [], 'all', em.getTransactionContext());
+      try {
+        await connection.execute(
+          RELEASE_PREVIOUS_HOLD,
+          [toDate(booking.now), booking.studentId],
+          'all',
+          em.getTransactionContext(),
+        );
+        await connection.execute(
+          EXPIRE_OVERLAPPING_HOLDS,
+          [
+            toDate(booking.now),
+            toDate(booking.now),
+            toDate(booking.startsAt),
+            toDate(booking.endsAt.add({ minutes: booking.bufferMinutes })),
+          ],
+          'all',
+          em.getTransactionContext(),
+        );
+        await connection.execute(
+          INSERT_BOOKING,
+          [
+            booking.id,
+            booking.mentorId,
+            booking.studentId,
+            booking.type,
+            booking.status,
+            toDate(booking.startsAt),
+            toDate(booking.endsAt),
+            booking.bufferMinutes,
+            toDate(booking.startsAt),
+            toDate(booking.endsAt.add({ minutes: booking.bufferMinutes })),
+            booking.holdExpiresAt === null ? null : toDate(booking.holdExpiresAt),
+            booking.goal,
+            booking.price?.amount ?? null,
+            booking.price?.currency ?? null,
+            this.#paymentMode,
+            booking.acceptDeadlineAt === null ? null : toDate(booking.acceptDeadlineAt),
+            toDate(booking.now),
+            toDate(booking.now),
+          ],
+          'all',
+          em.getTransactionContext(),
+        );
+      } catch (error) {
+        await connection.execute('rollback to savepoint booking_claim', [], 'all', em.getTransactionContext());
+        const outcome = CONSTRAINT_OUTCOMES[constraintOf(error) ?? ''];
+        if (outcome !== undefined && outcome !== 'created') return { kind: outcome };
+        throw error;
+      }
+      await connection.execute('release savepoint booking_claim', [], 'all', em.getTransactionContext());
+      const created = await this.#read(em, booking.id);
+      if (created === null) throw new Error(`Booking ${booking.id} vanished right after insert`);
+      return { kind: 'created', booking: created };
+    });
   }
 
   async releaseHold(
@@ -165,14 +190,15 @@ export class MikroOrmBookingRepository implements BookingRepository {
         'all',
         em.getTransactionContext(),
       );
-      const ids = rows.map((row) => row.id);
-      if (ids.length === 0) return [];
-      const found = await em.find(
-        BookingRecord,
-        { id: { $in: ids } },
-        { disableIdentityMap: true },
-      );
-      return found.map(toBooking);
+      const expired = await this.#readMany(em, rows.map((row) => row.id));
+      if (expired.length > 0) {
+        // The job is the F3 trigger of `booking_expired`; F4 billing listens for the refund.
+        await this.#eventPublisher.publish(
+          em,
+          expired.map((booking) => bookingExpiredEvent(booking, now)),
+        );
+      }
+      return expired;
     });
   }
 
@@ -202,12 +228,58 @@ export class MikroOrmBookingRepository implements BookingRepository {
     });
   }
 
+  async completeCheckout(input: CheckoutTransition): Promise<CheckoutOutcome> {
+    return this.#em.transactional(async (em) => {
+      const rows = await em.getConnection().execute<{ id: string }[]>(
+        `update "scheduling"."booking"
+          set "status" = ?, "goal" = ?, "accept_deadline_at" = ?,
+              "version" = "version" + 1, "updated_at" = ?
+          where "id" = ? and "student_id" = ? and "status" = 'hold' and "hold_expires_at" > ?
+          returning "id"`,
+        [
+          input.to,
+          input.goal,
+          input.acceptDeadlineAt === null ? null : toDate(input.acceptDeadlineAt),
+          toDate(input.now),
+          input.bookingId,
+          input.studentId,
+          toDate(input.now),
+        ],
+        'all',
+        em.getTransactionContext(),
+      );
+      if (rows.length === 0) {
+        const existing = await this.#read(em, input.bookingId);
+        if (existing === null) return { kind: 'not_found' };
+        if (existing.studentId !== input.studentId) return { kind: 'not_found' };
+        if (existing.status === 'hold') {
+          // The hold passed its deadline between the read and the update: expire it and say so.
+          const expired = await this.#expireHold(input.bookingId, input.now, {}, em);
+          if (expired !== null) {
+            await this.#eventPublisher.publish(em, [bookingExpiredEvent(expired, input.now)]);
+          }
+        }
+        return { kind: 'expired' };
+      }
+      const booking = await this.#read(em, input.bookingId);
+      if (booking === null) return { kind: 'not_found' };
+      // State and outbox job share the transaction: a rollback publishes nothing (spec §4.6).
+      await this.#eventPublisher.publish(em, [
+        input.acceptDeadlineAt === null
+          ? bookingConfirmedEvent(booking, 'credit', input.now)
+          : bookingRequestedEvent(booking, input.acceptDeadlineAt, input.now),
+      ]);
+      return { kind: 'confirmed', booking };
+    });
+  }
+
   async #expireHold(
     id: BookingId,
     now: Temporal.Instant,
     scope: { studentId?: StudentId },
+    existingEm?: EntityManager,
   ): Promise<Booking | null> {
-    return this.#em.transactional(async (em) => {
+    const run = async (em: EntityManager): Promise<Booking | null> => {
       const row = await em.findOne(
         BookingRecord,
         { id, status: 'hold', ...scope },
@@ -219,8 +291,19 @@ export class MikroOrmBookingRepository implements BookingRepository {
         { id, status: 'hold' },
         { status: 'expired', version: row.version + 1, updatedAt: toDate(now) },
       );
-      return this.#read(em, id);
-    });
+      const expired = await this.#read(em, id);
+      if (expired !== null) {
+        await this.#eventPublisher.publish(em, [bookingExpiredEvent(expired, now)]);
+      }
+      return expired;
+    };
+    return existingEm === undefined ? this.#em.transactional(run) : run(existingEm);
+  }
+
+  async #readMany(em: EntityManager, ids: readonly string[]): Promise<Booking[]> {
+    if (ids.length === 0) return [];
+    const found = await em.find(BookingRecord, { id: { $in: ids } }, { disableIdentityMap: true });
+    return found.map(toBooking);
   }
 
   async #read(em: EntityManager, id: BookingId): Promise<Booking | null> {
