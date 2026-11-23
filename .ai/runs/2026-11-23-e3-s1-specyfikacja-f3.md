@@ -23,6 +23,7 @@ Historia E3-S1 (#36, epik #24): szkic specyfikacji F3 ze stałymi ID ekranów, m
 - 10:30 — Odpowiedzi właściciela: **Q1–Q21 wszystkie zgodnie z rekomendacjami**. Wpisane w „Decyzje i zmiany” spec F3, `status: approved`; zaktualizowany backlog (E3 approved, E3-S1 gotowe, E3-S4/E3-S9 wg Q19, U2/U3 w F3 wg Q1).
 - 10:40 — §4.3 spec stacku uzupełnione o przejścia z Q7 (`hold.hold_released → expired`, `requested.cancelled_by_student → cancelled`) + wpis w „Decyzje i zmiany” spec stacku. Przejścia wchodzą do kodu `scheduling` z implementacją F3 (E3-S4/E3-S6).
 - 10:50 — Commit `113eebe` na `cez/00c9b37b`, wypchnięty; **PR #70** do `main` (etykiety `documentation`, `skip-qa`). Komentarze z postępem w #36 (E3-S1) i #24 (epik E3).
+- 11:05 — CI na PR #70 zielone: lint, typecheck, test (unit, integration, Storybook light+dark), build, e2e smoke. PR gotowy do scalenia przez człowieka.
 
 ## Wynik
 - Nowe: `.ai/specs/2026-11-23-f3-dostepnosc-rezerwacje.md` (`status: approved`), ten log.
