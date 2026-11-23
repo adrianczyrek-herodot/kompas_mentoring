@@ -34,6 +34,13 @@ z publicznym `GET /mentors/:id/availability`.
   `event_id`, upsert jednego wiersza). `accepting_new` było w migracji `catalog` z F2, ale nie
   w encji/recordzie/mapperze — dopisane.
 
+- 12:0x — krok 8: `getMentorAvailability` (zakres, „następny wolny termin", horyzont 8 tygodni,
+  próbna = 30 min + min. 6 h wyprzedzenia), port `BusyRepository` (adapter pusty do kroku 10),
+  publiczne `GET /mentors/{id}/availability` (sloty + godziny lokalne w strefie pytającego) i
+  kod `scheduling.mentor_unavailable` (404); testy integracyjne z bazą: szablon w strefie mentora,
+  wyjątki `off`/`extra`, bufor mentora (fake busy), DST marzec/październik, „następny wolny termin",
+  próbna vs kolejna sesja, 404. `temporal-polyfill` dodany do `apps/web` (router buduje instanty).
+
 ## Wynik
 (w toku)
 

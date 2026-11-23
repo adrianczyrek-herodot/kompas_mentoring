@@ -1,12 +1,12 @@
 export {
   AddAvailabilityExceptionInput,
-  addAvailabilityExceptionContract,
   AvailabilityConflicts,
-  AvailabilityExceptionKind,
   AvailabilityExceptionId,
+  AvailabilityExceptionKind,
   AvailabilityExceptionView,
   AvailabilityIssues,
   AvailabilityRuleView,
+  addAvailabilityExceptionContract,
   deleteAvailabilityExceptionContract,
   getMentorCalendarContract,
   MentorCalendarSession,
@@ -18,3 +18,10 @@ export {
   updateMentorSettingsContract,
 } from './availability.contract.ts';
 export { SCHEDULING_LIMITS } from './limits.ts';
+export {
+  AvailabilityBookingType,
+  AvailabilityDurationMinutes,
+  getMentorAvailabilityContract,
+  MentorAvailabilitySlot,
+  MentorAvailabilityView,
+} from './mentor-availability.contract.ts';

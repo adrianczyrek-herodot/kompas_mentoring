@@ -8,6 +8,7 @@ import type {
   MentorSchedule,
 } from '../domain/availability.entity.ts';
 import type { SchedulingForbidden } from '../domain/booking.errors.ts';
+import type { Interval } from '../domain/policies/slots-for.policy.ts';
 
 /** Port: mentor availability (MikroORM adapter in `infrastructure/`). */
 export interface AvailabilityRepository {
@@ -72,6 +73,18 @@ export interface MentorBookabilityRepository {
   findByProfileId(mentorProfileId: string): Promise<MentorBookability | null>;
   /** Consumer side: stores the newest state; the inbox already deduped the event itself. */
   upsert(bookability: MentorBookability): Promise<void>;
+}
+
+/**
+ * Port: time that cannot be booked although the template is open (Q17). Bookings join in step 10
+ * and Google Calendar in E3-S10; until then the adapter answers with an empty list, so the query,
+ * the engine and the API are already complete.
+ */
+export interface BusyRepository {
+  listBusy(
+    mentorId: MentorId,
+    range: { from: Temporal.Instant; to: Temporal.Instant },
+  ): Promise<Interval[]>;
 }
 
 /** Every command and query starts here (spec §8: checked server-side, not in the UI). */

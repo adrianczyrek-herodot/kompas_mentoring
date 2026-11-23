@@ -12,12 +12,14 @@ import {
   type BookingError,
   toExceptionInput,
   toExceptionView,
+  toMentorAvailabilityView,
   toMentorCalendarView,
   toRuleInput,
   toScheduleSettings,
   toSchedulingProblem,
 } from '@kompas/core/scheduling';
 import { implement, ORPCError } from '@orpc/server';
+import { Temporal } from 'temporal-polyfill';
 import { getContainer } from './runtime.ts';
 
 /** Request context given by the route handler: the browser's headers carry the session cookie. */
@@ -115,6 +117,24 @@ const confirmPhotoUpload = os.confirmPhotoUpload
     return viewOf(unwrap(result), actor);
   });
 
+/**
+ * Requirement 20: public availability of one mentor (U1). No session — a guest sees the slots, and
+ * the session is only needed at the hold. `:id` is the mentor profile id.
+ */
+const getMentorAvailability = os.getMentorAvailability.handler(async ({ input }) => {
+  const scope = createRequestScope(getContainer(), { requestId: crypto.randomUUID() });
+  const result = await scope.cradle.getMentorAvailability({
+    mentorProfileId: input.id,
+    range: {
+      from: Temporal.Instant.from(input.from),
+      to: Temporal.Instant.from(input.to),
+    },
+    durationMinutes: input.duration ?? 30,
+    kind: input.type ?? 'plan',
+  });
+  return toMentorAvailabilityView(unwrapScheduling(result), input.timeZone);
+});
+
 /** Q13: the M3 "pause new students" switch goes to `catalog`, the source of truth. */
 const setAcceptingNew = os.setAcceptingNew
   .use(authed)
@@ -183,6 +203,7 @@ export const router = os.router({
   requestPhotoUpload,
   confirmPhotoUpload,
   setAcceptingNew,
+  getMentorAvailability,
   getMentorCalendar,
   saveAvailabilityTemplate,
   addAvailabilityException,

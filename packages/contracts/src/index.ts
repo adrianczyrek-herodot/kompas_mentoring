@@ -9,6 +9,7 @@ import { healthContract } from './health.contract.ts';
 import {
   addAvailabilityExceptionContract,
   deleteAvailabilityExceptionContract,
+  getMentorAvailabilityContract,
   getMentorCalendarContract,
   saveAvailabilityTemplateContract,
   updateMentorSettingsContract,
@@ -24,6 +25,7 @@ export const contract = {
   requestPhotoUpload: requestPhotoUploadContract,
   confirmPhotoUpload: confirmPhotoUploadContract,
   setAcceptingNew: setAcceptingNewContract,
+  getMentorAvailability: getMentorAvailabilityContract,
   getMentorCalendar: getMentorCalendarContract,
   saveAvailabilityTemplate: saveAvailabilityTemplateContract,
   addAvailabilityException: addAvailabilityExceptionContract,

@@ -7,6 +7,7 @@ export type BookingError =
   | InvalidAvailability
   | AvailabilityConflicts
   | SchedulingNotFound
+  | MentorUnavailable
   | SchedulingForbidden
   | VersionConflict;
 
@@ -45,6 +46,12 @@ interface AvailabilityConflicts extends DomainError<'scheduling.availability_con
 
 /** Someone else's resource, or none at all — indistinguishable on purpose (→ 404, spec §8). */
 type SchedulingNotFound = DomainError<'scheduling.not_found'>;
+
+/**
+ * The mentor cannot be booked at all: no profile, not `approved` or `suspended` (Q5, Q13). One
+ * answer for every reason, so a public caller cannot tell a draft from a suspension (→ 404).
+ */
+type MentorUnavailable = DomainError<'scheduling.mentor_unavailable'>;
 
 /** The actor lacks the permission (→ 403). */
 export type SchedulingForbidden = DomainError<'scheduling.forbidden'>;
