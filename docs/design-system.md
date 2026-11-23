@@ -48,6 +48,8 @@ Ten plik to skondensowana instrukcja obsługi design systemu. Agent budujący no
 | EmptyState | `EmptyState` | Dlaczego pusto + następny krok (brak wyników filtrów vs pierwsze użycie) | Ładowanie (Skeleton), błąd (ErrorState) |
 | ErrorState | `ErrorState` | Błąd wczytania widoku + przycisk „Ponów” | Pusty stan (EmptyState), ładowanie (Skeleton) |
 
+**Onboarding mentora (F2, M1):** `Stepper` (postęp 6 kroków; `aria-current="step"`), `TagInput` (wolne tagi z chipami), `PhotoUploader` (wybór pliku, podgląd, stan uploadu), `VideoLinkField` (link YouTube/Vimeo) + `VideoFacade` (odtwarzacz ładuje się dopiero po kliknięciu), `RateInput` + `EarningsPreview` (stawka 60/30 min, bez kwoty po prowizji — Q9) — patrz Storybook → **Produkt/E2 Katalog i onboarding**.
+
 **Produkt (E1–E3):** `AppHeader`, `PageHeader`, `Money`, `DateTime`, `MentorCard`, `FilterPanel`, `ActiveFilters`, `ProfileHero`, `StickyBookingBar`, `SlotGrid`, `HoldCountdown`, `SessionListItem`, `NextSessionCard`, `BookingStatusBadge`, `PolicyNotice`, `TrialRequestCard`, `TodayAgenda` — patrz Storybook → **Produkt**.
 
 ---
