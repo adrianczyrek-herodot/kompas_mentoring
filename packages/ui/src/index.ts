@@ -183,6 +183,14 @@ export {
 } from './product/calendar-sync-card.tsx';
 export { DateTime, type DateTimeProps } from './product/date-time.tsx';
 export {
+  EmailVerificationBanner,
+  type EmailVerificationBannerProps,
+} from './product/email-verification-banner.tsx';
+export {
+  BookingConfirmation,
+  type BookingConfirmationProps,
+} from './product/booking-confirmation.tsx';
+export {
   ExceptionDialog,
   type ExceptionDialogProps,
   type ExceptionDraft,
@@ -194,8 +202,13 @@ export {
   MentorCardSkeleton,
   type MentorSummary,
 } from './product/mentor-card.tsx';
+export {
+  MentorSummaryBar,
+  type MentorSummaryBarProps,
+} from './product/mentor-summary-bar.tsx';
 export { Money, type MoneyProps } from './product/money.tsx';
 export { NextSessionCard, type NextSessionCardProps } from './product/next-session-card.tsx';
+export { OrderSummary, type OrderSummaryProps } from './product/order-summary.tsx';
 export { PageHeader, type PageHeaderProps } from './product/page-header.tsx';
 export {
   PolicyNotice,
@@ -221,7 +234,19 @@ export {
   type SlotGridProps,
   SlotGridSkeleton,
 } from './product/slot-grid.tsx';
-export { StickyBookingBar, type StickyBookingBarProps } from './product/sticky-booking-bar.tsx';
+export {
+  StickyBookingBar,
+  type StickyBookingBarProps,
+} from './product/sticky-booking-bar.tsx';
+export {
+  StickyContinueButton,
+  type StickyContinueButtonProps,
+} from './product/sticky-continue-button.tsx';
+export {
+  DEFAULT_TIME_ZONES,
+  TimezoneSelect,
+  type TimezoneSelectProps,
+} from './product/timezone-select.tsx';
 export { type AgendaItem, TodayAgenda, type TodayAgendaProps } from './product/today-agenda.tsx';
 export {
   type TrialRequest,
@@ -234,3 +259,4 @@ export {
   type WeekExceptionView,
   type WeekSessionView,
 } from './product/week-calendar.tsx';
+export { WeekPicker, type WeekPickerProps } from './product/week-picker.tsx';

@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 import { BookingSlotPicker, type HoldAnswer } from '../../.storybook/examples/booking';
 import { fullscreen, ScreenShell } from '../../.storybook/examples/screen-shell';
 import { withToasts } from '../../.storybook/examples/with-toasts';
 import { emptyWeek, kasia, week } from '../../.storybook/fixtures/kompas';
+import { EmailVerificationBanner } from '../product/email-verification-banner';
 import { PageHeader } from '../product/page-header';
 
 type Args = {
@@ -11,15 +12,20 @@ type Args = {
   holdAnswer: HoldAnswer;
   empty: boolean;
   sessionType: 'trial' | 'plan';
+  /** Q19/requirement 14: an unverified student sees the banner and cannot continue. */
+  unverifiedEmail: boolean;
 };
 
-function U1Screen({ slotsStatus, holdAnswer, empty, sessionType }: Args) {
+function U1Screen({ slotsStatus, holdAnswer, empty, sessionType, unverifiedEmail }: Args) {
   return (
     <ScreenShell navRole="student" current="search">
       <PageHeader
         title="Wybierz termin"
         description="Godziny w Twojej strefie czasowej. Wybrany termin trzymamy dla Ciebie przez 10 minut."
       />
+      {unverifiedEmail ? (
+        <EmailVerificationBanner email="ola@example.com" onResend={fn()} />
+      ) : null}
       <BookingSlotPicker
         mentor={kasia}
         sessionType={sessionType}
@@ -36,7 +42,13 @@ const meta = {
   title: 'Produkt/E3 Dostępność i rezerwacje/Ekrany/U1 Wybór terminu',
   component: U1Screen,
   decorators: [withToasts],
-  args: { slotsStatus: 'ready', holdAnswer: 'success', empty: false, sessionType: 'trial' },
+  args: {
+    slotsStatus: 'ready',
+    holdAnswer: 'success',
+    empty: false,
+    sessionType: 'trial',
+    unverifiedEmail: false,
+  },
   argTypes: {
     slotsStatus: { control: 'inline-radio', options: ['ready', 'loading', 'error'] },
     holdAnswer: {
@@ -89,6 +101,11 @@ export const Conflict: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Dalej' }));
     await waitFor(() => expect(screen.getByText('Ten termin został właśnie zajęty')).toBeVisible());
   },
+};
+
+export const UnverifiedEmail: Story = {
+  name: 'Nieweryfikowany e-mail — blokada i „Wyślij link ponownie”',
+  args: { unverifiedEmail: true },
 };
 
 export const Loading: Story = { name: 'L — ładowanie terminów', args: { slotsStatus: 'loading' } };
