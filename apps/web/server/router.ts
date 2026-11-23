@@ -34,6 +34,7 @@ const PROBLEM_CODES = {
   404: 'NOT_FOUND',
   409: 'CONFLICT',
   422: 'UNPROCESSABLE_CONTENT',
+  429: 'TOO_MANY_REQUESTS',
 } as const;
 
 /** Expected domain failures → RFC 9457 problem responses (spec §4.9). */
@@ -44,11 +45,11 @@ const problem = (error: CatalogError): ORPCError<string, unknown> => {
 
 /** Same for `scheduling`: the problem codes are the domain codes (spec §4.9). */
 const schedulingProblem = (error: BookingError): ORPCError<string, unknown> => {
-  const { status, code, issues, bookingIds } = toSchedulingProblem(error);
+  const { status, code, issues, bookingIds, retryAfterSeconds } = toSchedulingProblem(error);
   return new ORPCError(PROBLEM_CODES[status], {
     status,
     message: code,
-    data: { code, issues, bookingIds },
+    data: { code, issues, bookingIds, retryAfterSeconds },
   });
 };
 

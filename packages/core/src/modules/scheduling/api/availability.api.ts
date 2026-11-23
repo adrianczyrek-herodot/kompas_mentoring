@@ -70,27 +70,37 @@ export const toMentorCalendarView = (calendar: MentorCalendar): MentorCalendarVi
 });
 
 export interface SchedulingProblem {
-  readonly status: 403 | 404 | 409 | 422;
+  readonly status: 403 | 404 | 409 | 422 | 429;
   readonly code: string;
   readonly issues?: readonly AvailabilityIssue[];
   readonly bookingIds?: readonly string[];
+  readonly retryAfterSeconds?: number;
 }
 
 /** Expected failures → RFC 9457 status codes (spec §4.9). */
 export const toSchedulingProblem = (error: BookingError): SchedulingProblem => {
   switch (error.code) {
     case 'scheduling.forbidden':
+    case 'scheduling.email_not_verified':
       return { status: 403, code: error.code };
     case 'scheduling.not_found':
     case 'scheduling.mentor_unavailable':
       return { status: 404, code: error.code };
     case 'scheduling.version_conflict':
+    case 'scheduling.slot_taken':
+    case 'scheduling.student_busy':
+    case 'scheduling.trial_already_used':
+    case 'scheduling.hold_expired':
+    case 'scheduling.not_accepting_new':
+    case 'booking.invalid_transition':
       return { status: 409, code: error.code };
     case 'scheduling.availability_conflicts':
       return { status: 409, code: error.code, bookingIds: error.bookingIds };
     case 'scheduling.invalid_availability':
       return { status: 422, code: error.code, issues: error.issues };
-    case 'booking.invalid_transition':
-      return { status: 409, code: error.code };
+    case 'scheduling.invalid_goal':
+      return { status: 422, code: error.code };
+    case 'scheduling.hold_rate_limited':
+      return { status: 429, code: error.code, retryAfterSeconds: error.retryAfterSeconds };
   }
 };

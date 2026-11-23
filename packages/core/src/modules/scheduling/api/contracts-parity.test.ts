@@ -1,6 +1,6 @@
 import * as contracts from '@kompas/contracts/scheduling';
 import { describe, expect, it } from 'vitest';
-import { AVAILABILITY } from '../domain/policies/config.ts';
+import { AVAILABILITY, GOAL, HOLD } from '../domain/policies/config.ts';
 import { toSchedulingProblem } from './availability.api.ts';
 
 describe('contracts mirror the scheduling availability rules', () => {
@@ -19,6 +19,8 @@ describe('contracts mirror the scheduling availability rules', () => {
         stepMinutes: AVAILABILITY.buffer.stepMinutes,
       },
       exceptionNoteMaxLength: 300,
+      goal: { minLength: GOAL.minLength, maxLength: GOAL.maxLength },
+      hold: { minutes: HOLD.durationMinutes, maxPerHour: HOLD.maxPerHour },
     });
   });
 });

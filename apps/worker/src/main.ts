@@ -17,6 +17,7 @@ import {
   CLEANUP_ORPHAN_UPLOADS_CRON,
   CLEANUP_ORPHAN_UPLOADS_QUEUE,
 } from '@kompas/core/catalog';
+import { EXPIRE_HOLDS_CRON, EXPIRE_HOLDS_QUEUE } from '@kompas/core/scheduling';
 import { createHealthServer } from './health-server.ts';
 
 const SHUTDOWN_TIMEOUT_MS = 30_000;
@@ -75,6 +76,14 @@ try {
     const scope = createRequestScope(container, { requestId: crypto.randomUUID() });
     const removed = await scope.cradle.cleanupOrphanUploads();
     logger.info({ removed }, 'orphan uploads removed');
+  });
+  // Rule 5: holds that were never confirmed expire after 10 minutes.
+  await boss.createQueue(EXPIRE_HOLDS_QUEUE);
+  await boss.schedule(EXPIRE_HOLDS_QUEUE, EXPIRE_HOLDS_CRON);
+  await boss.work(EXPIRE_HOLDS_QUEUE, async () => {
+    const scope = createRequestScope(container, { requestId: crypto.randomUUID() });
+    const expired = await scope.cradle.expireHolds();
+    if (expired > 0) logger.info({ expired }, 'holds expired');
   });
   // Idempotency keys expire after 24 h (spec §4.6); this cron drops them.
   await boss.createQueue(PURGE_IDEMPOTENCY_QUEUE);

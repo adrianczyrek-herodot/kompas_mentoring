@@ -2,7 +2,7 @@ import { Migration } from '@mikro-orm/migrations';
 
 // E3-S4 (step 9): Idempotency-Key support (spec §4.6). The `platform` schema holds cross-module
 // infrastructure; expand-only, nothing existing changes.
-export class Migration20261125000000PlatformIdempotency extends Migration {
+export class Migration20261129000000PlatformIdempotency extends Migration {
   override up(): void {
     this.addSql(`create schema if not exists "platform";`);
     this.addSql(
