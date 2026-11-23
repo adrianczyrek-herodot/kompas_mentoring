@@ -11,6 +11,7 @@ export type Permission =
   | 'admin.access' // any /admin route (2FA enforced separately)
   | 'catalog.mentor_profile.edit.own' // F2 M1: own mentor profile (someone else's → 404)
   | 'catalog.favorite.manage.own' // F2: own favourite mentors
+  | 'scheduling.availability.manage.own' // F3 M3: own weekly template, exceptions and settings
   | 'trust.mentor_application.decide' // F2 A1: mentor verification queue and decisions
   | 'payouts.payout_profile.edit.own' // F2 M1 step 6: own DAC7 and payout data
   | 'payouts.payout_profile.read_sensitive'; // F2 (Q5): full DAC7 values, audited reads
@@ -21,6 +22,7 @@ const PERMISSIONS: Record<Role, readonly Permission[]> = {
     'account.manage.own',
     'mentor.access',
     'catalog.mentor_profile.edit.own',
+    'scheduling.availability.manage.own',
     'payouts.payout_profile.edit.own',
   ],
   admin_trust: ['account.manage.own', 'admin.access', 'trust.mentor_application.decide'],

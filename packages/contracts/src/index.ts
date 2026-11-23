@@ -5,6 +5,13 @@ import {
   saveProfileStepContract,
 } from './catalog/index.ts';
 import { healthContract } from './health.contract.ts';
+import {
+  addAvailabilityExceptionContract,
+  deleteAvailabilityExceptionContract,
+  getMentorCalendarContract,
+  saveAvailabilityTemplateContract,
+  updateMentorSettingsContract,
+} from './scheduling/index.ts';
 
 export { HealthStatus, healthContract } from './health.contract.ts';
 
@@ -15,6 +22,11 @@ export const contract = {
   saveProfileStep: saveProfileStepContract,
   requestPhotoUpload: requestPhotoUploadContract,
   confirmPhotoUpload: confirmPhotoUploadContract,
+  getMentorCalendar: getMentorCalendarContract,
+  saveAvailabilityTemplate: saveAvailabilityTemplateContract,
+  addAvailabilityException: addAvailabilityExceptionContract,
+  deleteAvailabilityException: deleteAvailabilityExceptionContract,
+  updateMentorSettings: updateMentorSettingsContract,
 };
 
 export type Contract = typeof contract;

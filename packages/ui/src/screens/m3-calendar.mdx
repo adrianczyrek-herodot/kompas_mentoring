@@ -1,0 +1,37 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as M3Stories from './m3-calendar.stories';
+
+<Meta of={M3Stories} />
+
+# M3 · Kalendarz i dostępność
+
+**Cel:** Ustawić, kiedy uczniowie mogą się rezerwować: tygodniowy szablon, wyjątki, ustawienia i Google Calendar (KONCEPCJA §M3, E3-S2).
+**Kto i gdzie:** Mentor · `/mentor/kalendarz`. Ekran składa się wyłącznie z komponentów pakietu; dane z mockupów.
+
+## Mapa stanów
+
+Każdy stan ekranu ma swoją story. Oznaczenia L / E / Er / S jak w KONCEPCJI (ładowanie, pusto, błąd, sukces).
+
+| Stan | Co widzi użytkownik | Story |
+|---|---|---|
+| S — z dostępnością | Tydzień z sesjami, szablon z sumą, ustawienia, wyjątki, karta Google Calendar | `WithAvailability` |
+| E — pusta dostępność | Baner „Uczniowie nie mogą cię zarezerwować” z akcją i pusty tydzień | `EmptyAvailability` |
+
+## Z czego jest zbudowany
+
+- `PageHeader`, `WeekCalendar`, `AvailabilityEditor`, `ExceptionDialog`, `CalendarSyncCard`, `Card`, `Field`, `Select`, `Switch`, `Alert`, `Button`, `DateTime`
+- Edytor obsługuje klawiaturę: strzałki, Spacja i Shift+strzałka (zaznaczenie wtorku 18:00–20:00 bez myszy).
+
+## Co zostaje w produkcie
+
+- Zapis (toast „Zapisano”), potwierdzenie kolizji z sesjami (Q11), trasa OAuth Google — w kolejnych krokach E3-S2 i E3-S10.
+
+## Stany
+
+### S — z dostępnością
+
+<Canvas of={M3Stories.WithAvailability} layout="fullscreen" />
+
+### E — pusta dostępność
+
+<Canvas of={M3Stories.EmptyAvailability} layout="fullscreen" />

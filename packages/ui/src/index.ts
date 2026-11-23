@@ -70,7 +70,6 @@ export {
 export { Input } from './components/input.tsx';
 export { Label } from './components/label.tsx';
 export { Link, type LinkProps } from './components/link.tsx';
-export { PhotoUploader, type PhotoUploaderProps } from './components/photo-uploader.tsx';
 export {
   Menu,
   MenuContent,
@@ -81,6 +80,7 @@ export {
   MenuSeparator,
   MenuTrigger,
 } from './components/menu.tsx';
+export { PhotoUploader, type PhotoUploaderProps } from './components/photo-uploader.tsx';
 export {
   Popover,
   PopoverClose,
@@ -116,7 +116,12 @@ export {
 export { Skeleton } from './components/skeleton.tsx';
 export { Slider, type SliderProps } from './components/slider.tsx';
 export { Spinner, type SpinnerProps } from './components/spinner.tsx';
-export { Stepper, type StepperProps, type StepperStep, type StepperStepState } from './components/stepper.tsx';
+export {
+  Stepper,
+  type StepperProps,
+  type StepperStep,
+  type StepperStepState,
+} from './components/stepper.tsx';
 export { Switch } from './components/switch.tsx';
 export {
   Table,
@@ -132,6 +137,12 @@ export { TagInput, type TagInputProps } from './components/tag-input.tsx';
 export { Textarea, type TextareaProps } from './components/textarea.tsx';
 export { ToastProvider, type ToastProviderProps, useToast } from './components/toast.tsx';
 export { ToggleGroup, ToggleGroupItem } from './components/toggle-group.tsx';
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './components/tooltip.tsx';
 export { VideoFacade, type VideoFacadeProps } from './components/video-facade.tsx';
 export {
   parseVideoLink,
@@ -139,12 +150,6 @@ export {
   type VideoLinkFieldProps,
   type VideoProvider,
 } from './components/video-link-field.tsx';
-export {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from './components/tooltip.tsx';
 export {
   type CountForms,
   type Currency,
@@ -162,11 +167,26 @@ export {
 } from './product/active-filters.tsx';
 export { AppHeader, type AppHeaderProps, type NavRole } from './product/app-header.tsx';
 export {
+  AvailabilityEditor,
+  type AvailabilityEditorProps,
+  type AvailabilityRuleView,
+} from './product/availability-editor.tsx';
+export {
   type BookingStatus,
   BookingStatusBadge,
   type BookingStatusBadgeProps,
 } from './product/booking-status-badge.tsx';
+export {
+  CalendarSyncCard,
+  type CalendarSyncCardProps,
+  type CalendarSyncStatus,
+} from './product/calendar-sync-card.tsx';
 export { DateTime, type DateTimeProps } from './product/date-time.tsx';
+export {
+  ExceptionDialog,
+  type ExceptionDialogProps,
+  type ExceptionDraft,
+} from './product/exception-dialog.tsx';
 export { HoldCountdown, type HoldCountdownProps } from './product/hold-countdown.tsx';
 export {
   MentorCard,
@@ -208,3 +228,9 @@ export {
   TrialRequestCard,
   type TrialRequestCardProps,
 } from './product/trial-request-card.tsx';
+export {
+  WeekCalendar,
+  type WeekCalendarProps,
+  type WeekExceptionView,
+  type WeekSessionView,
+} from './product/week-calendar.tsx';

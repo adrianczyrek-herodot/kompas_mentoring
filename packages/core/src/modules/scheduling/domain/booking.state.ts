@@ -19,12 +19,14 @@ export type BookingStatus =
 export type BookingEvent =
   | 'checkout_started'
   | 'confirmed_with_credit'
+  | 'hold_released'
   | 'hold_expired'
   | 'payment_succeeded'
   | 'mentor_accepted'
   | 'auto_accepted'
   | 'mentor_declined'
   | 'calendar_conflict'
+  | 'cancelled_by_student'
   | 'started'
   | 'rescheduled'
   | 'cancelled_free'
@@ -48,6 +50,8 @@ const transitions = {
   hold: {
     checkout_started: 'pending_payment',
     confirmed_with_credit: 'scheduled',
+    // F3 Q7: the student gives up the hold or picks another slot in U2.
+    hold_released: 'expired',
     hold_expired: 'expired',
   },
   pending_payment: { payment_succeeded: 'requested', hold_expired: 'expired' },
@@ -56,6 +60,8 @@ const transitions = {
     auto_accepted: 'scheduled',
     mentor_declined: 'cancelled',
     calendar_conflict: 'cancelled',
+    // F3 Q7: the student withdraws the request before the mentor decides — always free.
+    cancelled_by_student: 'cancelled',
   },
   scheduled: {
     started: 'in_progress',
