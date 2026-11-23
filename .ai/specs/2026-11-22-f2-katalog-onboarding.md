@@ -151,7 +151,7 @@ Kierunek zależności: `trust` nie importuje `catalog` ani odwrotnie. Łączą j
 
 ## Kryteria akceptacji
 
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` zielone; testy integracyjne i E2E w CI zielone; brak nowych ostrzeżeń Knip i dependency-cruiser (granice `catalog` ↔ `trust` ↔ `payouts` tylko przez `index.ts` i zdarzenia).
+- [x] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` zielone; testy integracyjne i E2E w CI zielone; brak nowych ostrzeżeń Knip i dependency-cruiser (granice `catalog` ↔ `trust` ↔ `payouts` tylko przez `index.ts` i zdarzenia). *(E2-S2 — PR #68, CI zielone)*
 - [x] **[M1]** Polityki walidacji (tabela pól) mają testy Vitest na granicach (np. headline 19/20/80/81 znaków, stawka 39/40/1000/1001 zł, 2/3/15/16 tagów); pokrycie gałęzi `catalog/domain` ≥ 90%. *(E2-S2, kroki 1–4 planu)*
 - [x] **[M1]** Maszyna stanów `MentorProfile`: test każdego dozwolonego przejścia i odrzucenia niedozwolonego (`catalog.invalid_transition`). *(E2-S2, krok 1)*
 - [x] **[M1]** Szkic: E2E przechodzi kroki 1–4, przeładowuje stronę i wraca do pierwszego niekompletnego kroku z zachowanymi danymi; błędy pól inline, fokus na pierwszym błędzie. *(E2-S2, krok 6)*

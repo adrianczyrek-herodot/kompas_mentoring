@@ -38,6 +38,12 @@ Wszystkie polecenia z `AGENTS.md` → „Projekt” zielone w worktree (Docker D
 | `pnpm --filter @kompas/ui test:stories:themes` | 379 + 379 OK (jasny i ciemny) |
 | `pnpm --filter @kompas/ui check:tokens` | „No values outside the design tokens.” |
 
+CI na PR #68 (po poprawce lotnego testu nawigacji w Menu): `lint` ✓ · `typecheck` ✓ · `test (unit)` ✓ · `test (integration, Testcontainers)` ✓ · `test (Storybook stories, light + dark)` ✓ · `build` ✓ · `e2e smoke (Playwright)` ✓.
+
+## Przebieg (dodatkowo)
+- 21:40 — Historia porządkowana na siedem commitów (jeden na krok planu) zamiast jednego commita autosave; kroki 1–3, 2–3 i 4–6 rozdzielone wg kroków planu, w każdym pełny zakres plików danego kroku.
+- 22:05 — CI na PR #68: czerwony tylko przez **lotny test nawigacji w Menu** (strażnicy fokusu Base UI zostają w portalu po zamknięciu nakładki; axe zgłasza `aria-hidden-focus`). Test czeka teraz na ich zniknięcie — `fix(ui)`. Po poprawce całe CI zielone.
+
 ## Problemy i otwarte kwestie
 - `next build` (Next.js 16.4.2) raz na ~5 minut przerywa się błędem `SecurityFatalError` (znana podatność wersji Next.js) i każe powtórzyć to samo polecenie — w CI (bez zmiennych agenta) warunek ten nie zachodzi. Rekomendacja od Next.js: `next upgrade --agent=security` (decyzja właściciela, poza zakresem E2-S2).
 - Kroki 5–6 M1 (dostępność, weryfikacja, DAC7) oraz `/mentor` ze statusem wniosku należą do E2-S3 — ekrany M1 pokazują w tym miejscu komunikat „ten krok dochodzi w kolejnym etapie”.
