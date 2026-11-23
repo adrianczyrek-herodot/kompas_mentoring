@@ -21,6 +21,9 @@ playwright-report/
 test-results/
 blob-report/
 
+# Local file storage of the dev/e2e adapter (photos uploaded in the tests)
+.kompas-files/
+
 # Local environment
 .env
 .env.*

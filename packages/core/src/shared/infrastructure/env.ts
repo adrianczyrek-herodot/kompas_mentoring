@@ -23,6 +23,20 @@ const EnvSchema = z
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
     LINKEDIN_CLIENT_ID: z.string().min(1).optional(),
     LINKEDIN_CLIENT_SECRET: z.string().min(1).optional(),
+    /** Driver of the file storage: `local` (directory on disk, dev/e2e) or `r2` (production). */
+    FILE_STORAGE_DRIVER: z.enum(['local', 'r2']).default('local'),
+    /** Directory of the local adapter (relative paths resolve against the process directory). */
+    FILE_STORAGE_LOCAL_DIR: z.string().min(1).default('.kompas-files'),
+    /** Public origin of the app; the local adapter builds absolute URLs only with it. */
+    FILE_STORAGE_PUBLIC_URL: z.url().optional(),
+    /** Signs the upload URLs of the local adapter; falls back to `BETTER_AUTH_SECRET`. */
+    FILE_STORAGE_SIGNING_SECRET: z.string().min(16).optional(),
+    /** R2 (S3-compatible) connection — required with the `r2` driver. */
+    R2_ACCOUNT_ID: z.string().min(1).optional(),
+    R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+    R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+    R2_BUCKET: z.string().min(1).optional(),
+    R2_PUBLIC_URL: z.url().optional(),
   })
   .refine((env) => env.NODE_ENV !== 'production' || env.BETTER_AUTH_SECRET !== undefined, {
     message: 'BETTER_AUTH_SECRET is required in production',

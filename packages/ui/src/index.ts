@@ -51,6 +51,7 @@ export {
   DialogTitle,
   DialogTrigger,
 } from './components/dialog.tsx';
+export { EarningsPreview, type EarningsPreviewProps } from './components/earnings-preview.tsx';
 export { EmptyState, type EmptyStateProps } from './components/empty-state.tsx';
 export { ErrorState, type ErrorStateProps } from './components/error-state.tsx';
 export {
@@ -69,6 +70,7 @@ export {
 export { Input } from './components/input.tsx';
 export { Label } from './components/label.tsx';
 export { Link, type LinkProps } from './components/link.tsx';
+export { PhotoUploader, type PhotoUploaderProps } from './components/photo-uploader.tsx';
 export {
   Menu,
   MenuContent,
@@ -88,6 +90,7 @@ export {
   PopoverTrigger,
 } from './components/popover.tsx';
 export { RadioGroup, RadioGroupItem } from './components/radio-group.tsx';
+export { RateInput, type RateInputProps } from './components/rate-input.tsx';
 export {
   Select,
   SelectContent,
@@ -113,6 +116,7 @@ export {
 export { Skeleton } from './components/skeleton.tsx';
 export { Slider, type SliderProps } from './components/slider.tsx';
 export { Spinner, type SpinnerProps } from './components/spinner.tsx';
+export { Stepper, type StepperProps, type StepperStep, type StepperStepState } from './components/stepper.tsx';
 export { Switch } from './components/switch.tsx';
 export {
   Table,
@@ -124,9 +128,17 @@ export {
   TableRow,
 } from './components/table.tsx';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs.tsx';
+export { TagInput, type TagInputProps } from './components/tag-input.tsx';
 export { Textarea, type TextareaProps } from './components/textarea.tsx';
 export { ToastProvider, type ToastProviderProps, useToast } from './components/toast.tsx';
 export { ToggleGroup, ToggleGroupItem } from './components/toggle-group.tsx';
+export { VideoFacade, type VideoFacadeProps } from './components/video-facade.tsx';
+export {
+  parseVideoLink,
+  VideoLinkField,
+  type VideoLinkFieldProps,
+  type VideoProvider,
+} from './components/video-link-field.tsx';
 export {
   Tooltip,
   TooltipContent,

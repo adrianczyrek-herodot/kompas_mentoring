@@ -14,6 +14,6 @@ export function proxy(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  // Signed-in areas of F1: account (S3) and admin panel.
-  matcher: ['/konto/:path*', '/admin/:path*'],
+  // Signed-in areas of F1 (account, admin) and of F2 (the mentor area and its onboarding).
+  matcher: ['/konto/:path*', '/admin/:path*', '/mentor/:path*'],
 };

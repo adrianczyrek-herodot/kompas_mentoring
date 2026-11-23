@@ -19,3 +19,4 @@ Odpowiada za: reguły dostępności, silnik slotów, blokady (`hold`), rezerwacj
 ## Wzoruj się na
 - Polityka + test: `domain/policies/can-cancel-free.policy.ts`, test DST w `*.policy.test.ts`.
 - Zapytanie z `Clock`: `application/get-cancellation-terms.query.ts` + test z `FakeClock` z `@kompas/testing`.
+- Zdarzenie do innego modułu: publikacja w transakcji zmiany przez `eventPublisher.publish(em, events)` (`shared/infrastructure/events/outbox.ts`), konsument w `withInbox(em, '<schemat>', eventId, …)` (`inbox.ts`) z tabelą `<schemat>.inbox_event`; subskrypcja = wpis w `eventSubscriptions` kontenera (kolejka `<konsument>/<zdarzenie>`). Schematy zdarzeń: `packages/contracts/src/events`. Test: `events.int.test.ts` (rollback = brak zdarzenia, duplikat = brak efektu).

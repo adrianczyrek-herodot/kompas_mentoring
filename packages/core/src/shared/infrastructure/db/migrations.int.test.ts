@@ -23,6 +23,7 @@ describe.skipIf(!dockerAvailable)(integrationSuite('migrations on PostgreSQL 17'
       'Migration20261021000000Init',
       'Migration20261110000000IdentityAuth',
       'Migration20261110120000AccountRequests',
+      'Migration20261122000000CatalogProfile',
     ]);
     expect(await migrateUp(orm)).toEqual([]);
     expect(await checkDatabase(orm)).toBe('up');

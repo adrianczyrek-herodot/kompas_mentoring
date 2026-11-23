@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./catalog": "./src/modules/catalog/index.ts",
     "./scheduling": "./src/modules/scheduling/index.ts",
     "./identity": "./src/modules/identity/index.ts"
   },
@@ -16,6 +17,9 @@
     "db:seed": "node --env-file-if-exists=../../.env src/shared/infrastructure/db/cli/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1172.0",
+    "@aws-sdk/s3-request-presigner": "3.1172.0",
+    "@kompas/contracts": "workspace:*",
     "@mikro-orm/core": "7.2.5",
     "@mikro-orm/migrations": "7.2.5",
     "@mikro-orm/postgresql": "7.2.5",

@@ -27,6 +27,7 @@ Wczytuj tylko wiersze pasujące do zadania. Plik `AGENTS.md` w katalogu, w któr
 | Przegląd kodu / PR | `CODE_REVIEW.md`, `.ai/agentic.config.json` (ścieżki wymagające przeglądu człowieka) |
 | Kod w `packages/core` lub importy z `apps/web`, `apps/worker` | `packages/core/AGENTS.md`, `.ai/lessons/areas/backend.md` |
 | Moduł `identity` | `packages/core/src/modules/identity/AGENTS.md` |
+| Moduł `catalog` (profile mentorów, M1) | `packages/core/src/modules/catalog/AGENTS.md` |
 | Moduł `scheduling` (i wzorzec nowego modułu) | `packages/core/src/modules/scheduling/AGENTS.md` |
 | Nazwy domenowe, teksty UI, specyfikacja | `docs/domain-glossary.md`, `apps/web/messages/pl.json` |
 | UI, nowy ekran, design system (`packages/ui`) | `docs/design-system.md`, `.ai/lessons/areas/ui.md` |

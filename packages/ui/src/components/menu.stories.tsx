@@ -145,5 +145,10 @@ export const KeyboardSelect: Story = {
     await userEvent.click(trigger);
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Wyloguj' }));
     await expect(args.onSignOut).toHaveBeenCalledTimes(1);
+    // Base UI zostawia strażników fokusu w portalu, dopóki nakładka nie zniknie z DOM —
+    // bez tego sprawdzenie axe (po play) potrafi złapać „aria-hidden-focus" (lotny błąd w CI).
+    await waitFor(() =>
+      expect(document.querySelectorAll('[data-base-ui-focus-guard]')).toHaveLength(0),
+    );
   },
 };

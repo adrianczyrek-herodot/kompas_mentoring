@@ -1,6 +1,6 @@
 # `packages/core` — moduły domenowe
 
-Dotyczy pracy w `packages/core` oraz importów z `apps/web` i `apps/worker`. Moduły z własnymi niezmiennikami mają `src/modules/<x>/AGENTS.md` (`identity`, `scheduling`). Nazwy domenowe PL ↔ EN: `docs/domain-glossary.md`.
+Dotyczy pracy w `packages/core` oraz importów z `apps/web` i `apps/worker`. Moduły z własnymi niezmiennikami mają `src/modules/<x>/AGENTS.md` (`identity`, `scheduling`, `catalog`). Nazwy domenowe PL ↔ EN: `docs/domain-glossary.md`.
 
 **Reguły modułów** (`packages/core/src/modules/<x>/`, wymuszane lintem):
 
