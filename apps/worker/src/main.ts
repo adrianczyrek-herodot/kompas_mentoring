@@ -1,12 +1,19 @@
 // Worker process: fetches pg-boss jobs, runs cron and exposes /health (spec §1.4).
 import {
+  createAppContainer,
   createBoss,
   createLogger,
+  createRequestScope,
   directDatabaseUrl,
   HEARTBEAT_CRON,
   HEARTBEAT_QUEUE,
   parseEnv,
+  startEventSubscriptions,
 } from '@kompas/core';
+import {
+  CLEANUP_ORPHAN_UPLOADS_CRON,
+  CLEANUP_ORPHAN_UPLOADS_QUEUE,
+} from '@kompas/core/catalog';
 import { createHealthServer } from './health-server.ts';
 
 const SHUTDOWN_TIMEOUT_MS = 30_000;
@@ -14,6 +21,8 @@ const SHUTDOWN_TIMEOUT_MS = 30_000;
 const env = parseEnv();
 const logger = createLogger({ level: env.LOG_LEVEL, module: 'worker' });
 const boss = createBoss('worker', directDatabaseUrl(env));
+// Same domain wiring as web (spec §1.4); handlers resolve their services from a job scope.
+const container = createAppContainer({ env, logger, boss });
 let ready = false;
 
 boss.on('error', (error) => {
@@ -28,6 +37,7 @@ const shutdown = async (signal: string): Promise<void> => {
   // graceful: wait for running handlers before closing connections (Cloud Run sends SIGTERM).
   await boss.stop({ graceful: true, timeout: SHUTDOWN_TIMEOUT_MS });
   server.close();
+  await container.cradle.orm.close();
   logger.info('worker stopped');
 };
 
@@ -55,6 +65,15 @@ try {
     await Promise.resolve();
   });
   await boss.schedule(HEARTBEAT_QUEUE, HEARTBEAT_CRON);
+  // Requirement 2: files nobody pinned to a profile disappear after 24 h.
+  await boss.createQueue(CLEANUP_ORPHAN_UPLOADS_QUEUE);
+  await boss.schedule(CLEANUP_ORPHAN_UPLOADS_QUEUE, CLEANUP_ORPHAN_UPLOADS_CRON);
+  await boss.work(CLEANUP_ORPHAN_UPLOADS_QUEUE, async () => {
+    const scope = createRequestScope(container, { requestId: crypto.randomUUID() });
+    const removed = await scope.cradle.cleanupOrphanUploads();
+    logger.info({ removed }, 'orphan uploads removed');
+  });
+  await startEventSubscriptions(boss, container.cradle.eventSubscriptions);
   ready = true;
   logger.info('worker ready');
 } catch (error) {

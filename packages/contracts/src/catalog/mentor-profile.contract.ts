@@ -67,3 +67,40 @@ export const saveProfileStepContract = oc
   })
   .input(SaveProfileStepInput)
   .output(MentorProfileView);
+
+/** Presigned upload of the profile photo (requirement 2): the browser sends the file itself. */
+export const PhotoUploadGrant = z.object({
+  /** Key of the object in the storage; the server generated it. */
+  key: z.string(),
+  url: z.string(),
+  method: z.literal('PUT'),
+  /** Headers the browser must send unchanged — they are part of the signature. */
+  headers: z.record(z.string(), z.string()),
+  /** ISO 8601 instant after which the URL stops working. */
+  expiresAt: z.iso.datetime({ offset: true }),
+});
+export type PhotoUploadGrant = z.infer<typeof PhotoUploadGrant>;
+
+export const requestPhotoUploadContract = oc
+  .route({
+    method: 'POST',
+    path: '/me/mentor-photo',
+    summary: 'Presigned upload of the mentor photo',
+  })
+  .input(
+    z.object({
+      contentType: z.enum(['image/jpeg', 'image/png']),
+      size: z.number().int().positive(),
+    }),
+  )
+  .output(PhotoUploadGrant);
+
+/** Confirms the uploaded photo: the server checks the type, the size and the dimensions. */
+export const confirmPhotoUploadContract = oc
+  .route({
+    method: 'POST',
+    path: '/me/mentor-photo/confirm',
+    summary: 'Confirm the uploaded mentor photo',
+  })
+  .input(z.object({ key: z.string() }))
+  .output(MentorProfileView);

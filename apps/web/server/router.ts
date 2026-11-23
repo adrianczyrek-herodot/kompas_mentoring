@@ -76,4 +76,25 @@ const saveProfileStep = os.saveProfileStep
     return viewOf(unwrap(result), actor);
   });
 
-export const router = os.router({ health, myMentorProfile, saveProfileStep });
+/** Requirement 2: the browser uploads the photo straight to the storage. */
+const requestPhotoUpload = os.requestPhotoUpload
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) =>
+    unwrap(await scope.cradle.requestPhotoUpload(actor, input)),
+  );
+
+/** Requirement 2: the server confirms the type, the size and the dimensions of the file. */
+const confirmPhotoUpload = os.confirmPhotoUpload
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) => {
+    const result = await scope.cradle.confirmPhotoUpload(actor, input.key);
+    return viewOf(unwrap(result), actor);
+  });
+
+export const router = os.router({
+  health,
+  myMentorProfile,
+  saveProfileStep,
+  requestPhotoUpload,
+  confirmPhotoUpload,
+});

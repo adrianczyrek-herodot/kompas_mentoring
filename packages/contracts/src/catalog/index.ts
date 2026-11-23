@@ -9,10 +9,13 @@ export {
   STEP_SEGMENTS,
 } from './limits.ts';
 export {
+  confirmPhotoUploadContract,
   FieldIssues,
   getMyMentorProfileContract,
   MentorProfileStatus,
   MentorProfileView,
+  PhotoUploadGrant,
+  requestPhotoUploadContract,
   saveProfileStepContract,
 } from './mentor-profile.contract.ts';
 export {
