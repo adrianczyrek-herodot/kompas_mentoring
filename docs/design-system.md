@@ -54,6 +54,8 @@ Ten plik to skondensowana instrukcja obsługi design systemu. Agent budujący no
 
 **Dostępność i rezerwacje M3 (E3-S2):** `AvailabilityEditor` (DS-05: siatka tydzień × 30 min, klik/przeciągnięcie, strzałki/Spacja/Shift+strzałka, suma tygodniowa), `WeekCalendar` (tydzień z sesjami i dostępnością, strefa podpisana), `ExceptionDialog` (wyjątki `off`/`extra`), `CalendarSyncCard` (rozłączony / połączony / błąd, fail-open Q17). Ekran-wzorzec: **Produkt/E3 Dostępność i rezerwacje/Ekrany/M3 Kalendarz i dostępność**.
 
+**Rezerwacja U1–U3 (E3-S4):** `MentorSummaryBar` (nagłówek mentora w U1/U2 ze strefą), `WeekPicker` (przewijanie tygodni w horyzoncie 8 tygodni), `TimezoneSelect` (na `Combobox`, Q12), `StickyContinueButton` (jedna akcja główna U1/U2, powód blokady powiązany przez `aria-describedby`), `OrderSummary` (mentor, termin w strefie, długość, cena; F4 dokłada metodę płatności jako dziecko), `BookingConfirmation` (U3: status próbnej/kolejnej, `.ics`), `EmailVerificationBanner` (GAP-05/Q19). Ekran-wzorzec: **Produkt/E3 Dostępność i rezerwacje/Ekrany/U2 Podsumowanie**.
+
 ---
 
 ## Tokeny znaczeniowe (główne)

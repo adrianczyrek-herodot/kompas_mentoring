@@ -28,6 +28,7 @@ export class BetterAuthSessionReader implements SessionReader {
         emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled === true,
         roles: parseRoles(user.roles),
+        timeZone: typeof user.timeZone === 'string' && user.timeZone.length > 0 ? user.timeZone : null,
       },
       createdAt: toInstant(session.createdAt),
       expiresAt: toInstant(session.expiresAt),

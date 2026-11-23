@@ -12,6 +12,7 @@ const sessionOf = (roles: Role[], signedInHoursAgo: number): AuthSession => ({
     email: 'ola@example.com',
     emailVerified: true,
     twoFactorEnabled: true,
+    timeZone: null,
     roles,
   },
   createdAt: clock.now().subtract({ hours: signedInHoursAgo }),

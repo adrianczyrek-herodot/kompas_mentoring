@@ -18,6 +18,8 @@ const EnvSchema = z
     BETTER_AUTH_URL: z.url().optional(),
     /** HIBP k-anonymity check of new passwords (Q8); `off` only in tests that must stay offline. */
     AUTH_BREACHED_PASSWORD_CHECK: z.enum(['on', 'off']).default('on'),
+    /** Q1: payment adapter of the booking flow; `none` until F4 ships Stripe. */
+    BOOKING_PAYMENT_MODE: z.enum(['none', 'stripe']).default('none'),
     /** Social sign-in buttons appear only when both keys of a provider are set (F1 Q1). */
     GOOGLE_CLIENT_ID: z.string().min(1).optional(),
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),

@@ -1,4 +1,5 @@
 import { Temporal } from 'temporal-polyfill';
+import { money } from '../../../../shared/domain/index.ts';
 
 // Business constants of the scheduling module, each linked to its decision (spec §4.1).
 
@@ -33,3 +34,16 @@ export const BOOKING_HORIZON = Temporal.Duration.from({ hours: 56 * 24 });
 
 /** Q9: a trial booking always respects at least 6 h of notice so the mentor can answer. */
 export const TRIAL_MIN_NOTICE = Temporal.Duration.from({ hours: 6 });
+
+/** Q18: one active hold per student, 10 minutes long, at most 20 holds per hour per student. */
+export const HOLD = {
+  durationMinutes: 10,
+  maxPerHour: 20,
+  windowMinutes: 60,
+} as const;
+
+/** U2/U3: „Z czym przychodzisz?” — required for a trial, 20–500 characters. */
+export const GOAL = { minLength: 20, maxLength: 500 } as const;
+
+/** Q3: one platform-wide trial price until F4; a later session snapshots the mentor's rate. */
+export const TRIAL_PRICE = money.of(4_900n);

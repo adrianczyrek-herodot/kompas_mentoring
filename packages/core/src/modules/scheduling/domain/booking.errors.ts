@@ -5,11 +5,20 @@ import type { InvalidBookingTransition } from './booking.state.ts';
 export type BookingError =
   | InvalidBookingTransition
   | InvalidAvailability
+  | InvalidGoal
   | AvailabilityConflicts
   | SchedulingNotFound
   | MentorUnavailable
   | SchedulingForbidden
-  | VersionConflict;
+  | VersionConflict
+  | SlotTaken
+  | StudentBusy
+  | TrialAlreadyUsed
+  | HoldExpired
+  | EmailNotVerified
+  | NotAcceptingNew
+  | HoldRateLimited
+  | InsufficientCredit;
 
 /**
  * Why an availability payload is rejected (M3 acceptance: 29/30 min, overlap, grid,
@@ -55,6 +64,37 @@ type MentorUnavailable = DomainError<'scheduling.mentor_unavailable'>;
 
 /** The actor lacks the permission (→ 403). */
 export type SchedulingForbidden = DomainError<'scheduling.forbidden'>;
+
+/** Q1: the e-mail must be verified before the first booking (requirement 14, → 403). */
+export type EmailNotVerified = DomainError<'scheduling.email_not_verified'>;
+
+/** Q2/U1: someone took the mentor's slot between rendering and `createHold` (→ 409). */
+export type SlotTaken = DomainError<'scheduling.slot_taken'>;
+
+/** C3/U1: the student already has a session at that time, with any mentor (→ 409). */
+export type StudentBusy = DomainError<'scheduling.student_busy'>;
+
+/** Q2/Q6: one trial per student–mentor pair; a live trial already occupies it (→ 409). */
+export type TrialAlreadyUsed = DomainError<'scheduling.trial_already_used'>;
+
+/** U2: the 10-minute hold expired before checkout (→ 409). */
+export type HoldExpired = DomainError<'scheduling.hold_expired'>;
+
+/** Q13: the mentor paused new trial students — a trial is refused, a later session is not (→ 409). */
+export type NotAcceptingNew = DomainError<'scheduling.not_accepting_new'>;
+
+/** Q18: at most 20 holds per hour per student (→ 429 + `Retry-After`). */
+export interface HoldRateLimited extends DomainError<'scheduling.hold_rate_limited'> {
+  readonly retryAfterSeconds: number;
+}
+
+/** F4 keeps the balance: the credit of a later session could not be reserved (→ 409). */
+export type InsufficientCredit = DomainError<'scheduling.insufficient_credit'>;
+
+/** The case of the goal field of a trial is outside 20–500 characters (→ 422). */
+export interface InvalidGoal extends DomainError<'scheduling.invalid_goal'> {
+  readonly issue: 'too_short' | 'too_long';
+}
 
 /** Optimistic lock: the availability changed in another tab (→ 409 "odśwież"). */
 export interface VersionConflict extends DomainError<'scheduling.version_conflict'> {

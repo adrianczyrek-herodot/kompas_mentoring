@@ -57,6 +57,8 @@ export const createAuth = (deps: AuthDeps) => {
     user: {
       additionalFields: {
         roles: { type: 'string[]', required: false, defaultValue: ['student'], input: false },
+        // Q12: the user's zone, set from the browser. `fieldName` maps it to our snake_case column.
+        timeZone: { type: 'string', required: false, input: true, fieldName: 'time_zone' },
       },
     },
     // Q5: 30 days renewed on use. Better Auth renews every session by `expiresIn`, so the

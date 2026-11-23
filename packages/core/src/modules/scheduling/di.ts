@@ -1,12 +1,29 @@
 import { type AwilixContainer, asClass, asFunction } from 'awilix';
 import type { Clock } from '../../shared/domain/index.ts';
 import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
+import type { Env } from '../../shared/infrastructure/env.ts';
 import {
   type AddAvailabilityException,
   type DeleteAvailabilityException,
   makeAddAvailabilityException,
   makeDeleteAvailabilityException,
 } from './application/availability-exceptions.commands.ts';
+import {
+  type Checkout,
+  makeCheckout,
+} from './application/checkout.command.ts';
+import {
+  type CreateHold,
+  makeCreateHold,
+} from './application/create-hold.command.ts';
+import {
+  type GetBooking,
+  makeGetBooking,
+} from './application/get-booking.query.ts';
+import {
+  type ExpireHolds,
+  makeExpireHolds,
+} from './application/expire-holds.handler.ts';
 import {
   type GetCancellationTerms,
   makeGetCancellationTerms,
@@ -25,9 +42,16 @@ import {
 } from './application/get-weekly-availability-minutes.query.ts';
 import type {
   AvailabilityRepository,
+  BookingRepository,
   BusyRepository,
+  CreditReservation,
   MentorBookabilityRepository,
+  PaymentGate,
 } from './application/ports.ts';
+import {
+  makeReleaseHold,
+  type ReleaseHold,
+} from './application/release-hold.command.ts';
 import {
   makeSaveAvailabilityTemplate,
   type SaveAvailabilityTemplate,
@@ -39,11 +63,15 @@ import {
 import { MentorBookabilityRecord } from './infrastructure/mentor-bookability.records.ts';
 import { makeMentorBookabilitySubscription } from './infrastructure/mentor-bookability.subscription.ts';
 import { MikroOrmAvailabilityRepository } from './infrastructure/mikro-orm-availability.repository.ts';
+import { MikroOrmBookingRepository } from './infrastructure/mikro-orm-booking.repository.ts';
 import { MikroOrmBusyRepository } from './infrastructure/mikro-orm-busy.repository.ts';
+import { NoPaymentGate } from './infrastructure/no-payment-gate.ts';
+import { UnmeteredCredit } from './infrastructure/unmetered-credit.ts';
 import { MikroOrmMentorBookabilityRepository } from './infrastructure/mikro-orm-mentor-bookability.repository.ts';
 import { schedulingRecords } from './infrastructure/scheduling.records.ts';
 import { Migration20261123000000SchedulingAvailability } from './migrations/Migration20261123000000SchedulingAvailability.ts';
 import { Migration20261124000000SchedulingBookability } from './migrations/Migration20261124000000SchedulingBookability.ts';
+import { Migration20261126000000SchedulingBooking } from './migrations/Migration20261126000000SchedulingBooking.ts';
 
 /** Picked up by the ORM configuration (explicit lists, no globbing). */
 export const schedulingEntities = [...schedulingRecords, MentorBookabilityRecord];
@@ -56,14 +84,34 @@ export const schedulingMigrations = [
     name: 'Migration20261124000000SchedulingBookability',
     class: Migration20261124000000SchedulingBookability,
   },
+  {
+    name: 'Migration20261126000000SchedulingBooking',
+    class: Migration20261126000000SchedulingBooking,
+  },
 ];
 
 export interface SchedulingCradle {
   availabilityRepository: AvailabilityRepository;
   /** Q13: the mirrored `catalog` mentor, read by the availability query and (step 10) the hold. */
   mentorBookabilityRepository: MentorBookabilityRepository;
-  /** Time that blocks booking although the template is open (bookings in step 10, Google in E3-S10). */
+  /** Time that blocks booking although the template is open (bookings, and Google in E3-S10). */
   busyRepository: BusyRepository;
+  /** The `scheduling.booking` table (spec §4.4). */
+  bookingRepository: BookingRepository;
+  /** Q1: the money step of checkout (`none` in F3, Stripe in F4). */
+  paymentGate: PaymentGate;
+  /** F4: the credit step of checkout (unmetered in F3). */
+  creditReservation: CreditReservation;
+  /** U1: take a 10-minute hold. */
+  createHold: CreateHold;
+  /** U2: release the student's own hold („Zmień termin”). */
+  releaseHold: ReleaseHold;
+  /** U2: confirm the hold (trial → requested, later session → scheduled). */
+  checkout: Checkout;
+  /** U3: one booking of a participant. */
+  getBooking: GetBooking;
+  /** Job: expire holds past their deadline (rule 5). */
+  expireHolds: ExpireHolds;
   getCancellationTerms: GetCancellationTerms;
   getMentorCalendar: GetMentorCalendar;
   /** Public: U1 slots and „następny wolny termin" for one mentor profile. */
@@ -76,7 +124,7 @@ export interface SchedulingCradle {
   updateMentorSettings: UpdateMentorSettings;
 }
 
-export type SchedulingDeps = SchedulingCradle & DatabaseCradle & { clock: Clock };
+export type SchedulingDeps = SchedulingCradle & DatabaseCradle & { clock: Clock; env: Env };
 
 /** Registers the scheduling module; application services are scoped per request / per job. */
 export const registerSchedulingModule = (container: AwilixContainer<SchedulingDeps>): void => {
@@ -84,6 +132,20 @@ export const registerSchedulingModule = (container: AwilixContainer<SchedulingDe
     availabilityRepository: asClass(MikroOrmAvailabilityRepository).scoped(),
     mentorBookabilityRepository: asClass(MikroOrmMentorBookabilityRepository).scoped(),
     busyRepository: asClass(MikroOrmBusyRepository).scoped(),
+    bookingRepository: asClass(MikroOrmBookingRepository).scoped(),
+    // Q1: `stripe` is F4 — the F3 container refuses it loudly instead of silently paying.
+    paymentGate: asFunction(({ env }: SchedulingDeps) => {
+      if (env.BOOKING_PAYMENT_MODE === 'stripe') {
+        throw new Error('BOOKING_PAYMENT_MODE=stripe is not implemented yet (F4)');
+      }
+      return new NoPaymentGate();
+    }).scoped(),
+    creditReservation: asClass(UnmeteredCredit).scoped(),
+    createHold: asFunction(makeCreateHold).scoped(),
+    releaseHold: asFunction(makeReleaseHold).scoped(),
+    checkout: asFunction(makeCheckout).scoped(),
+    getBooking: asFunction(makeGetBooking).scoped(),
+    expireHolds: asFunction(makeExpireHolds).scoped(),
     getCancellationTerms: asFunction(makeGetCancellationTerms).scoped(),
     getMentorCalendar: asFunction(makeGetMentorCalendar).scoped(),
     getMentorAvailability: asFunction(makeGetMentorAvailability).scoped(),

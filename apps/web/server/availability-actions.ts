@@ -52,6 +52,17 @@ const toFailure = (error: BookingError): AvailabilityActionResult => {
     case 'scheduling.not_found':
     case 'scheduling.mentor_unavailable':
       return { ok: false, kind: 'not_found' };
+    case 'scheduling.email_not_verified':
+      return { ok: false, kind: 'forbidden' };
+    case 'scheduling.invalid_goal':
+      return invalid([{ field: 'goal', problem: error.issue }]);
+    case 'scheduling.slot_taken':
+    case 'scheduling.student_busy':
+    case 'scheduling.trial_already_used':
+    case 'scheduling.hold_expired':
+    case 'scheduling.not_accepting_new':
+    case 'scheduling.insufficient_credit':
+    case 'scheduling.hold_rate_limited':
     case 'booking.invalid_transition':
       return { ok: false, kind: 'conflict' };
   }

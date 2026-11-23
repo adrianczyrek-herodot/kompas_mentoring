@@ -299,5 +299,58 @@
       "title": "Ten krok dochodzi w kolejnym etapie",
       "lead": "Dostępność i weryfikacja (dane do wypłat) pojawią się, gdy skończysz kroki 1–4."
     }
+  },
+  "Booking": {
+    "u1": {
+      "title": "Wybierz termin",
+      "lead": "Godziny w Twojej strefie czasowej. Wybrany termin trzymamy dla Ciebie przez 10 minut.",
+      "mentorName": "Mentor",
+      "mentorHeadline": "Rezerwacja sesji",
+      "sessionType": "Rodzaj sesji",
+      "trial": "Sesja próbna",
+      "plan": "Kolejna sesja",
+      "duration": "Długość sesji",
+      "duration30": "30 min",
+      "duration60": "60 min",
+      "trialFixed": "Sesja próbna trwa 30 minut.",
+      "zoneNote": "Zmiana dotyczy tylko tego widoku.",
+      "horizon": "Terminy do {date}",
+      "nextFree": "Następny wolny termin: {when}",
+      "jumpToNext": "Przejdź do tego tygodnia",
+      "loadError": "Nie udało się wczytać terminów",
+      "retry": "Ponów",
+      "slotTaken": "Ten termin został właśnie zajęty",
+      "slotTakenDescription": "Odświeżyliśmy listę — wybierz inny termin.",
+      "holdFailed": "Nie udało się zablokować terminu. Spróbuj ponownie.",
+      "selectSlot": "Wybierz termin, żeby przejść dalej.",
+      "continue": "Dalej",
+      "signInToContinue": "Zaloguj się, żeby zarezerwować",
+      "holdHint": "Wybierz termin, żeby przejść dalej."
+    },
+    "u2": {
+      "title": "Podsumowanie rezerwacji",
+      "lead": "Sprawdź szczegóły i potwierdź. Termin trzymamy jeszcze 10 minut.",
+      "goalLabel": "Z czym przychodzisz?",
+      "goalHint": "Mentor zobaczy to przed sesją.",
+      "goalTooShort": "Cel jest za krótki — napisz co najmniej 20 znaków.",
+      "goalTooLong": "Cel jest za długi — maksymalnie 500 znaków.",
+      "freePaymentTitle": "Płatności uruchomimy wkrótce — ta rezerwacja jest bezpłatna",
+      "freePaymentDescription": "Na razie potwierdzasz termin bez płatności. Nic nie zapłacisz.",
+      "confirm": "Potwierdź rezerwację",
+      "confirmBlocked": "Wpisz cel sesji (20–500 znaków), żeby potwierdzić.",
+      "changeSlot": "Zmień termin",
+      "expired": "Blokada terminu wygasła. Wybierz termin ponownie.",
+      "notFound": "Nie znaleźliśmy tej blokady. Wybierz termin ponownie.",
+      "checkoutFailed": "Nie udało się potwierdzić rezerwacji. Spróbuj ponownie."
+    },
+    "u3": {
+      "title": "Potwierdzenie rezerwacji",
+      "backToHome": "Wróć na stronę główną"
+    },
+    "common": {
+      "busy": "Chwileczkę…",
+      "toastClose": "Zamknij",
+      "toastRegion": "Powiadomienia"
+    }
   }
 }

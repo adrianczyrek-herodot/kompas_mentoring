@@ -40,6 +40,7 @@ describe.skipIf(!dockerAvailable)(
         email,
         emailVerified: true,
         twoFactorEnabled: false,
+        timeZone: null,
         roles: [role],
       };
     };

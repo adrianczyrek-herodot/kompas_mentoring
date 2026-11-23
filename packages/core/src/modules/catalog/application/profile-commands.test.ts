@@ -45,6 +45,7 @@ const actor = (
   email: 'ola@example.com',
   emailVerified: true,
   twoFactorEnabled: false,
+  timeZone: null,
   roles,
 });
 

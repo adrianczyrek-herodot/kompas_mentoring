@@ -37,12 +37,14 @@ import { MikroOrmDataRequestRepository } from './infrastructure/mikro-orm-data-r
 import { UserRecord } from './infrastructure/user.record.ts';
 import { Migration20261110000000IdentityAuth } from './migrations/Migration20261110000000IdentityAuth.ts';
 import { Migration20261110120000AccountRequests } from './migrations/Migration20261110120000AccountRequests.ts';
+import { Migration20261111000000IdentityTimeZone } from './migrations/Migration20261111000000IdentityTimeZone.ts';
 
 /** Picked up by the ORM configuration (explicit lists, no globbing). */
 export const identityEntities = [UserRecord, ConsentRecord, DataRequestRecord];
 export const identityMigrations = [
   { name: 'Migration20261110000000IdentityAuth', class: Migration20261110000000IdentityAuth },
   { name: 'Migration20261110120000AccountRequests', class: Migration20261110120000AccountRequests },
+  { name: 'Migration20261111000000IdentityTimeZone', class: Migration20261111000000IdentityTimeZone },
 ];
 
 export interface IdentityCradle {

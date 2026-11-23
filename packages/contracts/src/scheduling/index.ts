@@ -17,6 +17,20 @@ export {
   UpdateMentorSettingsInput,
   updateMentorSettingsContract,
 } from './availability.contract.ts';
+export {
+  BookingPaymentModeView,
+  BookingStatusView,
+  BookingTypeView,
+  BookingView,
+  CheckoutInput,
+  CheckoutView,
+  CreateHoldInput,
+  checkoutContract,
+  createHoldContract,
+  deleteHoldContract,
+  getBookingContract,
+  getHoldContract,
+} from './booking.contract.ts';
 export { SCHEDULING_LIMITS } from './limits.ts';
 export {
   AvailabilityBookingType,

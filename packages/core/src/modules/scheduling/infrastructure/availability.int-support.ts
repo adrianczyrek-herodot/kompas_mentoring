@@ -59,15 +59,18 @@ let requestCounter = 0;
 const scopeOf = (container: AppContainer) =>
   createRequestScope(container, { requestId: `int-availability-${(requestCounter += 1)}` });
 
-const userWith = async (container: AppContainer): Promise<CurrentUser> => {
+const userWith = async (
+  container: AppContainer,
+  role: 'student' | 'mentor' = 'mentor',
+): Promise<CurrentUser> => {
   const email = `availability-${crypto.randomUUID()}@example.com`;
   const body = {
-    name: 'Marta',
+    name: role === 'mentor' ? 'Marta' : 'Ola',
     email,
     password: PASSWORD,
     terms: true,
     privacy: true,
-    as: 'mentor',
+    as: role,
   };
   const { user } = await container.cradle.auth.api.signUpEmail({ body });
   return {
@@ -76,9 +79,14 @@ const userWith = async (container: AppContainer): Promise<CurrentUser> => {
     email,
     emailVerified: true,
     twoFactorEnabled: false,
-    roles: ['mentor'],
+    timeZone: null,
+    roles: [role],
   };
 };
+
+/** A signed-in student (E3-S4 booking fixtures); the e-mail is treated as verified. */
+export const studentUser = (container: AppContainer): Promise<CurrentUser> =>
+  userWith(container, 'student');
 
 /**
  * A mentor the projection knows as bookable: the profile comes from the M1 query, the projection

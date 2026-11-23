@@ -10,4 +10,8 @@ export const SCHEDULING_LIMITS = {
   /** M3: buffer after a session — 0–30 min every 5 min. */
   buffer: { minMinutes: 0, maxMinutes: 30, stepMinutes: 5 },
   exceptionNoteMaxLength: 300,
+  /** U2: the goal of a trial is required, 20–500 characters. */
+  goal: { minLength: 20, maxLength: 500 },
+  /** Q18: a hold lives 10 minutes; at most 20 per hour per student. */
+  hold: { minutes: 10, maxPerHour: 20 },
 } as const;

@@ -67,6 +67,82 @@ const upsertAdmin = async (admin: (typeof ADMINS)[number]): Promise<void> => {
   );
 };
 
+/** E2E booking fixtures (E3-S4): one bookable mentor with availability and one verified student. */
+const E2E_MENTOR_EMAIL = 'mentor.e2e@kompas.local';
+const E2E_STUDENT_EMAIL = 'student.e2e@kompas.local';
+// One mentor per Playwright project, so the 360 px and 1280 px runs never race for the same slot.
+const E2E_MENTOR_PROFILES = [
+  '018f0000-0000-7000-8000-0000000000a1',
+  '018f0000-0000-7000-8000-0000000000a2',
+] as const;
+
+const ensureUser = async (email: string, name: string, role: string): Promise<string> => {
+  const existing = await db.execute<{ id: string }[]>(
+    'select "id" from "identity"."user" where "email" = ?',
+    [email],
+  );
+  if (existing.length === 0) {
+    // A variable keeps `terms`/`privacy` out of the excess-property check (hooks validate them).
+    const body = { name, email, password: adminSeedPassword, terms: true, privacy: true };
+    await auth.api.signUpEmail({ body });
+    logger.info(`seed: created ${role} ${email}`);
+  }
+  await db.execute(
+    `update "identity"."user"
+        set "roles" = ?::jsonb, "emailVerified" = true, "time_zone" = 'Europe/Warsaw'
+      where "email" = ?`,
+    [JSON.stringify([role]), email],
+  );
+  const rows = await db.execute<{ id: string }[]>(
+    'select "id" from "identity"."user" where "email" = ?',
+    [email],
+  );
+  return rows[0]?.id ?? '';
+};
+
+/**
+ * E2E needs a mentor the projection knows as bookable and whose weekly template has slots — trust
+ * approval (E2-S4) does not exist yet, so the fixture writes the mirror directly. Test-only data.
+ */
+const seedBookingFixtures = async (): Promise<void> => {
+  if (process.env['SEED_ADMIN_EMAIL'] !== undefined) return;
+  await ensureUser(E2E_STUDENT_EMAIL, 'Student E2E', 'student');
+  for (const [index, profileId] of E2E_MENTOR_PROFILES.entries()) {
+    const email = index === 0 ? E2E_MENTOR_EMAIL : `mentor${index + 1}.e2e@kompas.local`;
+    const mentorId = await ensureUser(email, `Mentor E2E ${index + 1}`, 'mentor');
+    await db.execute(
+      `insert into "scheduling"."mentor_bookability"
+          ("mentor_profile_id", "mentor_id", "is_bookable", "accepting_new", "rate_60_amount", "currency", "updated_at")
+        values (?, ?, true, true, 12000, 'PLN', now())
+        on conflict ("mentor_profile_id") do update set
+          "mentor_id" = excluded."mentor_id",
+          "is_bookable" = true,
+          "accepting_new" = true,
+          "rate_60_amount" = excluded."rate_60_amount",
+          "currency" = excluded."currency",
+          "updated_at" = now()`,
+      [profileId, mentorId],
+    );
+    await db.execute(
+      `insert into "scheduling"."mentor_schedule"
+          ("mentor_id", "time_zone", "min_notice_minutes", "buffer_minutes", "version", "created_at", "updated_at")
+        values (?, 'Europe/Warsaw', 120, 0, 1, now(), now())
+        on conflict ("mentor_id") do update set "time_zone" = excluded."time_zone", "min_notice_minutes" = 120`,
+      [mentorId],
+    );
+    await db.execute('delete from "scheduling"."availability_rule" where "mentor_id" = ?', [
+      mentorId,
+    ]);
+    for (const weekday of [1, 2, 3, 4, 5, 6, 7]) {
+      await db.execute(
+        `insert into "scheduling"."availability_rule" ("id", "mentor_id", "weekday", "start_local", "end_local")
+          values (?, ?, ?, '09:00', '17:00')`,
+        [crypto.randomUUID(), mentorId, weekday],
+      );
+    }
+  }
+};
+
 try {
   const status = await checkDatabase(orm);
   if (status === 'down') {
@@ -80,6 +156,7 @@ try {
       await upsertAdmin(admin);
     }
   }
+  await seedBookingFixtures();
   logger.info('seed: done');
 } finally {
   await orm.close();

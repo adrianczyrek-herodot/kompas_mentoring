@@ -10,6 +10,8 @@ export interface CurrentUser {
   readonly emailVerified: boolean;
   readonly twoFactorEnabled: boolean;
   readonly roles: readonly Role[];
+  /** Q12: the user's IANA zone; `null` until the browser reports it (falls back to Warsaw). */
+  readonly timeZone: string | null;
 }
 
 export interface AuthSession {
