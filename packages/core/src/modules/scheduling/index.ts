@@ -75,3 +75,9 @@ export {
   isValidTimeZone,
   validateMentorSettings,
 } from './domain/policies/mentor-schedule.policy.ts';
+export type {
+  AvailabilityWindowsInput,
+  Interval,
+  SlotsForInput,
+} from './domain/policies/slots-for.policy.ts';
+export { availabilityWindows, slotsFor } from './domain/policies/slots-for.policy.ts';
