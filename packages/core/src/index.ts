@@ -12,6 +12,10 @@ export * from './shared/domain/index.ts';
 export type { DatabaseStatus } from './shared/infrastructure/db/orm.ts';
 export { directDatabaseUrl, type Env, parseEnv } from './shared/infrastructure/env.ts';
 export {
+  type EventSubscription,
+  startEventSubscriptions,
+} from './shared/infrastructure/events/subscriptions.ts';
+export {
   type BossRole,
   createBoss,
   HEARTBEAT_CRON,

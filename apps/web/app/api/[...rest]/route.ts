@@ -5,9 +5,13 @@ import { router } from '../../../server/router.ts';
 const handler = new OpenAPIHandler(router);
 
 async function handle(request: Request): Promise<Response> {
-  const { matched, response } = await handler.handle(request, { prefix: '/api' });
+  const { matched, response } = await handler.handle(request, {
+    prefix: '/api',
+    context: { headers: request.headers },
+  });
   return matched ? response : new Response('Not found', { status: 404 });
 }
 
 export const GET = handle;
 export const POST = handle;
+export const PUT = handle;

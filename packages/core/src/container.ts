@@ -1,5 +1,13 @@
-import { type AwilixContainer, asFunction, asValue, createContainer, InjectionMode } from 'awilix';
+import {
+  type AwilixContainer,
+  asClass,
+  asFunction,
+  asValue,
+  createContainer,
+  InjectionMode,
+} from 'awilix';
 import type { BetterAuthPlugin } from 'better-auth';
+import { type CatalogCradle, registerCatalogModule } from './modules/catalog/di.ts';
 import { type IdentityCradle, registerIdentityModule } from './modules/identity/di.ts';
 import { registerSchedulingModule } from './modules/scheduling/di.ts';
 import type { SchedulingCradle } from './modules/scheduling/index.ts';
@@ -7,15 +15,27 @@ import type { Clock } from './shared/domain/index.ts';
 import type { DatabaseCradle } from './shared/infrastructure/db/database-cradle.ts';
 import { checkDatabase, createOrm, type DatabaseStatus } from './shared/infrastructure/db/orm.ts';
 import type { Env } from './shared/infrastructure/env.ts';
+import {
+  type EventPublisher,
+  PgBossEventPublisher,
+} from './shared/infrastructure/events/outbox.ts';
+import type { EventSubscription } from './shared/infrastructure/events/subscriptions.ts';
+import { createBoss, type PgBoss } from './shared/infrastructure/jobs/boss.ts';
 import type { Logger } from './shared/infrastructure/logger.ts';
 import { SystemClock } from './shared/infrastructure/system-clock.ts';
 
-export interface AppCradle extends SchedulingCradle, IdentityCradle, DatabaseCradle {
+export interface AppCradle extends SchedulingCradle, IdentityCradle, CatalogCradle, DatabaseCradle {
   env: Env;
   logger: Logger;
   clock: Clock;
   /** Pings the database; the ORM itself stays inside core (spec §2.4 rule 4). */
   databaseHealth: () => Promise<DatabaseStatus>;
+  /** pg-boss of this process: web only sends jobs, the worker also fetches them (spec §1.4). */
+  boss: PgBoss;
+  /** Outbox: events go out as jobs on the transaction of the change (spec §4.6). */
+  eventPublisher: EventPublisher;
+  /** Module reactions to other modules' events, started by the worker. */
+  eventSubscriptions: readonly EventSubscription[];
 }
 
 export interface RequestCradle extends AppCradle {
@@ -34,6 +54,8 @@ export const createAppContainer = (deps: {
   clock?: Clock;
   /** Better Auth plugins of the hosting framework (web: `nextCookies()`); the worker has none. */
   authPlugins?: readonly BetterAuthPlugin[];
+  /** The worker passes its own boss; web gets a send-only one, started on the first publish. */
+  boss?: PgBoss;
 }): AppContainer => {
   // strict: scoped services cannot be resolved from the root, which forces a request/job scope.
   const container = createContainer<AppCradle>({
@@ -50,9 +72,16 @@ export const createAppContainer = (deps: {
     logger: asValue(deps.logger),
     clock: asValue(deps.clock ?? new SystemClock()),
     authPlugins: asValue(deps.authPlugins ?? []),
+    boss: deps.boss
+      ? asValue(deps.boss)
+      : asFunction(() => createBoss('web', deps.env.DATABASE_URL)).singleton(),
+    eventPublisher: asClass(PgBossEventPublisher).singleton(),
+    // Consumers arrive with the modules that react to events (trust, catalog — E2-S3/E2-S4).
+    eventSubscriptions: asValue([]),
   });
   registerSchedulingModule(container);
   registerIdentityModule(container);
+  registerCatalogModule(container);
   return container;
 };
 
