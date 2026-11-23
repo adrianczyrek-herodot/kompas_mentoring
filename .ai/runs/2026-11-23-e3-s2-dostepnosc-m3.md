@@ -29,6 +29,7 @@ oraz ekran M3 `/mentor/kalendarz` z E2E (360/1280 px, axe). Jeden commit na krok
 - **Krok 4** `2c6f28a` `feat(ui)`: `AvailabilityEditor` (DS-05), `WeekCalendar`, `ExceptionDialog`, `CalendarSyncCard`, ekran-wzorzec `screens/m3-calendar` (+ `.mdx`), stories i dopisek w `docs/design-system.md`; autorstwo: subagent `8975ebd8`, wniesione na gałąź.
 - **Krok 5** (commit poniżej) `feat(web)`: M3 `/mentor/kalendarz` (tydzień, edytor, wyjątki, ustawienia, baner pustej dostępności), `AvailabilityTemplateForm` (liść dla M1·5), server actions, teksty `messages/pl.json`, E2E 360/1280 + axe.
 - Odstępstwa: dopisane w „Decyzje i zmiany” specyfikacji F3 (kody błędów `scheduling.forbidden`/`version_conflict`, `BOOKING_HORIZON` w godzinach, strażnik M3 `mentor.access`, lista stref zamiast `TimezoneSelect`, brak przełącznika accepting-new — krok 7).
+- **PR:** [#71](https://github.com/adrianczyrek-herodot/kompas_mentoring/pull/71) (do `main`, `Refs #37, #24`, **nie scalony**); zgłoszenie #37 oznaczone `in-progress` i skomentowane postępem. Wymaga przeglądu człowieka: migracja `scheduling` i zmiana uprawnień w `identity`.
 
 ## Weryfikacja
 - `pnpm typecheck` — 7/7 pakietów zielone.
