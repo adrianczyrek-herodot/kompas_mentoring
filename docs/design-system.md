@@ -52,6 +52,8 @@ Ten plik to skondensowana instrukcja obsługi design systemu. Agent budujący no
 
 **Produkt (E1–E3):** `AppHeader`, `PageHeader`, `Money`, `DateTime`, `MentorCard`, `FilterPanel`, `ActiveFilters`, `ProfileHero`, `StickyBookingBar`, `SlotGrid`, `HoldCountdown`, `SessionListItem`, `NextSessionCard`, `BookingStatusBadge`, `PolicyNotice`, `TrialRequestCard`, `TodayAgenda` — patrz Storybook → **Produkt**.
 
+**Dostępność i rezerwacje M3 (E3-S2):** `AvailabilityEditor` (DS-05: siatka tydzień × 30 min, klik/przeciągnięcie, strzałki/Spacja/Shift+strzałka, suma tygodniowa), `WeekCalendar` (tydzień z sesjami i dostępnością, strefa podpisana), `ExceptionDialog` (wyjątki `off`/`extra`), `CalendarSyncCard` (rozłączony / połączony / błąd, fail-open Q17). Ekran-wzorzec: **Produkt/E3 Dostępność i rezerwacje/Ekrany/M3 Kalendarz i dostępność**.
+
 ---
 
 ## Tokeny znaczeniowe (główne)
