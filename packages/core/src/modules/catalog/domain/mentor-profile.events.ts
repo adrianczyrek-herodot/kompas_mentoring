@@ -19,7 +19,18 @@ interface MentorProfileUnpublishedV1 {
   readonly mentorProfileId: MentorId;
 }
 
+/**
+ * catalog → scheduling (Q13): what `scheduling` needs to know about a mentor without asking
+ * `catalog` (that direction would be a cycle, spec §2.4 rule 5). The payload is completed from the
+ * profile in the repository, which is the only place that knows the stored state.
+ */
+interface MentorBookabilityChangedV1 {
+  readonly name: 'catalog.mentor_bookability_changed.v1';
+  readonly mentorProfileId: MentorId;
+}
+
 export type MentorProfileDomainEvent =
   | MentorProfileUpdatedV1
   | MentorProfilePublishedV1
-  | MentorProfileUnpublishedV1;
+  | MentorProfileUnpublishedV1
+  | MentorBookabilityChangedV1;

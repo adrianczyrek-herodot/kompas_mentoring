@@ -47,6 +47,24 @@ export const MentorProfileUnpublishedV1 = eventEnvelope(
   MentorProfileRef,
 );
 
+/**
+ * catalog → scheduling (Q13): the profile became (un)bookable, the mentor paused new trial
+ * students or changed the rate. `bookable` is "approved" in the profile state machine; `rate60`
+ * travels in minor units because JSON has no bigint (`Money` stays bigint inside the domain).
+ */
+export const MentorBookabilityChangedV1 = eventEnvelope(
+  'catalog.mentor_bookability_changed.v1',
+  z.object({
+    mentorUserId: z.uuid(),
+    mentorProfileId: z.uuid(),
+    bookable: z.boolean(),
+    acceptingNew: z.boolean(),
+    rate60: z
+      .object({ amountMinorUnits: z.number().int().min(0), currency: z.literal('PLN') })
+      .nullable(),
+  }),
+);
+
 /** Registry: event name → envelope schema, used by publishers and consumers alike. */
 export const DOMAIN_EVENTS = {
   'catalog.mentor_application_submitted.v1': MentorApplicationSubmittedV1,
@@ -55,6 +73,7 @@ export const DOMAIN_EVENTS = {
   'catalog.mentor_profile_published.v1': MentorProfilePublishedV1,
   'catalog.mentor_profile_updated.v1': MentorProfileUpdatedV1,
   'catalog.mentor_profile_unpublished.v1': MentorProfileUnpublishedV1,
+  'catalog.mentor_bookability_changed.v1': MentorBookabilityChangedV1,
 } as const;
 
 export type DomainEventName = keyof typeof DOMAIN_EVENTS;

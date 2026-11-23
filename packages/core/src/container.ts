@@ -9,7 +9,7 @@ import {
 import type { BetterAuthPlugin } from 'better-auth';
 import { type CatalogCradle, registerCatalogModule } from './modules/catalog/di.ts';
 import { type IdentityCradle, registerIdentityModule } from './modules/identity/di.ts';
-import { registerSchedulingModule } from './modules/scheduling/di.ts';
+import { registerSchedulingModule, schedulingEventSubscriptions } from './modules/scheduling/di.ts';
 import type { SchedulingCradle } from './modules/scheduling/index.ts';
 import type { Clock } from './shared/domain/index.ts';
 import type { DatabaseCradle } from './shared/infrastructure/db/database-cradle.ts';
@@ -76,12 +76,16 @@ export const createAppContainer = (deps: {
       ? asValue(deps.boss)
       : asFunction(() => createBoss('web', deps.env.DATABASE_URL)).singleton(),
     eventPublisher: asClass(PgBossEventPublisher).singleton(),
-    // Consumers arrive with the modules that react to events (trust, catalog — E2-S3/E2-S4).
-    eventSubscriptions: asValue([]),
   });
   registerSchedulingModule(container);
   registerIdentityModule(container);
   registerCatalogModule(container);
+  // Reactions of the modules to each other's events (spec §4.6); the worker starts the queues.
+  container.register({
+    eventSubscriptions: asFunction((deps: AppCradle) =>
+      schedulingEventSubscriptions({ orm: deps.orm }),
+    ).singleton(),
+  });
   return container;
 };
 

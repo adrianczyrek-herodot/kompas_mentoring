@@ -104,3 +104,21 @@ export const confirmPhotoUploadContract = oc
   })
   .input(z.object({ key: z.string() }))
   .output(MentorProfileView);
+
+/** Q13: the "pause new students" switch of M3 — `catalog` remains the source of truth. */
+export const SetAcceptingNewInput = z.object({
+  acceptingNew: z.boolean({ error: 'required' }),
+  /** Optimistic lock, like every other profile write (409 on a stale version). */
+  expectedVersion: z.number({ error: 'required' }).int({ error: 'out_of_range' }),
+});
+export type SetAcceptingNewInput = z.infer<typeof SetAcceptingNewInput>;
+
+/** PATCH /api/mentor/bookability — pauses or resumes new trial bookings (Q13). */
+export const setAcceptingNewContract = oc
+  .route({
+    method: 'PATCH',
+    path: '/mentor/bookability',
+    summary: 'Pause or resume new trial bookings (M3)',
+  })
+  .input(SetAcceptingNewInput)
+  .output(z.object({ acceptingNew: z.boolean(), version: z.number().int() }));

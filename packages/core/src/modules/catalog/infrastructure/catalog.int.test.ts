@@ -1,4 +1,5 @@
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import type { PgBoss } from 'pg-boss';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type AppContainer, createAppContainer, createRequestScope } from '../../../container.ts';
 import { money, UserId } from '../../../shared/domain/index.ts';
@@ -9,6 +10,7 @@ import {
   POSTGRES_IMAGE,
 } from '../../../shared/infrastructure/db/test-database.ts';
 import { parseEnv } from '../../../shared/infrastructure/env.ts';
+import { createBoss } from '../../../shared/infrastructure/jobs/boss.ts';
 import { createLogger } from '../../../shared/infrastructure/logger.ts';
 import type { CurrentUser, Role } from '../../identity/index.ts';
 import { CATEGORY_SLUGS } from '../domain/policies/config.ts';
@@ -20,6 +22,7 @@ describe.skipIf(!dockerAvailable)(
   () => {
     let database: StartedPostgreSqlContainer;
     let container: AppContainer;
+    let worker: PgBoss;
     let counter = 0;
 
     const scope = () =>
@@ -54,9 +57,20 @@ describe.skipIf(!dockerAvailable)(
         logger: createLogger({ level: 'silent' }),
       });
       await migrateUp(container.cradle.orm);
+      // Publishing needs pg-boss installed and a queue subscribed to the event (spec §4.6); the
+      // worker does that in production and here it also receives the jobs the commands emit.
+      worker = createBoss('worker', database.getConnectionUri());
+      await worker.start();
+      await worker.createQueue('scheduling/catalog.mentor_bookability_changed.v1');
+      await worker.subscribe(
+        'catalog.mentor_bookability_changed.v1',
+        'scheduling/catalog.mentor_bookability_changed.v1',
+      );
     });
 
     afterAll(async () => {
+      await worker.stop({ graceful: false });
+      await container.cradle.boss.stop({ graceful: false });
       await container.cradle.orm.close();
       await database.stop();
     });

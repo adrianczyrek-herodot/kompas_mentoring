@@ -82,6 +82,7 @@ export const toSchedulingProblem = (error: BookingError): SchedulingProblem => {
     case 'scheduling.forbidden':
       return { status: 403, code: error.code };
     case 'scheduling.not_found':
+    case 'scheduling.mentor_unavailable':
       return { status: 404, code: error.code };
     case 'scheduling.version_conflict':
       return { status: 409, code: error.code };

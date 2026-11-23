@@ -14,7 +14,6 @@ import {
   type OpenMyMentorProfile,
 } from './application/open-my-mentor-profile.query.ts';
 import type { MentorProfileRepository, UploadRepository } from './application/ports.ts';
-import type { FileStorage } from './domain/ports/file-storage.ts';
 import {
   makeRequestPhotoUpload,
   type RequestPhotoUpload,
@@ -23,15 +22,20 @@ import {
   makeSaveProfileStep,
   type SaveProfileStep,
 } from './application/save-profile-step.command.ts';
+import {
+  makeSetAcceptingNew,
+  type SetAcceptingNew,
+} from './application/set-accepting-new.command.ts';
+import type { FileStorage } from './domain/ports/file-storage.ts';
 import { catalogRecords } from './infrastructure/catalog.records.ts';
 import { createFileStorage } from './infrastructure/file-storage.factory.ts';
 import { MikroOrmMentorProfileRepository } from './infrastructure/mikro-orm-mentor-profile.repository.ts';
 import { MikroOrmUploadRepository } from './infrastructure/mikro-orm-upload.repository.ts';
-import { Migration20261122000000CatalogProfile } from './migrations/Migration20261122000000CatalogProfile.ts';
 import {
   type CleanupOrphanUploads,
   makeCleanupOrphanUploads,
 } from './jobs/cleanup-orphan-uploads.ts';
+import { Migration20261122000000CatalogProfile } from './migrations/Migration20261122000000CatalogProfile.ts';
 
 /** Picked up by the ORM configuration (explicit lists, no globbing). */
 export const catalogEntities = catalogRecords;
@@ -50,6 +54,8 @@ export interface CatalogCradle {
   openMyMentorProfile: OpenMyMentorProfile;
   getMentorAccess: GetMentorAccess;
   saveProfileStep: SaveProfileStep;
+  /** Q13: the M3 "pause new students" switch — `catalog` stays the source of truth. */
+  setAcceptingNew: SetAcceptingNew;
   requestPhotoUpload: RequestPhotoUpload;
   confirmPhotoUpload: ConfirmPhotoUpload;
   cleanupOrphanUploads: CleanupOrphanUploads;
@@ -68,6 +74,7 @@ export const registerCatalogModule = (container: AwilixContainer<Deps>): void =>
     openMyMentorProfile: asFunction(makeOpenMyMentorProfile).scoped(),
     getMentorAccess: asFunction(makeGetMentorAccess).scoped(),
     saveProfileStep: asFunction(makeSaveProfileStep).scoped(),
+    setAcceptingNew: asFunction(makeSetAcceptingNew).scoped(),
     requestPhotoUpload: asFunction(makeRequestPhotoUpload).scoped(),
     confirmPhotoUpload: asFunction(makeConfirmPhotoUpload).scoped(),
     cleanupOrphanUploads: asFunction(makeCleanupOrphanUploads).scoped(),

@@ -69,6 +69,7 @@ export const toMentorProfile = (
       ? { provider: row.videoProvider, videoId: row.videoId }
       : null,
   rate60: toRate(row.rate60Amount),
+  acceptingNew: row.acceptingNew,
   completedSteps: toSteps(row.completedSteps),
   requestedFields: row.requestedFields,
   version: row.version,
@@ -95,6 +96,7 @@ export const toRow = (profile: MentorProfile): MentorProfileRow => ({
   experience: profile.experience,
   rate60Amount: profile.rate60?.amount ?? null,
   currency: profile.rate60?.currency ?? 'PLN',
+  acceptingNew: profile.acceptingNew,
   completedSteps: [...profile.completedSteps],
   requestedFields: [...profile.requestedFields],
   submittedAt: profile.submittedAt ? toDate(profile.submittedAt) : null,

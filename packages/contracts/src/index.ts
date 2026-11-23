@@ -3,11 +3,13 @@ import {
   getMyMentorProfileContract,
   requestPhotoUploadContract,
   saveProfileStepContract,
+  setAcceptingNewContract,
 } from './catalog/index.ts';
 import { healthContract } from './health.contract.ts';
 import {
   addAvailabilityExceptionContract,
   deleteAvailabilityExceptionContract,
+  getMentorAvailabilityContract,
   getMentorCalendarContract,
   saveAvailabilityTemplateContract,
   updateMentorSettingsContract,
@@ -22,6 +24,8 @@ export const contract = {
   saveProfileStep: saveProfileStepContract,
   requestPhotoUpload: requestPhotoUploadContract,
   confirmPhotoUpload: confirmPhotoUploadContract,
+  setAcceptingNew: setAcceptingNewContract,
+  getMentorAvailability: getMentorAvailabilityContract,
   getMentorCalendar: getMentorCalendarContract,
   saveAvailabilityTemplate: saveAvailabilityTemplateContract,
   addAvailabilityException: addAvailabilityExceptionContract,

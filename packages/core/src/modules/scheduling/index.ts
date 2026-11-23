@@ -1,5 +1,6 @@
 // Public API of the scheduling module — the only file other modules and apps may import.
 
+export { toMentorAvailabilityView } from './api/mentor-availability.api.ts';
 export {
   type SchedulingProblem,
   toExceptionInput,
@@ -15,6 +16,16 @@ export type {
   AddAvailabilityExceptionInput,
   DeleteAvailabilityException,
 } from './application/availability-exceptions.commands.ts';
+export type {
+  AvailabilityBookingType,
+  AvailabilityDuration,
+  GetMentorAvailability,
+  GetMentorAvailabilityInput,
+} from './application/get-mentor-availability.query.ts';
+export type {
+  AvailableSlot,
+  MentorAvailabilitySlots,
+} from './application/mentor-availability.ts';
 export type {
   CancellationTerms,
   GetCancellationTerms,
@@ -75,3 +86,9 @@ export {
   isValidTimeZone,
   validateMentorSettings,
 } from './domain/policies/mentor-schedule.policy.ts';
+export type {
+  AvailabilityWindowsInput,
+  Interval,
+  SlotsForInput,
+} from './domain/policies/slots-for.policy.ts';
+export { availabilityWindows, slotsFor } from './domain/policies/slots-for.policy.ts';

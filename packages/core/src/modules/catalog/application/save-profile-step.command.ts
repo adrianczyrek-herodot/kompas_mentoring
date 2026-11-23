@@ -20,11 +20,19 @@ export type SaveProfileStepError =
   | InvalidFields
   | VersionConflict;
 
-/** A public profile changed: the search read model and the P3 cache refresh (spec "Zdarzenia"). */
-const eventsFor = (profile: MentorProfile): MentorProfileDomainEvent[] =>
-  isPublic(profile.status)
-    ? [{ name: 'catalog.mentor_profile_updated.v1', mentorProfileId: profile.id }]
-    : [];
+/**
+ * A public profile changed: the search read model and the P3 cache refresh (spec "Zdarzenia").
+ * The rate is part of what `scheduling` mirrors (`mentor_bookability`), so a rate save also tells
+ * it the new price; the profile lifecycle itself (approve/suspend) publishes from E2-S4 onward.
+ */
+const eventsFor = (profile: MentorProfile, step: StepInput['step']): MentorProfileDomainEvent[] => [
+  ...(isPublic(profile.status)
+    ? [{ name: 'catalog.mentor_profile_updated.v1' as const, mentorProfileId: profile.id }]
+    : []),
+  ...(step === 'rate'
+    ? [{ name: 'catalog.mentor_bookability_changed.v1' as const, mentorProfileId: profile.id }]
+    : []),
+];
 
 /**
  * M1 "Zapisz i dalej" / "Zapisz szkic": saves one step of the actor's own profile. The owner
@@ -51,7 +59,11 @@ export const makeSaveProfileStep =
     const changed = saveStep(profile, input, clock.now());
     if (changed.isErr()) return err(changed.error);
     const next = { ...changed.value, version: expectedVersion + 1 };
-    const outcome = await mentorProfileRepository.save(next, expectedVersion, eventsFor(next));
+    const outcome = await mentorProfileRepository.save(
+      next,
+      expectedVersion,
+      eventsFor(next, input.step),
+    );
     return outcome === 'saved' ? ok(next) : err({ code: 'catalog.version_conflict' });
   };
 

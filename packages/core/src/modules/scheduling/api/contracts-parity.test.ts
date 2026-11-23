@@ -27,6 +27,7 @@ describe('scheduling API mapping', () => {
   it('maps expected failures to RFC 9457 statuses', () => {
     expect(toSchedulingProblem({ code: 'scheduling.forbidden' }).status).toBe(403);
     expect(toSchedulingProblem({ code: 'scheduling.not_found' }).status).toBe(404);
+    expect(toSchedulingProblem({ code: 'scheduling.mentor_unavailable' }).status).toBe(404);
     expect(
       toSchedulingProblem({ code: 'scheduling.version_conflict', expected: 1, actual: 2 }).status,
     ).toBe(409);

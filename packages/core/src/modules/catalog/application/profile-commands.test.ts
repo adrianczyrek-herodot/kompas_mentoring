@@ -7,6 +7,7 @@ import type { MentorProfileDomainEvent } from '../domain/mentor-profile.events.t
 import { makeGetMentorAccess, makeOpenMyMentorProfile } from './open-my-mentor-profile.query.ts';
 import type { MentorProfileRepository } from './ports.ts';
 import { makeSaveProfileStep } from './save-profile-step.command.ts';
+import { makeSetAcceptingNew } from './set-accepting-new.command.ts';
 
 class InMemoryProfiles implements MentorProfileRepository {
   readonly byUser = new Map<string, MentorProfile>();
@@ -56,6 +57,7 @@ const setup = () => {
     open: makeOpenMyMentorProfile(deps),
     access: makeGetMentorAccess(deps),
     save: makeSaveProfileStep(deps),
+    setAcceptingNew: makeSetAcceptingNew(deps),
   };
 };
 
@@ -135,15 +137,20 @@ describe('catalog commands', () => {
     });
   });
 
-  it('publishes catalog.mentor_profile_updated.v1 only for public profiles', async () => {
+  it('publishes the profile update only when public, and the bookability change on every rate save', async () => {
     const { open, save, repo } = setup();
     const profile = (await open(actor()))._unsafeUnwrap();
+    // A draft mentor's rate still reaches `scheduling` — it mirrors the rate for step 10 (Q13).
     await save(actor(), rate(150n), 1);
-    expect(repo.published).toEqual([]);
+    expect(repo.published).toEqual([
+      { name: 'catalog.mentor_bookability_changed.v1', mentorProfileId: profile.id },
+    ]);
+    repo.published.length = 0;
     repo.byUser.set(profile.userId, { ...profile, status: 'approved', version: 2 });
     await save(actor(), rate(200n), 2);
     expect(repo.published).toEqual([
       { name: 'catalog.mentor_profile_updated.v1', mentorProfileId: profile.id },
+      { name: 'catalog.mentor_bookability_changed.v1', mentorProfileId: profile.id },
     ]);
   });
 
@@ -152,5 +159,48 @@ describe('catalog commands', () => {
     await open(actor());
     await save(actor(), rate(150n), 1);
     expect((await access(actor()))._unsafeUnwrap()).toEqual({ status: 'draft', nextStep: 'about' });
+  });
+
+  it('pauses new trial students and tells scheduling in the same save (Q13)', async () => {
+    const { open, save, setAcceptingNew, repo } = setup();
+    await open(actor());
+    await save(actor(), rate(150n), 1);
+    const paused = (
+      await setAcceptingNew(actor(), { acceptingNew: false, expectedVersion: 2 })
+    )._unsafeUnwrap();
+    expect(paused.acceptingNew).toBe(false);
+    expect(paused.version).toBe(3);
+    expect(
+      repo.published.filter((event) => event.name === 'catalog.mentor_bookability_changed.v1')
+        .length,
+    ).toBe(2);
+  });
+
+  it('refuses the switch for a locked profile, a stale version and someone else', async () => {
+    const { open, save, setAcceptingNew, repo } = setup();
+    const profile = (await open(actor()))._unsafeUnwrap();
+    await save(actor(), rate(150n), 1);
+    expect(
+      (
+        await setAcceptingNew(actor(), { acceptingNew: false, expectedVersion: 1 })
+      )._unsafeUnwrapErr(),
+    ).toEqual({ code: 'catalog.version_conflict' });
+    expect(
+      (
+        await setAcceptingNew(actor(['student']), { acceptingNew: false, expectedVersion: 2 })
+      )._unsafeUnwrapErr(),
+    ).toEqual({ code: 'catalog.forbidden' });
+    repo.byUser.set(profile.userId, { ...profile, status: 'submitted', version: 2 });
+    expect(
+      (
+        await setAcceptingNew(actor(), { acceptingNew: false, expectedVersion: 2 })
+      )._unsafeUnwrapErr(),
+    ).toEqual({ code: 'catalog.profile_locked', status: 'submitted' });
+    repo.byUser.delete(profile.userId);
+    expect(
+      (
+        await setAcceptingNew(actor(), { acceptingNew: false, expectedVersion: 2 })
+      )._unsafeUnwrapErr(),
+    ).toEqual({ code: 'catalog.not_found' });
   });
 });
