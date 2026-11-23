@@ -115,6 +115,19 @@ const confirmPhotoUpload = os.confirmPhotoUpload
     return viewOf(unwrap(result), actor);
   });
 
+/** Q13: the M3 "pause new students" switch goes to `catalog`, the source of truth. */
+const setAcceptingNew = os.setAcceptingNew
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) => {
+    const profile = unwrap(
+      await scope.cradle.setAcceptingNew(actor, {
+        acceptingNew: input.acceptingNew,
+        expectedVersion: input.expectedVersion,
+      }),
+    );
+    return { acceptingNew: profile.acceptingNew, version: profile.version };
+  });
+
 /** M3: the mentor's own week of availability and sessions (sessions come in step 10). */
 const getMentorCalendar = os.getMentorCalendar
   .use(authed)
@@ -169,6 +182,7 @@ export const router = os.router({
   saveProfileStep,
   requestPhotoUpload,
   confirmPhotoUpload,
+  setAcceptingNew,
   getMentorCalendar,
   saveAvailabilityTemplate,
   addAvailabilityException,

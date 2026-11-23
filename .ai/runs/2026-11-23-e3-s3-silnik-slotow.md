@@ -27,6 +27,13 @@ z publicznym `GET /mentors/:id/availability`.
   nie ma `PlainTime.toZonedDateTime` (użyte `PlainDate.toZonedDateTime` z `plainTime`, które daje
   disambiguation `compatible`); `Temporal.Instant.add` nie przyjmuje dni (zakresy w godzinach).
 
+- 11:1x — krok 7: `catalog.mentor_bookability_changed.v1` (schemat w `contracts/events`, publikacja
+  w transakcji zapisu profilu przez repozytorium), komenda `setAcceptingNew` (Q13, `PATCH
+  /api/mentor/bookability`), projekcja `scheduling.mentor_bookability` (nowa migracja) i konsument
+  z `withInbox`; testy: jednostkowe komendy + integracyjne (publikacja do kolejki, dedupe po
+  `event_id`, upsert jednego wiersza). `accepting_new` było w migracji `catalog` z F2, ale nie
+  w encji/recordzie/mapperze — dopisane.
+
 ## Wynik
 (w toku)
 

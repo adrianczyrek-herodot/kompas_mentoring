@@ -25,6 +25,7 @@ describe.skipIf(!dockerAvailable)(integrationSuite('migrations on PostgreSQL 17'
       'Migration20261110120000AccountRequests',
       'Migration20261122000000CatalogProfile',
       'Migration20261123000000SchedulingAvailability',
+      'Migration20261124000000SchedulingBookability',
     ]);
     expect(await migrateUp(orm)).toEqual([]);
     expect(await checkDatabase(orm)).toBe('up');

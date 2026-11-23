@@ -1,6 +1,7 @@
 import { type AwilixContainer, asClass, asFunction } from 'awilix';
 import type { Clock } from '../../shared/domain/index.ts';
 import type { DatabaseCradle } from '../../shared/infrastructure/db/database-cradle.ts';
+import type { Orm } from '../../shared/infrastructure/db/orm.ts';
 import {
   type AddAvailabilityException,
   type DeleteAvailabilityException,
@@ -19,7 +20,7 @@ import {
   type GetWeeklyAvailabilityMinutes,
   makeGetWeeklyAvailabilityMinutes,
 } from './application/get-weekly-availability-minutes.query.ts';
-import type { AvailabilityRepository } from './application/ports.ts';
+import type { AvailabilityRepository, MentorBookabilityRepository } from './application/ports.ts';
 import {
   makeSaveAvailabilityTemplate,
   type SaveAvailabilityTemplate,
@@ -28,21 +29,31 @@ import {
   makeUpdateMentorSettings,
   type UpdateMentorSettings,
 } from './application/update-mentor-settings.command.ts';
+import { MentorBookabilityRecord } from './infrastructure/mentor-bookability.records.ts';
+import { makeMentorBookabilitySubscription } from './infrastructure/mentor-bookability.subscription.ts';
 import { MikroOrmAvailabilityRepository } from './infrastructure/mikro-orm-availability.repository.ts';
+import { MikroOrmMentorBookabilityRepository } from './infrastructure/mikro-orm-mentor-bookability.repository.ts';
 import { schedulingRecords } from './infrastructure/scheduling.records.ts';
 import { Migration20261123000000SchedulingAvailability } from './migrations/Migration20261123000000SchedulingAvailability.ts';
+import { Migration20261124000000SchedulingBookability } from './migrations/Migration20261124000000SchedulingBookability.ts';
 
 /** Picked up by the ORM configuration (explicit lists, no globbing). */
-export const schedulingEntities = schedulingRecords;
+export const schedulingEntities = [...schedulingRecords, MentorBookabilityRecord];
 export const schedulingMigrations = [
   {
     name: 'Migration20261123000000SchedulingAvailability',
     class: Migration20261123000000SchedulingAvailability,
   },
+  {
+    name: 'Migration20261124000000SchedulingBookability',
+    class: Migration20261124000000SchedulingBookability,
+  },
 ];
 
 export interface SchedulingCradle {
   availabilityRepository: AvailabilityRepository;
+  /** Q13: the mirrored `catalog` mentor, read by the availability query and (step 10) the hold. */
+  mentorBookabilityRepository: MentorBookabilityRepository;
   getCancellationTerms: GetCancellationTerms;
   getMentorCalendar: GetMentorCalendar;
   /** Public query for `catalog` (F2 step 5): the weekly template in minutes. */
@@ -53,12 +64,13 @@ export interface SchedulingCradle {
   updateMentorSettings: UpdateMentorSettings;
 }
 
-type Deps = SchedulingCradle & DatabaseCradle & { clock: Clock };
+export type SchedulingDeps = SchedulingCradle & DatabaseCradle & { clock: Clock };
 
 /** Registers the scheduling module; application services are scoped per request / per job. */
-export const registerSchedulingModule = (container: AwilixContainer<Deps>): void => {
+export const registerSchedulingModule = (container: AwilixContainer<SchedulingDeps>): void => {
   container.register({
     availabilityRepository: asClass(MikroOrmAvailabilityRepository).scoped(),
+    mentorBookabilityRepository: asClass(MikroOrmMentorBookabilityRepository).scoped(),
     getCancellationTerms: asFunction(makeGetCancellationTerms).scoped(),
     getMentorCalendar: asFunction(makeGetMentorCalendar).scoped(),
     getWeeklyAvailabilityMinutes: asFunction(makeGetWeeklyAvailabilityMinutes).scoped(),
@@ -68,3 +80,8 @@ export const registerSchedulingModule = (container: AwilixContainer<Deps>): void
     updateMentorSettings: asFunction(makeUpdateMentorSettings).scoped(),
   });
 };
+
+/** Reactions of `scheduling` to other modules' events, started by the worker (spec §4.6). */
+export const schedulingEventSubscriptions = ({ orm }: { orm: Orm }) => [
+  makeMentorBookabilitySubscription({ orm }),
+];

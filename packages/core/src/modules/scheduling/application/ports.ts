@@ -1,5 +1,5 @@
 import type { Temporal } from 'temporal-polyfill';
-import type { MentorId } from '../../../shared/domain/index.ts';
+import type { MentorId, Money } from '../../../shared/domain/index.ts';
 import { err, ok, type Result } from '../../../shared/domain/index.ts';
 import { type CurrentUser, hasPermission } from '../../identity/index.ts';
 import type {
@@ -48,6 +48,30 @@ export interface AvailabilityRepository {
     mentorId: MentorId,
     rules: readonly AvailabilityRule[],
   ): Promise<string[]>;
+}
+
+/**
+ * One mentor as `scheduling` knows them without asking `catalog` (spec "Projekcja
+ * mentor_bookability"): mirrored from `catalog.mentor_bookability_changed.v1`, refreshed in the
+ * consumer's transaction (spec §4.6).
+ */
+export interface MentorBookability {
+  readonly mentorId: MentorId;
+  readonly mentorProfileId: string;
+  /** Q5/Q13: an approved profile; a suspended one is still mirrored but cannot be booked. */
+  readonly bookable: boolean;
+  readonly acceptingNew: boolean;
+  /** Q3/F2: the 60-minute rate the booking snapshots; `null` until the mentor sets it. */
+  readonly rate60: Money | null;
+  readonly updatedAt: Temporal.Instant;
+}
+
+/** Port: the `catalog` projection (MikroORM adapter in `infrastructure/`). */
+export interface MentorBookabilityRepository {
+  /** Public availability: a profile id the projection does not know is unavailable (404). */
+  findByProfileId(mentorProfileId: string): Promise<MentorBookability | null>;
+  /** Consumer side: stores the newest state; the inbox already deduped the event itself. */
+  upsert(bookability: MentorBookability): Promise<void>;
 }
 
 /** Every command and query starts here (spec §8: checked server-side, not in the UI). */

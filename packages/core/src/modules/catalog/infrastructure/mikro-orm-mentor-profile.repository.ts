@@ -1,11 +1,12 @@
 import { DOMAIN_EVENTS } from '@kompas/contracts/events';
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { v7 as uuidv7 } from 'uuid';
-import type { UserId } from '../../../shared/domain/index.ts';
+import { money, type UserId } from '../../../shared/domain/index.ts';
 import type { EventPublisher, OutboxEvent } from '../../../shared/infrastructure/events/outbox.ts';
 import type { MentorProfileRepository } from '../application/ports.ts';
 import type { MentorProfile } from '../domain/mentor-profile.entity.ts';
 import type { MentorProfileDomainEvent } from '../domain/mentor-profile.events.ts';
+import { isBookable } from '../domain/mentor-profile.state.ts';
 import { tagKey } from '../domain/policies/profile-fields.policy.ts';
 import {
   MentorProfileCategoryRecord,
@@ -15,13 +16,32 @@ import {
 } from './catalog.records.ts';
 import { toMentorProfile, toRow } from './mentor-profile.mapper.ts';
 
+/** Every payload is completed from the stored profile, so the event never drifts from the state. */
+const payloadOf = (event: MentorProfileDomainEvent, profile: MentorProfile): object =>
+  event.name === 'catalog.mentor_bookability_changed.v1'
+    ? {
+        mentorUserId: profile.userId,
+        mentorProfileId: profile.id,
+        bookable: isBookable(profile.status),
+        acceptingNew: profile.acceptingNew,
+        // JSON has no bigint: the wire carries grosze, the domain keeps `Money` (spec §6.3).
+        rate60:
+          profile.rate60 === null
+            ? null
+            : {
+                amountMinorUnits: money.toMinorUnits(profile.rate60),
+                currency: profile.rate60.currency,
+              },
+      }
+    : { mentorProfileId: event.mentorProfileId };
+
 const toOutboxEvent = (event: MentorProfileDomainEvent, profile: MentorProfile): OutboxEvent =>
   // Parsing with the contract schema keeps what we publish identical to what consumers accept.
   DOMAIN_EVENTS[event.name].parse({
     eventId: uuidv7(),
     name: event.name,
     occurredAt: profile.updatedAt.toString(),
-    payload: { mentorProfileId: event.mentorProfileId },
+    payload: payloadOf(event, profile),
   });
 
 export class MikroOrmMentorProfileRepository implements MentorProfileRepository {

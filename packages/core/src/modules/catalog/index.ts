@@ -7,8 +7,16 @@ export {
 } from './api/mentor-profile.api.ts';
 export type { ConfirmPhotoUploadError } from './application/confirm-photo-upload.command.ts';
 export type { MentorAccess } from './application/open-my-mentor-profile.query.ts';
-export type { PhotoUploadGrant, RequestPhotoUploadError } from './application/request-photo-upload.command.ts';
+export type {
+  PhotoUploadGrant,
+  RequestPhotoUploadError,
+} from './application/request-photo-upload.command.ts';
 export type { SaveProfileStepError } from './application/save-profile-step.command.ts';
+export type {
+  SetAcceptingNew,
+  SetAcceptingNewError,
+  SetAcceptingNewInput,
+} from './application/set-accepting-new.command.ts';
 export type { CatalogCradle } from './di.ts';
 export type {
   CatalogError,

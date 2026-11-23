@@ -29,6 +29,8 @@ export interface MentorProfile extends AboutFields, SkillsFields, BioFields, Rat
   readonly completedSteps: readonly ProfileStep[];
   /** Fields the admin asked to change (A1 "changes_requested"), highlighted in M1. */
   readonly requestedFields: readonly string[];
+  /** Q13: whether new students may book a trial (source of truth; `scheduling` mirrors it). */
+  readonly acceptingNew: boolean;
   /** Optimistic lock (spec: conflict → 409 "odśwież"). */
   readonly version: number;
   readonly submittedAt: Temporal.Instant | null;
@@ -68,6 +70,7 @@ export const createDraftProfile = (params: {
   rate60: null,
   completedSteps: [],
   requestedFields: [],
+  acceptingNew: true,
   version: 1,
   submittedAt: null,
   publishedAt: null,
@@ -133,6 +136,22 @@ export const saveStep = (
       withCompletedSteps({ ...editable, ...fields, updatedAt: now }),
     ),
   );
+
+/**
+ * Q13: pauses or resumes new trial bookings. Only *new* trial students are affected — current
+ * students keep booking sessions, because holidays are availability exceptions (`off`), not this
+ * switch. Editable exactly where the rest of the profile is (Q6).
+ */
+export const setAcceptingNew = (
+  profile: MentorProfile,
+  acceptingNew: boolean,
+  now: Temporal.Instant,
+): Result<MentorProfile, ProfileLocked> =>
+  ensureEditable(profile).map((editable) => ({
+    ...editable,
+    acceptingNew,
+    updatedAt: now,
+  }));
 
 /** Pins a confirmed photo (requirement 2) and re-derives step 1. */
 export const attachPhoto = (

@@ -21,6 +21,7 @@ export const MentorProfileRecord = defineEntity({
     experience: p.json<unknown>(),
     rate60Amount: p.bigint('bigint').fieldName('rate_60_amount').nullable(),
     currency: p.string(),
+    acceptingNew: p.boolean().fieldName('accepting_new'),
     completedSteps: p.array(),
     requestedFields: p.array(),
     submittedAt: p.datetime().nullable(),

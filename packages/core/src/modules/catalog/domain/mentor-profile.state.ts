@@ -37,6 +37,12 @@ export const transition = (
 /** Only an approved profile is public (brief rule 8); every other status is "profile unavailable". */
 export const isPublic = (status: MentorProfileStatus): boolean => status === 'approved';
 
+/**
+ * Q13/Q5: only an approved mentor may be booked. A suspended profile stays public-facing as
+ * "unavailable" but never takes new bookings, so `scheduling` learns both states through one flag.
+ */
+export const isBookable = (status: MentorProfileStatus): boolean => status === 'approved';
+
 /** The mentor may edit the profile only while no one is reviewing it and it is not closed (Q6). */
 export const isEditable = (status: MentorProfileStatus): boolean =>
   status === 'draft' || status === 'changes_requested' || status === 'approved';

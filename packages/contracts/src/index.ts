@@ -3,6 +3,7 @@ import {
   getMyMentorProfileContract,
   requestPhotoUploadContract,
   saveProfileStepContract,
+  setAcceptingNewContract,
 } from './catalog/index.ts';
 import { healthContract } from './health.contract.ts';
 import {
@@ -22,6 +23,7 @@ export const contract = {
   saveProfileStep: saveProfileStepContract,
   requestPhotoUpload: requestPhotoUploadContract,
   confirmPhotoUpload: confirmPhotoUploadContract,
+  setAcceptingNew: setAcceptingNewContract,
   getMentorCalendar: getMentorCalendarContract,
   saveAvailabilityTemplate: saveAvailabilityTemplateContract,
   addAvailabilityException: addAvailabilityExceptionContract,
