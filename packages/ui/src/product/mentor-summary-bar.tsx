@@ -9,9 +9,9 @@ type MentorSummaryBarProps = Omit<React.ComponentProps<'section'>, 'children'> &
   /** The mentor of the booking flow (U1/U2); only what the summary needs. */
   mentor: Pick<MentorSummary, 'name' | 'headline' | 'photoUrl' | 'verified'>;
   /** Q12: the mentor's own zone, shown so the grid is never ambiguous. */
-  timeZone?: string;
+  timeZone?: string | undefined;
   /** Human label of the zone, e.g. „Europa/Warszawa”. */
-  timeZoneLabel?: string;
+  timeZoneLabel?: string | undefined;
   /** Optional trailing action, e.g. a link to the profile. */
   action?: React.ReactNode;
 };

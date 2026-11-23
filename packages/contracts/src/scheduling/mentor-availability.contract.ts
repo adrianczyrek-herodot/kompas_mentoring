@@ -47,7 +47,11 @@ export const getMentorAvailabilityContract = oc
       id: z.uuid(),
       from: z.iso.datetime({ offset: true }),
       to: z.iso.datetime({ offset: true }),
-      duration: AvailabilityDurationMinutes.optional(),
+      // Query strings arrive as text; `coerce` keeps the JSON client (a number) working too.
+      duration: z.coerce
+        .number({ error: 'invalid' })
+        .pipe(AvailabilityDurationMinutes)
+        .optional(),
       type: AvailabilityBookingType.optional(),
       /** Q12: the viewer's zone; omitted → the mentor's zone. */
       timeZone: z.string().min(1).optional(),
