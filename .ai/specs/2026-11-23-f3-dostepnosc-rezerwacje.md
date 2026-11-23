@@ -1,6 +1,6 @@
 ---
 title: F3 — dostępność i rezerwacje (M3, U1–U5, M2, S2, reset hasła)
-status: draft               # draft | approved | in-progress | implemented | archived
+status: approved            # draft | approved | in-progress | implemented | archived
 created: 2026-11-23
 implemented:
 related:
@@ -357,3 +357,4 @@ Każde pytanie ma rekomendację; po odpowiedziach wpisujemy decyzje w „Decyzje
   - U2 i U3 powstają w F3 w wersji bez płatności (wcześniej całe w L1/F4) — inaczej nie ma gdzie podać celu sesji ani potwierdzić rezerwacji; F4 dokłada płatność w U2 bez zmiany trasy i API (`POST /checkout`).
   - Długość sesji 30/60 w U1 przez `ToggleGroup` (bez nowego `Segmented`, DS-04), strefa przez `Combobox` (DS-20); edytor dostępności jako nowy `AvailabilityEditor` (DS-05).
   - **Status `draft` — czeka na odpowiedzi Q1–Q21 i akceptację właściciela.**
+- 2026-11-23 — **Odpowiedzi właściciela: Q1–Q21 przyjęte zgodnie z rekomendacjami, `status: approved`.** Najważniejsze zmiany zakresu: **Q1** potwierdzanie przed F4 ścieżką F4 (`hold → pending_payment → requested`) przez port `PaymentGate` z adapterem `NoPaymentGate` i `CreditReservation` z `UnmeteredCredit`, przełącznik `BOOKING_PAYMENT_MODE`; **U2 i U3 powstają w F3 w wersji bez płatności** (F4/L1 dokłada płatność bez zmiany trasy i API); **Q19** wymuszenie weryfikacji e-maila przed rezerwacją przechodzi z E3-S9 do E3-S4. Pozostałe: Q2 próbna + kolejna sesja (`plan`, bez limitu tygodniowego); Q3 jedna cena próbnej platformy, robocza 49 zł w `config.ts`; Q4 sesje po terminie zostają `scheduled` do F5; Q5 zawieszenie mentora anuluje jego przyszłe sesje; Q6 próbna < 12 h przepada jak każda sesja; Q7 nowe przejścia `hold.hold_released → expired` i `requested.cancelled_by_student → cancelled` (naniesione w §4.3 spec stacku); Q8 przełożenie tylko ze `scheduled` i ≥ 12 h, mentor tylko anuluje; Q9 wyprzedzenie domyślnie 6 h (2–48 h), dla próbnej min. 6 h; Q10 horyzont 8 tygodni, siatka 30 min; Q11 zmiana dostępności nie anuluje sesji; Q12 `time_zone` w `identity.user`; Q13 wstrzymanie blokuje tylko nowe próbne; Q14 auto-akceptacja po SLA przy wolnym freebusy; Q15 e-mail + in-app, wyłączalne tylko przypomnienia; Q16 przypomnienia 24 h i 1 h dla obu stron; Q17 Google tylko `calendar.freebusy`, fail-open; Q18 jedna blokada na ucznia, 10 min, limit 20/h; Q20 `/mentor/sesje/[id]`; Q21 reset hasła (link 1 h) i zmiana e-maila w UI. Człowiek: zgłosić weryfikację aplikacji OAuth Google i wyjście SES z sandboxa zaraz po akceptacji (trwa tygodnie). E3-S1 zamknięte; następna historia: E3-S2.

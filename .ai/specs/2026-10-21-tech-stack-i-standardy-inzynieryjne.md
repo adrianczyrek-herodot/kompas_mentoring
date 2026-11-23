@@ -279,11 +279,13 @@ const transitions = {
   // wspólny początek: blokada terminu na 10 min
   hold:            { checkout_started: 'pending_payment',          // sesja próbna / pojedyncza
                      confirmed_with_credit: 'scheduled',           // plan: rezerwacja kredytu w tej samej transakcji
+                     hold_released: 'expired',                     // F3 Q7: uczeń rezygnuje z blokady / wybiera inny termin
                      hold_expired: 'expired' },
   pending_payment: { payment_succeeded: 'requested', hold_expired: 'expired' },
   // tylko sesja próbna wymaga akceptacji mentora (M2)
   requested:       { mentor_accepted: 'scheduled', auto_accepted: 'scheduled',
-                     mentor_declined: 'cancelled', calendar_conflict: 'cancelled' },
+                     mentor_declined: 'cancelled', calendar_conflict: 'cancelled',
+                     cancelled_by_student: 'cancelled' },          // F3 Q7: wycofanie prośby przed decyzją mentora, zawsze bez kosztów
   scheduled:       { started: 'in_progress',                       // pierwsza obecność w pokoju (LiveKit), nie zegar
                      rescheduled: 'scheduled',
                      cancelled_free: 'cancelled',                  // ≥ 12 h: kredyt wraca
@@ -717,6 +719,7 @@ Każda faza zostawia działającą aplikację i ma własną specyfikację w `.ai
 - 2026-10-21 — Po niezależnym przeglądzie: dodany stan `hold` i rozgałęzienie próbna/plan w maszynie `Booking`; wygaszanie nieaktualnych holdów w komendzie `createHold`; indeks sesji próbnej nie blokuje ponownej próby; ograniczenie nakładania dla ucznia; rozliczenie po zamknięciu okna sporu (72 h); rezerwacja kredytu przy umawianiu, partie kredytu z datą ważności i tabela księgowań z kontem `stripe_clearing`; CSP z nonce tylko na trasach zalogowanych; Better Auth przez adapter Kysely; TS 6 zamiast TS 6 + TS 7; tsconfig per środowisko; pg-boss: `web` tylko wysyła przez pooler, outbox = zadania w transakcji; uproszczenia MVP (11 modułów zamiast 14, widoki SQL zamiast projekcji, Stryker od F8, bez Bunny/OpenFeature/Grafany/passkeys w MVP, 5 ADR). Czeka na akceptację właściciela i odpowiedzi Q1–Q12.
 - 2026-10-21 — Właściciel zlecił wdrożenie spec (status `in-progress`). Start od F0 i dokumentów procesu (spec `.ai/specs/implemented/2026-10-21-f0-szkielet-i-harness.md`); dla F0 przyjęte rekomendacje Q1 (MikroORM + Awilix), Q2 (bez Open Mercato), Q8 (Frankfurt). Q3–Q7 i Q9–Q12 nadal otwarte — blokują dopiero F4–F7.
 - 2026-11-11 — Storybook wchodzi do MVP (decyzja właściciela, [ADR-0006](../../docs/decisions/0006-design-system-storybook.md)): design system w `packages/ui` z dokumentacją w Storybooku 10, testy dostępności i interakcji stories w Vitest, oba motywy. Zmienia wiersz „Storybook” w tabeli narzędzi. Specyfikacja: `.ai/specs/2026-11-11-design-system-storybook.md`.
+- 2026-11-23 — Maszyna `Booking` z §4.3 uzupełniona o dwa przejścia zatwierdzone przy specyfikacji F3 (E3-S1, [Q7](../specs/2026-11-23-f3-dostepnosc-rezerwacje.md)): `hold.hold_released → expired` (uczeń rezygnuje z blokady / wybiera inny termin) i `requested.cancelled_by_student → cancelled` (wycofanie prośby o próbną przed decyzją mentora, zawsze bez kosztów). Przejścia dochodzą do kodu `scheduling` wraz z implementacją F3 (E3-S4/E3-S6).
 
 ## Źródła
 
