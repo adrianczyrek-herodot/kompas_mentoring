@@ -41,7 +41,10 @@ export interface MentorSchedule {
   readonly version: number;
 }
 
-/** A schedule that does not exist yet is edited against these defaults (Q9/Q12). */
+/**
+ * A schedule that does not exist yet is edited against these defaults (Q9/Q12). `version: 0`
+ * means "no row saved yet" — the first save sends `expectedVersion: 0`.
+ */
 export const defaultScheduleSettings = (): Pick<
   MentorSchedule,
   'timeZone' | 'minNoticeMinutes' | 'bufferMinutes' | 'version'
@@ -49,7 +52,7 @@ export const defaultScheduleSettings = (): Pick<
   timeZone: AVAILABILITY.defaultTimeZone,
   minNoticeMinutes: AVAILABILITY.notice.defaultMinutes,
   bufferMinutes: AVAILABILITY.buffer.defaultMinutes,
-  version: 1,
+  version: 0,
 });
 
 /** The whole editable availability of one mentor, as the calendar and the editor need it. */

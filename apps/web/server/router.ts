@@ -8,6 +8,15 @@ import {
   toStepInput,
 } from '@kompas/core/catalog';
 import type { CurrentUser } from '@kompas/core/identity';
+import {
+  type BookingError,
+  toExceptionInput,
+  toExceptionView,
+  toMentorCalendarView,
+  toRuleInput,
+  toScheduleSettings,
+  toSchedulingProblem,
+} from '@kompas/core/scheduling';
 import { implement, ORPCError } from '@orpc/server';
 import { getContainer } from './runtime.ts';
 
@@ -29,6 +38,21 @@ const PROBLEM_CODES = {
 const problem = (error: CatalogError): ORPCError<string, unknown> => {
   const { status, code, issues } = toCatalogProblem(error);
   return new ORPCError(PROBLEM_CODES[status], { status, message: code, data: { code, issues } });
+};
+
+/** Same for `scheduling`: the problem codes are the domain codes (spec §4.9). */
+const schedulingProblem = (error: BookingError): ORPCError<string, unknown> => {
+  const { status, code, issues, bookingIds } = toSchedulingProblem(error);
+  return new ORPCError(PROBLEM_CODES[status], {
+    status,
+    message: code,
+    data: { code, issues, bookingIds },
+  });
+};
+
+const unwrapScheduling = <T>(result: Result<T, BookingError>): T => {
+  if (result.isErr()) throw schedulingProblem(result.error);
+  return result.value;
 };
 
 /** Resolves the signed-in user and a request scope; 401 without a valid session. */
@@ -91,10 +115,63 @@ const confirmPhotoUpload = os.confirmPhotoUpload
     return viewOf(unwrap(result), actor);
   });
 
+/** M3: the mentor's own week of availability and sessions (sessions come in step 10). */
+const getMentorCalendar = os.getMentorCalendar
+  .use(authed)
+  .handler(async ({ context: { scope, actor } }) =>
+    toMentorCalendarView(unwrapScheduling(await scope.cradle.getMentorCalendar(actor))),
+  );
+
+/** M3 "Zapisz": replaces the weekly template (409 on a stale version, 422 on a bad grid). */
+const saveAvailabilityTemplate = os.saveAvailabilityTemplate
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) => {
+    const result = await scope.cradle.saveAvailabilityTemplate(actor, {
+      rules: input.rules.map(toRuleInput),
+      expectedVersion: input.expectedVersion,
+      acknowledgeConflicts: input.acknowledgeConflicts ?? false,
+    });
+    return toMentorCalendarView(unwrapScheduling(result));
+  });
+
+const addAvailabilityException = os.addAvailabilityException
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) =>
+    toExceptionView(
+      unwrapScheduling(await scope.cradle.addAvailabilityException(actor, toExceptionInput(input))),
+    ),
+  );
+
+const deleteAvailabilityException = os.deleteAvailabilityException
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) =>
+    unwrapScheduling(await scope.cradle.deleteAvailabilityException(actor, input.id)),
+  );
+
+const updateMentorSettings = os.updateMentorSettings
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor } }) =>
+    toScheduleSettings(
+      unwrapScheduling(
+        await scope.cradle.updateMentorSettings(actor, {
+          timeZone: input.timeZone,
+          minNoticeMinutes: input.minNoticeMinutes,
+          bufferMinutes: input.bufferMinutes,
+          expectedVersion: input.expectedVersion,
+        }),
+      ),
+    ),
+  );
+
 export const router = os.router({
   health,
   myMentorProfile,
   saveProfileStep,
   requestPhotoUpload,
   confirmPhotoUpload,
+  getMentorCalendar,
+  saveAvailabilityTemplate,
+  addAvailabilityException,
+  deleteAvailabilityException,
+  updateMentorSettings,
 });

@@ -7,7 +7,8 @@ export type BookingError =
   | InvalidAvailability
   | AvailabilityConflicts
   | SchedulingNotFound
-  | SchedulingForbidden;
+  | SchedulingForbidden
+  | VersionConflict;
 
 /**
  * Why an availability payload is rejected (M3 acceptance: 29/30 min, overlap, grid,
@@ -38,12 +39,12 @@ export interface InvalidAvailability extends DomainError<'scheduling.invalid_ava
  * Q11: saving availability that overlaps `requested`/`scheduled` sessions returns the list of
  * those sessions; a second save with `acknowledgeConflicts: true` keeps them (→ 409).
  */
-export interface AvailabilityConflicts extends DomainError<'scheduling.availability_conflicts'> {
+interface AvailabilityConflicts extends DomainError<'scheduling.availability_conflicts'> {
   readonly bookingIds: readonly string[];
 }
 
 /** Someone else's resource, or none at all — indistinguishable on purpose (→ 404, spec §8). */
-export type SchedulingNotFound = DomainError<'scheduling.not_found'>;
+type SchedulingNotFound = DomainError<'scheduling.not_found'>;
 
 /** The actor lacks the permission (→ 403). */
 export type SchedulingForbidden = DomainError<'scheduling.forbidden'>;
@@ -53,3 +54,4 @@ export interface VersionConflict extends DomainError<'scheduling.version_conflic
   readonly expected: number;
   readonly actual: number;
 }
+

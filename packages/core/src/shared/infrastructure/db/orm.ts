@@ -2,6 +2,7 @@ import { Migrator } from '@mikro-orm/migrations';
 import { defineConfig, MikroORM } from '@mikro-orm/postgresql';
 import { catalogEntities, catalogMigrations } from '../../../modules/catalog/di.ts';
 import { identityEntities, identityMigrations } from '../../../modules/identity/di.ts';
+import { schedulingEntities, schedulingMigrations } from '../../../modules/scheduling/di.ts';
 import { Migration20261021000000Init } from './migrations/Migration20261021000000Init.ts';
 
 /**
@@ -12,10 +13,11 @@ const migrationsList = [
   { name: 'Migration20261021000000Init', class: Migration20261021000000Init },
   ...identityMigrations,
   ...catalogMigrations,
+  ...schedulingMigrations,
 ];
 
 /** Entities are listed explicitly for the same reason as migrations. */
-const entities = [...identityEntities, ...catalogEntities];
+const entities = [...identityEntities, ...catalogEntities, ...schedulingEntities];
 
 const createOrmConfig = (clientUrl: string) =>
   defineConfig({

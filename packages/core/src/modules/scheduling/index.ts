@@ -1,9 +1,35 @@
 // Public API of the scheduling module — the only file other modules and apps may import.
 
+export {
+  type SchedulingProblem,
+  toExceptionInput,
+  toExceptionView,
+  toMentorCalendarView,
+  toRuleInput,
+  toRuleView,
+  toScheduleSettings,
+  toSchedulingProblem,
+} from './api/availability.api.ts';
+export type {
+  AddAvailabilityException,
+  AddAvailabilityExceptionInput,
+  DeleteAvailabilityException,
+} from './application/availability-exceptions.commands.ts';
 export type {
   CancellationTerms,
   GetCancellationTerms,
 } from './application/get-cancellation-terms.query.ts';
+export type { GetMentorCalendar } from './application/get-mentor-calendar.query.ts';
+export type { GetWeeklyAvailabilityMinutes } from './application/get-weekly-availability-minutes.query.ts';
+export type { MentorCalendar } from './application/mentor-calendar.ts';
+export type {
+  SaveAvailabilityTemplate,
+  SaveAvailabilityTemplateInput,
+} from './application/save-availability-template.command.ts';
+export type {
+  UpdateMentorSettings,
+  UpdateMentorSettingsInput,
+} from './application/update-mentor-settings.command.ts';
 export type { SchedulingCradle } from './di.ts';
 export type {
   AvailabilityException,
