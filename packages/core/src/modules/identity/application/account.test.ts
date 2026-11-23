@@ -19,6 +19,7 @@ const actorWith = (roles: Role[]): CurrentUser => ({
   email: 'ola@example.com',
   emailVerified: true,
   twoFactorEnabled: false,
+  timeZone: null,
   roles,
 });
 

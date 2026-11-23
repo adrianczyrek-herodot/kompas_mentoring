@@ -3,6 +3,7 @@ import { defineConfig, MikroORM } from '@mikro-orm/postgresql';
 import { catalogEntities, catalogMigrations } from '../../../modules/catalog/di.ts';
 import { identityEntities, identityMigrations } from '../../../modules/identity/di.ts';
 import { schedulingEntities, schedulingMigrations } from '../../../modules/scheduling/di.ts';
+import { Migration20261125000000PlatformIdempotency } from '../idempotency/migrations/Migration20261125000000PlatformIdempotency.ts';
 import { Migration20261021000000Init } from './migrations/Migration20261021000000Init.ts';
 
 /**
@@ -14,6 +15,7 @@ const migrationsList = [
   ...identityMigrations,
   ...catalogMigrations,
   ...schedulingMigrations,
+  { name: 'Migration20261125000000PlatformIdempotency', class: Migration20261125000000PlatformIdempotency },
 ];
 
 /** Entities are listed explicitly for the same reason as migrations. */

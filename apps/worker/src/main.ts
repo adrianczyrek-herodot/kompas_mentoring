@@ -7,7 +7,10 @@ import {
   directDatabaseUrl,
   HEARTBEAT_CRON,
   HEARTBEAT_QUEUE,
+  MikroOrmIdempotencyStore,
   parseEnv,
+  PURGE_IDEMPOTENCY_CRON,
+  PURGE_IDEMPOTENCY_QUEUE,
   startEventSubscriptions,
 } from '@kompas/core';
 import {
@@ -72,6 +75,14 @@ try {
     const scope = createRequestScope(container, { requestId: crypto.randomUUID() });
     const removed = await scope.cradle.cleanupOrphanUploads();
     logger.info({ removed }, 'orphan uploads removed');
+  });
+  // Idempotency keys expire after 24 h (spec §4.6); this cron drops them.
+  await boss.createQueue(PURGE_IDEMPOTENCY_QUEUE);
+  await boss.schedule(PURGE_IDEMPOTENCY_QUEUE, PURGE_IDEMPOTENCY_CRON);
+  await boss.work(PURGE_IDEMPOTENCY_QUEUE, async () => {
+    const scope = createRequestScope(container, { requestId: crypto.randomUUID() });
+    const removed = await new MikroOrmIdempotencyStore({ em: scope.cradle.em }).purgeExpired();
+    logger.info({ removed }, 'expired idempotency keys removed');
   });
   await startEventSubscriptions(boss, container.cradle.eventSubscriptions);
   ready = true;

@@ -22,5 +22,13 @@ export {
   HEARTBEAT_QUEUE,
   type PgBoss,
 } from './shared/infrastructure/jobs/boss.ts';
+export {
+  idempotencyFingerprint,
+  type IdempotencyClaim,
+  type IdempotencyStore,
+  MikroOrmIdempotencyStore,
+  PURGE_IDEMPOTENCY_CRON,
+  PURGE_IDEMPOTENCY_QUEUE,
+} from './shared/infrastructure/idempotency/index.ts';
 export { createLogger, type Logger } from './shared/infrastructure/logger.ts';
 export { SystemClock } from './shared/infrastructure/system-clock.ts';

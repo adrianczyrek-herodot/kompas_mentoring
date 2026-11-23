@@ -1,7 +1,7 @@
 import type { Temporal } from 'temporal-polyfill';
 import type { MentorId, Money } from '../../../shared/domain/index.ts';
 import { err, ok, type Result } from '../../../shared/domain/index.ts';
-import { type CurrentUser, hasPermission } from '../../identity/index.ts';
+import { type CurrentUser, hasPermission, type Permission } from '../../identity/index.ts';
 import type {
   AvailabilityException,
   AvailabilityRule,
@@ -90,6 +90,6 @@ export interface BusyRepository {
 /** Every command and query starts here (spec §8: checked server-side, not in the UI). */
 export const requirePermission = (
   actor: CurrentUser,
-  permission: 'scheduling.availability.manage.own',
+  permission: Permission,
 ): Result<void, SchedulingForbidden> =>
   hasPermission(actor.roles, permission) ? ok(undefined) : err({ code: 'scheduling.forbidden' });

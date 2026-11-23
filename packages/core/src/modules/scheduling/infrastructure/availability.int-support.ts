@@ -76,6 +76,7 @@ const userWith = async (container: AppContainer): Promise<CurrentUser> => {
     email,
     emailVerified: true,
     twoFactorEnabled: false,
+    timeZone: null,
     roles: ['mentor'],
   };
 };

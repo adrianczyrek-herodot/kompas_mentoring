@@ -16,6 +16,8 @@ export const UserRecord = defineEntity({
     emailVerified: p.boolean().fieldName('emailVerified'),
     twoFactorEnabled: p.boolean().fieldName('twoFactorEnabled').nullable(),
     roles: p.json<string[]>().nullable(),
+    // Q12 (E3-S4): reported by the browser; `null` until the first report (falls back to Warsaw).
+    timeZone: p.string().fieldName('time_zone').nullable(),
     createdAt: p.datetime().fieldName('createdAt'),
   },
 });
