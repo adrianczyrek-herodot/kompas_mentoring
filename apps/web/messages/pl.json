@@ -41,8 +41,23 @@
   },
   "Mentor": {
     "title": "Panel mentora",
-    "welcome": "Zalogowano jako {name}.",
-    "lead": "Panel mentora jest w budowie — pełne ekrany mentora powstaną w kolejnej fazie."
+    "welcome": "Cześć, {name}",
+    "lead": "Uzupełnij profil, żeby uczniowie mogli Cię znaleźć. Zapisujemy szkic po każdym kroku.",
+    "profileStatus": "Status profilu",
+    "status": {
+      "draft": "Szkic",
+      "submitted": "Wysłany do weryfikacji",
+      "changes_requested": "Do poprawy",
+      "approved": "Opublikowany",
+      "suspended": "Zawieszony",
+      "rejected": "Odrzucony"
+    },
+    "stepsDone": "Ukończone kroki",
+    "stepsDoneCount": "Ukończono {done} z {total} kroków",
+    "continueOnboarding": "Wróć do onboardingu",
+    "nextStep": "Następny krok: {step}",
+    "draftStepsDone": "Kroki 1–4 są gotowe. Kroki 5–6 (dostępność i weryfikacja) dochodzą w kolejnym etapie.",
+    "openProfile": "Zobacz profil publiczny"
   },
   "Auth": {
     "loginTitle": "Logowanie — Kompas",
@@ -142,5 +157,118 @@
     "cancel": "Anuluj",
     "deletionPending": "Przyjęliśmy prośbę o usunięcie konta — potwierdzimy ją e-mailem.",
     "actionFailed": "Nie udało się zapisać zmiany. Spróbuj ponownie."
+  },
+  "Onboarding": {
+    "title": "Onboarding mentora",
+    "lead": "Profil powstaje krok po kroku. Możesz wrócić w dowolnym momencie — zapisany szkic czeka.",
+    "stepOf": "Krok {current} z {total}",
+    "saveDraft": "Zapisz szkic",
+    "saveAndNext": "Zapisz i dalej",
+    "saving": "Zapisuję…",
+    "saved": "Zapisano.",
+    "next": "Dalej",
+    "back": "Wstecz",
+    "errorSummary": "Popraw błędy w formularzu:",
+    "conflict": "Profil zmienił się w innej karcie — odśwież stronę i spróbuj ponownie.",
+    "locked": "Wniosek czeka na weryfikację — formularz jest tylko do odczytu.",
+    "forbidden": "Nie masz uprawnień do tej sekcji.",
+    "notFound": "Nie znaleziono profilu.",
+    "genericError": "Nie udało się zapisać zmiany. Spróbuj ponownie.",
+    "problems": {
+      "required": "To pole jest wymagane.",
+      "too_short": "Za krótka wartość.",
+      "too_long": "Za długa wartość.",
+      "too_few": "Za mało elementów.",
+      "too_many": "Za dużo elementów.",
+      "out_of_range": "Wartość spoza zakresu.",
+      "not_whole_zloty": "Stawka musi być pełną kwotą złotych.",
+      "invalid": "Nieprawidłowa wartość.",
+      "unknown_option": "Nieznana wartość."
+    },
+    "fields": {
+      "country": "Kraj",
+      "languages": "Języki sesji",
+      "photo": "Zdjęcie profilowe",
+      "categories": "Kategorie",
+      "tags": "Tagi",
+      "yearsExperience": "Lata doświadczenia",
+      "experience": "Firmy i role",
+      "company": "Firma",
+      "role": "Rola",
+      "fromYear": "Od roku",
+      "toYear": "Do roku",
+      "headline": "Nagłówek",
+      "bio": "Opis",
+      "videoUrl": "Link do wideo",
+      "rate60": "Stawka za 60 minut",
+      "rate60Amount": "Stawka za 60 minut"
+    },
+    "steps": {
+      "about": "O mnie",
+      "skills": "Kompetencje",
+      "bio": "Opis i wideo",
+      "rate": "Stawka",
+      "availability": "Dostępność",
+      "verification": "Weryfikacja"
+    },
+    "about": {
+      "heading": "O mnie",
+      "lead": "Zdjęcie, kraj i języki, w których prowadzisz sesje.",
+      "displayName": "Imię wyświetlane",
+      "displayNameHint": "Imię z konta. Zmienisz je w ustawieniach konta.",
+      "photo": "Zdjęcie profilowe",
+      "photoHint": "JPG lub PNG, co najmniej 400×400 px, maksymalnie 5 MB.",
+      "choosePhoto": "Wybierz zdjęcie",
+      "retryPhoto": "Spróbuj ponownie",
+      "uploadingPhoto": "Wysyłam zdjęcie…",
+      "photoMissing": "Dodaj zdjęcie profilowe.",
+      "photoInvalid": "Nie udało się wgrać zdjęcia — spróbuj innego pliku.",
+      "photoWrongType": "Ten plik nie jest JPG ani PNG.",
+      "photoTooBig": "Plik jest większy niż 5 MB.",
+      "photoTooSmall": "Ten plik ma mniej niż 400×400 px.",
+      "country": "Kraj",
+      "languages": "Języki sesji",
+      "languagesHint": "Od 1 do 5 języków."
+    },
+    "skills": {
+      "heading": "Kompetencje",
+      "lead": "Kategorie, tagi i doświadczenie.",
+      "categories": "Kategorie",
+      "categoriesHint": "Od 1 do 5 kategorii.",
+      "tags": "Tagi",
+      "tagsHint": "Od 3 do 15 tagów, każdy 2–30 znaków.",
+      "removeTag": "Usuń tag",
+      "tagPlaceholder": "Dodaj tag i zatwierdź Enterem",
+      "yearsExperience": "Lata doświadczenia",
+      "experience": "Firmy i role",
+      "addExperience": "Dodaj firmę",
+      "removeExperience": "Usuń firmę",
+      "company": "Firma",
+      "role": "Rola",
+      "fromYear": "Od roku",
+      "toYear": "Do roku"
+    },
+    "bio": {
+      "heading": "Opis i wideo",
+      "lead": "Nagłówek, opis i opcjonalne wideo.",
+      "headline": "Nagłówek",
+      "headlineHint": "Od 20 do 80 znaków.",
+      "bio": "Opis",
+      "bioHint": "Od 300 do 2000 znaków. Zwykły tekst, bez HTML.",
+      "video": "Link do wideo",
+      "videoHint": "YouTube albo Vimeo. Film jest opcjonalny.",
+      "videoInvalid": "Wklej link do filmu na YouTube albo Vimeo."
+    },
+    "rate": {
+      "heading": "Stawka",
+      "lead": "Ile kosztuje 60 minut Twojej sesji.",
+      "rate": "Stawka za 60 minut",
+      "rateHint": "Od 40 do 1000 zł, w pełnych złotych.",
+      "earnings": "Podgląd zarobku"
+    },
+    "later": {
+      "title": "Ten krok dochodzi w kolejnym etapie",
+      "lead": "Dostępność i weryfikacja (dane do wypłat) pojawią się, gdy skończysz kroki 1–4."
+    }
   }
 }
