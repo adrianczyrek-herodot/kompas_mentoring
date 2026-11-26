@@ -47,15 +47,20 @@ export const startBookingEnv = async (clock: Clock): Promise<BookingEnv> => {
   return env;
 };
 
+/** Every past trial gets its own 30-min slot, so several students of one mentor never overlap. */
+let pastTrials = 0;
+
 /**
  * Q2: a later session needs a trial of the pair that was `scheduled` and already ended — this one
- * took place a week before `BOOKING_NOW`. Written straight through the repository, like a seed.
+ * took place a week (and a unique half-hour) before `BOOKING_NOW`. Written straight through the
+ * repository, like a seed; the mentor's exclusion constraint still applies, hence the offset.
  */
 export const pastTrial = async (
   container: AppContainer,
   pair: { mentorId: string; studentId: string },
 ): Promise<void> => {
-  const startsAt = BOOKING_NOW.subtract({ hours: 7 * 24 });
+  pastTrials += 1;
+  const startsAt = BOOKING_NOW.subtract({ hours: 7 * 24, minutes: 30 * pastTrials });
   const scope = createRequestScope(container, { requestId: `past-trial-${pair.studentId}` });
   const outcome = await scope.cradle.bookingRepository.createHold({
     id: newId(BookingId),
