@@ -1,8 +1,10 @@
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import { ResponseHeadersPlugin } from '@orpc/server/plugins';
 import { router } from '../../../server/router.ts';
 
 // oRPC mounted in a Next.js route handler (spec §2.5): a thin adapter without business logic.
-const handler = new OpenAPIHandler(router);
+// `ResponseHeadersPlugin` carries headers a procedure sets (e.g. `Retry-After` on a 429).
+const handler = new OpenAPIHandler(router, { plugins: [new ResponseHeadersPlugin()] });
 
 async function handle(request: Request): Promise<Response> {
   const { matched, response } = await handler.handle(request, {

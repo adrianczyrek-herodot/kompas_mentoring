@@ -19,6 +19,7 @@ export const toBookingView = (booking: Booking): BookingView => ({
       : { amountMinorUnits: money.toMinorUnits(booking.price), currency: booking.price.currency },
   paymentMode: booking.paymentMode,
   acceptDeadlineAt: booking.acceptDeadlineAt?.toString() ?? null,
+  holdExpiresAt: booking.holdExpiresAt?.toString() ?? null,
   rescheduleCount: booking.rescheduleCount,
 });
 

@@ -57,6 +57,8 @@ const toFailure = (error: BookingError): AvailabilityActionResult => {
     case 'scheduling.invalid_goal':
       return invalid([{ field: 'goal', problem: error.issue }]);
     case 'scheduling.slot_taken':
+    case 'scheduling.slot_unavailable':
+    case 'scheduling.trial_required':
     case 'scheduling.student_busy':
     case 'scheduling.trial_already_used':
     case 'scheduling.hold_expired':

@@ -22,6 +22,8 @@ export default async function BookingPage({
         type={typ === 'plan' ? 'plan' : 'trial'}
         signedIn={user !== null}
         emailVerified={user?.emailVerified ?? false}
+        email={user?.email}
+        userTimeZone={user?.timeZone ?? null}
         notice={wygasla === '1' ? 'expired' : undefined}
       />
     </main>

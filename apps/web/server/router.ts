@@ -21,12 +21,16 @@ import {
   toSchedulingProblem,
 } from '@kompas/core/scheduling';
 import { implement, ORPCError } from '@orpc/server';
+import type { ResponseHeadersPluginContext } from '@orpc/server/plugins';
 import { Temporal } from 'temporal-polyfill';
 import { runIdempotent } from './idempotency.ts';
 import { getContainer } from './runtime.ts';
 
-/** Request context given by the route handler: the browser's headers carry the session cookie. */
-interface RequestContext {
+/**
+ * Request context given by the route handler: the browser's headers carry the session cookie;
+ * `resHeaders` (oRPC `ResponseHeadersPlugin`) lets a procedure add response headers.
+ */
+interface RequestContext extends ResponseHeadersPluginContext {
   readonly headers: Headers;
 }
 
@@ -46,9 +50,16 @@ const problem = (error: CatalogError): ORPCError<string, unknown> => {
   return new ORPCError(PROBLEM_CODES[status], { status, message: code, data: { code, issues } });
 };
 
-/** Same for `scheduling`: the problem codes are the domain codes (spec §4.9). */
-const schedulingProblem = (error: BookingError): ORPCError<string, unknown> => {
+/**
+ * Same for `scheduling`: the problem codes are the domain codes (spec §4.9). A 429 also answers
+ * with `Retry-After` (spec §4.9 „Rate limit”, Q18) when the route passes its response headers.
+ */
+const schedulingProblem = (
+  error: BookingError,
+  resHeaders?: Headers,
+): ORPCError<string, unknown> => {
   const { status, code, issues, bookingIds, retryAfterSeconds } = toSchedulingProblem(error);
+  if (retryAfterSeconds !== undefined) resHeaders?.set('Retry-After', String(retryAfterSeconds));
   return new ORPCError(PROBLEM_CODES[status], {
     status,
     message: code,
@@ -56,8 +67,8 @@ const schedulingProblem = (error: BookingError): ORPCError<string, unknown> => {
   });
 };
 
-const unwrapScheduling = <T>(result: Result<T, BookingError>): T => {
-  if (result.isErr()) throw schedulingProblem(result.error);
+const unwrapScheduling = <T>(result: Result<T, BookingError>, resHeaders?: Headers): T => {
+  if (result.isErr()) throw schedulingProblem(result.error, resHeaders);
   return result.value;
 };
 
@@ -186,7 +197,9 @@ const deleteAvailabilityException = os.deleteAvailabilityException
   );
 
 /** U1 „Dalej”: takes the hold. `Idempotency-Key` makes a retry return the same hold (spec §4.6). */
-const createHold = os.createHold.use(authed).handler(async ({ input, context: { scope, actor, headers } }) =>
+const createHold = os.createHold
+  .use(authed)
+  .handler(async ({ input, context: { scope, actor, headers, resHeaders } }) =>
   runIdempotent({ scope, actor, headers, path: ['bookings', 'holds'], body: input }, async () => {
     const result = await scope.cradle.createHold(actor, {
       mentorProfileId: input.mentorProfileId,
@@ -195,7 +208,7 @@ const createHold = os.createHold.use(authed).handler(async ({ input, context: { 
       type: input.type,
       goal: null,
     });
-    return toBookingView(unwrapScheduling(result));
+    return toBookingView(unwrapScheduling(result, resHeaders));
   }),
 );
 

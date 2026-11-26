@@ -63,6 +63,32 @@ const readAvailability = async (
   return { schedule: schedule ?? { mentorId, ...defaultScheduleSettings() }, rules, exceptions };
 };
 
+/**
+ * The engine input of `slotsFor` without busy time: template, exceptions, zone, notice (Q9) and
+ * horizon (Q10) of one mentor. `createHold` checks a chosen start against it, and leaves the
+ * conflicts with other bookings to the exclusion constraints (→ `slot_taken`).
+ */
+export const loadSlotEngine = async (
+  deps: Pick<AvailabilityDeps, 'availabilityRepository'>,
+  mentorId: MentorSchedule['mentorId'],
+  kind: AvailabilityBookingType,
+  now: Temporal.Instant,
+): Promise<Engine> => {
+  const { schedule, rules, exceptions } = await readAvailability(deps, mentorId);
+  return {
+    rules,
+    exceptions,
+    busy: [],
+    timeZone: schedule.timeZone,
+    settings: {
+      minNotice: noticeFor(schedule, kind),
+      buffer: Temporal.Duration.from({ minutes: schedule.bufferMinutes }),
+    },
+    horizon: BOOKING_HORIZON,
+    now,
+  };
+};
+
 /** The engine input of `slotsFor`, with busy time read for the whole horizon in one query. */
 const buildEngine = async (
   deps: AvailabilityDeps,
@@ -73,19 +99,11 @@ const buildEngine = async (
   const projection = await deps.mentorBookabilityRepository.findByProfileId(input.mentorProfileId);
   // Q5/Q13: an unknown, unapproved or suspended mentor is one 404 for the caller (spec §8).
   if (!projection?.bookable) return err({ code: 'scheduling.mentor_unavailable' });
-  const { schedule, rules, exceptions } = await readAvailability(deps, projection.mentorId);
-  return ok({
-    rules,
-    exceptions,
-    busy: await deps.busyRepository.listBusy(projection.mentorId, { from: now, to: horizonEnd }),
-    timeZone: schedule.timeZone,
-    settings: {
-      minNotice: noticeFor(schedule, input.kind),
-      buffer: Temporal.Duration.from({ minutes: schedule.bufferMinutes }),
-    },
-    horizon: BOOKING_HORIZON,
-    now,
-  });
+  const [engine, busy] = await Promise.all([
+    loadSlotEngine(deps, projection.mentorId, input.kind, now),
+    deps.busyRepository.listBusy(projection.mentorId, { from: now, to: horizonEnd }),
+  ]);
+  return ok({ ...engine, busy });
 };
 
 /** U1's answer: the slots of the window, or the first slot after it („następny wolny termin"). */

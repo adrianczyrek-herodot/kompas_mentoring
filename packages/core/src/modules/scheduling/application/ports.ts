@@ -1,3 +1,4 @@
+import type { EntityManager } from '@mikro-orm/postgresql';
 import type { Temporal } from 'temporal-polyfill';
 import type { BookingId, MentorId, Money, StudentId } from '../../../shared/domain/index.ts';
 import { err, ok, type Result } from '../../../shared/domain/index.ts';
@@ -9,7 +10,7 @@ import type {
 } from '../domain/availability.entity.ts';
 import type { Booking, BookingType } from '../domain/booking.entity.ts';
 import type { SchedulingForbidden } from '../domain/booking.errors.ts';
-import type { BookingStatus } from '../domain/booking.state.ts';
+import type { BookingEvent, BookingStatus } from '../domain/booking.state.ts';
 import type { Interval } from '../domain/policies/slots-for.policy.ts';
 
 /** Port: mentor availability (MikroORM adapter in `infrastructure/`). */
@@ -120,10 +121,18 @@ export interface BookingRepository {
   findActiveHold(studentId: StudentId, now: Temporal.Instant): Promise<Booking | null>;
   /** Holds the student took since `since` — the hourly cap of Q18 counts these. */
   countHoldsSince(studentId: StudentId, since: Temporal.Instant): Promise<number>;
+  /** Q2: the pair's trial was `scheduled` (or went further) and has already ended by `now`. */
+  hasTrialTakenPlace(
+    studentId: StudentId,
+    mentorId: MentorId,
+    now: Temporal.Instant,
+  ): Promise<boolean>;
   /**
-   * One transaction: releases the student's current hold, expires stale overlapping holds and
-   * inserts the new one; the exclusion/unique constraints map to `InsertOutcome`. Nothing is
-   * committed when the insert fails, so a rejected hold never costs the student their old one.
+   * One transaction, serialised per student: releases the student's current hold, expires stale
+   * overlapping holds and inserts the new one; the exclusion/unique constraints map to
+   * `InsertOutcome` (a partial unique index keeps one `hold` per student even under a race, Q18).
+   * Nothing is committed when the insert fails, so a rejected hold never costs the student their
+   * old one.
    */
   createHold(booking: NewBooking): Promise<InsertOutcome>;
   /** The student's own active hold → `expired` via `hold_released`; `null` when not found. */
@@ -137,20 +146,9 @@ export interface BookingRepository {
   /** Job: every hold past `hold_expires_at` → `expired`; returns the affected rows. */
   expireStaleHolds(now: Temporal.Instant): Promise<Booking[]>;
   /**
-   * Applies one transition inside a transaction and returns the updated row; `null` when the row is
-   * not in any of `expected` (a racing command won). Used by checkout in step 11.
-   */
-  transition(input: {
-    readonly id: BookingId;
-    readonly expected: readonly BookingStatus[];
-    readonly to: BookingStatus;
-    /** Q14: set `accept_deadline_at` when a trial becomes `requested`. */
-    readonly acceptDeadlineAt?: Temporal.Instant;
-    readonly now: Temporal.Instant;
-  }): Promise<Booking | null>;
-  /**
-   * `checkout` in one transaction: flips the hold (only while it is still `hold` and unexpired),
-   * stores the goal and the deadline and publishes the booking events atomically (§4.6).
+   * `checkout` in one transaction: reserves the credit of a later session (F4 ledger), flips the
+   * hold (only while it is still `hold` and unexpired) to the status the state machine gives for
+   * `events`, stores the goal and the deadline and publishes the booking events atomically (§4.6).
    */
   completeCheckout(input: CheckoutTransition): Promise<CheckoutOutcome>;
 }
@@ -170,14 +168,19 @@ export type CreditReservationOutcome =
   | { readonly kind: 'ok' }
   | { readonly kind: 'insufficient_credit' };
 
-/** Port: reservation of credit for a later session. F3 adapter is unmetered (no balance yet). */
+/**
+ * Port: reservation of credit for a later session. It runs inside the checkout transaction (`em`),
+ * so the F4 ledger entry and the state change commit or roll back together (spec §4.5). F3 adapter
+ * is unmetered (no balance yet).
+ */
 export interface CreditReservation {
-  reserve(booking: Booking): Promise<CreditReservationOutcome>;
+  reserve(booking: Booking, em: EntityManager): Promise<CreditReservationOutcome>;
 }
 
 /** Result of the single `checkout` transaction (§4.4). */
 export type CheckoutOutcome =
   | { readonly kind: 'confirmed'; readonly booking: Booking }
+  | { readonly kind: 'insufficient_credit' }
   | { readonly kind: 'expired' }
   | { readonly kind: 'not_found' };
 
@@ -185,8 +188,13 @@ export type CheckoutOutcome =
 export interface CheckoutTransition {
   readonly bookingId: BookingId;
   readonly studentId: StudentId;
-  /** `requested` for a paid trial, `scheduled` for a later session (Q-B2). */
-  readonly to: BookingStatus;
+  /**
+   * Lifecycle events from `hold` (§4.3): `checkout_started` + `payment_succeeded` for a paid trial
+   * (→ `requested`), `confirmed_with_credit` for a later session (→ `scheduled`, Q-B2).
+   */
+  readonly events: readonly BookingEvent[];
+  /** A later session reserves its credit in the same transaction (`CreditReservation`). */
+  readonly reserveCredit: boolean;
   /** U2: the goal the student typed; required for a trial. */
   readonly goal: string | null;
   readonly acceptDeadlineAt: Temporal.Instant | null;

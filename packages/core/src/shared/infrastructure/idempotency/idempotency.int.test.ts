@@ -45,6 +45,14 @@ describe.skipIf(!dockerAvailable)(
       ).toEqual({ kind: 'body_mismatch' });
     });
 
+    it('rejects a completed key replayed with a different body (422 before replay)', async () => {
+      await store().claim({ userId: USER, key: 'key-2b', fingerprint: FINGERPRINT });
+      await store().complete({ userId: USER, key: 'key-2b', response: { bookingId: 'b3' } });
+      expect(
+        await store().claim({ userId: USER, key: 'key-2b', fingerprint: 'other' }),
+      ).toEqual({ kind: 'body_mismatch' });
+    });
+
     it('lets exactly one of N concurrent claims win, the rest are in flight (409)', async () => {
       const results = await Promise.all(
         Array.from({ length: 5 }, () =>

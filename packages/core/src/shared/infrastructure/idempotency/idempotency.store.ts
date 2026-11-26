@@ -75,10 +75,13 @@ export class MikroOrmIdempotencyStore implements IdempotencyStore {
     const row = rows[0];
     // Deleted between the insert and the select: treat as a fresh claim rather than guessing.
     if (row === undefined) return { kind: 'claimed' };
+    // The fingerprint is checked before the stored response: a finished key replayed with a
+    // different body is a client bug (422), never a replay of the first answer (§4.6).
+    if (row.fingerprint !== fingerprint) return { kind: 'body_mismatch' };
     if (row.response !== null && row.response !== undefined) {
       return { kind: 'replay', response: parseResponse(row.response) };
     }
-    return row.fingerprint === fingerprint ? { kind: 'in_flight' } : { kind: 'body_mismatch' };
+    return { kind: 'in_flight' };
   }
 
   async complete({ userId, key, response }: {

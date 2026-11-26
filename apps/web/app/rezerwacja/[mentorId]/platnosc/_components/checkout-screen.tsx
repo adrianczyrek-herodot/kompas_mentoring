@@ -20,8 +20,13 @@ import {
 } from '@kompas/ui';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useId, useState } from 'react';
-import { BookingApiError, checkout, releaseHold } from '../../_components/booking-api.ts';
+import { useEffect, useId, useRef, useState } from 'react';
+import {
+  BookingApiError,
+  checkout,
+  idempotencyKeys,
+  releaseHold,
+} from '../../_components/booking-api.ts';
 
 export interface CheckoutScreenProps {
   readonly mentorProfileId: string;
@@ -59,7 +64,14 @@ function CheckoutBody({ mentorProfileId, hold }: CheckoutScreenProps) {
   const trimmed = goal.trim();
   const tooShort = trimmed.length > 0 && trimmed.length < 20;
   const tooLong = trimmed.length > 500;
-  const canConfirm = trimmed.length >= 20 && trimmed.length <= 500 && secondsLeft > 0;
+  // Only a trial asks for the goal (U2); a later session confirms without one.
+  const goalReady = hold.type !== 'trial' || (trimmed.length >= 20 && trimmed.length <= 500);
+  const canConfirm = goalReady && secondsLeft > 0;
+  // One key per confirmation of this hold and goal: a double click replays, never double-books.
+  const checkoutKey = useRef(idempotencyKeys());
+  // Q2: sessions are 30 or 60 min — the length comes from the hold, not from its type.
+  const durationMinutes =
+    Date.parse(hold.endsAt) - Date.parse(hold.startsAt) <= 30 * 60_000 ? 30 : 60;
 
   useEffect(() => {
     const end = Date.parse(hold.expiresAt);
@@ -77,7 +89,8 @@ function CheckoutBody({ mentorProfileId, hold }: CheckoutScreenProps) {
     if (!canConfirm || submitting) return;
     setSubmitting(true);
     try {
-      const result = await checkout({ holdId: hold.id, goal: trimmed });
+      const input = { holdId: hold.id, goal: trimmed };
+      const result = await checkout(input, checkoutKey.current(input));
       if (result.kind === 'confirmed') {
         router.push(`/rezerwacja/potwierdzenie/${result.booking.id}`);
       } else {
@@ -115,7 +128,7 @@ function CheckoutBody({ mentorProfileId, hold }: CheckoutScreenProps) {
         startsAt={hold.startsAt}
         endsAt={hold.endsAt}
         timeZone={region}
-        durationMinutes={hold.type === 'trial' ? 30 : 60}
+        durationMinutes={durationMinutes}
         price={hold.price === null ? null : BigInt(hold.price)}
       />
       {hold.type === 'trial' ? (

@@ -86,6 +86,63 @@ test('U1 blocks an unverified student and offers the resend link (Q19)', async (
   await expect(page.getByRole('button', { name: 'Dalej' })).toHaveAttribute('aria-disabled', 'true');
 });
 
+test('U1 „Wyślij link ponownie” sends a new verification link and stays on U1 (GAP-05)', async ({
+  page,
+}) => {
+  const { email } = await signUpUserViaApi(page.request, { name: 'Ola', as: 'student' });
+  await page.goto(`/rezerwacja/${mentorProfileId()}`);
+
+  const sent = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/auth/send-verification-email') &&
+      response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: 'Wyślij link ponownie' }).click();
+  const response = await sent;
+  // Better Auth calls the `EmailVerificationSender` port for the signed-in student's address.
+  expect(response.status()).toBe(200);
+  expect(response.request().postDataJSON()).toMatchObject({
+    email,
+    callbackURL: '/weryfikacja-email',
+  });
+  await expect(page.getByText('Wysłaliśmy nowy link. Sprawdź skrzynkę.')).toBeVisible();
+  // Before the fix the button navigated to s10, which said „E-mail zweryfikowany”.
+  await expect(page).toHaveURL(new RegExp(`/rezerwacja/${mentorProfileId()}$`));
+});
+
+test('the 21st hold in an hour answers 429 with Retry-After (Q18)', async ({ page }) => {
+  await signUpVerifiedStudent(page);
+  const from = new Date().toISOString();
+  const to = new Date(Date.now() + 56 * 24 * 3600 * 1000).toISOString();
+  const availability = await page.request.get(
+    `/api/mentors/${mentorProfileId()}/availability?from=${from}&to=${to}&duration=30&type=trial`,
+  );
+  const { slots } = (await availability.json()) as { slots: { startsAt: string }[] };
+  const startsAt = slots[0]?.startsAt;
+  expect(startsAt).toBeDefined();
+
+  const takeHold = () =>
+    page.request.post('/api/bookings/holds', {
+      headers: { 'idempotency-key': crypto.randomUUID() },
+      data: { mentorProfileId: mentorProfileId(), startsAt, durationMinutes: 30, type: 'trial' },
+    });
+  // Each hold releases the previous one (Q18), so the same slot can be held 20 times in a row.
+  let lastHoldId = '';
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const held = await takeHold();
+    expect(held.status()).toBe(200);
+    lastHoldId = ((await held.json()) as { id: string }).id;
+  }
+  const limited = await takeHold();
+  expect(limited.status()).toBe(429);
+  expect(limited.headers()['retry-after']).toBe('3600');
+  expect(((await limited.json()) as { data?: { code?: string } }).data?.code).toBe(
+    'scheduling.hold_rate_limited',
+  );
+  // Leave the slot free for the next test of this project.
+  await page.request.delete(`/api/bookings/holds/${lastHoldId}`);
+});
+
 test('a guest sees the slots and „Dalej” leads through sign-in', async ({ page }) => {
   await page.goto(`/rezerwacja/${mentorProfileId()}`);
   await pickFirstSlot(page);

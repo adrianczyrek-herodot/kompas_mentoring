@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { type BookingEvent, type BookingStatus, transition } from './booking.state.ts';
+import {
+  type BookingEvent,
+  type BookingStatus,
+  sourcesOf,
+  transition,
+  transitionAll,
+} from './booking.state.ts';
 
 const STATUSES: BookingStatus[] = [
   'hold',
@@ -90,6 +96,23 @@ describe('booking state machine', () => {
 
   it.each(ALLOWED)('%s --%s--> %s', (from, event, to) => {
     expect(transition(from, event)._unsafeUnwrap()).toBe(to);
+  });
+
+  it('applies several events in a row and stops at the first invalid one', () => {
+    expect(
+      transitionAll('hold', ['checkout_started', 'payment_succeeded'])._unsafeUnwrap(),
+    ).toBe('requested');
+    expect(transitionAll('hold', ['confirmed_with_credit'])._unsafeUnwrap()).toBe('scheduled');
+    expect(transitionAll('expired', ['checkout_started'])._unsafeUnwrapErr()).toEqual({
+      code: 'booking.invalid_transition',
+      from: 'expired',
+      event: 'checkout_started',
+    });
+  });
+
+  it('lists the source statuses of an event for set-based writers', () => {
+    expect(sourcesOf('hold_expired')).toEqual({ from: ['hold', 'pending_payment'], to: 'expired' });
+    expect(sourcesOf('hold_released')).toEqual({ from: ['hold'], to: 'expired' });
   });
 
   it('rejects every transition missing from the table', () => {

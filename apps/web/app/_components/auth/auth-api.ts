@@ -38,6 +38,27 @@ const failureOf = async (response: Response): Promise<AuthFailure | null> => {
   return FAILURES[body.code ?? ''] ?? 'unexpected';
 };
 
+/** The IANA zone of the browser, or `undefined` when the runtime cannot tell. */
+export const browserTimeZone = (): string | undefined =>
+  Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+
+/** Q12: stores the user's zone (`identity.user.time_zone`) through Better Auth's `update-user`. */
+export const saveTimeZone = async (timeZone: string): Promise<void> => {
+  await post('/update-user', { timeZone });
+};
+
+/**
+ * U1/GAP-05 „Wyślij link ponownie”: a new verification link to the signed-in user's address,
+ * returning to s10 like the link from sign-up.
+ */
+export const resendVerificationLink = async (email: string): Promise<boolean> => {
+  const response = await post('/send-verification-email', {
+    email,
+    callbackURL: VERIFICATION_CALLBACK_PATH,
+  });
+  return response.ok;
+};
+
 /** Any Better Auth endpoint called from the browser (rate limit and origin check apply). */
 export const callAuthApi = async (path: string, body: object = {}): Promise<AuthFailure | null> =>
   failureOf(await post(path, body));
@@ -62,6 +83,8 @@ export const signUpWithEmail = async (credentials: Credentials): Promise<AuthFai
       terms: credentials.terms,
       privacy: credentials.terms,
       marketing: credentials.marketing,
+      // Q12: the user's zone starts as the browser's; U1 fills it in for older accounts.
+      timeZone: browserTimeZone(),
       // The verification link returns to s10 (success or `?error=…`), spec [s10].
       callbackURL: VERIFICATION_CALLBACK_PATH,
     }),

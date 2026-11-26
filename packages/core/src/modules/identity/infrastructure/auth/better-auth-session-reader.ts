@@ -9,6 +9,19 @@ const parseRoles = (raw: unknown): Role[] =>
 
 const toInstant = (date: Date) => Temporal.Instant.fromEpochMilliseconds(date.getTime());
 
+/**
+ * Q12: the browser writes `timeZone` through Better Auth (`input: true`), so the value is client
+ * input — anything that is not an IANA zone reads as "unknown" instead of breaking date formatting.
+ */
+const parseTimeZone = (raw: unknown): string | null => {
+  if (typeof raw !== 'string' || raw.length === 0 || raw.length > 64) return null;
+  try {
+    return new Intl.DateTimeFormat('en', { timeZone: raw }).resolvedOptions().timeZone;
+  } catch {
+    return null;
+  }
+};
+
 export class BetterAuthSessionReader implements SessionReader {
   readonly #auth: Auth;
 
@@ -28,7 +41,7 @@ export class BetterAuthSessionReader implements SessionReader {
         emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled === true,
         roles: parseRoles(user.roles),
-        timeZone: typeof user.timeZone === 'string' && user.timeZone.length > 0 ? user.timeZone : null,
+        timeZone: parseTimeZone(user.timeZone),
       },
       createdAt: toInstant(session.createdAt),
       expiresAt: toInstant(session.expiresAt),

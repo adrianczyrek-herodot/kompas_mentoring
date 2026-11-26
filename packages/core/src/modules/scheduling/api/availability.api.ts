@@ -88,6 +88,8 @@ export const toSchedulingProblem = (error: BookingError): SchedulingProblem => {
       return { status: 404, code: error.code };
     case 'scheduling.version_conflict':
     case 'scheduling.slot_taken':
+    case 'scheduling.slot_unavailable':
+    case 'scheduling.trial_required':
     case 'scheduling.student_busy':
     case 'scheduling.trial_already_used':
     case 'scheduling.hold_expired':

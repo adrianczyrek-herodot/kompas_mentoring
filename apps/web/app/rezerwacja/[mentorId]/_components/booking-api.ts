@@ -27,6 +27,8 @@ export interface BookingView {
   readonly price: { readonly amountMinorUnits: number; readonly currency: 'PLN' } | null;
   readonly paymentMode: string | null;
   readonly acceptDeadlineAt: string | null;
+  /** U2 countdown: the end of the 10-minute hold; `null` once the booking is confirmed. */
+  readonly holdExpiresAt: string | null;
   readonly rescheduleCount: number;
 }
 
@@ -81,18 +83,34 @@ export const fetchAvailability = async (input: {
   return (await response.json()) as AvailabilityView;
 };
 
+/**
+ * One Idempotency-Key per user action (§4.6): the same request body keeps its key, so a retry or a
+ * double click of the same action replays the first answer; a different body gets a new key.
+ */
+export const idempotencyKeys = () => {
+  let last: { readonly body: string; readonly key: string } | null = null;
+  return (body: object): string => {
+    const serialized = JSON.stringify(body);
+    if (last?.body !== serialized) last = { body: serialized, key: crypto.randomUUID() };
+    return last.key;
+  };
+};
+
 /** U1 „Dalej”: takes the hold with an Idempotency-Key so a retry returns the same hold (§4.6). */
-export const createHold = async (input: {
-  mentorProfileId: string;
-  startsAt: string;
-  durationMinutes: 30 | 60;
-  type: 'trial' | 'plan';
-}): Promise<BookingView> => {
+export const createHold = async (
+  input: {
+    mentorProfileId: string;
+    startsAt: string;
+    durationMinutes: 30 | 60;
+    type: 'trial' | 'plan';
+  },
+  idempotencyKey: string,
+): Promise<BookingView> => {
   const response = await fetch('/api/bookings/holds', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      'idempotency-key': crypto.randomUUID(),
+      'idempotency-key': idempotencyKey,
     },
     body: JSON.stringify(input),
   });
@@ -111,15 +129,18 @@ export type CheckoutView =
   | { readonly kind: 'payment_required'; readonly clientSecret: string };
 
 /** U2 „Potwierdź rezerwację”: confirms the hold. */
-export const checkout = async (input: {
-  holdId: string;
-  goal: string;
-}): Promise<CheckoutView> => {
+export const checkout = async (
+  input: {
+    holdId: string;
+    goal: string;
+  },
+  idempotencyKey: string,
+): Promise<CheckoutView> => {
   const response = await fetch('/api/checkout', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      'idempotency-key': crypto.randomUUID(),
+      'idempotency-key': idempotencyKey,
     },
     body: JSON.stringify(input),
   });
