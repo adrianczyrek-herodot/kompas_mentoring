@@ -1,4 +1,4 @@
-import type { Temporal } from 'temporal-polyfill';
+import { Temporal } from 'temporal-polyfill';
 import {
   BookingId,
   type Clock,
@@ -16,6 +16,8 @@ import type { BookingError } from '../domain/booking.errors.ts';
 import { TRIAL_PRICE } from '../domain/policies/config.ts';
 import { goalProblem } from '../domain/policies/goal.policy.ts';
 import { holdExpiresAt, holdLimitReached, HOLD_WINDOW } from '../domain/policies/hold.policy.ts';
+import { slotsFor } from '../domain/policies/slots-for.policy.ts';
+import { loadSlotEngine } from './get-mentor-availability.query.ts';
 import type {
   AvailabilityRepository,
   BookingRepository,
@@ -53,9 +55,26 @@ const priceFor = (
 };
 
 /**
+ * U1 shows what `slotsFor` offers; the hold accepts nothing else — the same engine checks the
+ * template and exceptions, the notice (Q9), the 8-week horizon (Q10), the grid and the past.
+ * Other bookings are left to the exclusion constraints, so a race still reads `slot_taken`.
+ */
+const isOffered = (
+  engine: Awaited<ReturnType<typeof loadSlotEngine>>,
+  startsAt: Temporal.Instant,
+  durationMinutes: number,
+): boolean => {
+  const duration = Temporal.Duration.from({ minutes: durationMinutes });
+  return slotsFor({ ...engine, range: { from: startsAt, to: startsAt.add(duration) }, duration }).some(
+    (slot) => slot.equals(startsAt),
+  );
+};
+
+/**
  * U1/requirement 4: takes a 10-minute hold on a slot (spec §4.4). Checks the caller (student, its
  * e-mail verified), the mentor mirror (bookable, `accepting_new` for a trial), the goal of a trial,
- * the hourly hold cap and then lets the database's exclusion/unique constraints decide the race.
+ * the hourly hold cap, Q2 for a later session and the slot itself (`slotsFor`), and then lets the
+ * database's exclusion/unique constraints decide the race.
  */
 export const makeCreateHold =
   (deps: Deps) =>
@@ -86,17 +105,31 @@ export const makeCreateHold =
       return err({ code: 'scheduling.hold_rate_limited', retryAfterSeconds: 3_600 });
     }
 
+    const studentId = StudentId.parse(actor.id);
+    // Q2: a later session only for a pair whose trial was `scheduled` and already took place.
+    if (
+      input.type === 'plan' &&
+      !(await deps.bookingRepository.hasTrialTakenPlace(studentId, mentor.mentorId, now))
+    ) {
+      return err({ code: 'scheduling.trial_required' });
+    }
+
     const durationMinutes = input.type === 'trial' ? 30 : input.durationMinutes;
-    const schedule = await deps.availabilityRepository.findSchedule(mentor.mentorId);
+    const endsAt = input.startsAt.add({ minutes: durationMinutes });
+    const engine = await loadSlotEngine(deps, mentor.mentorId, input.type, now);
+    if (!isOffered(engine, input.startsAt, durationMinutes)) {
+      return err({ code: 'scheduling.slot_unavailable' });
+    }
+
     const result = await deps.bookingRepository.createHold({
       id: newId(BookingId),
       mentorId: mentor.mentorId,
-      studentId: StudentId.parse(actor.id),
+      studentId,
       type: input.type,
       status: 'hold',
       startsAt: input.startsAt,
-      endsAt: input.startsAt.add({ minutes: durationMinutes }),
-      bufferMinutes: schedule?.bufferMinutes ?? 0,
+      endsAt,
+      bufferMinutes: engine.settings.buffer.total({ unit: 'minute' }),
       holdExpiresAt: holdExpiresAt(now),
       goal: goal.length > 0 ? goal : null,
       price: priceFor(input.type, durationMinutes, mentor.rate60),

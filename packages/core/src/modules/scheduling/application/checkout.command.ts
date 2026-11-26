@@ -7,7 +7,7 @@ import type { Booking } from '../domain/booking.entity.ts';
 import type { BookingError } from '../domain/booking.errors.ts';
 import { autoAcceptDeadline } from '../domain/policies/auto-accept-deadline.policy.ts';
 import { goalProblem } from '../domain/policies/goal.policy.ts';
-import type { BookingRepository, CreditReservation, PaymentGate } from './ports.ts';
+import type { BookingRepository, PaymentGate } from './ports.ts';
 import { requirePermission } from './ports.ts';
 
 /** `POST /checkout` (U2): the hold and, for a trial, the goal the student typed. */
@@ -25,14 +25,14 @@ type Deps = {
   clock: Clock;
   bookingRepository: BookingRepository;
   paymentGate: PaymentGate;
-  creditReservation: CreditReservation;
 };
 
 /**
  * Confirms a held slot (Q-B2/A8): a trial goes `hold → pending_payment → requested` through the
  * `PaymentGate` (the F3 adapter pays at once), a later session `hold → scheduled` through the
- * `CreditReservation`. The state change and its event live in one transaction, so a rollback leaves
- * neither a booking nor a job behind (spec §4.6).
+ * `CreditReservation` the repository calls in its transaction. The state change, the credit and
+ * the event live in one transaction, so a rollback leaves neither a booking nor a job behind
+ * (spec §4.6).
  */
 export const makeCheckout =
   (deps: Deps) =>
@@ -63,10 +63,12 @@ export const makeCheckout =
         return ok({ kind: 'payment_required', clientSecret: payment.clientSecret });
       }
       const acceptDeadlineAt = autoAcceptDeadline(hold.createdAt, hold.startsAt);
+      // F3: `NoPaymentGate` paid at once, so both steps of §4.3 happen in one transaction.
       const outcome = await deps.bookingRepository.completeCheckout({
         bookingId: hold.id,
         studentId,
-        to: 'requested',
+        events: ['checkout_started', 'payment_succeeded'],
+        reserveCredit: false,
         goal,
         acceptDeadlineAt,
         now,
@@ -74,15 +76,13 @@ export const makeCheckout =
       return confirmed(outcome);
     }
 
-    const reservation = await deps.creditReservation.reserve(hold);
-    if (reservation.kind === 'insufficient_credit') {
-      return err({ code: 'scheduling.insufficient_credit' });
-    }
+    // The credit is reserved by `CreditReservation` inside the checkout transaction (spec §4.5).
     const trimmedGoal = input.goal?.trim() ?? null;
     const outcome = await deps.bookingRepository.completeCheckout({
       bookingId: hold.id,
       studentId,
-      to: 'scheduled',
+      events: ['confirmed_with_credit'],
+      reserveCredit: true,
       goal: trimmedGoal === '' ? null : trimmedGoal,
       acceptDeadlineAt: null,
       now,
@@ -93,9 +93,16 @@ export const makeCheckout =
 const confirmed = (
   outcome: Awaited<ReturnType<BookingRepository['completeCheckout']>>,
 ): Result<CheckoutResult, BookingError> => {
-  if (outcome.kind === 'confirmed') return ok({ kind: 'confirmed', booking: outcome.booking });
-  if (outcome.kind === 'expired') return err({ code: 'scheduling.hold_expired' });
-  return err({ code: 'scheduling.not_found' });
+  switch (outcome.kind) {
+    case 'confirmed':
+      return ok({ kind: 'confirmed', booking: outcome.booking });
+    case 'insufficient_credit':
+      return err({ code: 'scheduling.insufficient_credit' });
+    case 'expired':
+      return err({ code: 'scheduling.hold_expired' });
+    case 'not_found':
+      return err({ code: 'scheduling.not_found' });
+  }
 };
 
 export type Checkout = ReturnType<typeof makeCheckout>;

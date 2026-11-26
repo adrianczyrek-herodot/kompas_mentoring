@@ -2,7 +2,8 @@ import { FakeClock } from '@kompas/testing';
 import { PgBoss } from 'pg-boss';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createRequestScope } from '../../../container.ts';
-import { MentorId } from '../../../shared/domain/index.ts';
+import { asValue } from 'awilix';
+import { BookingId, MentorId, newId, StudentId } from '../../../shared/domain/index.ts';
 import type { OutboxEvent } from '../../../shared/infrastructure/events/outbox.ts';
 import { queueFor } from '../../../shared/infrastructure/events/subscriptions.ts';
 import { dockerAvailable, integrationSuite } from '../../../shared/infrastructure/db/test-database.ts';
@@ -11,8 +12,11 @@ import {
   BOOKING_NOW,
   type BookingEnv,
   mondayMentor,
+  pastTrial,
   SLOT_0900,
+  SLOT_1000,
   startBookingEnv,
+  TRIAL_NOW,
 } from './booking.int-support.ts';
 
 const GOAL = 'Chcę przygotować się do rozmowy rekrutacyjnej na stanowisko senior.';
@@ -73,7 +77,8 @@ describe.skipIf(!dockerAvailable)(
     });
 
     beforeEach(async () => {
-      clock.set(BOOKING_NOW);
+      // A day ahead of the Monday slots: a trial clears its 6 h notice (Q9).
+      clock.set(TRIAL_NOW);
       baseline = {};
       for (const event of EVENTS) baseline[event] = (await jobs(event)).length;
     });
@@ -115,12 +120,15 @@ describe.skipIf(!dockerAvailable)(
         updatedAt: BOOKING_NOW,
       });
       const student = await studentUser(env.container);
+      await pastTrial(env.container, { mentorId: mentor.id, studentId: student.id });
       const created = (await hold(student, profileId))._unsafeUnwrap();
 
       const result = (await scope().cradle.checkout(student, { holdId: created.id, goal: null }))._unsafeUnwrap();
       if (result.kind !== 'confirmed') throw new Error('unreachable');
       expect(result.booking.status).toBe('scheduled');
       expect(result.booking.price?.amount).toBe(12_000n);
+      // A confirmed booking is no longer a hold: its deadline is cleared.
+      expect(result.booking.holdExpiresAt).toBeNull();
 
       const confirmed = await newJobs('scheduling.booking_confirmed.v1');
       expect(confirmed).toHaveLength(1);
@@ -141,7 +149,83 @@ describe.skipIf(!dockerAvailable)(
       expect(result._unsafeUnwrapErr()).toEqual({ code: 'scheduling.hold_expired' });
       expect((await scope().cradle.bookingRepository.findById(created.id))?.status).toBe('expired');
       expect(await newJobs('scheduling.booking_requested.v1')).toHaveLength(0);
-      expect(await newJobs('scheduling.booking_expired.v1')).toHaveLength(1);
+      const expired = await newJobs('scheduling.booking_expired.v1');
+      expect(expired).toHaveLength(1);
+      // The status before the change, not the `expired` it became (F4 refunds by it).
+      expect(expired[0]?.data.payload).toEqual({ bookingId: created.id, fromStatus: 'hold' });
+    });
+
+    it('publishes booking_expired for the hold a new hold releases (Q18)', async () => {
+      const { profileId } = await mondayMentor(env.container);
+      const student = await studentUser(env.container);
+      const first = (await hold(student, profileId, { type: 'trial' }))._unsafeUnwrap();
+      expect(
+        (
+          await scope().cradle.createHold(student, {
+            mentorProfileId: profileId,
+            startsAt: SLOT_1000,
+            durationMinutes: 30,
+            type: 'trial',
+            goal: null,
+          })
+        ).isOk(),
+      ).toBe(true);
+      expect(
+        (await newJobs('scheduling.booking_expired.v1')).map((job) => job.data.payload),
+      ).toEqual([{ bookingId: first.id, fromStatus: 'hold' }]);
+    });
+
+    it('expires a stale pending_payment with fromStatus pending_payment (job)', async () => {
+      const { mentor } = await mondayMentor(env.container);
+      const student = await studentUser(env.container);
+      const id = newId(BookingId);
+      await scope().cradle.bookingRepository.createHold({
+        id,
+        mentorId: MentorId.parse(mentor.id),
+        studentId: StudentId.parse(student.id),
+        type: 'trial',
+        status: 'pending_payment',
+        startsAt: SLOT_0900,
+        endsAt: SLOT_0900.add({ minutes: 30 }),
+        bufferMinutes: 0,
+        holdExpiresAt: TRIAL_NOW.add({ minutes: 10 }),
+        goal: GOAL,
+        price: null,
+        acceptDeadlineAt: null,
+        now: TRIAL_NOW,
+      });
+      clock.advance({ minutes: 11 });
+      await scope().cradle.expireHolds();
+      expect((await scope().cradle.bookingRepository.findById(id))?.status).toBe('expired');
+      // The job also sweeps holds earlier tests left behind; only this booking matters here.
+      expect(
+        (await newJobs('scheduling.booking_expired.v1'))
+          .map((job) => job.data.payload)
+          .filter((payload) => (payload as { bookingId: string }).bookingId === id),
+      ).toEqual([{ bookingId: id, fromStatus: 'pending_payment' }]);
+    });
+
+    it('reserves the credit inside the checkout transaction and rolls back on insufficient credit', async () => {
+      const { mentor, profileId } = await mondayMentor(env.container);
+      const student = await studentUser(env.container);
+      await pastTrial(env.container, { mentorId: mentor.id, studentId: student.id });
+      const created = (await hold(student, profileId))._unsafeUnwrap();
+
+      const calls: { bookingId: string; inTransaction: boolean }[] = [];
+      const checkoutScope = scope();
+      checkoutScope.register({
+        creditReservation: asValue({
+          reserve: (booking: { id: string }, em: { isInTransaction(): boolean }) => {
+            calls.push({ bookingId: booking.id, inTransaction: em.isInTransaction() });
+            return Promise.resolve({ kind: 'insufficient_credit' as const });
+          },
+        }),
+      });
+      const result = await checkoutScope.cradle.checkout(student, { holdId: created.id, goal: null });
+      expect(result._unsafeUnwrapErr()).toEqual({ code: 'scheduling.insufficient_credit' });
+      expect(calls).toEqual([{ bookingId: created.id, inTransaction: true }]);
+      expect((await scope().cradle.bookingRepository.findById(created.id))?.status).toBe('hold');
+      expect(await newJobs('scheduling.booking_confirmed.v1')).toHaveLength(0);
     });
 
     it('rejects a goal outside 20–500 characters and a foreign hold without publishing', async () => {

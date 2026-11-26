@@ -72,6 +72,7 @@ import { schedulingRecords } from './infrastructure/scheduling.records.ts';
 import { Migration20261123000000SchedulingAvailability } from './migrations/Migration20261123000000SchedulingAvailability.ts';
 import { Migration20261124000000SchedulingBookability } from './migrations/Migration20261124000000SchedulingBookability.ts';
 import { Migration20261126000000SchedulingBooking } from './migrations/Migration20261126000000SchedulingBooking.ts';
+import { Migration20261130000000SchedulingOneActiveHold } from './migrations/Migration20261130000000SchedulingOneActiveHold.ts';
 
 /** Picked up by the ORM configuration (explicit lists, no globbing). */
 export const schedulingEntities = [...schedulingRecords, MentorBookabilityRecord];
@@ -87,6 +88,10 @@ export const schedulingMigrations = [
   {
     name: 'Migration20261126000000SchedulingBooking',
     class: Migration20261126000000SchedulingBooking,
+  },
+  {
+    name: 'Migration20261130000000SchedulingOneActiveHold',
+    class: Migration20261130000000SchedulingOneActiveHold,
   },
 ];
 

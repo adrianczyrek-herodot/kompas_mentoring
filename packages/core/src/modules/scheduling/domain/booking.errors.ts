@@ -12,6 +12,8 @@ export type BookingError =
   | SchedulingForbidden
   | VersionConflict
   | SlotTaken
+  | SlotUnavailable
+  | TrialRequired
   | StudentBusy
   | TrialAlreadyUsed
   | HoldExpired
@@ -70,6 +72,15 @@ export type EmailNotVerified = DomainError<'scheduling.email_not_verified'>;
 
 /** Q2/U1: someone took the mentor's slot between rendering and `createHold` (→ 409). */
 export type SlotTaken = DomainError<'scheduling.slot_taken'>;
+
+/**
+ * U1: the chosen start is not a slot `slotsFor` offers — outside the mentor's availability, too
+ * soon (Q9 notice), beyond the 8-week horizon (Q10), in the past or off the grid (→ 409).
+ */
+type SlotUnavailable = DomainError<'scheduling.slot_unavailable'>;
+
+/** Q2: a later session needs a trial of the pair that was `scheduled` and already took place (→ 409). */
+type TrialRequired = DomainError<'scheduling.trial_required'>;
 
 /** C3/U1: the student already has a session at that time, with any mentor (→ 409). */
 export type StudentBusy = DomainError<'scheduling.student_busy'>;

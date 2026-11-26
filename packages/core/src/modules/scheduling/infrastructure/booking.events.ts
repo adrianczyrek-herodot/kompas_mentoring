@@ -3,6 +3,7 @@ import { v7 as uuidv7 } from 'uuid';
 import { money } from '../../../shared/domain/index.ts';
 import type { OutboxEvent } from '../../../shared/infrastructure/events/outbox.ts';
 import type { Booking } from '../domain/booking.entity.ts';
+import type { BookingStatus } from '../domain/booking.state.ts';
 
 // Outbox events of the booking lifecycle (spec §4.7); infrastructure builds them so the payload
 // stays next to the writer that publishes it. The contract schemas in `@kompas/contracts/events`
@@ -51,10 +52,18 @@ export const bookingConfirmedEvent = (
   },
 });
 
-/** scheduling → billing (F4): a hold was released or expired without becoming a request. */
-export const bookingExpiredEvent = (booking: Booking, now: Temporal.Instant): OutboxEvent => ({
+/**
+ * scheduling → billing (F4): a hold was released or expired without becoming a request.
+ * `fromStatus` is the status before the change (`hold` or `pending_payment`) — F4 refunds only a
+ * `pending_payment` — so it is passed in, never read from the already-expired row.
+ */
+export const bookingExpiredEvent = (
+  booking: Booking,
+  fromStatus: BookingStatus,
+  now: Temporal.Instant,
+): OutboxEvent => ({
   eventId: uuidv7(),
   name: 'scheduling.booking_expired.v1',
   occurredAt: now.toString(),
-  payload: { bookingId: booking.id, fromStatus: booking.status },
+  payload: { bookingId: booking.id, fromStatus },
 });

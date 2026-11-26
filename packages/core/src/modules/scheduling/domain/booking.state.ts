@@ -96,3 +96,37 @@ export const transition = (
   const to = allowed[event];
   return to === undefined ? err({ code: 'booking.invalid_transition', from, event }) : ok(to);
 };
+
+/** Several events in a row, e.g. `checkout_started` + `payment_succeeded` in one F3 checkout. */
+export const transitionAll = (
+  from: BookingStatus,
+  events: readonly BookingEvent[],
+): Result<BookingStatus, InvalidBookingTransition> =>
+  events.reduce<Result<BookingStatus, InvalidBookingTransition>>(
+    (current, event) => current.andThen((status) => transition(status, event)),
+    ok(from),
+  );
+
+/**
+ * Every status `event` may leave, with the status it leads to — for set-based writers (a job
+ * expiring all stale holds) that still have to follow the table instead of hard-coding states.
+ */
+export const sourcesOf = (
+  event: BookingEvent,
+): { readonly from: readonly BookingStatus[]; readonly to: BookingStatus } => {
+  const from: BookingStatus[] = [];
+  const targets = new Set<BookingStatus>();
+  for (const status of Object.keys(transitions) as BookingStatus[]) {
+    const allowed: Partial<Record<BookingEvent, BookingStatus>> = transitions[status];
+    const to = allowed[event];
+    if (to !== undefined) {
+      from.push(status);
+      targets.add(to);
+    }
+  }
+  const [to, ...rest] = [...targets];
+  if (to === undefined || rest.length > 0) {
+    throw new Error(`Event ${event} must lead to exactly one status, got ${[...targets].join(', ')}`);
+  }
+  return { from, to };
+};

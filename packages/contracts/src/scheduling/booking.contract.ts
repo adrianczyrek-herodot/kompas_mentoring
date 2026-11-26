@@ -45,6 +45,8 @@ export const BookingView = z.object({
   paymentMode: BookingPaymentModeView.nullable(),
   /** Q14: the mentor's answer deadline of a trial request. */
   acceptDeadlineAt: z.iso.datetime({ offset: true }).nullable(),
+  /** Q18: end of the 10-minute hold (U2 countdown); `null` once the booking left `hold`. */
+  holdExpiresAt: z.iso.datetime({ offset: true }).nullable(),
   rescheduleCount: z.number().int(),
 });
 export type BookingView = z.infer<typeof BookingView>;
