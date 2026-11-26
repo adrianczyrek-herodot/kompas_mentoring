@@ -4,11 +4,17 @@ import {
   BookingApiError,
   createHold,
   fetchAvailability,
+  idempotencyKeys,
   type AvailabilityView,
 } from './booking-api.ts';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  browserTimeZone,
+  resendVerificationLink,
+  saveTimeZone,
+} from '../../../_components/auth/auth-api.ts';
 import { Temporal } from 'temporal-polyfill';
 import { firstSlotOf, horizonEnd, nextWeekWithSlots, toWeeks } from './week.ts';
 import {
@@ -32,11 +38,23 @@ export interface BookingScreenProps {
   readonly type: 'trial' | 'plan';
   readonly signedIn: boolean;
   readonly emailVerified: boolean;
+  /** The signed-in user's address: „Wyślij link ponownie” sends the new link there. */
+  readonly email?: string | undefined;
+  /** Q12: the zone stored on the account; `null` until the browser has written it once. */
+  readonly userTimeZone?: string | null | undefined;
   /** U2 sent the student back because the hold expired („wygasla=1”). */
   readonly notice?: 'expired' | undefined;
 }
 
 const DEFAULT_ZONE = 'Europe/Warsaw';
+
+/** Domain codes of `POST /bookings/holds` that U1 explains with a toast (key in `Booking.u1`). */
+const HOLD_PROBLEMS: Record<string, 'notAcceptingNew' | 'trialRequired' | 'forbidden' | 'rateLimited'> = {
+  'scheduling.not_accepting_new': 'notAcceptingNew',
+  'scheduling.trial_required': 'trialRequired',
+  'scheduling.forbidden': 'forbidden',
+  'scheduling.hold_rate_limited': 'rateLimited',
+};
 
 /** U1 `/rezerwacja/[mentorId]`: slots in the viewer's zone, a 10-minute hold and „Dalej”. */
 export function BookingScreen(props: BookingScreenProps) {
@@ -48,12 +66,20 @@ export function BookingScreen(props: BookingScreenProps) {
   );
 }
 
-function BookingBody({ mentorProfileId, type, signedIn, emailVerified, notice }: BookingScreenProps) {
+function BookingBody({
+  mentorProfileId,
+  type,
+  signedIn,
+  emailVerified,
+  email,
+  userTimeZone,
+  notice,
+}: BookingScreenProps) {
   const t = useTranslations('Booking');
   const router = useRouter();
   const toast = useToast();
   const durationId = useId();
-  const [timeZone, setTimeZone] = useState(DEFAULT_ZONE);
+  const [timeZone, setTimeZone] = useState(userTimeZone ?? DEFAULT_ZONE);
   const [duration, setDuration] = useState<30 | 60>(60);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [availability, setAvailability] = useState<AvailabilityView | null>(null);
@@ -62,11 +88,31 @@ function BookingBody({ mentorProfileId, type, signedIn, emailVerified, notice }:
   const [holding, setHolding] = useState(false);
   // Only a signed-in student without a verified address is blocked; a guest simply logs in later.
   const [blockedEmail, setBlockedEmail] = useState(signedIn && !emailVerified);
+  const [resending, setResending] = useState(false);
+  // One key per chosen slot: a retry of the same „Dalej” replays the same hold (§4.6).
+  const holdKey = useRef(idempotencyKeys());
 
   useEffect(() => {
-    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (zone) setTimeZone(zone);
-  }, []);
+    if (userTimeZone) return;
+    const zone = browserTimeZone();
+    if (zone === undefined) return;
+    setTimeZone(zone);
+    // Q12: an account without a stored zone takes the browser's, once.
+    if (signedIn) void saveTimeZone(zone).catch(() => undefined);
+  }, [signedIn, userTimeZone]);
+
+  const onResend = async () => {
+    if (email === undefined || resending) return;
+    setResending(true);
+    try {
+      const sent = await resendVerificationLink(email);
+      toast.add({ title: sent ? t('u1.resendSent') : t('u1.resendFailed') });
+    } catch {
+      toast.add({ title: t('u1.resendFailed') });
+    } finally {
+      setResending(false);
+    }
+  };
 
   const load = useCallback(async () => {
     setStatus('loading');
@@ -113,21 +159,32 @@ function BookingBody({ mentorProfileId, type, signedIn, emailVerified, notice }:
     if (selectedSlotId === undefined || holding) return;
     setHolding(true);
     try {
-      const hold = await createHold({
+      const input = {
         mentorProfileId,
         startsAt: selectedSlotId,
         durationMinutes: type === 'trial' ? 30 : duration,
         type,
-      });
+      } as const;
+      const hold = await createHold(input, holdKey.current(input));
       router.push(`/rezerwacja/${mentorProfileId}/platnosc?blokada=${hold.id}`);
     } catch (error) {
       const code = error instanceof BookingApiError ? error.code : 'unknown';
+      const problem = HOLD_PROBLEMS[code];
       if (code === 'scheduling.email_not_verified') {
         setBlockedEmail(true);
       } else if (code === 'scheduling.slot_taken' || code === 'scheduling.student_busy') {
         setSelectedSlotId(undefined);
         toast.add({ title: t('u1.slotTaken'), description: t('u1.slotTakenDescription') });
         await load();
+      } else if (code === 'scheduling.slot_unavailable') {
+        setSelectedSlotId(undefined);
+        toast.add({
+          title: t('u1.slotUnavailable'),
+          description: t('u1.slotUnavailableDescription'),
+        });
+        await load();
+      } else if (problem !== undefined) {
+        toast.add({ title: t(`u1.${problem}`) });
       } else {
         toast.add({ title: t('u1.holdFailed') });
       }
@@ -146,9 +203,15 @@ function BookingBody({ mentorProfileId, type, signedIn, emailVerified, notice }:
       ) : null}
       {blockedEmail ? (
         <EmailVerificationBanner
-          onResend={() => {
-            router.push('/weryfikacja-email');
-          }}
+          resending={resending}
+          {...(email === undefined
+            ? {}
+            : {
+                email,
+                onResend: () => {
+                  void onResend();
+                },
+              })}
         />
       ) : null}
       <MentorSummaryBar
